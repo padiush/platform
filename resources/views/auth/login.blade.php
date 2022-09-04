@@ -1,56 +1,55 @@
+@php
+$url = Storage::disk('s3')->temporaryUrl('public/bg.jpg', now()->addMinutes(5));
+@endphp
+
 <x-guest-layout>
-    <x-auth-card>
-        <x-slot name="logo">
-            <a href="/">
-                <x-application-logo class="w-20 h-20 fill-current text-gray-500" />
-            </a>
-        </x-slot>
-
-        <!-- Session Status -->
-        <x-auth-session-status class="mb-4" :status="session('status')" />
-
-        <!-- Validation Errors -->
-        <x-auth-validation-errors class="mb-4" :errors="$errors" />
-
-        <form method="POST" action="{{ route('login') }}">
-            @csrf
-
-            <!-- Email Address -->
-            <div>
-                <x-label for="email" :value="__('Email')" />
-
-                <x-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus />
+    <section class="min-h-screen flex items-stretch text-base-content">
+        <div class="lg:flex w-1/2 hidden bg-base-100 bg-no-repeat bg-cover relative items-center" style="background-image: url({{ $url }});">
+            <div class="absolute bg-black opacity-60 inset-0 z-0"></div>
+            <div class="w-full px-24 z-10">
+                <h1 class="text-5xl font-bold text-left tracking-wide">Padiush</h1>
+                <p class="text-3xl my-4">Sistema bioinformático que facilita la recolección y análisis de datos etnobotánicos</p>
             </div>
-
-            <!-- Password -->
-            <div class="mt-4">
-                <x-label for="password" :value="__('Password')" />
-
-                <x-input id="password" class="block mt-1 w-full"
-                                type="password"
-                                name="password"
-                                required autocomplete="current-password" />
+        </div>
+        <div class="lg:w-1/2 w-full flex items-center justify-center text-center md:px-16 px-0 z-0 bg-base-100">
+            <div class="absolute lg:hidden z-10 inset-0 bg-black bg-no-repeat bg-cover items-center" style="background-image: url({{ $url }});">
+                <div class="absolute bg-base-100 opacity-60 inset-0 z-0"></div>
             </div>
-
-            <!-- Remember Me -->
-            <div class="block mt-4">
-                <label for="remember_me" class="inline-flex items-center">
-                    <input id="remember_me" type="checkbox" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" name="remember">
-                    <span class="ml-2 text-sm text-gray-600">{{ __('Remember me') }}</span>
-                </label>
-            </div>
-
-            <div class="flex items-center justify-end mt-4">
+            <div class="w-full py-6 z-20">
+                <div class="flex justify-center">
+                    <x-application-isotype class="w-48 pb-4"/>
+                </div>
+                <p class="text-base-content">
+                    Ingresa tus credenciales a continuación
+                </p>
+                <form method="POST" action="{{ route('login') }}" class="sm:w-2/3 w-full px-4 lg:px-0 mx-auto pt-4">
+                    @csrf
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text">Correo electrónico</span>
+                        </label>
+                        <input type="email" name="email" id="email" class="input input-bordered w-full">
+                    </div>
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text">Contraseña</span>
+                        </label>
+                        <input class="input input-bordered w-full" type="password" name="password" id="password">
+                    </div>
+                    <div class="form-control">
+                        <label class="label cursor-pointer">
+                            <span class="label-text">Mantener mi sesión activa en este navegador</span>
+                            <input id="remember_me" type="checkbox" class="checkbox checkbox-primary" name="remember">
+                        </label>
+                    </div>
+                    <div class="px-4 pb-2 pt-4">
+                        <button class="btn btn-primary">Iniciar sesión</button>
+                    </div>
+                </form>
                 @if (Route::has('password.request'))
-                    <a class="underline text-sm text-gray-600 hover:text-gray-900" href="{{ route('password.request') }}">
-                        {{ __('Forgot your password?') }}
-                    </a>
+                <a href="{{ route('password.request') }}" class="link link-hover text-sm">¿Olvidaste tu contraseña?</a>
                 @endif
-
-                <x-button class="ml-3">
-                    {{ __('Log in') }}
-                </x-button>
             </div>
-        </form>
-    </x-auth-card>
+        </div>
+    </section>
 </x-guest-layout>
