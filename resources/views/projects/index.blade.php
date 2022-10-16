@@ -6,9 +6,9 @@
         @foreach($projects as $project)
         <x-card title="{{ $project->name }}">
             @isset($project->author)
-            Por {{ $project->author }}.
+            Creado el {{ $project->created_at->format('d/m/Y') }} por {{ $project->user->name }}.
             @endisset
-            <a class="btn btn-primary">
+            <a class="btn btn-primary" href="{{ route('projects.edit', ['project' => $project]) }}">
                 Editar detalles
             </a>
         </x-card>
