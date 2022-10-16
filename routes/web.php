@@ -17,8 +17,8 @@ Route::controller(ProjectController::class)->group(function(){
     Route::get('/projects/create', 'create')->middleware(['auth'])->name('projects.create');
     Route::post('/projects/create', 'store')->middleware(['auth']);
 
-    Route::get('/projects/{project}/update', 'update')->middleware(['auth'])->name('projects.update');
-    Route::post('/projects/{project}/update', 'update')->middleware(['auth']);
+    Route::get('/projects/{project}/edit', 'edit')->middleware(['auth'])->name('projects.edit');
+    Route::post('/projects/{project}/edit', 'update')->middleware(['auth']);
 });
 
 require __DIR__.'/auth.php';

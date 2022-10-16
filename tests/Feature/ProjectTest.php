@@ -82,4 +82,59 @@ class ProjectTest extends TestCase
             'shared' => false,
         ]);
     }
+
+    public function test_projects_edit_can_be_rendered()
+    {
+        $user = User::factory()->create();
+
+        $project = Project::factory()->create(['user_id' => $user->id]);
+
+        $response = $this->actingAs($user)->get(route('projects.edit', $project));
+
+        $response->assertStatus(200);
+        $response->assertSee($project->name);
+    }
+
+    public function test_projects_edit_cannot_be_rendered_for_others_projects()
+    {
+        $user = User::factory()->create();
+        $anotherUser = User::factory()->create();
+
+        $project = Project::factory()->create([
+            'user_id' => $anotherUser->id,
+        ]);
+
+        $response = $this->actingAs($user)->get(route('projects.edit', $project));
+
+        $response->assertRedirect(route('projects.index'));
+        $response->assertSessionHas('error', 'No tienes permiso para editar este proyecto.');
+    }
+
+    public function test_projects_can_be_updated(){
+        $user = User::factory()->create();
+
+        $project = Project::factory()->create(['user_id' => $user->id]);
+
+        $response = $this->actingAs($user)->post(route('projects.edit', $project), [
+            'name' => 'Proyecto de prueba',
+            'author' => 'Autor de prueba',
+            'institution' => 'Institución de prueba',
+            'author_email' => 'testing@avalontechsv.dev',
+            'country' => 'El Salvador',
+        ]);
+
+        $response->assertRedirect(route('projects.index'));
+        $response->assertSessionHas('success', 'Se ha actualizado el proyecto exitosamente.');
+        $this->assertDatabaseHas('projects', [
+            'user_id' => $user->id,
+            'name' => 'Proyecto de prueba',
+            'author' => 'Autor de prueba',
+            'institution' => 'Institución de prueba',
+            'author_email' => 'testing@avalontechsv.dev',
+            'country' => 'El Salvador',
+            'finished' => false,
+            'published' => false,
+            'shared' => false,
+        ]);
+    }
 }
