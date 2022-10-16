@@ -5,11 +5,7 @@
         </h2>
     </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <x-card>
-                 ¡Te damos la bienvenida a Padiush!
-            </x-card>
-        </div>
-    </div>
+    <x-card>
+        ¡Te damos la bienvenida a Padiush!
+    </x-card>
 </x-app-layout>
