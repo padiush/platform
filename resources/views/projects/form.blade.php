@@ -1,4 +1,10 @@
 <x-app-layout>
+    <x-slot name="action">
+        <a class="btn btn-ghost btn-circle" href="{{ route('projects.index') }}">
+            <i class="fa-solid fa-arrow-left"></i>
+        </a>
+    </x-slot>
+
     <x-slot name="header">@isset($project) Editar detalles del proyecto @else Crear proyecto @endisset</x-slot>
 
     <x-card title="Detalles del proyecto">

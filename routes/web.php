@@ -19,6 +19,9 @@ Route::controller(ProjectController::class)->group(function(){
 
     Route::get('/projects/{project}/edit', 'edit')->middleware(['auth'])->name('projects.edit');
     Route::post('/projects/{project}/edit', 'update')->middleware(['auth']);
+
+    Route::get('/projects/{project}/accesses', 'manageAccess')->middleware(['auth'])->name('projects.accesses');
+    Route::delete('/projects/{project}/accesses/{user}/revoke', 'revokeAccess')->middleware(['auth'])->name('projects.accesses.revoke');
 });
 
 require __DIR__.'/auth.php';

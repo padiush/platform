@@ -8,8 +8,11 @@
             @isset($project->author)
             Creado el {{ $project->created_at->format('d/m/Y') }} por {{ $project->user->name }}.
             @endisset
-            <a class="btn btn-primary" href="{{ route('projects.edit', ['project' => $project]) }}">
+            <a class="btn btn-primary btn-sm" href="{{ route('projects.edit', ['project' => $project]) }}">
                 Editar detalles
+            </a>
+            <a class="btn btn-primary btn-sm" href="{{ route('projects.accesses', ['project' => $project]) }}">
+                Administrar acceso
             </a>
         </x-card>
         @endforeach
