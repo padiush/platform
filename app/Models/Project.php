@@ -32,4 +32,25 @@ class Project extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function accesses()
+    {
+        return $this->hasMany(ProjectAccess::class);
+    }
+
+    public function capabilities()
+    {
+        return $this->hasMany(ProjectCapability::class);
+    }
+
+    public function users()
+    {
+        $users = collect();
+
+        foreach($this->accesses as $access){
+            $users->push($access->user);
+        }
+
+        return $users;
+    }
 }

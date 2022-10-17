@@ -14,4 +14,6 @@ abstract class TestCase extends BaseTestCase
 
         $this->withoutVite();
     }
+
+    protected $seed = true;
 }
