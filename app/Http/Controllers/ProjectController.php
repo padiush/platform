@@ -119,8 +119,9 @@ class ProjectController extends Controller
         }
 
         $users = $project->users();
+        $invites = $project->invites;
 
-        return view('projects.access', ['project' => $project, 'users' => $users, 'capabilities' => $capabilities]);
+        return view('projects.access', ['project' => $project, 'users' => $users, 'capabilities' => $capabilities, 'invites' => $invites]);
     }
 
     public function revokeAccess(Project $project, User $user)
@@ -199,5 +200,41 @@ class ProjectController extends Controller
         Notification::route('mail', $request->email)->notify(new InviteNotification($invite));
 
         return redirect()->route('projects.accesses', ['project' => $project])->with('success', 'Se ha enviado la invitación al proyecto exitosamente.');
+    }
+
+    public function projectInvites(Project $project){
+        $access = Auth::user()->hasAccessToProject($project);
+
+        if(!$access){
+            return redirect()->route('projects.index')->with('error', 'No tienes acceso a este proyecto.');
+        }
+
+        if(!$access->capability->manage_users){
+            return redirect()->route('projects.index')->with('error', 'No cuentas con los permisos necesarios para editar este proyecto.');
+        }
+
+        $invites = $project->invites;
+
+        if($invites->count() == 0){
+            return redirect()->route('projects.accesses', ['project' => $project])->with('error', 'No hay invitaciones pendientes para este proyecto.');
+        }
+
+        return view('projects.project-invites', ['project' => $project, 'invites' => $invites]);
+    }
+
+    public function revokeInvite(Project $project, ProjectInvite $invite){
+        $access = Auth::user()->hasAccessToProject($project);
+
+        if(!$access){
+            return redirect()->route('projects.index')->with('error', 'No tienes acceso a este proyecto.');
+        }
+
+        if(!$access->capability->manage_users){
+            return redirect()->route('projects.index')->with('error', 'No cuentas con los permisos necesarios para editar este proyecto.');
+        }
+
+        $invite->delete();
+
+        return redirect()->route('projects.accesses.invites', ['project' => $project])->with('success', 'Se ha revocado la invitación al proyecto exitosamente.');
     }
 }

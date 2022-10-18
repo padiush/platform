@@ -6,37 +6,45 @@
     </x-slot>
     <x-slot name="header">Acceso al proyecto</x-slot>
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 w-full">
-        <x-card title="Invitar usuario al proyecto">
-            <form action="{{ route('projects.accesses.invite', ['project' => $project]) }}" method="post">
-                @csrf
-                <div class="form-control w-full">
-                    <label class="label">
-                        <span class="label-text">Nombre</span>
-                    </label>
-                    <input type="name" class="input input-bordered w-full" name="name" />
-                </div>
-                <div class="form-control w-full">
-                    <label class="label">
-                        <span class="label-text">Correo electrónico</span>
-                    </label>
-                    <input type="email" class="input input-bordered w-full" name="email" />
-                </div>
-                <div class="form-control w-full">
-                    <label class="label">
-                        <span class="label-text">Permisos</span>
-                    </label>
-                    <select name="capability_id" class="select select-bordered w-full">
-                        <option value="0" selected disabled hidden>Selecciona un permiso</option>
-                        @foreach($capabilities as $capability)
-                        <option value="{{ $capability->id }}">{{ $capability->name }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <div class="mt-4 w-full">
-                    <button type="submit" class="btn btn-primary w-full">Invitar</button>
-                </div>
-            </form>
-        </x-card>
+        <div class="grid grid-cols-1 gap-4 w-full">
+            @if(count($invites) > 0)
+            <div class="indicator w-full">
+                <span class="indicator-item badge badge-secondary">{{ count($invites) }}</span>
+                <a href="{{ route('projects.accesses.invites', ['project' => $project]) }}" class="btn btn-primary w-full">Ver invitaciones pendientes</a>
+            </div>
+            @endif
+            <x-card title="Invitar usuario al proyecto">
+                <form action="{{ route('projects.accesses.invite', ['project' => $project]) }}" method="post">
+                    @csrf
+                    <div class="form-control w-full">
+                        <label class="label">
+                            <span class="label-text">Nombre</span>
+                        </label>
+                        <input type="name" class="input input-bordered w-full" name="name" />
+                    </div>
+                    <div class="form-control w-full">
+                        <label class="label">
+                            <span class="label-text">Correo electrónico</span>
+                        </label>
+                        <input type="email" class="input input-bordered w-full" name="email" />
+                    </div>
+                    <div class="form-control w-full">
+                        <label class="label">
+                            <span class="label-text">Permisos</span>
+                        </label>
+                        <select name="capability_id" class="select select-bordered w-full">
+                            <option value="0" selected disabled hidden>Selecciona un permiso</option>
+                            @foreach($capabilities as $capability)
+                            <option value="{{ $capability->id }}">{{ $capability->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="mt-4 w-full">
+                        <button type="submit" class="btn btn-primary w-full">Invitar</button>
+                    </div>
+                </form>
+            </x-card>
+        </div>
         <x-card class="lg:col-span-2" title="Usuarios con acceso al proyecto">
             @if(count($users) > 1)
             <table class="table table-compact w-full">

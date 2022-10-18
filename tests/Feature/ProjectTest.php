@@ -11,6 +11,7 @@ use App\Models\Project;
 use App\Models\User;
 use App\Models\ProjectAccess;
 use App\Models\ProjectCapability;
+use App\Models\ProjectInvite;
 
 class ProjectTest extends TestCase
 {
@@ -381,5 +382,60 @@ class ProjectTest extends TestCase
             'inviting_user_id' => $user->id,
             'project_capability_id' => ProjectCapability::where('manage_project', false)->first()->id,
         ]);
+    }
+
+    public function test_project_invitations_can_be_rendered_with_manage_users_capability(){
+        $user = User::factory()->create();
+
+        $project = Project::factory()->create();
+
+        $access = ProjectAccess::factory()->create([
+            'project_id' => $project->id,
+            'user_id' => $user->id,
+            'project_capability_id' => ProjectCapability::where('manage_users', true)->first()->id,
+        ]);
+
+        $invite = ProjectInvite::factory()->create([
+            'project_id' => $project->id,
+            'inviting_user_id' => $user->id,
+            'invited_user_id' => null,
+            'invited_name' => 'Usuario de prueba',
+            'invited_email' => 'testing@avalontechsv.dev',
+            'project_capability_id' => ProjectCapability::where('manage_project', false)->first()->id,
+            'expires_at' => now()->addDays(7),
+        ]);
+
+        $response = $this->actingAs($user)->get(route('projects.accesses.invites', $project));
+
+        $response->assertStatus(200);
+        $response->assertViewIs('projects.project-invites');
+    }
+
+    public function test_project_invitations_cannot_be_rendered_without_access(){
+        $user = User::factory()->create();
+
+        $project = Project::factory()->create();
+
+        $response = $this->actingAs($user)->get(route('projects.accesses.invites', $project));
+
+        $response->assertRedirect(route('projects.index'));
+        $response->assertSessionHas('error', 'No tienes acceso a este proyecto.');
+    }
+
+    public function test_project_invitations_cannot_be_rendered_without_manage_users_capability(){
+        $user = User::factory()->create();
+
+        $project = Project::factory()->create();
+
+        $access = ProjectAccess::factory()->create([
+            'project_id' => $project->id,
+            'user_id' => $user->id,
+            'project_capability_id' => ProjectCapability::where('manage_users', false)->first()->id,
+        ]);
+
+        $response = $this->actingAs($user)->get(route('projects.accesses.invites', $project));
+
+        $response->assertRedirect(route('projects.index'));
+        $response->assertSessionHas('error', 'No cuentas con los permisos necesarios para editar este proyecto.');
     }
 }
