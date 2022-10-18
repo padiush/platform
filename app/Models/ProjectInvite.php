@@ -42,8 +42,8 @@ class ProjectInvite extends Model
         return $this->belongsTo(User::class, 'invited_user_id');
     }
 
-    public function projectCapability()
+    public function capability()
     {
-        return $this->belongsTo(ProjectCapability::class);
+        return $this->belongsTo(ProjectCapability::class, 'project_capability_id');
     }
 }
