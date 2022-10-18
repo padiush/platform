@@ -7,8 +7,14 @@
     <x-slot name="header">Acceso al proyecto</x-slot>
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 w-full">
         <x-card title="Invitar usuario al proyecto">
-            <form action="#" method="post">
+            <form action="{{ route('projects.accesses.invite', ['project' => $project]) }}" method="post">
                 @csrf
+                <div class="form-control w-full">
+                    <label class="label">
+                        <span class="label-text">Nombre</span>
+                    </label>
+                    <input type="name" class="input input-bordered w-full" name="name" />
+                </div>
                 <div class="form-control w-full">
                     <label class="label">
                         <span class="label-text">Correo electrónico</span>

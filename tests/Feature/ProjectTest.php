@@ -275,4 +275,111 @@ class ProjectTest extends TestCase
             'project_capability_id' => ProjectCapability::where('manage_project', false)->first()->id,
         ]);
     }
+
+    public function test_registered_users_can_be_invited(){
+        $user = User::factory()->create();
+        $anotherUser = User::factory()->create(['email' => 'testing@avalontechsv.dev']);
+
+        $project = Project::factory()->create(['user_id' => $user->id]);
+
+        $access = ProjectAccess::factory()->create([
+            'project_id' => $project->id,
+            'user_id' => $user->id,
+            'project_capability_id' => ProjectCapability::where('manage_project', true)->first()->id,
+        ]);
+
+        $response = $this->actingAs($user)->post(route('projects.accesses.invite', $project), [
+            'name' => 'Usuario de prueba',
+            'email' => 'testing@avalontechsv.dev',
+            'capability_id' => ProjectCapability::where('manage_project', false)->first()->id,
+        ]);
+
+        $response->assertRedirect(route('projects.accesses', $project));
+        $response->assertSessionHas('success', 'Se ha enviado la invitación al proyecto exitosamente.');
+        $this->assertDatabaseHas('project_invites', [
+            'project_id' => $project->id,
+            'inviting_user_id' => $user->id,
+            'invited_user_id' => $anotherUser->id,
+            'invited_name' => null,
+            'invited_email' => $anotherUser->email,
+            'expires_at' => now()->addDays(7),
+            'project_capability_id' => ProjectCapability::where('manage_project', false)->first()->id,
+        ]);
+    }
+
+    public function test_not_registered_users_can_be_invited(){
+        $user = User::factory()->create();
+
+        $project = Project::factory()->create(['user_id' => $user->id]);
+
+        $access = ProjectAccess::factory()->create([
+            'project_id' => $project->id,
+            'user_id' => $user->id,
+            'project_capability_id' => ProjectCapability::where('manage_project', true)->first()->id,
+        ]);
+
+        $response = $this->actingAs($user)->post(route('projects.accesses.invite', $project), [
+            'name' => 'Usuario de prueba',
+            'email' => 'testing@avalontechsv.dev',
+            'capability_id' => ProjectCapability::where('manage_project', false)->first()->id,
+        ]);
+
+        $response->assertRedirect(route('projects.accesses', $project));
+        $response->assertSessionHas('success', 'Se ha enviado la invitación al proyecto exitosamente.');
+        $this->assertDatabaseHas('project_invites', [
+            'project_id' => $project->id,
+            'inviting_user_id' => $user->id,
+            'invited_user_id' => null,
+            'invited_name' => 'Usuario de prueba',
+            'invited_email' => 'testing@avalontechsv.dev',
+            'expires_at' => now()->addDays(7),
+            'project_capability_id' => ProjectCapability::where('manage_project', false)->first()->id,
+        ]);
+    }
+
+        public function test_users_cannot_be_invited_without_access(){
+        $user = User::factory()->create();
+
+        $project = Project::factory()->create();
+
+        $response = $this->actingAs($user)->post(route('projects.accesses.invite', $project), [
+            'name' => 'Usuario de prueba',
+            'email' => 'testing@avalontechsv.dev',
+            'capability_id' => ProjectCapability::where('manage_project', false)->first()->id,
+        ]);
+
+        $response->assertRedirect(route('projects.index'));
+        $response->assertSessionHas('error', 'No tienes acceso a este proyecto.');
+        $this->assertDatabaseMissing('project_invites', [
+            'project_id' => $project->id,
+            'inviting_user_id' => $user->id,
+            'project_capability_id' => ProjectCapability::where('manage_project', false)->first()->id,
+        ]);
+    }
+
+    public function test_users_cannot_be_invited_without_manage_users_capability(){
+        $user = User::factory()->create();
+
+        $project = Project::factory()->create();
+
+        $access = ProjectAccess::factory()->create([
+            'project_id' => $project->id,
+            'user_id' => $user->id,
+            'project_capability_id' => ProjectCapability::where('manage_users', false)->first()->id,
+        ]);
+
+        $response = $this->actingAs($user)->post(route('projects.accesses.invite', $project), [
+            'name' => 'Usuario de prueba',
+            'email' => 'testing@avalontechsv.dev',
+            'capability_id' => ProjectCapability::where('manage_project', false)->first()->id,
+        ]);
+
+        $response->assertRedirect(route('projects.index'));
+        $response->assertSessionHas('error', 'No cuentas con los permisos necesarios para editar este proyecto.');
+        $this->assertDatabaseMissing('project_invites', [
+            'project_id' => $project->id,
+            'inviting_user_id' => $user->id,
+            'project_capability_id' => ProjectCapability::where('manage_project', false)->first()->id,
+        ]);
+    }
 }

@@ -5,6 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\User;
+use App\Models\ProjectAccess;
+use App\Models\ProjectCapability;
+use App\Models\ProjectInvite;
 
 class Project extends Model
 {
@@ -52,5 +55,10 @@ class Project extends Model
         }
 
         return $users;
+    }
+
+    public function invites()
+    {
+        return $this->hasMany(ProjectInvite::class);
     }
 }
