@@ -4,11 +4,17 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Notification;
+
+use Carbon\Carbon;
 
 use App\Models\Project;
 use App\Models\ProjectAccess;
 use App\Models\ProjectCapability;
+use App\Models\ProjectInvite;
 use App\Models\User;
+
+use App\Notifications\InviteNotification;
 
 class ProjectController extends Controller
 {
@@ -136,5 +142,62 @@ class ProjectController extends Controller
         $project->accesses()->where('user_id', $user->id)->delete();
 
         return redirect()->route('projects.accesses', ['project' => $project])->with('success', 'Se ha revocado el acceso al proyecto exitosamente.');
+    }
+
+    public function inviteUser(Request $request, Project $project){
+        $request->validate([
+            'name' => 'required|string',
+            'email' => 'required|email',
+            'capability_id' => 'required|numeric|exists:project_capabilities,id'
+        ]);
+
+        $access = Auth::user()->hasAccessToProject($project);
+
+        if(!$access){
+            return redirect()->route('projects.index')->with('error', 'No tienes acceso a este proyecto.');
+        }
+
+        if(!$access->capability->manage_users){
+            return redirect()->route('projects.index')->with('error', 'No cuentas con los permisos necesarios para editar este proyecto.');
+        }
+
+        $existingInvite = ProjectInvite::where('invited_email', $request->email)->where('project_id', $project->id)->where('expired_at', '>', Carbon::now())->first();
+
+        if($existingInvite){
+            return redirect()->route('projects.accesses', ['project' => $project])->with('error', 'Ya existe una invitación pendiente para este usuario.');
+        }
+
+        $invitingUser = Auth::user();
+        $invitedUser = User::where('email', $request->email)->first();
+        $capability = ProjectCapability::find($request->capability_id);
+        $expiringDate = Carbon::now()->addDays(7);
+
+        if(!$invitedUser){
+            $invite = ProjectInvite::create([
+                'project_id' => $project->id,
+                'inviting_user_id' => $invitingUser->id,
+                'invited_name' => $request->name,
+                'invited_email' => $request->email,
+                'project_capability_id' => $capability->id,
+                'expires_at' => $expiringDate,
+            ]);
+
+            Notification::route('mail', $request->email)->notify(new InviteNotification($invite));
+
+            return redirect()->route('projects.accesses', ['project' => $project])->with('success', 'Se ha enviado la invitación al proyecto exitosamente.');
+        }
+
+        $invite = ProjectInvite::create([
+            'project_id' => $project->id,
+            'inviting_user_id' => $invitingUser->id,
+            'invited_user_id' => $invitedUser->id,
+            'invited_email' => $request->email,
+            'project_capability_id' => $capability->id,
+            'expires_at' => $expiringDate,
+        ]);
+
+        Notification::route('mail', $request->email)->notify(new InviteNotification($invite));
+
+        return redirect()->route('projects.accesses', ['project' => $project])->with('success', 'Se ha enviado la invitación al proyecto exitosamente.');
     }
 }
