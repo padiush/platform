@@ -70,7 +70,7 @@ class RegisteredUserController extends Controller
             }
         }
 
-        $expired_invites = ProjectInvite::where('email', $user->email)->where('expires_at', '<', Carbon::now())->get();
+        $expired_invites = ProjectInvite::where('invited_email', $user->email)->where('expires_at', '<', Carbon::now())->get();
 
         if($expired_invites){
             foreach($expired_invites as $expired_invite){
