@@ -162,7 +162,7 @@ class ProjectController extends Controller
             return redirect()->route('projects.index')->with('error', 'No cuentas con los permisos necesarios para editar este proyecto.');
         }
 
-        $existingInvite = ProjectInvite::where('invited_email', $request->email)->where('project_id', $project->id)->where('expired_at', '>', Carbon::now())->first();
+        $existingInvite = ProjectInvite::where('invited_email', $request->email)->where('project_id', $project->id)->where('expires_at', '>', Carbon::now())->first();
 
         if($existingInvite){
             return redirect()->route('projects.accesses', ['project' => $project])->with('error', 'Ya existe una invitación pendiente para este usuario.');
