@@ -338,7 +338,44 @@ class ProjectTest extends TestCase
         ]);
     }
 
-        public function test_users_cannot_be_invited_without_access(){
+    public function test_users_with_access_cannot_be_invited_again(){
+        $user = User::factory()->create();
+        $anotherUser = User::factory()->create();
+
+        $project = Project::factory()->create(['user_id' => $user->id]);
+
+        $access = ProjectAccess::factory()->create([
+            'project_id' => $project->id,
+            'user_id' => $user->id,
+            'project_capability_id' => ProjectCapability::where('manage_project', true)->first()->id,
+        ]);
+
+        $otherAccess = ProjectAccess::factory()->create([
+            'project_id' => $project->id,
+            'user_id' => $anotherUser->id,
+            'project_capability_id' => ProjectCapability::where('manage_project', false)->first()->id,
+        ]);
+
+        $response = $this->actingAs($user)->post(route('projects.accesses.invite', $project), [
+            'name' => 'Usuario de prueba',
+            'email' => $anotherUser->email,
+            'capability_id' => ProjectCapability::where('manage_project', false)->first()->id,
+        ]);
+
+        $response->assertRedirect(route('projects.accesses', $project));
+        $response->assertSessionHas('error', 'Este usuario ya tiene acceso al proyecto.');
+        $this->assertDatabaseMissing('project_invites', [
+            'project_id' => $project->id,
+            'inviting_user_id' => $user->id,
+            'invited_user_id' => $anotherUser->id,
+            'invited_name' => null,
+            'invited_email' => $anotherUser->email,
+            'expires_at' => now()->addDays(7),
+            'project_capability_id' => ProjectCapability::where('manage_project', false)->first()->id,
+        ]);
+    }
+
+    public function test_users_cannot_be_invited_without_access(){
         $user = User::factory()->create();
 
         $project = Project::factory()->create();
