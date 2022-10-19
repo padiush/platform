@@ -64,4 +64,15 @@ class User extends Authenticatable
 
         return $access ? $access : false;
     }
+
+    public function hasCapabilityOnProject(Project $project, string $query)
+    {
+        $access = $this->hasAccessToProject($project);
+
+        if ($access) {
+            return $access->capability->$query;
+        }
+
+        return false;
+    }
 }
