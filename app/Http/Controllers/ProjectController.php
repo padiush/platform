@@ -170,6 +170,13 @@ class ProjectController extends Controller
 
         $invitingUser = Auth::user();
         $invitedUser = User::where('email', $request->email)->first();
+
+        foreach($project->accesses as $access){
+            if($access->user->email == $request->email){
+                return redirect()->route('projects.accesses', ['project' => $project])->with('error', 'Este usuario ya tiene acceso al proyecto.');
+            }
+        }
+
         $capability = ProjectCapability::find($request->capability_id);
         $expiringDate = Carbon::now()->addDays(7);
 
