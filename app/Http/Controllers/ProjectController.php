@@ -27,7 +27,9 @@ class ProjectController extends Controller
             $projects->push(Project::find($access->project_id));
         }
 
-        return view('projects.index', ['projects' => $projects]);
+        $invites = ProjectInvite::where('invited_user_id', Auth::id())->where('expires_at', '>', Carbon::now())->get();
+
+        return view('projects.index', ['projects' => $projects, 'invites' => $invites]);
     }
 
     public function create(){
@@ -249,5 +251,43 @@ class ProjectController extends Controller
         }
 
         return redirect()->route('projects.accesses.invites', ['project' => $project])->with('success', 'Se ha revocado la invitación al proyecto exitosamente.');
+    }
+
+    public function declineInvite(ProjectInvite $invite){
+        $user = Auth::user();
+
+        if($user->email != $invite->invited_email){
+            return redirect()->route('projects.index')->with('error', 'No puedes declinar esta invitación.');
+        }
+
+        $invite->delete();
+
+        return redirect()->route('projects.index')->with('success', 'Se ha rechazado la invitación a participar en el proyecto.');
+    }
+
+    public function acceptInvite(ProjectInvite $invite){
+        $user = Auth::user();
+
+        if($user->email != $invite->invited_email){
+            return redirect()->route('projects.index')->with('error', 'No puedes aceptar esta invitación.');
+        }
+
+        $project = $invite->project;
+
+        $existingAccess = ProjectAccess::where('user_id', $user->id)->where('project_id', $project->id)->first();
+
+        if($existingAccess){
+            $invite->delete();
+            return redirect()->route('projects.index')->with('error', 'Ya tienes acceso a este proyecto.');
+        }
+
+        $project->accesses()->create([
+            'user_id' => $user->id,
+            'project_capability_id' => $invite->project_capability_id
+        ]);
+
+        $invite->delete();
+
+        return redirect()->route('projects.index')->with('success', 'Se ha aceptado la invitación a participar en el proyecto.');
     }
 }

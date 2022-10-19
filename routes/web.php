@@ -25,6 +25,9 @@ Route::controller(ProjectController::class)->group(function(){
     Route::post('/projects/{project}/accesses/invite', 'inviteUser')->middleware(['auth'])->name('projects.accesses.invite');
     Route::get('/project/{project}/accesses/invites', 'projectInvites')->middleware(['auth'])->name('projects.accesses.invites');
     Route::delete('/project/{project}/accesses/invites/{invite}/revoke', 'revokeInvite')->middleware(['auth'])->name('projects.accesses.invites.revoke');
+
+    Route::get('/projects/accept/{invite}', 'acceptInvite')->middleware(['auth'])->name('projects.invites.accept');
+    Route::get('/projects/decline/{invite}', 'declineInvite')->middleware(['auth'])->name('projects.invites.decline');
 });
 
 require __DIR__.'/auth.php';

@@ -475,4 +475,203 @@ class ProjectTest extends TestCase
         $response->assertRedirect(route('projects.index'));
         $response->assertSessionHas('error', 'No cuentas con los permisos necesarios para editar este proyecto.');
     }
+
+    public function test_invitations_appear_in_projects_index(){
+        $user = User::factory()->create();
+        $anotherUser = User::factory()->create();
+
+        $project = Project::factory()->create();
+
+        $access = ProjectAccess::factory()->create([
+            'project_id' => $project->id,
+            'user_id' => $user->id,
+            'project_capability_id' => ProjectCapability::where('manage_users', true)->first()->id,
+        ]);
+
+        $invite = ProjectInvite::factory()->create([
+            'project_id' => $project->id,
+            'inviting_user_id' => $user->id,
+            'invited_user_id' => $anotherUser->id,
+            'invited_name' => null,
+            'invited_email' => $anotherUser->email,
+            'project_capability_id' => ProjectCapability::where('manage_project', false)->first()->id,
+            'expires_at' => now()->addDays(7),
+        ]);
+
+        $response = $this->actingAs($anotherUser)->get(route('projects.index'));
+
+        $response->assertStatus(200);
+        $response->assertViewIs('projects.index');
+        $response->assertSee($project->name);
+    }
+
+    public function test_invitations_can_be_accepted_by_invited_user(){
+                $user = User::factory()->create();
+        $anotherUser = User::factory()->create();
+
+        $project = Project::factory()->create();
+
+        $access = ProjectAccess::factory()->create([
+            'project_id' => $project->id,
+            'user_id' => $user->id,
+            'project_capability_id' => ProjectCapability::where('manage_users', true)->first()->id,
+        ]);
+
+        $invite = ProjectInvite::factory()->create([
+            'project_id' => $project->id,
+            'inviting_user_id' => $user->id,
+            'invited_user_id' => $anotherUser->id,
+            'invited_name' => null,
+            'invited_email' => $anotherUser->email,
+            'project_capability_id' => ProjectCapability::where('manage_project', false)->first()->id,
+            'expires_at' => now()->addDays(7),
+        ]);
+
+        $response = $this->actingAs($anotherUser)->get(route('projects.invites.accept', $invite));
+
+        $response->assertRedirect(route('projects.index'));
+        $response->assertSessionHas('success', 'Se ha aceptado la invitación a participar en el proyecto.');
+        $this->assertDatabaseHas('project_accesses', [
+            'project_id' => $project->id,
+            'user_id' => $anotherUser->id,
+            'project_capability_id' => ProjectCapability::where('manage_project', false)->first()->id,
+        ]);
+        $this->assertDatabaseMissing('project_invites', [
+            'project_id' => $project->id,
+            'inviting_user_id' => $user->id,
+            'invited_user_id' => $anotherUser->id,
+            'invited_name' => null,
+            'invited_email' => $anotherUser->email,
+            'project_capability_id' => ProjectCapability::where('manage_project', false)->first()->id,
+            'expires_at' => now()->addDays(7),
+        ]);
+    }
+
+    public function test_invitations_can_be_declined_by_invited_user(){
+        $user = User::factory()->create();
+        $anotherUser = User::factory()->create();
+
+        $project = Project::factory()->create();
+
+        $access = ProjectAccess::factory()->create([
+            'project_id' => $project->id,
+            'user_id' => $user->id,
+            'project_capability_id' => ProjectCapability::where('manage_users', true)->first()->id,
+        ]);
+
+        $invite = ProjectInvite::factory()->create([
+            'project_id' => $project->id,
+            'inviting_user_id' => $user->id,
+            'invited_user_id' => $anotherUser->id,
+            'invited_name' => null,
+            'invited_email' => $anotherUser->email,
+            'project_capability_id' => ProjectCapability::where('manage_project', false)->first()->id,
+            'expires_at' => now()->addDays(7),
+        ]);
+
+        $response = $this->actingAs($anotherUser)->get(route('projects.invites.decline', $invite));
+
+        $response->assertRedirect(route('projects.index'));
+        $response->assertSessionHas('success', 'Se ha rechazado la invitación a participar en el proyecto.');
+        $this->assertDatabaseMissing('project_accesses', [
+            'project_id' => $project->id,
+            'user_id' => $anotherUser->id,
+            'project_capability_id' => ProjectCapability::where('manage_project', false)->first()->id,
+        ]);
+        $this->assertDatabaseMissing('project_invites', [
+            'project_id' => $project->id,
+            'inviting_user_id' => $user->id,
+            'invited_user_id' => $anotherUser->id,
+            'invited_name' => null,
+            'invited_email' => $anotherUser->email,
+            'project_capability_id' => ProjectCapability::where('manage_project', false)->first()->id,
+            'expires_at' => now()->addDays(7),
+        ]);
+    }
+
+    public function test_invitations_cannot_be_accepted_by_other_users(){
+        $user = User::factory()->create();
+        $anotherUser = User::factory()->create();
+        $yetAnotherUser = User::factory()->create();
+
+        $project = Project::factory()->create();
+
+        $access = ProjectAccess::factory()->create([
+            'project_id' => $project->id,
+            'user_id' => $user->id,
+            'project_capability_id' => ProjectCapability::where('manage_users', true)->first()->id,
+        ]);
+
+        $invite = ProjectInvite::factory()->create([
+            'project_id' => $project->id,
+            'inviting_user_id' => $user->id,
+            'invited_user_id' => $anotherUser->id,
+            'invited_name' => null,
+            'invited_email' => $anotherUser->email,
+            'project_capability_id' => ProjectCapability::where('manage_project', false)->first()->id,
+            'expires_at' => now()->addDays(7),
+        ]);
+
+        $response = $this->actingAs($yetAnotherUser)->get(route('projects.invites.accept', $invite));
+
+        $response->assertRedirect(route('projects.index'));
+        $response->assertSessionHas('error', 'No puedes aceptar esta invitación.');
+        $this->assertDatabaseMissing('project_accesses', [
+            'project_id' => $project->id,
+            'user_id' => $yetAnotherUser->id,
+            'project_capability_id' => ProjectCapability::where('manage_project', false)->first()->id,
+        ]);
+        $this->assertDatabaseHas('project_invites', [
+            'project_id' => $project->id,
+            'inviting_user_id' => $user->id,
+            'invited_user_id' => $anotherUser->id,
+            'invited_name' => null,
+            'invited_email' => $anotherUser->email,
+            'project_capability_id' => ProjectCapability::where('manage_project', false)->first()->id,
+            'expires_at' => now()->addDays(7),
+        ]);
+    }
+
+    public function test_invitations_cannot_be_declined_by_other_users(){
+        $user = User::factory()->create();
+        $anotherUser = User::factory()->create();
+        $yetAnotherUser = User::factory()->create();
+
+        $project = Project::factory()->create();
+
+        $access = ProjectAccess::factory()->create([
+            'project_id' => $project->id,
+            'user_id' => $user->id,
+            'project_capability_id' => ProjectCapability::where('manage_users', true)->first()->id,
+        ]);
+
+        $invite = ProjectInvite::factory()->create([
+            'project_id' => $project->id,
+            'inviting_user_id' => $user->id,
+            'invited_user_id' => $anotherUser->id,
+            'invited_name' => null,
+            'invited_email' => $anotherUser->email,
+            'project_capability_id' => ProjectCapability::where('manage_project', false)->first()->id,
+            'expires_at' => now()->addDays(7),
+        ]);
+
+        $response = $this->actingAs($yetAnotherUser)->get(route('projects.invites.decline', $invite));
+
+        $response->assertRedirect(route('projects.index'));
+        $response->assertSessionHas('error', 'No puedes declinar esta invitación.');
+        $this->assertDatabaseMissing('project_accesses', [
+            'project_id' => $project->id,
+            'user_id' => $yetAnotherUser->id,
+            'project_capability_id' => ProjectCapability::where('manage_project', false)->first()->id,
+        ]);
+        $this->assertDatabaseHas('project_invites', [
+            'project_id' => $project->id,
+            'inviting_user_id' => $user->id,
+            'invited_user_id' => $anotherUser->id,
+            'invited_name' => null,
+            'invited_email' => $anotherUser->email,
+            'project_capability_id' => ProjectCapability::where('manage_project', false)->first()->id,
+            'expires_at' => now()->addDays(7),
+        ]);
+    }
 }
