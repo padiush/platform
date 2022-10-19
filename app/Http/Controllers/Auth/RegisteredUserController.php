@@ -55,7 +55,7 @@ class RegisteredUserController extends Controller
         Auth::login($user);
 
         // Check if the user was invited to a project
-        $invites = ProjectInvite::where('email', $user->email)->where('expires_at', '>', Carbon::now())->get();
+        $invites = ProjectInvite::where('invited_email', $user->email)->where('expires_at', '>', Carbon::now())->get();
 
         if($invites){
             foreach($invites as $invite){
