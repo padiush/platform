@@ -11,6 +11,11 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 
+use App\Models\ProjectInvite;
+use App\Models\ProjectAccess;
+
+use Carbon\Carbon;
+
 class RegisteredUserController extends Controller
 {
     /**
@@ -48,6 +53,30 @@ class RegisteredUserController extends Controller
         event(new Registered($user));
 
         Auth::login($user);
+
+        // Check if the user was invited to a project
+        $invites = ProjectInvite::where('email', $user->email)->where('expires_at', '>', Carbon::now())->get();
+
+        if($invites){
+            foreach($invites as $invite){
+                $project = $invite->project;
+
+                $project->accesses()->create([
+                    'user_id' => $user->id,
+                    'project_capability_id' => $invite->project_capability_id,
+                ]);
+
+                $invite->delete();
+            }
+        }
+
+        $expired_invites = ProjectInvite::where('email', $user->email)->where('expires_at', '<', Carbon::now())->get();
+
+        if($expired_invites){
+            foreach($expired_invites as $expired_invite){
+                $expired_invite->delete();
+            }
+        }
 
         return redirect(RouteServiceProvider::HOME);
     }
