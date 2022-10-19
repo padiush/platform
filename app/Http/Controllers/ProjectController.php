@@ -242,6 +242,12 @@ class ProjectController extends Controller
 
         $invite->delete();
 
+        $remaining_invites = $project->invites->count();
+
+        if($remaining_invites == 0){
+            return redirect()->route('projects.accesses', ['project' => $project])->with('success', 'Se ha revocado la invitación al proyecto exitosamente.');
+        }
+
         return redirect()->route('projects.accesses.invites', ['project' => $project])->with('success', 'Se ha revocado la invitación al proyecto exitosamente.');
     }
 }
