@@ -5,6 +5,7 @@
         </a>
     </x-slot>
     <x-slot name="header">Acceso al proyecto</x-slot>
+    <x-slot name="subtitle">{{ $project->name }}</x-slot>
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 w-full">
         <div class="grid grid-cols-1 gap-4 w-full">
             @if(count($invites) > 0)

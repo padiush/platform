@@ -21,12 +21,13 @@
 
         <!-- Page Heading -->
         <header class="bg-base-100 shadow">
-            <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 text-base-content">
+            <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 text-base-content flex items-center">
                 <span class="inline-block">{{ $action ?? ''}}</span>
                 <span class="inline-block">
                     <h2 class="font-semibold text-xl leading-tight text-base-content">
                         {{ $header }}
                     </h2>
+                    @isset($subtitle)<span class="text-sm">{{ $subtitle }}</span>@endisset
                 </span>
             </div>
         </header>
