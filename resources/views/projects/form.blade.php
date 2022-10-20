@@ -6,6 +6,7 @@
     </x-slot>
 
     <x-slot name="header">@isset($project) Editar detalles del proyecto @else Crear proyecto @endisset</x-slot>
+    <x-slot name="subtitle">@isset($project){{ $project->name }}@endisset</x-slot>
 
     <x-card title="Detalles del proyecto">
         <form action="@isset($project){{ route('projects.edit', ['project' => $project])}}@else{{ route('projects.create')}}@endif" method="post">

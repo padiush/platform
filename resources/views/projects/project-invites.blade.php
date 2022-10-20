@@ -5,6 +5,7 @@
         </a>
     </x-slot>
     <x-slot name="header">Invitaciones pendientes</x-slot>
+    <x-slot name="subtitle">{{ $project->name }}</x-slot>
     <div class="grid grid-cols-1 gap-4 w-full">
         <x-card title="Invitaciones">
             <table class="table table-compact w-full">
