@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProjectController;
-
+use App\Http\Controllers\InterviewFormController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -28,6 +28,11 @@ Route::controller(ProjectController::class)->group(function(){
 
     Route::get('/projects/accept/{invite}', 'acceptInvite')->middleware(['auth'])->name('projects.invites.accept');
     Route::get('/projects/decline/{invite}', 'declineInvite')->middleware(['auth'])->name('projects.invites.decline');
+});
+
+Route::controller(InterviewFormController::class)->group(function(){
+    Route::get('/designer', 'index')->middleware(['auth'])->name('designer.index');
+    Route::get('/designer/{project}/create', 'create')->middleware(['auth'])->name('designer.create');
 });
 
 require __DIR__.'/auth.php';

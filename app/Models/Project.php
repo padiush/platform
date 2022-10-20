@@ -4,10 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+
 use App\Models\User;
 use App\Models\ProjectAccess;
 use App\Models\ProjectCapability;
 use App\Models\ProjectInvite;
+use App\Models\InterviewForm;
 
 class Project extends Model
 {
@@ -60,5 +62,10 @@ class Project extends Model
     public function invites()
     {
         return $this->hasMany(ProjectInvite::class);
+    }
+
+    public function interviewForms()
+    {
+        return $this->hasMany(InterviewForm::class);
     }
 }
