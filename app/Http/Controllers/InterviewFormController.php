@@ -12,8 +12,7 @@ use App\Models\User;
 
 class InterviewFormController extends Controller
 {
-    public function index()
-    {
+    public function index(){
         $accesses = ProjectAccess::where('user_id', Auth::id())->get();
 
         $projects = collect();
@@ -33,10 +32,75 @@ class InterviewFormController extends Controller
         return view('interview-forms.index', compact('projects'));
     }
 
-    public function create(Project $project)
-    {
+    public function create(Project $project){
+         $access = ProjectAccess::where('user_id', Auth::id())->where('project_id', $project->id)->first();
+
+        if(!$access || !Auth::user()->hasCapabilityOnProject($project, 'manage_forms')){
+            return redirect()->route('projects.index')->with('error', 'No tienes permisos para crear entrevistas en este proyecto.');
+        }
+
         return view('interview-forms.create', [
             'project' => $project,
+        ]);
+    }
+
+    public function store(Request $request, Project $project){
+        $request->validate([
+            'project_id' => 'required|exists:projects,id',
+            'name' => 'required|string',
+            'description' => 'nullable|string',
+        ]);
+
+        $access = ProjectAccess::where('user_id', Auth::id())->where('project_id', $project->id)->first();
+
+        if(!$access || !Auth::user()->hasCapabilityOnProject($project, 'manage_forms')){
+            return redirect()->route('projects.index')->with('error', 'No tienes permisos para crear entrevistas en este proyecto.');
+        }
+
+        $form = InterviewForm::create([
+            'project_id' => $request->project_id,
+            'name' => $request->name,
+            'description' => $request->description,
+        ]);
+
+        return redirect()->route('interview-forms.edit', $form)->with('success', 'Formulario de entrevista creado exitosamente.');
+    }
+
+    public function destroy(Project $project, InterviewForm $form){
+        $access = ProjectAccess::where('user_id', Auth::id())->where('project_id', $project->id)->first();
+
+        if(!$access || !Auth::user()->hasCapabilityOnProject($project, 'manage_forms')){
+            return redirect()->route('projects.index')->with('error', 'No tienes permisos para eliminar formularios en este proyecto.');
+        }
+
+        $form->delete();
+
+        return redirect()->route('designer.index')->with('success', 'Formulario eliminado exitosamente.');
+    }
+
+    public function toggle(Project $project, InterviewForm $form){
+        $access = ProjectAccess::where('user_id', Auth::id())->where('project_id', $project->id)->first();
+
+        if(!$access || !Auth::user()->hasCapabilityOnProject($project, 'manage_forms')){
+            return redirect()->route('projects.index')->with('error', 'No tienes permisos para editar formularios en este proyecto.');
+        }
+
+        $form->is_active = !$form->is_active;
+        $form->save();
+
+        return redirect()->route('designer.index')->with('success', 'Formulario actualizado exitosamente.');
+    }
+
+    public function edit(Project $project, InterviewForm $form){
+        $access = ProjectAccess::where('user_id', Auth::id())->where('project_id', $project->id)->first();
+
+        if(!$access || !Auth::user()->hasCapabilityOnProject($project, 'manage_forms')){
+            return redirect()->route('projects.index')->with('error', 'No tienes permisos para editar formularios en este proyecto.');
+        }
+
+        return view('interview-forms.edit', [
+            'project' => $project,
+            'form' => $form,
         ]);
     }
 }

@@ -52,7 +52,7 @@
                 <thead>
                     <tr>
                         <td>Nombre</td>
-                        <td class="hidden lg:table-cell">Correo electrónico</td>
+                        <td class="hidden lg:table-cell lg:text-wrap">Correo electrónico</td>
                         <td>Categoría</td>
                         <td>Acciones</td>
                     </tr>
@@ -60,9 +60,9 @@
                 <tbody>
                     @foreach($users as $user)
                     <tr>
-                        <td>{{ $user->name }}</td>
-                        <td class="hidden lg:table-cell">{{ $user->email }}</td>
-                        <td>{{ $project->accesses->where('user_id', $user->id)->first()->capability->name }}</td>
+                        <td class="text-wrap">{{ $user->name }}</td>
+                        <td class="hidden lg:table-cell lg:text-wrap">{{ $user->email }}</td>
+                        <td class="text-wrap">{{ $project->accesses->where('user_id', $user->id)->first()->capability->name }}</td>
                         <td>
                             <form action="{{ route('projects.accesses.revoke', ['project' => $project, 'user' => $user]) }}" method="POST">
                                 @csrf
