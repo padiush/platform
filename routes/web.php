@@ -33,6 +33,11 @@ Route::controller(ProjectController::class)->group(function(){
 Route::controller(InterviewFormController::class)->group(function(){
     Route::get('/designer', 'index')->middleware(['auth'])->name('designer.index');
     Route::get('/designer/{project}/create', 'create')->middleware(['auth'])->name('designer.create');
+    Route::post('/designer/{project}/create', 'store')->middleware(['auth']);
+
+    Route::get('/designer/{project}/form/{form}', 'edit')->middleware(['auth'])->name('designer.form.edit');
+    Route::delete('/designer/{project}/form/{form}/delete', 'destroy')->middleware(['auth'])->name('designer.form.delete');
+    Route::get('/designer/{project}/form/{form}/toggle', 'toggle')->middleware(['auth'])->name('designer.form.toggle');
 });
 
 require __DIR__.'/auth.php';
