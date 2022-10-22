@@ -27,7 +27,7 @@
         <button id="textInput">
             <span><i class="fa-solid fa-plus"></i><i class="fa-regular fa-input-text ml-2"></i></span><span class="hidden lg:inline-block text-sm">Campo de texto</span>
         </button>
-        <button onclick="pushNumberInput()">
+        <button id="numberInput">
             <span><i class="fa-solid fa-plus"></i><i class="fa-regular fa-input-numeric ml-2"></i></span><span class="hidden lg:inline-block text-sm">Campo numérico</span>
         </button>
         <button onclick="pushDateInput()">
@@ -63,10 +63,14 @@
                 pushRepeatingSection(route, csrfToken);
             });
 
-            $('#textInput').click(function(){
-                var createRoute = '{{ route('designer.item.create', ['form' => $form]) }}';
+            var createRoute = '{{ route('designer.item.create', ['form' => $form]) }}';
 
+            $('#textInput').click(function(){
                 pushTextInput(createRoute, getItemRoute, updateItemRoute, csrfToken);
+            });
+
+            $('#numberInput').click(function(){
+                pushNumberInput(createRoute, getItemRoute, updateItemRoute, csrfToken);
             });
         });
 
