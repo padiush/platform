@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\InterviewFormController;
+use App\Http\Controllers\InterviewDesignerController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -38,6 +39,17 @@ Route::controller(InterviewFormController::class)->group(function(){
     Route::get('/designer/{project}/form/{form}', 'edit')->middleware(['auth'])->name('designer.form.edit');
     Route::delete('/designer/{project}/form/{form}/delete', 'destroy')->middleware(['auth'])->name('designer.form.delete');
     Route::get('/designer/{project}/form/{form}/toggle', 'toggle')->middleware(['auth'])->name('designer.form.toggle');
+    Route::get('/designer/{project}/form/{form}/preview', 'preview')->middleware(['auth'])->name('designer.form.preview');
+});
+
+Route::controller(InterviewDesignerController::class)->group(function(){
+    Route::post('/designer/{form}/section/create', 'createSection')->middleware(['auth'])->name('designer.section.create');
+    Route::post('/designer/{form}/section/items', 'getSectionItems')->middleware(['auth'])->name('designer.section.items');
+
+    Route::post('/designer/{form}/item/create', 'createItem')->middleware(['auth'])->name('designer.item.create');
+
+    Route::post('/designer/{form}/item/data', 'getItem')->middleware(['auth'])->name('designer.item.data');
+    Route::post('/designer/{form}/item/update', 'updateItem')->middleware(['auth'])->name('designer.item.update');
 });
 
 require __DIR__.'/auth.php';

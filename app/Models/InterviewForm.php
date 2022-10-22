@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 use App\Models\Project;
 use App\Models\User;
+use App\Models\InterviewSection;
 
 class InterviewForm extends Model
 {
@@ -28,5 +29,10 @@ class InterviewForm extends Model
     public function designer()
     {
         return $this->belongsTo(User::class, 'designed_by');
+    }
+
+    public function sections()
+    {
+        return $this->hasMany(InterviewSection::class);
     }
 }
