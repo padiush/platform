@@ -48,6 +48,10 @@ function startFormDesigner(csrfToken, sections, getItemsRoute, getItemRoute, upd
                         if(item.type == 'text'){
                             pushTextInput('', getItemRoute, updateItemRoute, csrfToken, false, item.id, section.id);
                         }
+
+                        if(item.type == 'number'){
+                            pushNumberInput('', getItemRoute, updateItemRoute, csrfToken, false, item.id, section.id);
+                        }
                     });
                 },
                 error: function(error){
@@ -71,6 +75,10 @@ function startFormDesigner(csrfToken, sections, getItemsRoute, getItemRoute, upd
                     items.forEach(function(item){
                         if(item.type == 'text'){
                             pushTextInput('', getItemRoute, updateItemRoute, csrfToken, false, item.id, section.id);
+                        }
+
+                        if(item.type == 'number'){
+                            pushNumberInput('', getItemRoute, updateItemRoute, csrfToken, false, item.id, section.id);
                         }
                     });
                 },
@@ -176,7 +184,6 @@ function updateItem(route, token, item_id, json){
 function pushTextInput(createRoute, getRoute, updateRoute, token, create = true, id = null, section_id = null){
     if(section_id == null){
         var form = document.getElementById('form-designer');
-        // Get the last section
         var sections = document.getElementsByClassName('section');
         var lastSection = sections[sections.length - 1];
 
@@ -344,13 +351,21 @@ function pushTextInput(createRoute, getRoute, updateRoute, token, create = true,
 }
 
 function pushNumberInput(createRoute, getRoute, updateRoute, token, create = true, id = null, section_id = null){
-    var container = document.getElementById('container');
+    if(section_id == null){
+        var form = document.getElementById('form-designer');
+        var sections = document.getElementsByClassName('section');
+        var lastSection = sections[sections.length - 1];
 
+        var container = document.getElementById(lastSection.id);
+    } else {
+        var container = document.getElementById('section-' + section_id);
+    }
     var jsonField = document.createElement('input');
     jsonField.setAttribute('type', 'hidden');
+    jsonField.setAttribute('name', 'json');
 
     var card = document.createElement('div');
-    card.classList.add('card', 'mb-5');
+    card.classList.add('card', 'w-full', 'bg-base-100', 'shadow-xl', 'text-base-content', 'overflow-x-auto', 'self-start');
 
     var cardBody = document.createElement('div');
     cardBody.classList.add('card-body');
@@ -383,8 +398,8 @@ function pushNumberInput(createRoute, getRoute, updateRoute, token, create = tru
     nameInput.setAttribute('type', 'text');
     nameInput.setAttribute('placeholder', 'Ingrese el nombre del campo');
 
-    var innerGrid = document.createElement('div');
-    innerGrid.classList.add('grid', 'grid-cols-1', 'lg:grid-cols-4', 'gap-4');
+    var mandatoryGrid = document.createElement('div');
+    mandatoryGrid.classList.add('grid', 'grid-cols-1', 'lg:grid-cols-4', 'gap-4');
 
     var isMandatoryFormControl = document.createElement('div');
     isMandatoryFormControl.classList.add('form-control', 'w-full');
@@ -396,6 +411,212 @@ function pushNumberInput(createRoute, getRoute, updateRoute, token, create = tru
     var isMandatoryCheckbox = document.createElement('input');
     isMandatoryCheckbox.setAttribute('type', 'checkbox');
     isMandatoryCheckbox.classList.add('checkbox', 'checkbox-primary');
+
+    var numericGrid = document.createElement('div');
+    numericGrid.classList.add('grid', 'grid-cols-1', 'lg:grid-cols-3', 'gap-4');
+
+    var minFormControl = document.createElement('div');
+    minFormControl.classList.add('form-control', 'w-full');
+
+    var minLabel = document.createElement('label');
+    minLabel.classList.add('label');
+    minLabel.innerHTML = '<span class="label-text">Valor mínimo</span>';
+
+    var minInput = document.createElement('input');
+    minInput.classList.add('input', 'input-bordered', 'w-full');
+    minInput.setAttribute('type', 'number');
+    minInput.setAttribute('placeholder', 'Ingrese el valor mínimo');
+
+    var maxFormControl = document.createElement('div');
+    maxFormControl.classList.add('form-control', 'w-full');
+
+    var maxLabel = document.createElement('label');
+    maxLabel.classList.add('label');
+    maxLabel.innerHTML = '<span class="label-text">Valor máximo</span>';
+
+    var maxInput = document.createElement('input');
+    maxInput.classList.add('input', 'input-bordered', 'w-full');
+    maxInput.setAttribute('type', 'number');
+    maxInput.setAttribute('placeholder', 'Ingrese el valor máximo');
+
+    var stepFormControl = document.createElement('div');
+    stepFormControl.classList.add('form-control', 'w-full');
+
+    var stepLabel = document.createElement('label');
+    stepLabel.classList.add('label');
+    stepLabel.innerHTML = '<span class="label-text">Incremento</span>';
+
+    var stepInput = document.createElement('input');
+    stepInput.classList.add('input', 'input-bordered', 'w-full');
+    stepInput.setAttribute('type', 'number');
+    stepInput.setAttribute('placeholder', 'Ingrese el incremento');
+
+    if(create){
+        $.ajax({
+            url: createRoute,
+            type: 'POST',
+            data: {
+                _token: token,
+                type: 'number'
+            },
+            success: function(response){
+                jsonField.value = JSON.stringify(response);
+                labelInput.setAttribute('label', 'label-' + response.id);
+                nameInput.setAttribute('name', 'name-' + response.id);
+                minInput.setAttribute('min', 'min-' + response.id);
+                maxInput.setAttribute('max', 'max-' + response.id);
+                stepInput.setAttribute('step', 'step-' + response.id);
+                isMandatoryCheckbox.setAttribute('id', 'required-' + response.id);
+
+                if(response.label != 'null'){
+                    labelInput.value = response.label;
+                }
+
+                if(response.name != 'null'){
+                    nameInput.value = response.name;
+                }
+
+                if(response.required){
+                    isMandatoryCheckbox.checked = true;
+                }
+
+                if(response.min != 'null'){
+                    minInput.value = response.min;
+                }
+
+                if(response.max != 'null'){
+                    maxInput.value = response.max;
+                }
+
+                if(response.step != 'null'){
+                    stepInput.value = response.step;
+                }
+            }
+        });
+    } else {
+        $.ajax({
+            url: getRoute,
+            type: 'POST',
+            data: {
+                _token: token,
+                id: id,
+            },
+            success: function(response){
+                jsonField.value = JSON.stringify(response);
+                labelInput.setAttribute('label', 'label-' + response.id);
+                nameInput.setAttribute('name', 'name-' + response.id);
+                minInput.setAttribute('min', 'min-' + response.id);
+                maxInput.setAttribute('max', 'max-' + response.id);
+                stepInput.setAttribute('step', 'step-' + response.id);
+                isMandatoryCheckbox.setAttribute('id', 'required-' + response.id);
+
+                if(response.label != 'null'){
+                    labelInput.value = response.label;
+                }
+
+                if(response.name != 'null'){
+                    nameInput.value = response.name;
+                }
+
+                if(response.required){
+                    isMandatoryCheckbox.checked = true;
+                }
+
+                if(response.min != 'null'){
+                    minInput.value = response.min;
+                }
+
+                if(response.max != 'null'){
+                    maxInput.value = response.max;
+                }
+
+                if(response.step != 'null'){
+                    stepInput.value = response.step;
+                }
+            }
+        });
+    }
+
+    labelFormControl.appendChild(labelLabel);
+    labelFormControl.appendChild(labelInput);
+
+    nameFormControl.appendChild(nameLabel);
+    nameFormControl.appendChild(nameInput);
+
+    isMandatoryFormControl.appendChild(isMandatoryLabel);
+    isMandatoryFormControl.appendChild(isMandatoryCheckbox);
+
+    minFormControl.appendChild(minLabel);
+    minFormControl.appendChild(minInput);
+
+    maxFormControl.appendChild(maxLabel);
+    maxFormControl.appendChild(maxInput);
+
+    stepFormControl.appendChild(stepLabel);
+    stepFormControl.appendChild(stepInput);
+
+    mandatoryGrid.appendChild(isMandatoryFormControl);
+
+    numericGrid.appendChild(minFormControl);
+    numericGrid.appendChild(maxFormControl);
+    numericGrid.appendChild(stepFormControl);
+
+    container.appendChild(card)
+    card.appendChild(cardBody);
+    cardBody.appendChild(cardTitle);
+    cardBody.appendChild(labelFormControl);
+    cardBody.appendChild(jsonField);
+    cardBody.appendChild(nameFormControl);
+    cardBody.appendChild(numericGrid);
+    cardBody.appendChild(mandatoryGrid);
+
+    labelInput.addEventListener('change', function(){
+        var json = JSON.parse(jsonField.value);
+        json.label = this.value;
+        jsonField.value = JSON.stringify(json);
+
+        updateItem(updateRoute, token, json.id, jsonField.value);
+    });
+
+    nameInput.addEventListener('change', function(){
+        var json = JSON.parse(jsonField.value);
+        json.name = this.value;
+        jsonField.value = JSON.stringify(json);
+
+        updateItem(updateRoute, token, json.id, jsonField.value);
+    });
+
+    isMandatoryCheckbox.addEventListener('change', function(){
+        var json = JSON.parse(jsonField.value);
+        json.required = this.checked;
+        jsonField.value = JSON.stringify(json);
+
+        updateItem(updateRoute, token, json.id, jsonField.value);
+    });
+
+    minInput.addEventListener('change', function(){
+        var json = JSON.parse(jsonField.value);
+        json.min = this.value;
+        jsonField.value = JSON.stringify(json);
+
+        updateItem(updateRoute, token, json.id, jsonField.value);
+    });
+
+    maxInput.addEventListener('change', function(){
+        var json = JSON.parse(jsonField.value);
+        json.max = this.value;
+        jsonField.value = JSON.stringify(json);
+
+        updateItem(updateRoute, token, json.id, jsonField.value);
+    });
+
+    stepInput.addEventListener('change', function(){
+        var json = JSON.parse(jsonField.value);
+        json.step = this.value;
+        jsonField.value = JSON.stringify(json);
+
+        updateItem(updateRoute, token, json.id, jsonField.value);
+    });
 }
 
 window.startFormDesigner = startFormDesigner;
@@ -404,3 +625,4 @@ window.pushSingleSection = pushSingleSection;
 window.pushRepeatingSection = pushRepeatingSection;
 
 window.pushTextInput = pushTextInput;
+window.pushNumberInput = pushNumberInput;
