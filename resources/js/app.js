@@ -21,17 +21,173 @@ function confirmAction(message) {
 
 window.confirmAction = confirmAction;
 
-function startFormDesigner(csrfToken) {
+function startFormDesigner(csrfToken, sections, getItemsRoute, getItemRoute, updateItemRoute) {
     const csrfElement = document.createElement('input');
     csrfElement.setAttribute('type', 'hidden');
     csrfElement.setAttribute('name', '_token');
     csrfElement.setAttribute('value', csrfToken);
 
     var form = document.getElementById('form-designer');
+
+    sections.forEach(function(section){
+        if(section.repeatable){
+            pushRepeatingSection('', '', false, section.id);
+
+            var section_id = section.id;
+
+            $.ajax({
+                url: getItemsRoute,
+                type: 'POST',
+                data: {
+                    section_id: section_id,
+                    _token: csrfToken
+                },
+                success: function(response){
+                    var items = response;
+                    items.forEach(function(item){
+                        if(item.type == 'text'){
+                            pushTextInput('', getItemRoute, updateItemRoute, csrfToken, false, item.id, section.id);
+                        }
+                    });
+                },
+                error: function(error){
+                    console.log(error);
+                }
+            });
+        } else {
+            pushSingleSection('', '', false, section.id);
+
+            var section_id = section.id;
+
+            $.ajax({
+                url: getItemsRoute,
+                type: 'POST',
+                data: {
+                    section_id: section_id,
+                    _token: csrfToken
+                },
+                success: function(response){
+                    var items = response;
+                    items.forEach(function(item){
+                        if(item.type == 'text'){
+                            pushTextInput('', getItemRoute, updateItemRoute, csrfToken, false, item.id, section.id);
+                        }
+                    });
+                },
+                error: function(error){
+                    console.log(error);
+                }
+            });
+        }
+    });
 }
 
-function pushTextInput() {
+function pushSingleSection(route, token, create = true, id = null){
     var form = document.getElementById('form-designer');
+
+    var divider = document.createElement('div');
+    divider.classList.add('divider', 'section-single');
+    divider.innerHTML = 'Sección única';
+
+    var container = document.createElement('div');
+
+    form.appendChild(divider);
+
+    if(create){
+        $.ajax({
+            url: route,
+            type: 'POST',
+            data: {
+                _token: token,
+                repeatable: '0',
+            },
+            success: function(response){
+                var section_id = response.id;
+                divider.setAttribute('data-section-id', section_id);
+                form.appendChild(divider);
+                container.setAttribute('id', 'section-' + section_id);
+                container.classList.add('section', 'grid', 'grid-cols-1', 'gap-4', 'w-full');
+                form.appendChild(container);
+            },
+            error: function(error){
+                console.log(error);
+            }
+        });
+    } else {
+        form.appendChild(divider);
+        container.setAttribute('id', 'section-' + id);
+        container.classList.add('section', 'grid', 'grid-cols-1', 'gap-4', 'w-full');
+        form.appendChild(container);
+    }
+}
+
+function pushRepeatingSection(route, token, create = true, id = null){
+    var form = document.getElementById('form-designer');
+
+    var divider = document.createElement('div');
+    divider.classList.add('divider', 'section-repeating');
+    divider.innerHTML = 'Sección repetitiva';
+
+    var container = document.createElement('div');
+
+    if(create){
+        $.ajax({
+            url: route,
+            type: 'POST',
+            data: {
+                _token: token,
+                repeatable: '1',
+            },
+            success: function(response){
+                var section_id = response.id;
+                divider.setAttribute('data-section-id', section_id);
+                form.appendChild(divider);
+                container.setAttribute('id', 'section-' + section_id);
+                container.classList.add('section', 'grid', 'grid-cols-1', 'gap-4', 'w-full');
+                form.appendChild(container);
+            },
+            error: function(error){
+                console.log(error);
+            }
+        });
+    } else {
+        form.appendChild(divider);
+        container.setAttribute('id', 'section-' + id);
+        container.classList.add('section', 'grid', 'grid-cols-1', 'gap-4', 'w-full');
+        form.appendChild(container);
+    }
+}
+
+function updateItem(route, token, item_id, json){
+    $.ajax({
+        url: route,
+        type: 'POST',
+        data: {
+            _token: token,
+            id: item_id,
+            json: json,
+        },
+        success: function(response){
+            console.log(response);
+        }
+    });
+}
+
+function pushTextInput(createRoute, getRoute, updateRoute, token, create = true, id = null, section_id = null){
+    if(section_id == null){
+        var form = document.getElementById('form-designer');
+        // Get the last section
+        var sections = document.getElementsByClassName('section');
+        var lastSection = sections[sections.length - 1];
+
+        var container = document.getElementById(lastSection.id);
+    } else {
+        var container = document.getElementById('section-' + section_id);
+    }
+
+    var jsonField = document.createElement('input');
+    jsonField.setAttribute('type', 'hidden');
+    jsonField.setAttribute('name', 'json');
 
     var card = document.createElement('div');
     card.classList.add('card', 'w-full', 'bg-base-100', 'shadow-xl', 'text-base-content', 'overflow-x-auto', 'self-start');
@@ -43,17 +199,29 @@ function pushTextInput() {
     cardTitle.classList.add('card-title');
     cardTitle.innerHTML = 'Campo de texto';
 
+    var labelFormControl = document.createElement('div');
+    labelFormControl.classList.add('form-control', 'w-full');
+
+    var labelLabel = document.createElement('label');
+    labelLabel.classList.add('label');
+    labelLabel.innerHTML = '<span class="label-text">Etiqueta del campo <span class="text-red-500">*</span></span>';
+
+    var labelInput = document.createElement('input');
+    labelInput.classList.add('input', 'input-bordered', 'w-full');
+    labelInput.setAttribute('type', 'text');
+    labelInput.setAttribute('placeholder', 'Ingrese el texto de la etiqueta');
+
     var nameFormControl = document.createElement('div');
     nameFormControl.classList.add('form-control', 'w-full');
 
     var nameLabel = document.createElement('label');
     nameLabel.classList.add('label');
-    nameLabel.innerHTML = '<span class="label-text">Etiqueta del campo <span class="text-red-500">*</span></span>';
+    nameLabel.innerHTML = '<span class="label-text">Nombre del campo <span class="text-red-500">*</span></span>';
 
     var nameInput = document.createElement('input');
     nameInput.classList.add('input', 'input-bordered', 'w-full');
     nameInput.setAttribute('type', 'text');
-    nameInput.setAttribute('placeholder', 'Ingrese el texto de la etiqueta');
+    nameInput.setAttribute('placeholder', 'Ingrese el nombre del campo');
 
     var innerGrid = document.createElement('div');
     innerGrid.classList.add('grid', 'grid-cols-1', 'lg:grid-cols-4', 'gap-4');
@@ -69,9 +237,72 @@ function pushTextInput() {
     isMandatoryCheckbox.setAttribute('type', 'checkbox');
     isMandatoryCheckbox.classList.add('checkbox', 'checkbox-primary');
 
-    form.appendChild(card);
+    if(create){
+        $.ajax({
+            url: createRoute,
+            type: 'POST',
+            data: {
+                _token: token,
+                type: 'text',
+            },
+            success: function(response) {
+                labelInput.setAttribute('label', 'label-' + response.id);
+                nameInput.setAttribute('name', 'name-' + response.id);
+                isMandatoryCheckbox.setAttribute('name', 'required-' + response.id);
+                if(response.label != null){
+                    labelInput.setAttribute('value', response.label);
+                    nameInput.setAttribute('value', response.name);
+                }
+                if(response.required){
+                    isMandatoryCheckbox.setAttribute('checked', 'checked');
+                } else {
+                    isMandatoryCheckbox.removeAttribute('checked');
+                }
+                jsonField.setAttribute('id', 'json-' + response.id);
+                jsonField.setAttribute('value', JSON.stringify(response));
+            },
+            error: function(error) {
+                console.log(error);
+            }
+        });
+    } else {
+        $.ajax({
+            url: getRoute,
+            type: 'POST',
+            data: {
+                _token: token,
+                id: id,
+            },
+            success: function(response) {
+                labelInput.setAttribute('label', 'label-' + response.id);
+                nameInput.setAttribute('name', 'name-' + response.id);
+                isMandatoryCheckbox.setAttribute('name', 'required-' + response.id);
+                if(response.label != null){
+                    labelInput.setAttribute('value', response.label);
+                    nameInput.setAttribute('value', response.name);
+                }
+                if(response.required){
+                    isMandatoryCheckbox.setAttribute('checked', 'checked');
+                } else {
+                    isMandatoryCheckbox.removeAttribute('checked');
+                }
+                jsonField.setAttribute('id', 'json-' + response.id);
+                jsonField.setAttribute('value', JSON.stringify(response));
+            },
+            error: function(error) {
+                console.log(error);
+            }
+        });
+    }
+
+    container.appendChild(card);
     card.appendChild(cardBody);
     cardBody.appendChild(cardTitle);
+    cardBody.appendChild(jsonField);
+
+    cardBody.appendChild(labelFormControl);
+    labelFormControl.appendChild(labelLabel);
+    labelFormControl.appendChild(labelInput);
 
     cardBody.appendChild(nameFormControl);
     nameFormControl.appendChild(nameLabel);
@@ -82,13 +313,44 @@ function pushTextInput() {
     innerGrid.appendChild(isMandatoryFormControl);
     isMandatoryFormControl.appendChild(isMandatoryLabel);
     isMandatoryLabel.appendChild(isMandatoryCheckbox);
+
+    labelInput.addEventListener('change', function(){
+        var json = JSON.parse(jsonField.value);
+        json.label = labelInput.value;
+        jsonField.value = JSON.stringify(json);
+
+        updateItem(updateRoute, token, json.id, jsonField.value);
+    });
+
+    nameInput.addEventListener('change', function(){
+        var json = JSON.parse(jsonField.value);
+        json.name = nameInput.value;
+        jsonField.value = JSON.stringify(json);
+
+        updateItem(updateRoute, token, json.id, jsonField.value);
+    });
+
+    isMandatoryCheckbox.addEventListener('change', function(){
+        var json = JSON.parse(jsonField.value);
+        if(isMandatoryCheckbox.checked){
+            json.required = true;
+        } else {
+            json.required = false;
+        }
+        jsonField.value = JSON.stringify(json);
+
+        updateItem(updateRoute, token, json.id, jsonField.value);
+    });
 }
 
-function pushNumberInput(){
-    var form = document.getElementById('form-designer');
+function pushNumberInput(createRoute, getRoute, updateRoute, token, create = true, id = null, section_id = null){
+    var container = document.getElementById('container');
+
+    var jsonField = document.createElement('input');
+    jsonField.setAttribute('type', 'hidden');
 
     var card = document.createElement('div');
-    card.classList.add('card', 'w-full', 'bg-base-100', 'shadow-xl', 'text-base-content', 'overflow-x-auto', 'self-start');
+    card.classList.add('card', 'mb-5');
 
     var cardBody = document.createElement('div');
     cardBody.classList.add('card-body');
@@ -97,17 +359,29 @@ function pushNumberInput(){
     cardTitle.classList.add('card-title');
     cardTitle.innerHTML = 'Campo numérico';
 
+    var labelFormControl = document.createElement('div');
+    labelFormControl.classList.add('form-control', 'w-full');
+
+    var labelLabel = document.createElement('label');
+    labelLabel.classList.add('label');
+    labelLabel.innerHTML = '<span class="label-text">Etiqueta del campo <span class="text-red-500">*</span></span>';
+
+    var labelInput = document.createElement('input');
+    labelInput.classList.add('input', 'input-bordered', 'w-full');
+    labelInput.setAttribute('type', 'text');
+    labelInput.setAttribute('placeholder', 'Ingrese el texto de la etiqueta');
+
     var nameFormControl = document.createElement('div');
     nameFormControl.classList.add('form-control', 'w-full');
 
     var nameLabel = document.createElement('label');
     nameLabel.classList.add('label');
-    nameLabel.innerHTML = '<span class="label-text">Etiqueta del campo <span class="text-red-500">*</span></span>';
+    nameLabel.innerHTML = '<span class="label-text">Nombre del campo <span class="text-red-500">*</span></span>';
 
     var nameInput = document.createElement('input');
     nameInput.classList.add('input', 'input-bordered', 'w-full');
     nameInput.setAttribute('type', 'text');
-    nameInput.setAttribute('placeholder', 'Ingrese el texto de la etiqueta');
+    nameInput.setAttribute('placeholder', 'Ingrese el nombre del campo');
 
     var innerGrid = document.createElement('div');
     innerGrid.classList.add('grid', 'grid-cols-1', 'lg:grid-cols-4', 'gap-4');
@@ -122,289 +396,11 @@ function pushNumberInput(){
     var isMandatoryCheckbox = document.createElement('input');
     isMandatoryCheckbox.setAttribute('type', 'checkbox');
     isMandatoryCheckbox.classList.add('checkbox', 'checkbox-primary');
-
-    var minValueFormControl = document.createElement('div');
-    minValueFormControl.classList.add('form-control', 'w-full');
-
-    var minValueLabel = document.createElement('label');
-    minValueLabel.classList.add('label');
-    minValueLabel.innerHTML = '<span class="label-text">Valor mínimo <span class="text-red-500">*</span></span>';
-
-    var minValueInput = document.createElement('input');
-    minValueInput.classList.add('input', 'input-bordered', 'w-full');
-    minValueInput.setAttribute('type', 'number');
-    minValueInput.setAttribute('placeholder', '0.00');
-
-    var maxValueFormControl = document.createElement('div');
-    maxValueFormControl.classList.add('form-control', 'w-full');
-
-    var maxValueLabel = document.createElement('label');
-    maxValueLabel.classList.add('label');
-    maxValueLabel.innerHTML = '<span class="label-text">Valor máximo</span>';
-
-    var maxValueInput = document.createElement('input');
-    maxValueInput.classList.add('input', 'input-bordered', 'w-full');
-    maxValueInput.setAttribute('type', 'number');
-    maxValueInput.setAttribute('placeholder', '100.00');
-
-    var stepFormControl = document.createElement('div');
-    stepFormControl.classList.add('form-control', 'w-full');
-
-    var stepLabel = document.createElement('label');
-    stepLabel.classList.add('label');
-    stepLabel.innerHTML = '<span class="label-text">Incremento <span class="text-red-500">*</span></span>';
-
-    var stepInput = document.createElement('input');
-    stepInput.classList.add('input', 'input-bordered', 'w-full');
-    stepInput.setAttribute('type', 'number');
-    stepInput.setAttribute('placeholder', '0.01');
-
-    form.appendChild(card);
-    card.appendChild(cardBody);
-    cardBody.appendChild(cardTitle);
-
-    cardBody.appendChild(nameFormControl);
-    nameFormControl.appendChild(nameLabel);
-    nameFormControl.appendChild(nameInput);
-
-    cardBody.appendChild(innerGrid);
-
-    innerGrid.appendChild(minValueFormControl);
-    minValueFormControl.appendChild(minValueLabel);
-    minValueFormControl.appendChild(minValueInput);
-
-    innerGrid.appendChild(maxValueFormControl);
-    maxValueFormControl.appendChild(maxValueLabel);
-    maxValueFormControl.appendChild(maxValueInput);
-
-    innerGrid.appendChild(stepFormControl);
-    stepFormControl.appendChild(stepLabel);
-    stepFormControl.appendChild(stepInput);
-
-    innerGrid.appendChild(isMandatoryFormControl);
-    isMandatoryFormControl.appendChild(isMandatoryLabel);
-    isMandatoryLabel.appendChild(isMandatoryCheckbox);
-}
-
-function pushDateInput(){
-    var form = document.getElementById('form-designer');
-
-    var card = document.createElement('div');
-    card.classList.add('card', 'w-full', 'bg-base-100', 'shadow-xl', 'text-base-content', 'overflow-x-auto', 'self-start');
-
-    var cardBody = document.createElement('div');
-    cardBody.classList.add('card-body');
-
-    var cardTitle = document.createElement('h2');
-    cardTitle.classList.add('card-title');
-    cardTitle.innerHTML = 'Campo de fecha';
-
-    var nameFormControl = document.createElement('div');
-    nameFormControl.classList.add('form-control', 'w-full');
-
-    var nameLabel = document.createElement('label');
-    nameLabel.classList.add('label');
-    nameLabel.innerHTML = '<span class="label-text">Etiqueta del campo <span class="text-red-500">*</span></span>';
-
-    var nameInput = document.createElement('input');
-    nameInput.classList.add('input', 'input-bordered', 'w-full');
-    nameInput.setAttribute('type', 'text');
-    nameInput.setAttribute('placeholder', 'Ingrese el texto de la etiqueta');
-
-    var innerGrid = document.createElement('div');
-    innerGrid.classList.add('grid', 'grid-cols-1', 'lg:grid-cols-4', 'gap-4');
-
-    var isMandatoryFormControl = document.createElement('div');
-    isMandatoryFormControl.classList.add('form-control', 'w-full');
-
-    var isMandatoryLabel = document.createElement('label');
-    isMandatoryLabel.classList.add('label', 'cursor-pointer');
-    isMandatoryLabel.innerHTML = '<span class="label-text">¿Es obligatorio?</span>';
-
-    var isMandatoryCheckbox = document.createElement('input');
-    isMandatoryCheckbox.setAttribute('type', 'checkbox');
-    isMandatoryCheckbox.classList.add('checkbox', 'checkbox-primary');
-
-    form.appendChild(card);
-    card.appendChild(cardBody);
-    cardBody.appendChild(cardTitle);
-
-    cardBody.appendChild(nameFormControl);
-    nameFormControl.appendChild(nameLabel);
-    nameFormControl.appendChild(nameInput);
-
-    cardBody.appendChild(innerGrid);
-
-    innerGrid.appendChild(isMandatoryFormControl);
-    isMandatoryFormControl.appendChild(isMandatoryLabel);
-    isMandatoryLabel.appendChild(isMandatoryCheckbox);
-}
-
-function pushSelect(){
-    var form = document.getElementById('form-designer');
-
-    var card = document.createElement('div');
-    card.classList.add('card', 'w-full', 'bg-base-100', 'shadow-xl', 'text-base-content', 'overflow-x-auto', 'self-start');
-
-    var cardBody = document.createElement('div');
-    cardBody.classList.add('card-body');
-
-    var cardTitle = document.createElement('h2');
-    cardTitle.classList.add('card-title');
-    cardTitle.innerHTML = 'Campo de selección';
-
-    var nameFormControl = document.createElement('div');
-    nameFormControl.classList.add('form-control', 'w-full');
-
-    var nameLabel = document.createElement('label');
-    nameLabel.classList.add('label');
-    nameLabel.innerHTML = '<span class="label-text">Etiqueta del campo <span class="text-red-500">*</span></span>';
-
-    var nameInput = document.createElement('input');
-    nameInput.classList.add('input', 'input-bordered', 'w-full');
-    nameInput.setAttribute('type', 'text');
-    nameInput.setAttribute('placeholder', 'Ingrese el texto de la etiqueta');
-
-    var innerGrid = document.createElement('div');
-    innerGrid.classList.add('grid', 'grid-cols-1', 'lg:grid-cols-4', 'gap-4');
-
-    var isMandatoryFormControl = document.createElement('div');
-    isMandatoryFormControl.classList.add('form-control', 'w-full');
-
-    var isMandatoryLabel = document.createElement('label');
-    isMandatoryLabel.classList.add('label', 'cursor-pointer');
-    isMandatoryLabel.innerHTML = '<span class="label-text">¿Es obligatorio?</span>';
-
-    var isMandatoryCheckbox = document.createElement('input');
-    isMandatoryCheckbox.setAttribute('type', 'checkbox');
-    isMandatoryCheckbox.classList.add('checkbox', 'checkbox-primary');
-
-    var optionsFormControl = document.createElement('div');
-    optionsFormControl.classList.add('form-control', 'w-full');
-
-    var optionsLabel = document.createElement('label');
-    optionsLabel.classList.add('label');
-    optionsLabel.innerHTML = '<span class="label-text">Opciones <span class="text-red-500">*</span></span>';
-
-    var optionsInput = document.createElement('textarea');
-    optionsInput.classList.add('textarea', 'textarea-bordered', 'w-full');
-    optionsInput.setAttribute('rows', '3');
-    optionsInput.setAttribute('placeholder', 'Ingrese las opciones separadas por comas');
-
-    form.appendChild(card);
-    card.appendChild(cardBody);
-    cardBody.appendChild(cardTitle);
-
-    cardBody.appendChild(nameFormControl);
-    nameFormControl.appendChild(nameLabel);
-    nameFormControl.appendChild(nameInput);
-
-    cardBody.appendChild(optionsFormControl);
-    optionsFormControl.appendChild(optionsLabel);
-    optionsFormControl.appendChild(optionsInput);
-
-    cardBody.appendChild(innerGrid);
-
-    innerGrid.appendChild(isMandatoryFormControl);
-    isMandatoryFormControl.appendChild(isMandatoryLabel);
-    isMandatoryLabel.appendChild(isMandatoryCheckbox);
-}
-
-function pushMultiSelect(){
-    var form = document.getElementById('form-designer');
-
-    var card = document.createElement('div');
-    card.classList.add('card', 'w-full', 'bg-base-100', 'shadow-xl', 'text-base-content', 'overflow-x-auto', 'self-start');
-
-    var cardBody = document.createElement('div');
-    cardBody.classList.add('card-body');
-
-    var cardTitle = document.createElement('h2');
-    cardTitle.classList.add('card-title');
-    cardTitle.innerHTML = 'Campo de selección múltiple';
-
-    var nameFormControl = document.createElement('div');
-    nameFormControl.classList.add('form-control', 'w-full');
-
-    var nameLabel = document.createElement('label');
-    nameLabel.classList.add('label');
-    nameLabel.innerHTML = '<span class="label-text">Etiqueta del campo <span class="text-red-500">*</span></span>';
-
-    var nameInput = document.createElement('input');
-    nameInput.classList.add('input', 'input-bordered', 'w-full');
-    nameInput.setAttribute('type', 'text');
-    nameInput.setAttribute('placeholder', 'Ingrese el texto de la etiqueta');
-
-    var innerGrid = document.createElement('div');
-    innerGrid.classList.add('grid', 'grid-cols-1', 'lg:grid-cols-4', 'gap-4');
-
-    var isMandatoryFormControl = document.createElement('div');
-    isMandatoryFormControl.classList.add('form-control', 'w-full');
-
-    var isMandatoryLabel = document.createElement('label');
-    isMandatoryLabel.classList.add('label', 'cursor-pointer');
-    isMandatoryLabel.innerHTML = '<span class="label-text">¿Es obligatorio?</span>';
-
-    var isMandatoryCheckbox = document.createElement('input');
-    isMandatoryCheckbox.setAttribute('type', 'checkbox');
-    isMandatoryCheckbox.classList.add('checkbox', 'checkbox-primary');
-
-    var optionsFormControl = document.createElement('div');
-    optionsFormControl.classList.add('form-control', 'w-full');
-
-    var optionsLabel = document.createElement('label');
-    optionsLabel.classList.add('label');
-    optionsLabel.innerHTML = '<span class="label-text">Opciones <span class="text-red-500">*</span></span>';
-
-    var optionsInput = document.createElement('textarea');
-    optionsInput.classList.add('textarea', 'textarea-bordered', 'w-full');
-    optionsInput.setAttribute('rows', '3');
-    optionsInput.setAttribute('placeholder', 'Ingrese las opciones separadas por comas');
-
-    form.appendChild(card);
-    card.appendChild(cardBody);
-    cardBody.appendChild(cardTitle);
-
-    cardBody.appendChild(nameFormControl);
-    nameFormControl.appendChild(nameLabel);
-    nameFormControl.appendChild(nameInput);
-
-    cardBody.appendChild(optionsFormControl);
-    optionsFormControl.appendChild(optionsLabel);
-    optionsFormControl.appendChild(optionsInput);
-
-    cardBody.appendChild(innerGrid);
-
-    innerGrid.appendChild(isMandatoryFormControl);
-    isMandatoryFormControl.appendChild(isMandatoryLabel);
-    isMandatoryLabel.appendChild(isMandatoryCheckbox);
-}
-
-function pushSingleSection(){
-    var form = document.getElementById('form-designer');
-
-    var divider = document.createElement('div');
-    divider.classList.add('divider', 'section-single');
-    divider.innerHTML = 'Sección única';
-
-    form.appendChild(divider);
-}
-
-function pushRepeatingSection(){
-    var form = document.getElementById('form-designer');
-
-    var divider = document.createElement('div');
-    divider.classList.add('divider', 'section-repeating');
-    divider.innerHTML = 'Sección repetitiva';
-
-    form.appendChild(divider);
 }
 
 window.startFormDesigner = startFormDesigner;
-window.pushTextInput = pushTextInput;
-window.pushNumberInput = pushNumberInput;
-window.pushDateInput = pushDateInput;
-window.pushSelect = pushSelect;
-window.pushMultiSelect = pushMultiSelect;
+
 window.pushSingleSection = pushSingleSection;
 window.pushRepeatingSection = pushRepeatingSection;
+
+window.pushTextInput = pushTextInput;

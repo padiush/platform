@@ -30,7 +30,7 @@
                     </h2>
                     @isset($subtitle)<span class="text-sm">{{ $subtitle }}</span>@endisset
                 </span>
-                @isset($action_right)<span class="inline-block w-16">{{ $action_right }}</span>@endisset
+                @isset($action_right)<span class="inline-block w-32">{{ $action_right }}</span>@endisset
             </div>
         </header>
 
