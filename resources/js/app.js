@@ -1246,7 +1246,7 @@ window.pushDateInput = pushDateInput;
 window.pushSingleSelect = pushSingleSelect;
 window.pushMultiSelect = pushMultiSelect;
 
-function createNewRepeatingSectionInstance(section_id){
+function createNewRepeatingSectionInstance(section_id, route, token){
     var masterSectionId = "section-" + section_id + "-master";
     var masterSection = document.getElementById(masterSectionId);
 
@@ -1268,6 +1268,37 @@ function createNewRepeatingSectionInstance(section_id){
     });
 
     instance.appendChild(deleteButton);
+
+    // Check if instance contains field with answer-repeatable class
+    var answerRepeatable = instance.getElementsByClassName('answer-repeatable');
+
+    if(answerRepeatable.length > 0){
+        var answerRepeatable = answerRepeatable[0];
+        // Get the item_id from the id of the answer-repeatable's parent element
+        var item_id = answerRepeatable.parentElement.id;
+
+        // Set its id to answer-repeatable-{item_id}-{instance_number}
+        answerRepeatable.id = "answer-repeatable-" + item_id + "-" + (instancesContainer.childElementCount + 1);
+
+        // Attach a change event listener to the answer-repeatable
+        answerRepeatable.addEventListener('change', function(){
+            var value = $(this).val();
+            var id = $(this).attr('id');
+
+            var item_id = id.replace('answer-repeatable-', '').replace(/-[^-]*$/, '');
+            var repeatable_index = id.replace('answer-repeatable-' + item_id + '-', '');
+
+            var answer = {
+                'item_id': item_id,
+                'repeatable_index': repeatable_index,
+                'answer': value
+            };
+
+            var answerJSON = JSON.stringify(answer);
+
+            storeAnswer(route, answerJSON, token);
+        });
+    }
 
     instancesContainer.appendChild(instance);
 }
