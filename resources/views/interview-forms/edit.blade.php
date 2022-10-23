@@ -30,10 +30,10 @@
         <button id="numberInput">
             <span><i class="fa-solid fa-plus"></i><i class="fa-regular fa-input-numeric ml-2"></i></span><span class="hidden lg:inline-block text-sm">Campo numérico</span>
         </button>
-        <button onclick="pushDateInput()">
+        <button id="dateInput">
             <span><i class="fa-solid fa-plus"></i><i class="fa-regular fa-calendar-days ml-2"></i></span><span class="hidden lg:inline-block text-sm">Campo de fecha</span>
         </button>
-        <button onclick="pushSelect()">
+        <button id="singleSelect">
             <span><i class="fa-solid fa-plus"></i><i class="fa-regular fa-list-dropdown ml-2"></i></span><span class="hidden lg:inline-block text-sm">Selección única</span>
         </button>
         <button onclick="pushMultiSelect()">
@@ -71,6 +71,14 @@
 
             $('#numberInput').click(function(){
                 pushNumberInput(createRoute, getItemRoute, updateItemRoute, csrfToken);
+            });
+
+            $('#dateInput').click(function(){
+                pushDateInput(createRoute, getItemRoute, updateItemRoute, csrfToken);
+            });
+
+            $('#singleSelect').click(function(){
+                pushSingleSelect(createRoute, getItemRoute, updateItemRoute, csrfToken);
             });
         });
 

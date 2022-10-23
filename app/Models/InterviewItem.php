@@ -31,9 +31,4 @@ class InterviewItem extends Model
     {
         return $this->belongsTo(InterviewSection::class);
     }
-
-    public function getOptionsAttribute($value)
-    {
-        return json_decode($value);
-    }
 }

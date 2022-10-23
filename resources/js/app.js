@@ -52,6 +52,14 @@ function startFormDesigner(csrfToken, sections, getItemsRoute, getItemRoute, upd
                         if(item.type == 'number'){
                             pushNumberInput('', getItemRoute, updateItemRoute, csrfToken, false, item.id, section.id);
                         }
+
+                        if(item.type == 'date'){
+                            pushDateInput('', getItemRoute, updateItemRoute, csrfToken, false, item.id, section.id);
+                        }
+
+                        if(item.type == 'select'){
+                            pushSingleSelect('', getItemRoute, updateItemRoute, csrfToken, false, item.id, section.id);
+                        }
                     });
                 },
                 error: function(error){
@@ -79,6 +87,14 @@ function startFormDesigner(csrfToken, sections, getItemsRoute, getItemRoute, upd
 
                         if(item.type == 'number'){
                             pushNumberInput('', getItemRoute, updateItemRoute, csrfToken, false, item.id, section.id);
+                        }
+
+                        if(item.type == 'date'){
+                            pushDateInput('', getItemRoute, updateItemRoute, csrfToken, false, item.id, section.id);
+                        }
+
+                        if(item.type == 'select'){
+                            pushSingleSelect('', getItemRoute, updateItemRoute, csrfToken, false, item.id, section.id);
                         }
                     });
                 },
@@ -177,6 +193,9 @@ function updateItem(route, token, item_id, json){
         },
         success: function(response){
             console.log(response);
+        },
+        error: function(error){
+            console.log(error);
         }
     });
 }
@@ -619,6 +638,387 @@ function pushNumberInput(createRoute, getRoute, updateRoute, token, create = tru
     });
 }
 
+function pushDateInput(createRoute, getRoute, updateRoute, token, create = true, id = null, section_id = null){
+    if(section_id == null){
+        var form = document.getElementById('form-designer');
+        var sections = document.getElementsByClassName('section');
+        var lastSection = sections[sections.length - 1];
+
+        var container = document.getElementById(lastSection.id);
+    } else {
+        var container = document.getElementById('section-' + section_id);
+    }
+
+    var jsonField = document.createElement('input');
+    jsonField.setAttribute('type', 'hidden');
+    jsonField.setAttribute('name', 'json');
+
+    var card = document.createElement('div');
+    card.classList.add('card', 'w-full', 'bg-base-100', 'shadow-xl', 'text-base-content', 'overflow-x-auto', 'self-start');
+
+    var cardBody = document.createElement('div');
+    cardBody.classList.add('card-body');
+
+    var cardTitle = document.createElement('h2');
+    cardTitle.classList.add('card-title');
+    cardTitle.innerHTML = 'Campo de fecha';
+
+    var labelFormControl = document.createElement('div');
+    labelFormControl.classList.add('form-control', 'w-full');
+
+    var labelLabel = document.createElement('label');
+    labelLabel.classList.add('label');
+    labelLabel.innerHTML = '<span class="label-text">Etiqueta del campo <span class="text-red-500">*</span></span>';
+
+    var labelInput = document.createElement('input');
+    labelInput.classList.add('input', 'input-bordered', 'w-full');
+    labelInput.setAttribute('type', 'text');
+    labelInput.setAttribute('placeholder', 'Ingrese el texto de la etiqueta');
+
+    var nameFormControl = document.createElement('div');
+    nameFormControl.classList.add('form-control', 'w-full');
+
+    var nameLabel = document.createElement('label');
+    nameLabel.classList.add('label');
+    nameLabel.innerHTML = '<span class="label-text">Nombre del campo <span class="text-red-500">*</span></span>';
+
+    var nameInput = document.createElement('input');
+    nameInput.classList.add('input', 'input-bordered', 'w-full');
+    nameInput.setAttribute('type', 'text');
+    nameInput.setAttribute('placeholder', 'Ingrese el nombre del campo');
+
+    var innerGrid = document.createElement('div');
+    innerGrid.classList.add('grid', 'grid-cols-1', 'lg:grid-cols-4', 'gap-4');
+
+    var isMandatoryFormControl = document.createElement('div');
+    isMandatoryFormControl.classList.add('form-control', 'w-full');
+
+    var isMandatoryLabel = document.createElement('label');
+    isMandatoryLabel.classList.add('label', 'cursor-pointer');
+    isMandatoryLabel.innerHTML = '<span class="label-text">¿Es obligatorio?</span>';
+
+    var isMandatoryCheckbox = document.createElement('input');
+    isMandatoryCheckbox.setAttribute('type', 'checkbox');
+    isMandatoryCheckbox.classList.add('checkbox', 'checkbox-primary');
+
+    if(create){
+        $.ajax({
+            url: createRoute,
+            type: 'POST',
+            data: {
+                _token: token,
+                type: 'date',
+            },
+            success: function(response) {
+                labelInput.setAttribute('label', 'label-' + response.id);
+                nameInput.setAttribute('name', 'name-' + response.id);
+                isMandatoryCheckbox.setAttribute('name', 'required-' + response.id);
+                if(response.label != null){
+                    labelInput.setAttribute('value', response.label);
+                    nameInput.setAttribute('value', response.name);
+                }
+                if(response.required){
+                    isMandatoryCheckbox.setAttribute('checked', 'checked');
+                } else {
+                    isMandatoryCheckbox.removeAttribute('checked');
+                }
+                jsonField.setAttribute('id', 'json-' + response.id);
+                jsonField.setAttribute('value', JSON.stringify(response));
+            },
+            error: function(error) {
+                console.log(error);
+            }
+        });
+    } else {
+        $.ajax({
+            url: getRoute,
+            type: 'POST',
+            data: {
+                _token: token,
+                id: id,
+            },
+            success: function(response) {
+                labelInput.setAttribute('label', 'label-' + response.id);
+                nameInput.setAttribute('name', 'name-' + response.id);
+                isMandatoryCheckbox.setAttribute('name', 'required-' + response.id);
+                if(response.label != null){
+                    labelInput.setAttribute('value', response.label);
+                    nameInput.setAttribute('value', response.name);
+                }
+                if(response.required){
+                    isMandatoryCheckbox.setAttribute('checked', 'checked');
+                } else {
+                    isMandatoryCheckbox.removeAttribute('checked');
+                }
+                jsonField.setAttribute('id', 'json-' + response.id);
+                jsonField.setAttribute('value', JSON.stringify(response));
+            },
+            error: function(error) {
+                console.log(error);
+            }
+        });
+    }
+
+    container.appendChild(card);
+    card.appendChild(cardBody);
+    cardBody.appendChild(cardTitle);
+    cardBody.appendChild(jsonField);
+
+    cardBody.appendChild(labelFormControl);
+    labelFormControl.appendChild(labelLabel);
+    labelFormControl.appendChild(labelInput);
+
+    cardBody.appendChild(nameFormControl);
+    nameFormControl.appendChild(nameLabel);
+    nameFormControl.appendChild(nameInput);
+
+    cardBody.appendChild(innerGrid);
+
+    innerGrid.appendChild(isMandatoryFormControl);
+    isMandatoryFormControl.appendChild(isMandatoryLabel);
+    isMandatoryLabel.appendChild(isMandatoryCheckbox);
+
+    labelInput.addEventListener('change', function(){
+        var json = JSON.parse(jsonField.value);
+        json.label = labelInput.value;
+        jsonField.value = JSON.stringify(json);
+
+        updateItem(updateRoute, token, json.id, jsonField.value);
+    });
+
+    nameInput.addEventListener('change', function(){
+        var json = JSON.parse(jsonField.value);
+        json.name = nameInput.value;
+        jsonField.value = JSON.stringify(json);
+
+        updateItem(updateRoute, token, json.id, jsonField.value);
+    });
+
+    isMandatoryCheckbox.addEventListener('change', function(){
+        var json = JSON.parse(jsonField.value);
+        if(isMandatoryCheckbox.checked){
+            json.required = true;
+        } else {
+            json.required = false;
+        }
+        jsonField.value = JSON.stringify(json);
+
+        updateItem(updateRoute, token, json.id, jsonField.value);
+    });
+}
+
+function pushSingleSelect(createRoute, getRoute, updateRoute, token, create = true, id = null, section_id = null){
+    if(section_id == null){
+        var form = document.getElementById('form-designer');
+        var sections = document.getElementsByClassName('section');
+        var lastSection = sections[sections.length - 1];
+
+        var container = document.getElementById(lastSection.id);
+    } else {
+        var container = document.getElementById('section-' + section_id);
+    }
+
+    var jsonField = document.createElement('input');
+    jsonField.setAttribute('type', 'hidden');
+    jsonField.setAttribute('name', 'json');
+
+    var card = document.createElement('div');
+    card.classList.add('card', 'w-full', 'bg-base-100', 'shadow-xl', 'text-base-content', 'overflow-x-auto', 'self-start');
+
+    var cardBody = document.createElement('div');
+    cardBody.classList.add('card-body');
+
+    var cardTitle = document.createElement('h2');
+    cardTitle.classList.add('card-title');
+    cardTitle.innerHTML = 'Selección única';
+
+    var labelFormControl = document.createElement('div');
+    labelFormControl.classList.add('form-control', 'w-full');
+
+    var labelLabel = document.createElement('label');
+    labelLabel.classList.add('label');
+    labelLabel.innerHTML = '<span class="label-text">Etiqueta del campo <span class="text-red-500">*</span></span>';
+
+    var labelInput = document.createElement('input');
+    labelInput.classList.add('input', 'input-bordered', 'w-full');
+    labelInput.setAttribute('type', 'text');
+    labelInput.setAttribute('placeholder', 'Ingrese el texto de la etiqueta');
+
+    var nameFormControl = document.createElement('div');
+    nameFormControl.classList.add('form-control', 'w-full');
+
+    var nameLabel = document.createElement('label');
+    nameLabel.classList.add('label');
+    nameLabel.innerHTML = '<span class="label-text">Nombre del campo <span class="text-red-500">*</span></span>';
+
+    var nameInput = document.createElement('input');
+    nameInput.classList.add('input', 'input-bordered', 'w-full');
+    nameInput.setAttribute('type', 'text');
+    nameInput.setAttribute('placeholder', 'Ingrese el nombre del campo');
+
+    var optionsFormControl = document.createElement('div');
+    optionsFormControl.classList.add('form-control', 'w-full');
+
+    var optionsLabel = document.createElement('label');
+    optionsLabel.classList.add('label');
+    optionsLabel.innerHTML = '<span class="label-text">Opciones <span class="text-red-500">*</span></span>';
+
+    var optionsTextArea = document.createElement('textarea');
+    optionsTextArea.classList.add('textarea', 'textarea-bordered', 'w-full');
+    optionsTextArea.setAttribute('rows', '3');
+    optionsTextArea.setAttribute('placeholder', 'Ingrese las opciones separadas por coma');
+
+    var innerGrid = document.createElement('div');
+    innerGrid.classList.add('grid', 'grid-cols-1', 'lg:grid-cols-4', 'gap-4');
+
+    var isMandatoryFormControl = document.createElement('div');
+    isMandatoryFormControl.classList.add('form-control', 'w-full');
+
+    var isMandatoryLabel = document.createElement('label');
+    isMandatoryLabel.classList.add('label', 'cursor-pointer');
+    isMandatoryLabel.innerHTML = '<span class="label-text">¿Es obligatorio?</span>';
+
+    var isMandatoryCheckbox = document.createElement('input');
+    isMandatoryCheckbox.setAttribute('type', 'checkbox');
+    isMandatoryCheckbox.classList.add('checkbox', 'checkbox-primary');
+
+        if(create){
+        $.ajax({
+            url: createRoute,
+            type: 'POST',
+            data: {
+                _token: token,
+                type: 'select',
+            },
+            success: function(response) {
+                labelInput.setAttribute('label', 'label-' + response.id);
+                nameInput.setAttribute('name', 'name-' + response.id);
+                isMandatoryCheckbox.setAttribute('name', 'required-' + response.id);
+
+                if(response.label != "null"){
+                    labelInput.setAttribute('value', response.label);
+                }
+
+                if(response.name != "null"){
+                    nameInput.setAttribute('value', response.name);
+                }
+
+                if(response.required){
+                    isMandatoryCheckbox.setAttribute('checked', 'checked');
+                } else {
+                    isMandatoryCheckbox.removeAttribute('checked');
+                }
+                optionsTextArea.setAttribute('name', 'options-' + response.id);
+                if(response.options != "null"){
+                    optionsTextArea.value = JSON.parse(response.options).join(',');
+                }
+
+                jsonField.setAttribute('id', 'json-' + response.id);
+                jsonField.setAttribute('value', JSON.stringify(response));
+            },
+            error: function(error) {
+                console.log(error);
+            }
+        });
+    } else {
+        $.ajax({
+            url: getRoute,
+            type: 'POST',
+            data: {
+                _token: token,
+                id: id,
+            },
+            success: function(response) {
+                labelInput.setAttribute('label', 'label-' + response.id);
+                nameInput.setAttribute('name', 'name-' + response.id);
+                isMandatoryCheckbox.setAttribute('name', 'required-' + response.id);
+                if(response.label != "null"){
+                    labelInput.setAttribute('value', response.label);
+                }
+
+                if(response.name != "null"){
+                    nameInput.setAttribute('value', response.name);
+                }
+
+                if(response.required){
+                    isMandatoryCheckbox.setAttribute('checked', 'checked');
+                } else {
+                    isMandatoryCheckbox.removeAttribute('checked');
+                }
+                optionsTextArea.setAttribute('name', 'options-' + response.id);
+                if(response.options != "null"){
+                    optionsTextArea.value = JSON.parse(response.options).join(',');
+                }
+
+                jsonField.setAttribute('id', 'json-' + response.id);
+                jsonField.setAttribute('value', JSON.stringify(response));
+            },
+            error: function(error) {
+                console.log(error);
+            }
+        });
+    }
+
+    container.appendChild(card);
+    card.appendChild(cardBody);
+    cardBody.appendChild(cardTitle);
+    cardBody.appendChild(jsonField);
+
+    cardBody.appendChild(labelFormControl);
+    labelFormControl.appendChild(labelLabel);
+    labelFormControl.appendChild(labelInput);
+
+    cardBody.appendChild(nameFormControl);
+    nameFormControl.appendChild(nameLabel);
+    nameFormControl.appendChild(nameInput);
+
+    cardBody.appendChild(optionsFormControl);
+    optionsFormControl.appendChild(optionsLabel);
+    optionsFormControl.appendChild(optionsTextArea);
+
+    cardBody.appendChild(innerGrid);
+
+    innerGrid.appendChild(isMandatoryFormControl);
+    isMandatoryFormControl.appendChild(isMandatoryLabel);
+    isMandatoryLabel.appendChild(isMandatoryCheckbox);
+
+    labelInput.addEventListener('change', function(){
+        var json = JSON.parse(jsonField.value);
+        json.label = labelInput.value;
+        jsonField.value = JSON.stringify(json);
+
+        updateItem(updateRoute, token, json.id, jsonField.value);
+    });
+
+    nameInput.addEventListener('change', function(){
+        var json = JSON.parse(jsonField.value);
+        json.name = nameInput.value;
+        jsonField.value = JSON.stringify(json);
+
+        updateItem(updateRoute, token, json.id, jsonField.value);
+    });
+
+    isMandatoryCheckbox.addEventListener('change', function(){
+        var json = JSON.parse(jsonField.value);
+        if(isMandatoryCheckbox.checked){
+            json.required = true;
+        } else {
+            json.required = false;
+        }
+        jsonField.value = JSON.stringify(json);
+
+        updateItem(updateRoute, token, json.id, jsonField.value);
+    });
+
+    optionsTextArea.addEventListener('change', function(){
+        var json = JSON.parse(jsonField.value);
+        json.options = optionsTextArea.value.split(',');
+        jsonField.value = JSON.stringify(json);
+
+        updateItem(updateRoute, token, json.id, jsonField.value);
+    });
+}
+
 window.startFormDesigner = startFormDesigner;
 
 window.pushSingleSection = pushSingleSection;
@@ -626,3 +1026,5 @@ window.pushRepeatingSection = pushRepeatingSection;
 
 window.pushTextInput = pushTextInput;
 window.pushNumberInput = pushNumberInput;
+window.pushDateInput = pushDateInput;
+window.pushSingleSelect = pushSingleSelect;
