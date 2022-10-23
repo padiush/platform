@@ -6,3 +6,5 @@
 </div>
 
 <div class="divider"></div>
+
+<a class="btn btn-error btn-sm float-right"></a>

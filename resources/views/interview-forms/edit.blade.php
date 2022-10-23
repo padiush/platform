@@ -47,40 +47,42 @@
             var sections = @json($form->sections);
             var getItemsRoute = '{{ route('designer.section.items', ['form' => $form]) }}';
 
+            var createItemRoute = '{{ route('designer.item.create', ['form' => $form]) }}';
             var getItemRoute = '{{ route('designer.item.data', ['form' => $form]) }}';
             var updateItemRoute = '{{ route('designer.item.update', ['form' => $form]) }}';
-            startFormDesigner(csrfToken, sections, getItemsRoute, getItemRoute, updateItemRoute);
+
+            var createSectionRoute = '{{ route('designer.section.create', ['form' => $form]) }}';
+            var getSectionRoute = '{{ route('designer.section.data', ['form' => $form]) }}';
+            var updateSectionRoute = '{{ route('designer.section.update', ['form' => $form]) }}';
+
+            startFormDesigner(csrfToken, sections, getItemsRoute, getItemRoute, updateItemRoute, getSectionRoute, updateSectionRoute);
 
             $('#singleSection').click(function(){
-                var route = '{{ route('designer.section.create', ['form' => $form]) }}';
-                pushSingleSection(route, csrfToken);
+                pushSection(createSectionRoute, getSectionRoute, updateSectionRoute, csrfToken, true, null, false)
             });
 
             $('#repeatingSection').click(function(){
-                var route = '{{ route('designer.section.create', ['form' => $form]) }}';
-                pushRepeatingSection(route, csrfToken);
+                pushSection(createSectionRoute, getSectionRoute, updateSectionRoute, csrfToken, true, null, true)
             });
 
-            var createRoute = '{{ route('designer.item.create', ['form' => $form]) }}';
-
             $('#textInput').click(function(){
-                pushTextInput(createRoute, getItemRoute, updateItemRoute, csrfToken);
+                pushTextInput(createItemRoute, getItemRoute, updateItemRoute, csrfToken);
             });
 
             $('#numberInput').click(function(){
-                pushNumberInput(createRoute, getItemRoute, updateItemRoute, csrfToken);
+                pushNumberInput(createItemRoute, getItemRoute, updateItemRoute, csrfToken);
             });
 
             $('#dateInput').click(function(){
-                pushDateInput(createRoute, getItemRoute, updateItemRoute, csrfToken);
+                pushDateInput(createItemRoute, getItemRoute, updateItemRoute, csrfToken);
             });
 
             $('#singleSelect').click(function(){
-                pushSingleSelect(createRoute, getItemRoute, updateItemRoute, csrfToken);
+                pushSingleSelect(createItemRoute, getItemRoute, updateItemRoute, csrfToken);
             });
 
             $('#multiSelect').click(function(){
-                pushMultiSelect(createRoute, getItemRoute, updateItemRoute, csrfToken);
+                pushMultiSelect(createItemRoute, getItemRoute, updateItemRoute, csrfToken);
             });
         });
 

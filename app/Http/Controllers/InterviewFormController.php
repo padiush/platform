@@ -63,7 +63,7 @@ class InterviewFormController extends Controller
             'description' => $request->description,
         ]);
 
-        return redirect()->route('interview-forms.edit', $form)->with('success', 'Formulario de entrevista creado exitosamente.');
+        return redirect()->route('designer.form.edit', ['project' => $project, 'form' => $form])->with('success', 'Formulario de entrevista creado exitosamente.');
     }
 
     public function destroy(Project $project, InterviewForm $form){

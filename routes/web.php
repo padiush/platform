@@ -51,6 +51,9 @@ Route::controller(InterviewDesignerController::class)->group(function(){
 
     Route::post('/designer/{form}/item/data', 'getItem')->middleware(['auth'])->name('designer.item.data');
     Route::post('/designer/{form}/item/update', 'updateItem')->middleware(['auth'])->name('designer.item.update');
+
+    Route::post('/designer/{form}/section/data', 'getSection')->middleware(['auth'])->name('designer.section.data');
+    Route::post('/designer/{form}/section/update', 'updateSection')->middleware(['auth'])->name('designer.section.update');
 });
 
 Route::controller(ProjectCatalogController::class)->group(function(){
