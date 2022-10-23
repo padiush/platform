@@ -1,0 +1,130 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
+use App\Models\InterviewForm;
+use App\Models\InterviewInstance;
+use App\Models\ProjectAccess;
+use App\Models\Project;
+use App\Models\User;
+use App\Models\InstanceAnswer;
+
+class InterviewInstancesController extends Controller
+{
+    public function index(){
+        $accesses = ProjectAccess::where('user_id', Auth::id())->get();
+
+        $projects = collect();
+
+        foreach($accesses as $access){
+            $project = Project::find($access->project_id);
+
+            if(!$project->finished && Auth::user()->hasCapabilityOnProject($project, 'record_data')){
+                $projects->push($project);
+            }
+        }
+
+        if($projects->count() == 0){
+            return redirect()->route('projects.index')->with('error', 'No tienes proyectos activos para tomar entrevistas.');
+        }
+
+        return view('interviews.index', compact('projects'));
+    }
+
+    public function create(InterviewForm $form){
+        $project = Project::find($form->project_id);
+
+        if(!$project->finished && Auth::user()->hasCapabilityOnProject($project, 'record_data')){
+            $instance = InterviewInstance::create([
+                'interview_form_id' => $form->id,
+                'user_id' => Auth::id(),
+            ]);
+
+            return redirect()->route('interviews.show', $instance);
+        }
+
+        return redirect()->route('projects.index')->with('error', 'No tienes permisos para tomar entrevistas en este proyecto.');
+    }
+
+    public function show(InterviewInstance $instance){
+        $form = $instance->form;
+        $project = $form->project;
+
+        if(!$project->finished && Auth::user()->hasCapabilityOnProject($project, 'record_data')){
+            return view('interviews.show', compact('instance', 'project', 'form'));
+        }
+
+        return redirect()->route('projects.index')->with('error', 'No tienes permisos para tomar entrevistas en este proyecto.');
+    }
+
+    public function storeAnswer(Request $request, InterviewInstance $instance){
+        $form = $instance->form;
+        $project = $form->project;
+
+        if($project->finished || !Auth::user()->hasCapabilityOnProject($project, 'record_data')){
+            return redirect()->route('projects.index')->with('error', 'No tienes permisos para tomar entrevistas en este proyecto.');
+        }
+
+        $request->validate([
+            'item_id' => 'required|integer',
+            'repeatable_index' => 'nullable|integer',
+            'answer' => 'required',
+        ]);
+
+        // Check for previous answer
+        $answer = InstanceAnswer::where('interview_instance_id', $instance->id)
+            ->where('interview_item_id', $request->item_id)
+            ->where('repeatable_index', $request->repeatable_index)
+            ->first();
+
+        if($answer){
+            $answer->answer = $request->answer;
+            $answer->save();
+        } else {
+            $answer = InstanceAnswer::create([
+                'interview_instance_id' => $instance->id,
+                'interview_item_id' => $request->item_id,
+                'repeatable_index' => $request->repeatable_index,
+                'answer' => $request->answer,
+            ]);
+        }
+
+        return response()->json([
+            'success' => true,
+            'answer' => $answer,
+        ]);
+    }
+
+    public function getAnswer(Request $request, InterviewInstance $instance){
+        $form = $instance->form;
+        $project = $form->project;
+
+        if($project->finished || !Auth::user()->hasCapabilityOnProject($project, 'record_data')){
+            return redirect()->route('projects.index')->with('error', 'No tienes permisos para tomar entrevistas en este proyecto.');
+        }
+
+        $request->validate([
+            'item_id' => 'required|integer',
+            'repeatable_index' => 'nullable|integer',
+        ]);
+
+        $answer = InstanceAnswer::where('interview_instance_id', $instance->id)
+            ->where('interview_item_id', $request->item_id)
+            ->where('repeatable_index', $request->repeatable_index)
+            ->first();
+
+        if($answer){
+            return response()->json([
+                'success' => true,
+                'answer' => $answer,
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+        ]);
+    }
+}

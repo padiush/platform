@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\Project;
 use App\Models\User;
 use App\Models\InterviewSection;
+use App\Models\InterviewInstance;
 
 class InterviewForm extends Model
 {
@@ -34,5 +35,10 @@ class InterviewForm extends Model
     public function sections()
     {
         return $this->hasMany(InterviewSection::class);
+    }
+
+    public function instances()
+    {
+        return $this->hasMany(InterviewInstance::class);
     }
 }

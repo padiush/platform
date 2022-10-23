@@ -70,6 +70,11 @@ class Project extends Model
         return $this->hasMany(InterviewForm::class);
     }
 
+    public function activeInterviewForms()
+    {
+        return $this->hasMany(InterviewForm::class)->where('is_active', true);
+    }
+
     public function catalogSpecies()
     {
         return $this->hasMany(CatalogSpecies::class);

@@ -14,7 +14,7 @@
                     </a>
                     <ul class="p-2 bg-base-200">
                         <li><a href="{{ route('designer.index') }}">Diseñar</a></li>
-                        <li><a>Entrevistar</a></li>
+                        <li><a href="{{ route('interviews.index') }}">Entrevistar</a></li>
                     </ul>
                 </li>
                 <li><a href="{{ route('catalogs.index') }}">Catálogos</a></li>
@@ -38,7 +38,7 @@
                 </a>
                 <ul class="p-2 bg-base-100">
                     <li><a href="{{ route('designer.index') }}">Diseñar</a></li>
-                    <li><a>Entrevistar</a></li>
+                    <li><a href="{{ route('interviews.index') }}">Entrevistar</a></li>
                 </ul>
             </li>
             <li><a href="{{ route('catalogs.index') }}">Catálogos</a></li>

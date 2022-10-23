@@ -5,6 +5,7 @@ use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\InterviewFormController;
 use App\Http\Controllers\InterviewDesignerController;
 use App\Http\Controllers\ProjectCatalogController;
+use App\Http\Controllers\InterviewInstancesController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -62,6 +63,15 @@ Route::controller(ProjectCatalogController::class)->group(function(){
 
     Route::get('/catalogs/{project}/species/register', 'registerSpecies')->middleware(['auth'])->name('catalogs.species.register');
     Route::post('/catalogs/{project}/species/register', 'storeSpecies')->middleware(['auth']);
+});
+
+Route::controller(InterviewInstancesController::class)->group(function(){
+    Route::get('/interviews', 'index')->middleware(['auth'])->name('interviews.index');
+    Route::get('/interviews/{form}/create', 'create')->middleware(['auth'])->name('interviews.create');
+    Route::get('/interviews/instance/{instance}', 'show')->middleware(['auth'])->name('interviews.show');
+
+    Route::post('/interviews/instance/{instance}/answer/store', 'storeAnswer')->middleware(['auth'])->name('interviews.answer');
+    Route::post('/interviews/instance/{instance}/answer/get', 'getAnswer')->middleware(['auth'])->name('interviews.answer.get');
 });
 
 require __DIR__.'/auth.php';

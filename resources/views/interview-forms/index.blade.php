@@ -21,7 +21,7 @@
                     <tr>
                         <td class="text-center">@if($form->is_active)<i class="fa-solid fa-check"></i>@else<i class="fa-solid fa-times"></i>@endif</td>
                         <td class="text-wrap">{{ $form->name }}</td>
-                        <td class="hidden lg:table-cell">0</td>
+                        <td class="hidden lg:table-cell">{{ count($form->instances) }}</td>
                         <td>
                             <a class="btn btn-primary btn-xs" href="{{ route('designer.form.edit', ['project' => $project, 'form' => $form]) }} ">
                                 Editar

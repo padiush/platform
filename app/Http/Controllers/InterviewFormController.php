@@ -73,6 +73,22 @@ class InterviewFormController extends Controller
             return redirect()->route('projects.index')->with('error', 'No tienes permisos para eliminar formularios en este proyecto.');
         }
 
+        foreach($form->instances as $instance){
+            foreach($instance->answers as $answer){
+                $answer->delete();
+            }
+
+            $instance->delete();
+        }
+
+        foreach($form->sections as $section){
+            foreach($section->items as $item){
+                $item->delete();
+            }
+
+            $section->delete();
+        }
+
         $form->delete();
 
         return redirect()->route('designer.index')->with('success', 'Formulario eliminado exitosamente.');
