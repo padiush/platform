@@ -10,6 +10,7 @@ use App\Models\ProjectAccess;
 use App\Models\ProjectCapability;
 use App\Models\ProjectInvite;
 use App\Models\InterviewForm;
+use App\Models\CatalogSpecies;
 
 class Project extends Model
 {
@@ -67,5 +68,10 @@ class Project extends Model
     public function interviewForms()
     {
         return $this->hasMany(InterviewForm::class);
+    }
+
+    public function catalogSpecies()
+    {
+        return $this->hasMany(CatalogSpecies::class);
     }
 }

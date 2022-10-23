@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\InterviewFormController;
 use App\Http\Controllers\InterviewDesignerController;
+use App\Http\Controllers\ProjectCatalogController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -50,6 +51,14 @@ Route::controller(InterviewDesignerController::class)->group(function(){
 
     Route::post('/designer/{form}/item/data', 'getItem')->middleware(['auth'])->name('designer.item.data');
     Route::post('/designer/{form}/item/update', 'updateItem')->middleware(['auth'])->name('designer.item.update');
+});
+
+Route::controller(ProjectCatalogController::class)->group(function(){
+    Route::get('/catalogs', 'index')->middleware(['auth'])->name('catalogs.index');
+    Route::get('/catalogs/{project}', 'show')->middleware(['auth'])->name('catalogs.show');
+
+    Route::get('/catalogs/{project}/species/register', 'registerSpecies')->middleware(['auth'])->name('catalogs.species.register');
+    Route::post('/catalogs/{project}/species/register', 'storeSpecies')->middleware(['auth']);
 });
 
 require __DIR__.'/auth.php';
