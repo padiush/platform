@@ -36,7 +36,7 @@
         <button id="singleSelect">
             <span><i class="fa-solid fa-plus"></i><i class="fa-regular fa-list-dropdown ml-2"></i></span><span class="hidden lg:inline-block text-sm">Selección única</span>
         </button>
-        <button onclick="pushMultiSelect()">
+        <button id="multiSelect">
             <span><i class="fa-solid fa-plus"></i><i class="fa-regular fa-list-check ml-2"></i></span><span class="hidden lg:inline-block text-sm">Selección múltiple</span>
         </button>
     </x-slot>
@@ -50,8 +50,6 @@
             var getItemRoute = '{{ route('designer.item.data', ['form' => $form]) }}';
             var updateItemRoute = '{{ route('designer.item.update', ['form' => $form]) }}';
             startFormDesigner(csrfToken, sections, getItemsRoute, getItemRoute, updateItemRoute);
-
-            var current_section = null;
 
             $('#singleSection').click(function(){
                 var route = '{{ route('designer.section.create', ['form' => $form]) }}';
@@ -79,6 +77,10 @@
 
             $('#singleSelect').click(function(){
                 pushSingleSelect(createRoute, getItemRoute, updateItemRoute, csrfToken);
+            });
+
+            $('#multiSelect').click(function(){
+                pushMultiSelect(createRoute, getItemRoute, updateItemRoute, csrfToken);
             });
         });
 

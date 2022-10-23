@@ -9,7 +9,7 @@
 
     <div class="grid grid-cols-1 gap-4 w-full">
         @foreach($form->sections as $section)
-        <div class="bg-base-100 rounded-lg py-4 px-8">
+        <x-card title="{{ $section->name ?? '' }}">
             <div class="grid grid-cols-1 gap-4 w-full">
                 @foreach($section->items as $item)
                 @if($item->type == 'text')
@@ -42,11 +42,28 @@
                         @foreach(json_decode($item->options) as $option)
                         <option value="{{ $option ?? '' }}">{{ $option ?? '' }}</option>
                         @endforeach
+                    </select>
+                </div>
+                @elseif($item->type == 'multi')
+                <div class="form-control w-full">
+                    <label class="label">
+                        <span class="label-text">{{ $item->label ?? '' }}@if($item->required) <span class="text-red-500">*</span>@endif</span>
+                    </label>
+                    <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 w-full">
+                        @foreach(json_decode($item->options) as $option)
+                        <div class="w-full">
+                            <label class="cursor-pointer select-none">
+                                <input type="checkbox" class="checkbox checkbox-primary" name="{{ $item->name ?? '' }}" value="{{ $option ?? '' }}" />
+                                <span class="ml-2">{{ $option ?? '' }}</span>
+                            </label>
+                        </div>
+                        @endforeach
+                    </div>
                 </div>
                 @endif
                 @endforeach
             </div>
-        </div>
+        </x-card>
         @endforeach
     </div>
 </x-app-layout>
