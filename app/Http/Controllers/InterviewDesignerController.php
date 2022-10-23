@@ -29,11 +29,18 @@ class InterviewDesignerController extends Controller
             'repeatable' =>  'nullable|boolean',
         ]);
 
+        $last_section = InterviewSection::where('interview_form_id', $form->id)->orderBy('order', 'desc')->get();
+        if($last_section->count() == 0){
+            $order = 1;
+        } else {
+            $order = $last_section->first()->order + 1;
+        }
+
         $section = new InterviewSection();
         $section->interview_form_id = $form->id;
         $section->name = $request->name;
         $section->description = $request->description;
-        $section->order = $request->order;
+        $section->order = $order;
         $section->repeatable = $request->repeatable;
         $section->save();
 
@@ -157,5 +164,55 @@ class InterviewDesignerController extends Controller
         $item = InterviewItem::find($request->id);
 
         return response()->json($item);
+    }
+
+    public function updateSection(Request $request, InterviewForm $form){
+        $project = $form->project;
+
+        $access = ProjectAccess::where('user_id', Auth::id())->where('project_id', $project->id)->first();
+
+        if(!$access || !Auth::user()->hasCapabilityOnProject($project, 'manage_forms')){
+            return redirect()->route('projects.index')->with('error', 'No tienes permisos para editar formularios en este proyecto.');
+        }
+
+        $request->validate([
+            'id' =>  'required|integer',
+            'json' =>  'required|string',
+        ]);
+
+        $section = InterviewSection::find($request->id);
+        $section_form = InterviewForm::find($section->interview_form_id);
+
+        if($section_form->id != $form->id){
+            return redirect()->route('projects.index')->with('error', 'Se ha intentado actualizar una sección que no pertenece al formulario.');
+        }
+
+        $data = json_decode($request->json);
+
+        $section->name = $data->name != 'null' ? $data->name : $section->name;
+        $section->description = $data->description != 'null' ? $data->description : $section->description;
+        $section->order = $data->order;
+        $section->repeatable = $data->repeatable;
+        $section->save();
+
+        return response()->json($section);
+    }
+
+    public function getSection(Request $request, InterviewForm $form){
+        $project = $form->project;
+
+        $access = ProjectAccess::where('user_id', Auth::id())->where('project_id', $project->id)->first();
+
+        if(!$access || !Auth::user()->hasCapabilityOnProject($project, 'manage_forms')){
+            return redirect()->route('projects.index')->with('error', 'No tienes permisos para editar formularios en este proyecto.');
+        }
+
+        $request->validate([
+            'id' =>  'required|integer',
+        ]);
+
+        $section = InterviewSection::find($request->id);
+
+        return response()->json($section);
     }
 }

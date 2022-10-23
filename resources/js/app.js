@@ -21,173 +21,152 @@ function confirmAction(message) {
 
 window.confirmAction = confirmAction;
 
-function startFormDesigner(csrfToken, sections, getItemsRoute, getItemRoute, updateItemRoute) {
-    const csrfElement = document.createElement('input');
-    csrfElement.setAttribute('type', 'hidden');
-    csrfElement.setAttribute('name', '_token');
-    csrfElement.setAttribute('value', csrfToken);
-
+function startFormDesigner(csrfToken, sections, getItemsRoute, getItemRoute, updateItemRoute, getSectionRoute, updateSectionRoute) {
     var form = document.getElementById('form-designer');
 
     sections.forEach(function(section){
-        if(section.repeatable){
-            pushRepeatingSection('', '', false, section.id);
+        pushSection('', getSectionRoute, updateSectionRoute, csrfToken, false, section.id, section.repeatable);
 
-            var section_id = section.id;
+        var section_id = section.id;
 
-            $.ajax({
-                url: getItemsRoute,
-                type: 'POST',
-                data: {
-                    section_id: section_id,
-                    _token: csrfToken
-                },
-                success: function(response){
-                    var items = response;
-                    items.forEach(function(item){
-                        if(item.type == 'text'){
-                            pushTextInput('', getItemRoute, updateItemRoute, csrfToken, false, item.id, section.id);
-                        }
+        $.ajax({
+            url: getItemsRoute,
+            type: 'POST',
+            data: {
+                section_id: section_id,
+                _token: csrfToken
+            },
+            success: function(response){
+                var items = response;
+                items.forEach(function(item){
+                    if(item.type == 'text'){
+                        pushTextInput('', getItemRoute, updateItemRoute, csrfToken, false, item.id, section.id);
+                    }
 
-                        if(item.type == 'number'){
-                            pushNumberInput('', getItemRoute, updateItemRoute, csrfToken, false, item.id, section.id);
-                        }
+                    if(item.type == 'number'){
+                        pushNumberInput('', getItemRoute, updateItemRoute, csrfToken, false, item.id, section.id);
+                    }
 
-                        if(item.type == 'date'){
-                            pushDateInput('', getItemRoute, updateItemRoute, csrfToken, false, item.id, section.id);
-                        }
+                    if(item.type == 'date'){
+                        pushDateInput('', getItemRoute, updateItemRoute, csrfToken, false, item.id, section.id);
+                    }
 
-                        if(item.type == 'select'){
-                            pushSingleSelect('', getItemRoute, updateItemRoute, csrfToken, false, item.id, section.id);
-                        }
+                    if(item.type == 'select'){
+                        pushSingleSelect('', getItemRoute, updateItemRoute, csrfToken, false, item.id, section.id);
+                    }
 
-                        if(item.type == 'multi'){
-                            pushMultiSelect('', getItemRoute, updateItemRoute, csrfToken, false, item.id, section.id);
-                        }
-                    });
-                },
-                error: function(error){
-                    console.log(error);
-                }
-            });
-        } else {
-            pushSingleSection('', '', false, section.id);
-
-            var section_id = section.id;
-
-            $.ajax({
-                url: getItemsRoute,
-                type: 'POST',
-                data: {
-                    section_id: section_id,
-                    _token: csrfToken
-                },
-                success: function(response){
-                    var items = response;
-                    items.forEach(function(item){
-                        if(item.type == 'text'){
-                            pushTextInput('', getItemRoute, updateItemRoute, csrfToken, false, item.id, section.id);
-                        }
-
-                        if(item.type == 'number'){
-                            pushNumberInput('', getItemRoute, updateItemRoute, csrfToken, false, item.id, section.id);
-                        }
-
-                        if(item.type == 'date'){
-                            pushDateInput('', getItemRoute, updateItemRoute, csrfToken, false, item.id, section.id);
-                        }
-
-                        if(item.type == 'select'){
-                            pushSingleSelect('', getItemRoute, updateItemRoute, csrfToken, false, item.id, section.id);
-                        }
-
-                        if(item.type == 'multi'){
-                            pushMultiSelect('', getItemRoute, updateItemRoute, csrfToken, false, item.id, section.id);
-                        }
-                    });
-                },
-                error: function(error){
-                    console.log(error);
-                }
-            });
-        }
+                    if(item.type == 'multi'){
+                        pushMultiSelect('', getItemRoute, updateItemRoute, csrfToken, false, item.id, section.id);
+                    }
+                });
+            },
+            error: function(error){
+                console.log(error);
+            }
+        });
     });
 }
 
-function pushSingleSection(route, token, create = true, id = null){
+function pushSection(createRoute, getRoute, updateRoute, token, create = true, id = null, repeatable = false){
     var form = document.getElementById('form-designer');
 
     var divider = document.createElement('div');
     divider.classList.add('divider', 'section-single');
-    divider.innerHTML = 'Sección única';
+    if(repeatable){
+        divider.innerHTML = 'Sección repetitiva';
+    } else {
+        divider.innerHTML = 'Sección única';
+    }
+
+    var sectionDetailsCard = document.createElement('div');
+    sectionDetailsCard.classList.add('card', 'w-full', 'bg-base-100', 'shadow-xl', 'text-base-content', 'overflow-x-auto', 'self-start', 'animate__animated','animate__zoomIn');
+
+    var cardBody = document.createElement('div');
+    cardBody.classList.add('card-body');
+
+    var jsonField = document.createElement('input');
+    jsonField.setAttribute('type', 'hidden');
+    jsonField.setAttribute('name', 'json');
+
+    var cardTitle = document.createElement('h2');
+    cardTitle.classList.add('card-title');
+    cardTitle.innerHTML = 'Detalles de la sección';
+
+    var sectionNameFormControl = document.createElement('div');
+    sectionNameFormControl.classList.add('form-control');
+
+    var sectionNameLabel = document.createElement('label');
+    sectionNameLabel.classList.add('label');
+    sectionNameLabel.innerHTML = '<span class="label-text">Nombre de la sección <span class="text-red-500">*</span></span>';
+
+    var sectionNameInput = document.createElement('input');
+    sectionNameInput.classList.add('input', 'input-bordered');
+    sectionNameInput.setAttribute('type', 'text');
+    sectionNameInput.setAttribute('placeholder', 'Nombre de la sección');
+    sectionNameInput.setAttribute('id', 'section-name');
 
     var container = document.createElement('div');
 
-    form.appendChild(divider);
+    sectionDetailsCard.appendChild(cardBody);
+    cardBody.appendChild(jsonField);
+    cardBody.appendChild(cardTitle);
+    cardBody.appendChild(sectionNameFormControl);
+    sectionNameFormControl.appendChild(sectionNameLabel);
+    sectionNameFormControl.appendChild(sectionNameInput);
 
     if(create){
         $.ajax({
-            url: route,
+            url: createRoute,
             type: 'POST',
             data: {
                 _token: token,
-                repeatable: '0',
+                repeatable: repeatable ? "1" : "0",
             },
             success: function(response){
                 var section_id = response.id;
+                id = section_id;
                 divider.setAttribute('data-section-id', section_id);
                 form.appendChild(divider);
+                form.appendChild(sectionDetailsCard);
                 container.setAttribute('id', 'section-' + section_id);
                 container.classList.add('section', 'grid', 'grid-cols-1', 'gap-4', 'w-full');
                 form.appendChild(container);
+                jsonField.value = JSON.stringify(response);
             },
             error: function(error){
                 console.log(error);
             }
         });
     } else {
-        form.appendChild(divider);
-        container.setAttribute('id', 'section-' + id);
-        container.classList.add('section', 'grid', 'grid-cols-1', 'gap-4', 'w-full');
-        form.appendChild(container);
-    }
-}
-
-function pushRepeatingSection(route, token, create = true, id = null){
-    var form = document.getElementById('form-designer');
-
-    var divider = document.createElement('div');
-    divider.classList.add('divider', 'section-repeating');
-    divider.innerHTML = 'Sección repetitiva';
-
-    var container = document.createElement('div');
-
-    if(create){
         $.ajax({
-            url: route,
+            url: getRoute,
             type: 'POST',
             data: {
                 _token: token,
-                repeatable: '1',
+                id: id,
             },
             success: function(response){
-                var section_id = response.id;
-                divider.setAttribute('data-section-id', section_id);
                 form.appendChild(divider);
-                container.setAttribute('id', 'section-' + section_id);
+                form.appendChild(sectionDetailsCard);
+                container.setAttribute('id', 'section-' + id);
                 container.classList.add('section', 'grid', 'grid-cols-1', 'gap-4', 'w-full');
                 form.appendChild(container);
+                sectionNameInput.value = response.name;
+                jsonField.value = JSON.stringify(response);
             },
             error: function(error){
                 console.log(error);
             }
         });
-    } else {
-        form.appendChild(divider);
-        container.setAttribute('id', 'section-' + id);
-        container.classList.add('section', 'grid', 'grid-cols-1', 'gap-4', 'w-full');
-        form.appendChild(container);
     }
+
+    sectionNameInput.addEventListener('change', function(){
+        var json = JSON.parse(jsonField.value);
+        json.name = sectionNameInput.value;
+        jsonField.value = JSON.stringify(json);
+
+        updateSection(updateRoute, token, id, jsonField.value);
+    });
 }
 
 function updateItem(route, token, item_id, json){
@@ -197,6 +176,24 @@ function updateItem(route, token, item_id, json){
         data: {
             _token: token,
             id: item_id,
+            json: json,
+        },
+        success: function(response){
+            console.log(response);
+        },
+        error: function(error){
+            console.log(error);
+        }
+    });
+}
+
+function updateSection(route, token, section_id, json){
+    $.ajax({
+        url: route,
+        type: 'POST',
+        data: {
+            _token: token,
+            id: section_id,
             json: json,
         },
         success: function(response){
@@ -224,7 +221,7 @@ function pushTextInput(createRoute, getRoute, updateRoute, token, create = true,
     jsonField.setAttribute('name', 'json');
 
     var card = document.createElement('div');
-    card.classList.add('card', 'w-full', 'bg-base-100', 'shadow-xl', 'text-base-content', 'overflow-x-auto', 'self-start');
+    card.classList.add('card', 'w-full', 'bg-base-100', 'shadow-xl', 'text-base-content', 'overflow-x-auto', 'self-start', 'animate__animated','animate__zoomIn');
 
     var cardBody = document.createElement('div');
     cardBody.classList.add('card-body');
@@ -392,7 +389,7 @@ function pushNumberInput(createRoute, getRoute, updateRoute, token, create = tru
     jsonField.setAttribute('name', 'json');
 
     var card = document.createElement('div');
-    card.classList.add('card', 'w-full', 'bg-base-100', 'shadow-xl', 'text-base-content', 'overflow-x-auto', 'self-start');
+    card.classList.add('card', 'w-full', 'bg-base-100', 'shadow-xl', 'text-base-content', 'overflow-x-auto', 'self-start', 'animate__animated','animate__zoomIn');
 
     var cardBody = document.createElement('div');
     cardBody.classList.add('card-body');
@@ -662,7 +659,7 @@ function pushDateInput(createRoute, getRoute, updateRoute, token, create = true,
     jsonField.setAttribute('name', 'json');
 
     var card = document.createElement('div');
-    card.classList.add('card', 'w-full', 'bg-base-100', 'shadow-xl', 'text-base-content', 'overflow-x-auto', 'self-start');
+    card.classList.add('card', 'w-full', 'bg-base-100', 'shadow-xl', 'text-base-content', 'overflow-x-auto', 'self-start', 'animate__animated','animate__zoomIn');
 
     var cardBody = document.createElement('div');
     cardBody.classList.add('card-body');
@@ -831,7 +828,7 @@ function pushSingleSelect(createRoute, getRoute, updateRoute, token, create = tr
     jsonField.setAttribute('name', 'json');
 
     var card = document.createElement('div');
-    card.classList.add('card', 'w-full', 'bg-base-100', 'shadow-xl', 'text-base-content', 'overflow-x-auto', 'self-start');
+    card.classList.add('card', 'w-full', 'bg-base-100', 'shadow-xl', 'text-base-content', 'overflow-x-auto', 'self-start', 'animate__animated','animate__zoomIn');
 
     var cardBody = document.createElement('div');
     cardBody.classList.add('card-body');
@@ -1043,7 +1040,7 @@ function pushMultiSelect(createRoute, getRoute, updateRoute, token, create = tru
     jsonField.setAttribute('name', 'json');
 
     var card = document.createElement('div');
-    card.classList.add('card', 'w-full', 'bg-base-100', 'shadow-xl', 'text-base-content', 'overflow-x-auto', 'self-start');
+    card.classList.add('card', 'w-full', 'bg-base-100', 'shadow-xl', 'text-base-content', 'overflow-x-auto', 'self-start', 'animate__animated','animate__zoomIn');
 
     var cardBody = document.createElement('div');
     cardBody.classList.add('card-body');
@@ -1241,11 +1238,38 @@ function pushMultiSelect(createRoute, getRoute, updateRoute, token, create = tru
 
 window.startFormDesigner = startFormDesigner;
 
-window.pushSingleSection = pushSingleSection;
-window.pushRepeatingSection = pushRepeatingSection;
+window.pushSection = pushSection;
 
 window.pushTextInput = pushTextInput;
 window.pushNumberInput = pushNumberInput;
 window.pushDateInput = pushDateInput;
 window.pushSingleSelect = pushSingleSelect;
 window.pushMultiSelect = pushMultiSelect;
+
+function createNewRepeatingSectionInstance(section_id){
+    var masterSectionId = "section-" + section_id + "-master";
+    var masterSection = document.getElementById(masterSectionId);
+
+    var instancesContainerId = "section-" + section_id + "-instances";
+    var instancesContainer = document.getElementById(instancesContainerId);
+
+    var instance = masterSection.cloneNode(true);
+    instance.id = "section-" + section_id + "-instance-" + (instancesContainer.childElementCount + 1);
+    instance.classList.add('animate__animated', 'animate__zoomIn');
+
+    var deleteButton = document.createElement('button');
+    deleteButton.classList.add('btn', 'btn-error', 'btn-sm', 'float-right');
+    deleteButton.innerHTML = "Eliminar";
+    deleteButton.addEventListener('click', function(){
+        instance.classList.add('animate__animated', 'animate__zoomOut');
+        setTimeout(function(){
+            instance.remove();
+        }, 500);
+    });
+
+    instance.appendChild(deleteButton);
+
+    instancesContainer.appendChild(instance);
+}
+
+window.createNewRepeatingSectionInstance = createNewRepeatingSectionInstance;
