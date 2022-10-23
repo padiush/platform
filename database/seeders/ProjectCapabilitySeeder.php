@@ -19,6 +19,8 @@ class ProjectCapabilitySeeder extends Seeder
             'record_data' => true,
             'manage_data' => true,
             'generate_reports' => true,
+            'view_catalog' => true,
+            'edit_catalog' => true
         ]);
 
         ProjectCapability::factory()->create([
@@ -29,6 +31,8 @@ class ProjectCapabilitySeeder extends Seeder
             'record_data' => true,
             'manage_data' => false,
             'generate_reports' => true,
+            'view_catalog' => true,
+            'edit_catalog' => true
         ]);
 
         ProjectCapability::factory()->create([
@@ -39,6 +43,8 @@ class ProjectCapabilitySeeder extends Seeder
             'record_data' => false,
             'manage_data' => false,
             'generate_reports' => true,
+            'view_catalog' => true,
+            'edit_catalog' => false
         ]);
     }
 }

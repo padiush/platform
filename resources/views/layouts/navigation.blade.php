@@ -17,7 +17,7 @@
                         <li><a>Entrevistar</a></li>
                     </ul>
                 </li>
-                <li><a href="#">Catálogos</a></li>
+                <li><a href="{{ route('catalogs.index') }}">Catálogos</a></li>
                 <li><a href="#">Datos</a></li>
                 @endif
                 <li><a href="#">Comunidad</a></li>
@@ -41,7 +41,7 @@
                     <li><a>Entrevistar</a></li>
                 </ul>
             </li>
-            <li><a href="#">Catálogos</a></li>
+            <li><a href="{{ route('catalogs.index') }}">Catálogos</a></li>
             <li><a href="#">Datos</a></li>
             @endif
             <li><a href="#">Comunidad</a></li>
