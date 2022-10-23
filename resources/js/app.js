@@ -1273,3 +1273,78 @@ function createNewRepeatingSectionInstance(section_id){
 }
 
 window.createNewRepeatingSectionInstance = createNewRepeatingSectionInstance;
+
+function storeAnswer(route, json, token){
+    var answer = JSON.parse(json);
+
+    $.ajax({
+        url: route,
+        type: 'POST',
+        data: {
+            _token: token,
+            item_id: answer.item_id,
+            repeatable_index: answer.repeatable_index,
+            answer: answer.answer,
+        },
+        success: function(response) {
+            console.log(response);
+        },
+        error: function(error) {
+            console.log(error);
+        }
+    });
+}
+
+window.storeAnswer = storeAnswer;
+
+function setAnswerToSingleField(getAnswerRoute, token, item_id, element){
+    $.ajax({
+        url: getAnswerRoute,
+        type: 'POST',
+        data: {
+            _token: token,
+            item_id: item_id,
+        },
+        success: function(response) {
+            if(response != null && response.success == true){
+                element.value = response.answer.answer;
+            }
+        },
+        error: function(error) {
+            console.log(error);
+        }
+    });
+}
+
+window.setAnswerToSingleField = setAnswerToSingleField;
+
+function setAnswerToSingleMultiField(getAnswerRoute, token, item_id, elements){
+    $.ajax({
+        url: getAnswerRoute,
+        type: 'POST',
+        data: {
+            _token: token,
+            item_id: item_id,
+        },
+        success: function(response) {
+            if(response != null && response.success == true){
+                var answer = response.answer.answer;
+                answer = JSON.parse(answer);
+
+                for(var i = 0; i < elements.length; i++){
+                    var element = elements[i];
+                    if(answer.includes(element.value)){
+                        element.checked = true;
+                    } else {
+                        element.checked = false;
+                    }
+                }
+            }
+        },
+        error: function(error) {
+            console.log(error);
+        }
+    });
+}
+
+window.setAnswerToSingleMultiField = setAnswerToSingleMultiField;
