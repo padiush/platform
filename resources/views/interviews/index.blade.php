@@ -36,7 +36,6 @@
                 </div>
             </div>
             @endif
-            <a href="{{ route('designer.create', $project)}}" class="btn btn-primary w-full mt-4">Crear</a>
         </x-card>
         @endforeach
     </div>

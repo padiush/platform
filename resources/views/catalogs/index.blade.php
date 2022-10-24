@@ -12,11 +12,11 @@
                 </div>
                 <div class="stat">
                     <div class="stat-value">0</div>
-                    <div class="stat-title">Especies reportadas</div>
+                    <div class="stat-title">Especies vinculadas</div>
                 </div>
                 <div class="stat">
                     <div class="stat-value">0</div>
-                    <div class="stat-title">Familias reportadas</div>
+                    <div class="stat-title">Familias vinculadas</div>
                 </div>
             </div>
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 w-full mt-4">
