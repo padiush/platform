@@ -22,6 +22,7 @@
                         <td class="hidden lg:table-cell">0</td>
                         <td>
                             <a href="{{ route('interviews.create', $form) }}" class="btn btn-xs btn-primary">Entrevistar</a>
+                            <a href="{{ route('interviews.instances', $form) }}" class="btn btn-xs btn-primary">Ver entrevistas</a>
                         </td>
                     </tr>
                     @endforeach

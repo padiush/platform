@@ -49,6 +49,18 @@ class InterviewInstancesController extends Controller
         return redirect()->route('projects.index')->with('error', 'No tienes permisos para tomar entrevistas en este proyecto.');
     }
 
+    public function list(InterviewForm $form){
+        $project = Project::find($form->project_id);
+
+        if($project->finished || !Auth::user()->hasCapabilityOnProject($project, 'record_data')){
+            return redirect()->route('projects.index')->with('error', 'No tienes permisos para ver entrevistas en este proyecto.');
+        }
+
+        $instances = InterviewInstance::where('interview_form_id', $form->id)->paginate(20);
+
+        return view('interviews.list', compact('instances', 'form', 'project'));
+    }
+
     public function show(InterviewInstance $instance){
         $form = $instance->form;
         $project = $form->project;
@@ -56,6 +68,8 @@ class InterviewInstancesController extends Controller
         if(!$project->finished && Auth::user()->hasCapabilityOnProject($project, 'record_data')){
             return view('interviews.show', compact('instance', 'project', 'form'));
         }
+
+        $repeating_sections = InterviewSection::where('interview_form_id', $form->id)->where('repeating', true)->get();
 
         return redirect()->route('projects.index')->with('error', 'No tienes permisos para tomar entrevistas en este proyecto.');
     }

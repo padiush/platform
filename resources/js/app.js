@@ -1273,30 +1273,30 @@ function createNewRepeatingSectionInstance(section_id, route, token){
     var answerRepeatable = instance.getElementsByClassName('answer-repeatable');
 
     if(answerRepeatable.length > 0){
-        var answerRepeatable = answerRepeatable[0];
-        // Get the item_id from the id of the answer-repeatable's parent element
-        var item_id = answerRepeatable.parentElement.id;
+        Object.values(answerRepeatable).forEach(function(element){
+            var item_id = element.parentElement.id;
 
-        // Set its id to answer-repeatable-{item_id}-{instance_number}
-        answerRepeatable.id = "answer-repeatable-" + item_id + "-" + (instancesContainer.childElementCount + 1);
+            // Set its id to answer-repeatable-{item_id}-{instance_number}
+            element.id = "answer-repeatable-" + item_id + "-" + (instancesContainer.childElementCount + 1);
 
-        // Attach a change event listener to the answer-repeatable
-        answerRepeatable.addEventListener('change', function(){
-            var value = $(this).val();
-            var id = $(this).attr('id');
+            // Attach a change event listener to the answer-repeatable
+            element.addEventListener('change', function(){
+                var value = $(this).val();
+                var id = $(this).attr('id');
 
-            var item_id = id.replace('answer-repeatable-', '').replace(/-[^-]*$/, '');
-            var repeatable_index = id.replace('answer-repeatable-' + item_id + '-', '');
+                var item_id = id.replace('answer-repeatable-', '').replace(/-[^-]*$/, '');
+                var repeatable_index = id.replace('answer-repeatable-' + item_id + '-', '');
 
-            var answer = {
-                'item_id': item_id,
-                'repeatable_index': repeatable_index,
-                'answer': value
-            };
+                var answer = {
+                    'item_id': item_id,
+                    'repeatable_index': repeatable_index,
+                    'answer': value
+                };
 
-            var answerJSON = JSON.stringify(answer);
+                var answerJSON = JSON.stringify(answer);
 
-            storeAnswer(route, answerJSON, token);
+                storeAnswer(route, answerJSON, token);
+            });
         });
     }
 

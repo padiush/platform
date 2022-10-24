@@ -68,6 +68,8 @@ Route::controller(ProjectCatalogController::class)->group(function(){
 Route::controller(InterviewInstancesController::class)->group(function(){
     Route::get('/interviews', 'index')->middleware(['auth'])->name('interviews.index');
     Route::get('/interviews/{form}/create', 'create')->middleware(['auth'])->name('interviews.create');
+
+    Route::get('/interviews/{form}/instances', 'list')->middleware(['auth'])->name('interviews.instances');
     Route::get('/interviews/instance/{instance}', 'show')->middleware(['auth'])->name('interviews.show');
 
     Route::post('/interviews/instance/{instance}/answer/store', 'storeAnswer')->middleware(['auth'])->name('interviews.answer');
