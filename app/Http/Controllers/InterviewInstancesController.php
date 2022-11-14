@@ -11,6 +11,8 @@ use App\Models\ProjectAccess;
 use App\Models\Project;
 use App\Models\User;
 use App\Models\InstanceAnswer;
+use App\Models\InterviewSection;
+use App\Models\InterviewItem;
 
 class InterviewInstancesController extends Controller
 {
@@ -139,6 +141,62 @@ class InterviewInstancesController extends Controller
 
         return response()->json([
             'success' => false,
+        ]);
+    }
+
+    public function populateRepeatableSection(Request $request, InterviewInstance $instance){
+        $form = $instance->form;
+        $project = $form->project;
+
+        if($project->finished || !Auth::user()->hasCapabilityOnProject($project, 'record_data')){
+            return response()->json([
+                'success' => false,
+            ]);
+        }
+
+        $request->validate([
+            'section_id' => 'required|integer',
+        ]);
+
+        $section = InterviewSection::find($request->section_id);
+
+        if(!$section || $section->interview_form_id != $form->id){
+            return response()->json([
+                'success' => false,
+            ]);
+        }
+
+        $highest_index = InstanceAnswer::where('interview_instance_id', $instance->id)
+            ->where('repeatable_index', '!=', null)
+            ->whereHas('item', function($query) use ($request){
+                $query->where('interview_section_id', $request->section_id);
+            })
+            ->max('repeatable_index');
+
+        $highest_index = $highest_index ? $highest_index : 0;
+
+        if(!$highest_index){
+            return response()->json([
+                'success' => false,
+            ]);
+        }
+
+        // Render the section $highest_index times and return it
+        $html = '';
+        for($i = 1; $i <= $highest_index; $i++){
+            $answers = InstanceAnswer::where('interview_instance_id', $instance->id)
+                ->where('repeatable_index', $i)
+                ->whereHas('item', function($query) use ($request){
+                    $query->where('interview_section_id', $request->section_id);
+                })
+                ->get();
+
+            $html .= view('interviews.repeatable-section', compact('section', 'instance', 'i', 'answers'))->render();
+        }
+
+        return response()->json([
+            'success' => true,
+            'html' => $html,
         ]);
     }
 }
