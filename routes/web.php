@@ -74,6 +74,7 @@ Route::controller(InterviewInstancesController::class)->group(function(){
 
     Route::post('/interviews/instance/{instance}/answer/store', 'storeAnswer')->middleware(['auth'])->name('interviews.answer');
     Route::post('/interviews/instance/{instance}/answer/get', 'getAnswer')->middleware(['auth'])->name('interviews.answer.get');
+    Route::post('/interviews/instance/{instance}/repeating-section/populate', 'populateRepeatableSection')->middleware(['auth'])->name('interviews.repeating-section.populate');
 });
 
 require __DIR__.'/auth.php';

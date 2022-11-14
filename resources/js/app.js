@@ -1379,3 +1379,42 @@ function setAnswerToSingleMultiField(getAnswerRoute, token, item_id, elements){
 }
 
 window.setAnswerToSingleMultiField = setAnswerToSingleMultiField;
+
+function populateRepeatableSection(container, route, token, section_id, storeAnswerRoute){
+    $.ajax({
+        url: route,
+        type: 'POST',
+        data: {
+            _token: token,
+            section_id: section_id,
+        },
+        success: function(response) {
+            if(response != null && response.success == true){
+                container.innerHTML = response.html;
+
+                $('.answer-repeatable').change(function() {
+                    var value = $(this).val();
+                    var id = $(this).attr('id');
+
+                    var item_id = id.replace('answer-repeatable-', '').replace(/-[^-]*$/, '');
+                    var repeatable_index = id.replace('answer-repeatable-' + item_id + '-', '');
+
+                    var answer = {
+                        'item_id': item_id,
+                        'repeatable_index': repeatable_index,
+                        'answer': value
+                    };
+
+                    var answerJSON = JSON.stringify(answer);
+
+                    storeAnswer(storeAnswerRoute, answerJSON, token);
+            });
+            }
+        },
+        error: function(error) {
+            console.log(error);
+        }
+    });
+}
+
+window.populateRepeatableSection = populateRepeatableSection;

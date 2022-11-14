@@ -142,6 +142,7 @@
         $(document).ready(function() {
             var storeAnswerRoute = '{{ route('interviews.answer', ['instance' => $instance->id]) }}';
             var getAnswerRoute = '{{ route('interviews.answer.get', ['instance' => $instance->id]) }}';
+            var populateRepeatingSectionRoute = '{{ route('interviews.repeating-section.populate', ['instance' => $instance->id]) }}';
             var csrfToken = '{{ csrf_token() }}';
 
             var answerSingleElements = document.getElementsByClassName("answer-single");
@@ -172,6 +173,21 @@
                 var elements = answerSingleMultiElementsGrouped[item_id];
 
                 setAnswerToSingleMultiField(getAnswerRoute, csrfToken, item_id, elements);
+            }
+
+            var repeatableSections = [];
+
+            @php
+                foreach($form->repeatableSections as $section){
+                    echo 'repeatableSections.push(' . $section->id . ');';
+                }
+            @endphp
+
+            for (var i = 0; i < repeatableSections.length; i++) {
+                var section_id = repeatableSections[i];
+                var section_instances_container = document.getElementById('section-' + section_id + '-instances');
+
+                populateRepeatableSection(section_instances_container, populateRepeatingSectionRoute, csrfToken, section_id, storeAnswerRoute);
             }
 
             $('.answer-single').change(function() {
