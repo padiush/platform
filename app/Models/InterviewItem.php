@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\InterviewSection;
 
 class InterviewItem extends Model
 {
@@ -29,6 +30,6 @@ class InterviewItem extends Model
 
     public function section()
     {
-        return $this->belongsTo(InterviewSection::class);
+        return $this->belongsTo(InterviewSection::class, 'interview_section_id');
     }
 }

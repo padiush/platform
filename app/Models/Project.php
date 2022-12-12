@@ -11,6 +11,7 @@ use App\Models\ProjectCapability;
 use App\Models\ProjectInvite;
 use App\Models\InterviewForm;
 use App\Models\CatalogSpecies;
+use App\Models\InstanceAnswer;
 
 class Project extends Model
 {
@@ -78,5 +79,53 @@ class Project extends Model
     public function catalogSpecies()
     {
         return $this->hasMany(CatalogSpecies::class);
+    }
+
+    public function unlinkedAnswers()
+    {
+        $answers = collect();
+
+        foreach($this->interviewForms as $form){
+            $sections = $form->sections;
+            foreach($sections as $section){
+                foreach($section->items as $item){
+                    if($item->link_to_species){
+                        $item_answers = InstanceAnswer::where('interview_item_id', $item->id)->get();
+
+                        foreach($item_answers as $answer){
+                            if($answer->catalog_species_id == null){
+                                $answers->push($answer);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return $answers;
+    }
+
+    public function linkedAnswers()
+    {
+        $answers = collect();
+
+        foreach($this->interviewForms as $form){
+            $sections = $form->sections;
+            foreach($sections as $section){
+                foreach($section->items as $item){
+                    if($item->link_to_species){
+                        $item_answers = InstanceAnswer::where('interview_item_id', $item->id)->get();
+
+                        foreach($item_answers as $answer){
+                            if($answer->catalog_species_id != null){
+                                $answers->push($answer);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return $answers;
     }
 }

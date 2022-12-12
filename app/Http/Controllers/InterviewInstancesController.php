@@ -90,6 +90,8 @@ class InterviewInstancesController extends Controller
             'answer' => 'required',
         ]);
 
+        $section = InterviewItem::find($request->item_id)->section;
+
         // Check for previous answer
         $answer = InstanceAnswer::where('interview_instance_id', $instance->id)
             ->where('interview_item_id', $request->item_id)
@@ -102,6 +104,7 @@ class InterviewInstancesController extends Controller
         } else {
             $answer = InstanceAnswer::create([
                 'interview_instance_id' => $instance->id,
+                'interview_section_id' => $section->id,
                 'interview_item_id' => $request->item_id,
                 'repeatable_index' => $request->repeatable_index,
                 'answer' => $request->answer,
