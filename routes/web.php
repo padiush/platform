@@ -64,6 +64,8 @@ Route::controller(ProjectCatalogController::class)->group(function(){
 
     Route::get('/catalogs/{project}/species/register', 'registerSpecies')->middleware(['auth'])->name('catalogs.species.register');
     Route::post('/catalogs/{project}/species/register', 'storeSpecies')->middleware(['auth']);
+
+    Route::get('/catalogs/{project}/species/{species}', 'showSpecies')->middleware(['auth'])->name('catalogs.species.show');
 });
 
 Route::controller(InterviewInstancesController::class)->group(function(){

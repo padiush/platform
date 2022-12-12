@@ -75,4 +75,12 @@ class ProjectCatalogController extends Controller{
 
         return view('catalogs.list', compact('project', 'species'));
     }
+
+    public function showSpecies(Project $project, CatalogSpecies $species){
+        if(!Auth::user()->hasCapabilityOnProject($project, 'view_catalog')){
+            return redirect()->route('catalogs.index')->with('error', 'No tienes permisos para ver este catálogo.');
+        }
+
+        return view('catalogs.show', compact('project', 'species'));
+    }
 }
