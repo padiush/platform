@@ -18,7 +18,7 @@
                     </ul>
                 </li>
                 <li><a href="{{ route('catalogs.index') }}">Catálogos</a></li>
-                <li><a href="#">Datos</a></li>
+                <li><a href="{{ route('data.index') }}">Datos</a></li>
                 @endif
                 <li><a href="#">Comunidad</a></li>
             </ul>
@@ -42,7 +42,7 @@
                 </ul>
             </li>
             <li><a href="{{ route('catalogs.index') }}">Catálogos</a></li>
-            <li><a href="#">Datos</a></li>
+            <li><a href="{{ route('data.index') }}">Datos</a></li>
             @endif
             <li><a href="#">Comunidad</a></li>
         </ul>

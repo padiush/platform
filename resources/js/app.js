@@ -1418,3 +1418,48 @@ function populateRepeatableSection(container, route, token, section_id, storeAns
 }
 
 window.populateRepeatableSection = populateRepeatableSection;
+
+function linkAnswerToSpecies(route, csrfToken, instanceId, sectionId, repeatableIndex, speciesId){
+    var divId = "div-" + instanceId + "-" + sectionId + "-" + repeatableIndex;
+    var animationTimeout = 500;
+
+    $.ajax({
+        url: route,
+        type: 'POST',
+        data: {
+            _token: csrfToken,
+            interview_instance_id: instanceId,
+            interview_section_id: sectionId,
+            repeatable_index: repeatableIndex,
+            catalog_species_id: speciesId,
+        },
+        success: function(response) {
+            if(response != null && response.success == true){
+                var div = document.getElementById(divId);
+
+                div.classList.remove('animate__animated', 'animate__zoomIn');
+                div.classList.add('animate__animated', 'animate__zoomOut');
+
+                setTimeout(() => {
+                    div.classList.remove('animate__animated', 'animate__zoomOut');
+                    div.innerHTML = response.html;
+                    div.classList.add('animate__animated', 'animate__zoomIn');
+
+                    setTimeout(() => {
+                        div.classList.remove('animate__animated', 'animate__zoomIn');
+                        div.classList.add('animate__animated', 'animate__zoomOut');
+
+                        setTimeout(() => {
+                            div.remove();
+                        }, animationTimeout);
+                    }, 3000);
+                }, animationTimeout);
+            }
+        },
+        error: function(error) {
+            console.log(error);
+        }
+    });
+}
+
+window.linkAnswerToSpecies = linkAnswerToSpecies;

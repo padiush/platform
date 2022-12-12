@@ -6,6 +6,7 @@ use App\Http\Controllers\InterviewFormController;
 use App\Http\Controllers\InterviewDesignerController;
 use App\Http\Controllers\ProjectCatalogController;
 use App\Http\Controllers\InterviewInstancesController;
+use App\Http\Controllers\InterviewDataController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -75,6 +76,12 @@ Route::controller(InterviewInstancesController::class)->group(function(){
     Route::post('/interviews/instance/{instance}/answer/store', 'storeAnswer')->middleware(['auth'])->name('interviews.answer');
     Route::post('/interviews/instance/{instance}/answer/get', 'getAnswer')->middleware(['auth'])->name('interviews.answer.get');
     Route::post('/interviews/instance/{instance}/repeating-section/populate', 'populateRepeatableSection')->middleware(['auth'])->name('interviews.repeating-section.populate');
+});
+
+Route::controller(InterviewDataController::class)->group(function(){
+    Route::get('/data', 'index')->middleware(['auth'])->name('data.index');
+    Route::get('/data/{project}/link', 'linkSpecies')->middleware(['auth'])->name('data.link');
+    Route::post('/data/{project}/link', 'handleLinkRequest')->middleware(['auth']);
 });
 
 require __DIR__.'/auth.php';
