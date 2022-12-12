@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 use App\Models\Project;
 use App\Models\InstanceAnswer;
+use App\Models\CatalogSpeciesPhoto;
 
 class CatalogSpecies extends Model
 {
@@ -26,5 +27,9 @@ class CatalogSpecies extends Model
 
     public function answers(){
         return $this->hasMany(InstanceAnswer::class);
+    }
+
+    public function photos(){
+        return $this->hasMany(CatalogSpeciesPhoto::class);
     }
 }
