@@ -24,7 +24,6 @@
                     <td class="text-wrap"><span class="italic">{{ $sp->genus }} {{ $sp->name }}</span> {{ $sp->authority }}</td>
                     <td class="text-wrap">{{ count($sp->answers) }}</td>
                     <td>
-                        {{ $sp }}
                         <a href="{{ route('catalogs.species.show', ['project' => $project, 'species' => $sp]) }}" class="btn btn-primary btn-xs">
                             <i class="fa-solid fa-eye mr-2"></i> Ver ficha
                         </a>
