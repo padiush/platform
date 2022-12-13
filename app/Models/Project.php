@@ -128,4 +128,29 @@ class Project extends Model
 
         return $answers;
     }
+
+    public function linkedSpecies(){
+        $species = collect();
+
+        foreach($this->linkedAnswers() as $answer){
+            if(!$species->contains($answer->species)){
+                $species->push($answer->species);
+            }
+        }
+
+        return $species;
+    }
+
+    public function linkedFamilies(){
+        $families = collect();
+
+        foreach($this->linkedSpecies() as $species){
+            $this_species = CatalogSpecies::find($species->id);
+            if(!$families->contains($this_species->family)){
+                $families->push($this_species->family);
+            }
+        }
+
+        return $families;
+    }
 }

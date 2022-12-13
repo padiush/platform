@@ -11,12 +11,12 @@
                     <div class="stat-title">Especies en el catálogo</div>
                 </div>
                 <div class="stat">
-                    <div class="stat-value">0</div>
-                    <div class="stat-title">Especies vinculadas</div>
+                    <div class="stat-value">{{ count($project->linkedSpecies()) }}</div>
+                    <div class="stat-title">Especies con reporte de uso</div>
                 </div>
                 <div class="stat">
-                    <div class="stat-value">0</div>
-                    <div class="stat-title">Familias vinculadas</div>
+                    <div class="stat-value">{{ count($project->linkedFamilies()) }}</div>
+                    <div class="stat-title">Familias con reporte de uso</div>
                 </div>
             </div>
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 w-full mt-4">
