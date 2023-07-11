@@ -83,4 +83,36 @@ class ProjectCatalogController extends Controller{
 
         return view('catalogs.show', compact('project', 'species'));
     }
+
+    public function addPhoto(Request $request, CatalogSpecies $species){
+        if(!Auth::user()->hasCapabilityOnProject($project, 'view_catalog')){
+            return redirect()->route('catalogs.index')->with('error', 'No tienes permisos para ver este catálogo.');
+        }
+
+        $this->validate($request, [
+            'photo' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:4096',
+            'caption' => 'nullable|string',
+            'author' => 'nullable|string',
+            'license' => 'nullable|string',
+            'license_url' => 'nullable|string',
+        ]);
+
+        $user = Auth::user();
+
+        $photo = $request->file('photo');
+        $name = $species->id . '-' . $user->id . '-' . time() . '.' . $photo->getClientOriginalExtension();
+        $path = public_path('storage/images/species/' . $name);
+        $photo->move(public_path('storage/images/species/'), $name);
+
+        SpeciesPhoto::create([
+            'catalog_species_id' => $species->id,
+            'path' => $name,
+            'caption' => $request->caption,
+            'author' => $request->author,
+            'license' => $request->license,
+            'license_url' => $request->license_url,
+        ]);
+
+        return redirect()->back()->with('success', 'La foto ha sido agregada a la especie.');
+    }
 }
