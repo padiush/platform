@@ -84,6 +84,9 @@ Route::controller(InterviewDataController::class)->group(function(){
     Route::get('/data', 'index')->middleware(['auth'])->name('data.index');
     Route::get('/data/{project}/link', 'linkSpecies')->middleware(['auth'])->name('data.link');
     Route::post('/data/{project}/link', 'handleLinkRequest')->middleware(['auth']);
+
+    Route::get('/data/{project}/ethnobotanyR', 'prepareEthnobotanyR')->middleware(['auth'])->name('data.ethnobotanyR');
+    Route::post('/data/{project}/ethnobotanyR', 'handleEthnobotanyRRequest')->middleware(['auth']);
 });
 
 require __DIR__.'/auth.php';
