@@ -9,6 +9,8 @@
 
         <!-- Fonts -->
         <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat">
+        <script src="https://kit.fontawesome.com/f77b4e0d38.js" crossorigin="anonymous"></script>
+        
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])

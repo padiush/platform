@@ -12,7 +12,7 @@
 
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <link href="https://cdn.jsdelivr.net/gh/hung1001/font-awesome-pro-v6@44659d9/css/all.min.css" rel="stylesheet" type="text/css" />
+    <script src="https://kit.fontawesome.com/f77b4e0d38.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/theme-change@2.0.2/index.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.1.min.js"></script>
 </head>
