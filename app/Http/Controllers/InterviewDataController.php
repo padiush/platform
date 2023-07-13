@@ -4,12 +4,16 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Maatwebsite\Excel\Facades\Excel;
+
+use App\Exports\EthnobotanyRExport;
 
 use App\Models\ProjectAccess;
 use App\Models\Project;
 use App\Models\User;
 use App\Models\InstanceAnswer;
 use App\Models\CatalogSpecies;
+use App\Models\InterviewItem;
 
 class InterviewDataController extends Controller
 {
@@ -96,6 +100,47 @@ class InterviewDataController extends Controller
 
         return response()->json(['success' => true, 'html' => $view]);
     }
+
+    public function prepareEthnobotanyR(Project $project){
+        $this->checkPermission($project);
+
+        // Get all the forms on the project
+        $forms = $project->interviewForms;
+
+        foreach($forms as $form){
+            $form->load('sections.items');
+        }
+
+        return view('data.ethnobotanyr', compact('project', 'forms'));
+    }
+
+    public function handleEthnobotanyRRequest(Project $project, Request $request){
+        $this->checkPermission($project, true);
+
+        $request->validate([
+            'form_id' => 'required|exists:interview_forms,id',
+            'field_id' => 'required|exists:interview_items,id',
+        ]);
+
+        $form = $project->interviewForms->where('id', $request->form_id)->first();
+
+        $item = InterviewItem::find($request->field_id);
+        $categories = InstanceAnswer::where('interview_item_id', $item->id)->get();
+
+        // Leave only unique answers
+        $categories = $categories->unique('answer');
+
+        // Get all the answers from $item->section where the answer's catalog_species_id is not null
+        $answers = InstanceAnswer::where('interview_section_id', $item->section->id)->where('catalog_species_id', '!=', null)->get();
+        
+        foreach($answers as $answer){
+            $answer->load('species');
+            $answer->category = InstanceAnswer::where('interview_item_id', $request->field_id)->where('interview_instance_id', $answer->interview_instance_id)->where('repeatable_index', $answer->repeatable_index)->first()->answer;
+        }
+
+        return Excel::download(new EthnobotanyRExport($answers, $categories), 'ethnobotanyr.xlsx');
+    }
+
 
     private function checkPermission(Project $project, $json = false){
         $access = ProjectAccess::where('user_id', Auth::id())->where('project_id', $project->id)->first();
