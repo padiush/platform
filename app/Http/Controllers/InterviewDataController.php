@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
 
 use App\Exports\EthnobotanyRExport;
+use App\Exports\CustomExport;
 
 use App\Models\ProjectAccess;
 use App\Models\Project;
@@ -14,6 +15,7 @@ use App\Models\User;
 use App\Models\InstanceAnswer;
 use App\Models\CatalogSpecies;
 use App\Models\InterviewItem;
+use App\Models\InterviewInstance;
 
 class InterviewDataController extends Controller
 {
@@ -141,6 +143,75 @@ class InterviewDataController extends Controller
         return Excel::download(new EthnobotanyRExport($answers, $categories), 'ethnobotanyr.xlsx');
     }
 
+    public function prepareCustom(Project $project){
+        $this->checkPermission($project);
+
+        // Get all the forms on the project
+        $forms = $project->interviewForms;
+
+        foreach($forms as $form){
+            $form->load('sections', 'sections.items');
+        }
+
+        return view('data.custom', compact('project', 'forms'));
+    }
+
+    public function handleCustomRequest(Project $project, Request $request){
+        $this->checkPermission($project);
+
+        $request->validate([
+            'form_id' => 'required|exists:interview_forms,id',
+            'selected_fields' => 'required|json',
+        ]);
+
+        $form = $project->interviewForms->where('id', $request->form_id)->first();
+
+        $selected_fields = json_decode($request->selected_fields);
+
+        $items = InterviewItem::whereIn('id', $selected_fields)->get();
+
+        // Check if all items belong to a section with the same repeatable value
+        $repeatable = collect();
+
+        foreach($items as $item){
+            $item->load('section');
+            $repeatable->push($item->section->repeatable);
+        }
+
+        if($repeatable->unique()->count() > 1){
+            return redirect()->back()->with('error', 'No puedes seleccionar campos de secciones repetibles y no repetibles al mismo tiempo.');
+        }
+
+        $repeatable = $repeatable->first();
+
+        $instances = collect();
+
+        foreach($items as $item){
+            $answers = InstanceAnswer::where('interview_item_id', $item->id)->get();
+
+            foreach($answers as $answer){
+                $instances->push($answer->interview_instance_id);
+            }
+        }
+
+        $instances = $instances->unique();
+        $instances = InterviewInstance::whereIn('id', $instances)->get();
+
+        if($repeatable){ 
+            foreach($instances as $instance){
+                // Get the highest repeatable index for this instance
+                $max_repeatable_index = InstanceAnswer::where('interview_instance_id', $instance->id)->max('repeatable_index');
+                $instance->max_repeatable_index = $max_repeatable_index;
+            }
+        }
+
+        foreach($items as $item){
+            $answers = InstanceAnswer::where('interview_item_id', $item->id)->get();
+            $item->answers = $answers;
+        }
+
+        return Excel::download(new CustomExport($items, $instances, $repeatable), 'custom.xlsx');
+    }
 
     private function checkPermission(Project $project, $json = false){
         $access = ProjectAccess::where('user_id', Auth::id())->where('project_id', $project->id)->first();
