@@ -19,8 +19,9 @@
                     <div class="stat-title">Familias con reporte de uso</div>
                 </div>
             </div>
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 w-full mt-4">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 w-full mt-4">
                 <a href="{{ route('catalogs.species.register', ['project' => $project]) }}" class="btn btn-primary w-full" @if(!Auth::user()->hasCapabilityOnProject($project, 'edit_catalog')) disabled @endif>Registrar especie</a>
+                <a href="{{ route('catalogs.upload', ['project' => $project]) }}" class="btn btn-primary w-full" @if(!Auth::user()->hasCapabilityOnProject($project, 'edit_catalog')) disabled @endif>Cargar catálogo desde Excel</a>
                 <a href="{{ route('catalogs.show', ['project' => $project])}}" class="btn btn-primary w-full" @if(!Auth::user()->hasCapabilityOnProject($project, 'view_catalog') || !count($project->catalogSpecies)) disabled @endif>Ver catálogo</a>
             </div>
         </x-card>
