@@ -32,5 +32,6 @@
                 @endforeach
             </tbody>
         </table>
+        {{ $species->links() }}
     </x-card>
 </x-app-layout>
