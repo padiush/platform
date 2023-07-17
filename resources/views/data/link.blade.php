@@ -15,7 +15,11 @@
                     <label class="label">
                         <span class="label-text">{{ $item->label }}</span>
                     </label>
+                    @if($section->answers->where('interview_item_id', $item->id)->first())
                     <input type="text" class="input input-bordered input-sm" value="{{ $section->answers->where('interview_item_id', $item->id)->first()->answer }}" disabled>
+                    @else
+                    <input type="text" class="input input-bordered input-sm" value="" disabled>
+                    @endif
                 </div>
                 @endforeach
                 <div class="form-control">
