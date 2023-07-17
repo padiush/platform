@@ -16,6 +16,18 @@
 
     <!-- SEO -->
     {!! SEO::generate() !!}
+
+    @if($_ENV['APP_ENV'] == 'production')
+    <!-- Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-JMVR4M354F"></script>
+    <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-JMVR4M354F');
+    </script>
+    @endif
 </head>
 <body class="font-sans antialiased">
     <div class="min-h-screen bg-neutral text-neutral-content">
