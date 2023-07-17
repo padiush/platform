@@ -7,10 +7,7 @@ use App\Http\Controllers\InterviewDesignerController;
 use App\Http\Controllers\ProjectCatalogController;
 use App\Http\Controllers\InterviewInstancesController;
 use App\Http\Controllers\InterviewDataController;
-
-Route::get('/', function () {
-    return view('welcome');
-});
+use App\Http\Controllers\PublicPageController;
 
 Route::get('/dashboard', function () {
     return view('dashboard');
@@ -87,6 +84,13 @@ Route::controller(InterviewDataController::class)->group(function(){
 
     Route::get('/data/{project}/ethnobotanyR', 'prepareEthnobotanyR')->middleware(['auth'])->name('data.ethnobotanyR');
     Route::post('/data/{project}/ethnobotanyR', 'handleEthnobotanyRRequest')->middleware(['auth']);
+
+    Route::get('/data/{project}/custom', 'prepareCustom')->middleware(['auth'])->name('data.custom');
+    Route::post('/data/{project}/custom', 'handleCustomRequest')->middleware(['auth']);
+});
+
+Route::controller(PublicPageController::class)->group(function(){
+    Route::get('/', 'index')->name('public.index');
 });
 
 require __DIR__.'/auth.php';

@@ -1,10 +1,16 @@
 import './bootstrap';
 import 'animate.css';
 import Alpine from 'alpinejs';
+import Swiper from 'swiper';
+import { themeChange } from 'theme-change'
+import $ from 'jquery';
 
+window.Swiper = Swiper;
 window.Alpine = Alpine;
-
+window.$ = $;
 Alpine.start();
+
+themeChange()
 
 function closeAlert() {
     document.getElementById('alert').classList.add('animate__animated', 'animate__fadeOutRight');
