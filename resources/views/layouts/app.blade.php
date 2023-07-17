@@ -13,8 +13,6 @@
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script src="https://kit.fontawesome.com/f77b4e0d38.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/theme-change@2.0.2/index.js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.1.min.js"></script>
 </head>
 <body class="font-sans antialiased" data-theme="dark">
     <div class="min-h-screen bg-neutral">

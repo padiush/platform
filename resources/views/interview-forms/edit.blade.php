@@ -44,7 +44,7 @@
         </button>
     </x-slot>
 
-    <script type="text/javascript">
+    <script type="module">
         $(document).ready(function(){
             var csrfToken = '{{ csrf_token() }}';
             var sections = @json($form->sections);

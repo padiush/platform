@@ -33,7 +33,7 @@
         </div>
         @endforeach
     </div>
-    <script type="text/javascript">
+    <script type="module">
         $(document).ready(function() {
             var linkSpeciesRoute = "{{ route('data.link', ['project' => $project]) }}";
             var csrfToken = "{{ csrf_token() }}";

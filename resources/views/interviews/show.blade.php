@@ -138,7 +138,7 @@
         @endforeach
     </div>
 
-    <script type="text/javascript">
+    <script type="module">
         $(document).ready(function() {
             var storeAnswerRoute = '{{ route('interviews.answer', ['instance' => $instance->id]) }}';
             var getAnswerRoute = '{{ route('interviews.answer.get', ['instance' => $instance->id]) }}';

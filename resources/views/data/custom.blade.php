@@ -40,7 +40,7 @@
         </x-card>
         @endforeach
     </div>
-    <script type="text/javascript">
+    <script type="module">
         $(document).ready(function() {
             var selectedFields = [];
             $('.checkbox').change(function() {
