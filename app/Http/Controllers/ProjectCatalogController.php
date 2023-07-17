@@ -4,11 +4,15 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Maatwebsite\Excel\Facades\Excel;
+
+use App\Imports\CatalogSpeciesImport;
 
 use App\Models\ProjectAccess;
 use App\Models\Project;
 use App\Models\User;
 use App\Models\CatalogSpecies;
+use App\Models\CatalogSpeciesPhoto;
 
 class ProjectCatalogController extends Controller{
     public function index(){
@@ -62,6 +66,30 @@ class ProjectCatalogController extends Controller{
         return redirect()->route('catalogs.index')->with('success', 'La especie ha sido registrada en el catálogo.');
     }
 
+    public function uploadCatalog(Project $project){
+        if(!Auth::user()->hasCapabilityOnProject($project, 'edit_catalog')){
+            return redirect()->route('catalogs.index')->with('error', 'No tienes permisos para agregar especies a este catálogo.');
+        }
+
+        return view('catalogs.upload', compact('project'));
+    }
+
+    public function handleUploadRequest(Project $project, Request $request){
+        if(!Auth::user()->hasCapabilityOnProject($project, 'edit_catalog')){
+            return redirect()->route('catalogs.index')->with('error', 'No tienes permisos para agregar especies a este catálogo.');
+        }
+
+        $request->validate([
+            'file' => 'required|file|mimes:xlsx',
+        ]);
+
+        $file = $request->file('file');
+
+        Excel::import(new CatalogSpeciesImport($project), $file);
+
+        return redirect()->route('catalogs.index')->with('success', 'El catálogo ha sido actualizado.');
+    }
+
     public function show(Project $project){
         if(!Auth::user()->hasCapabilityOnProject($project, 'view_catalog')){
             return redirect()->route('catalogs.index')->with('error', 'No tienes permisos para ver este catálogo.');
@@ -104,7 +132,7 @@ class ProjectCatalogController extends Controller{
         $path = public_path('storage/images/species/' . $name);
         $photo->move(public_path('storage/images/species/'), $name);
 
-        SpeciesPhoto::create([
+        CatalogSpeciesPhoto::create([
             'catalog_species_id' => $species->id,
             'path' => $name,
             'caption' => $request->caption,

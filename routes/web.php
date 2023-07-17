@@ -62,6 +62,9 @@ Route::controller(ProjectCatalogController::class)->group(function(){
     Route::get('/catalogs/{project}/species/register', 'registerSpecies')->middleware(['auth'])->name('catalogs.species.register');
     Route::post('/catalogs/{project}/species/register', 'storeSpecies')->middleware(['auth']);
 
+    Route::get('/catalogs/{project}/upload', 'uploadCatalog')->middleware(['auth'])->name('catalogs.upload');
+    Route::post('/catalogs/{project}/upload', 'handleUploadRequest')->middleware(['auth']);
+
     Route::get('/catalogs/{project}/species/{species}', 'showSpecies')->middleware(['auth'])->name('catalogs.species.show');
 });
 
