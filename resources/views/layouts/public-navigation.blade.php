@@ -15,7 +15,7 @@
             </ul>
         </div>
         <a class="btn btn-ghost" href="{{ route('public.index') }}">
-            <x-application-logo class="block h-10 w-auto fill-current" />
+            <x-application-full-logo class="block h-10 w-auto fill-current" />
         </a>
     </div>
     <div class="navbar-end hidden lg:flex">
