@@ -21,29 +21,37 @@
             <x-feature-card image="{{ Storage::disk('s3')->temporaryUrl('custom.png', now()->addMinutes(10)) }}" title="Entrevistas personalizables">
                 Nuestro diseñador de entrevistas es sumamente flexible y se puede adaptar a cualquier metodología, con secciones únicas y repetitivas que pueden contener campos de texto, números, fechas, de selección única y de selección múltiple.
             </x-feature-card>
-            <x-feature-card image="{{ Storage::disk('s3')->temporaryUrl('placeholder.png', now()->addMinutes(10)) }}" title="Entrevistas personalizables" title="Catálogo de especies">
+            <x-feature-card image="{{ Storage::disk('s3')->temporaryUrl('catalog.png', now()->addMinutes(10)) }}" title="Catálogo de especies">
                 Añade tantas especies identificadas como necesites, con toda su información taxonómica (familia, género, nombre de la especie, variante y autoridad).
             </x-feature-card>
-            <x-feature-card image="{{ Storage::disk('s3')->temporaryUrl('placeholder.png', now()->addMinutes(10)) }}" title="Entrevistas personalizables" title="Enlaza información">
+            <x-feature-card image="{{ Storage::disk('s3')->temporaryUrl('usage.png', now()->addMinutes(10)) }}" title="Enlaza información">
                 Enlaza rápida y fácilmente los datos de las entrevistas de campo (usos) a los datos taxonómicos del catálogo de especies.
             </x-feature-card>
-            <x-feature-card image="{{ Storage::disk('s3')->temporaryUrl('placeholder.png', now()->addMinutes(10)) }}" title="Entrevistas personalizables" title="Exportación de datos">
+            <x-feature-card image="{{ Storage::disk('s3')->temporaryUrl('data.png', now()->addMinutes(10)) }}" title="Exportación de datos">
                 Los datos se pueden exportar directamente para usarse con el paquete ethnobotanyR, o se puede generar un informe personalizado de Excel en cualquier momento con todos los datos de investigación.
                 <div class="card-actions justify-end">
                     <a class="btn btn-primary" href="https://cran.r-project.org/web/packages/ethnobotanyR/vignettes/ethnobotanyr_vignette.html">Conoce más sobre ethnobotanyR <i class="fa-solid fa-arrow-up-right-from-square pl-2"></i></a>
                 </div>
             </x-feature-card>
-            <x-feature-card image="{{ Storage::disk('s3')->temporaryUrl('placeholder.png', now()->addMinutes(10)) }}" title="Entrevistas personalizables" title="Comunidad">
+            <x-feature-card image="{{ Storage::disk('s3')->temporaryUrl('community.png', now()->addMinutes(10)) }}" title="Comunidad">
                 Si el autor principal lo permite al final de la investigación, una selección limitada de datos se puede compartir con la comunidad para ayudar a otros investigadores y generar discusión.
             </x-feature-card>
         </div>
     </div>
     <div class="bg-primary text=primary-content p-12">
-        <div class="flex justify-center text-3xl font-bold">
+        <div class="flex justify-center pt-4">
+            <div class="text-5xl">
+                <i class="fa-solid fa-video"></i>
+            </div>
+        </div>
+        <div class="flex justify-center text-3xl font-bold pt-4">
             ¿Cómo funciona?
         </div>
-        <div class="flex justify-center pt-4">
-            <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen class="w-full h-[40vh] lg:h-[calc(100vh-4rem)]"></iframe>
+        <div class="flex justify-center pt-4 lg:max-w-md">
+            <div class="alert">
+                <i class="fa-solid fa-screwdriver-wrench text-2xl lg:text-md"></i>
+                <span>Este video aún se encuentra en producción.<br/>Por favor, regresa pronto.</span>
+            </div>
         </div>
     </div>
     @if(false)
