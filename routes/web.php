@@ -94,6 +94,7 @@ Route::controller(InterviewDataController::class)->group(function(){
 
 Route::controller(PublicPageController::class)->group(function(){
     Route::get('/', 'index')->name('public.index');
+    Route::get('/acerca', 'about')->name('public.about');
 });
 
 require __DIR__.'/auth.php';

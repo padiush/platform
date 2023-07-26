@@ -1,9 +1,8 @@
 <footer class="footer p-10 bg-base-300 text-base-content">
   <div>
     <span class="footer-title">Acerca de</span> 
-    <a class="link link-hover">Sobre nosotros</a> 
+    <a class="link link-hover" href="{{ route('public.about') }}">Sobre nosotros</a> 
     <a class="link link-hover">Contáctanos</a> 
-    <a class="link link-hover">Colaboraciones</a>
     <span>Hecho con <i class="fa-solid fa-heart text-red-500"></i> en El Salvador</span>
   </div> 
   <div>
