@@ -9,12 +9,12 @@
                 <li><a href="{{ route('public.index') }}">Inicio</a></li>
                 @endif
                 <li><a href="{{ route('public.about') }}">Sobre nosotros</a></li>
+                <li><a href="{{ route('public.contact') }}">Contáctanos</a></li>
                 @if(Auth::user())
                 <li><a href="{{ route('dashboard') }}">Area de usuarios</a></li>
                 @else
                 <li><a href="{{ route('login') }}">Registrarse/Ingresar</a></li>
                 @endif
-                <li><a href="{{ route('public.contact') }}">Contáctanos</a></li>
             </ul>
         </div>
         <a class="btn btn-ghost" href="{{ route('public.index') }}">
@@ -27,12 +27,12 @@
                 <li><a href="{{ route('public.index') }}">Inicio</a></li>
             @endif
             <li><a href="{{ route('public.about') }}">Sobre nosotros</a></li>
+            <li><a href="{{ route('public.contact') }}">Contáctanos</a></li>
             @if(Auth::user())
             <li><a href="{{ route('dashboard') }}">Area de usuarios</a></li>
             @else
             <li><a href="{{ route('login') }}">Registrarse/Ingresar</a></li>
             @endif
-            <li><a href="{{ route('public.contact') }}">Contáctanos</a></li>
         </ul>
     </div>
 </div>

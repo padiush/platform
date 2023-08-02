@@ -3,7 +3,7 @@
         <div class="hero-overlay bg-opacity-60"></div>
         <div class="hero-content text-center text-neutral-content">
             <div class="max-w-md lg:max-w-[60vw]">
-                <h1 class="mb-5 text-5xl font-bold">La Herramienta Definitiva para Investigaciones Etnobotánicas</h1>
+                <h1 class="mb-5 text-5xl font-bold">Uniendo Saberes: Sistematizando el Conocimiento Ancestral</h1>
                 <p class="mb-5">Simplifica la recolección y el análisis de tus datos con nuestra plataforma intuitiva y personalizable.</p>
                 @if(Auth::user())
                 <a href="{{ route('dashboard') }}" class="btn btn-primary">Ingresar a la plataforma</a>
