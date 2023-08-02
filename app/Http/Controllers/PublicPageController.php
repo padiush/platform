@@ -11,7 +11,7 @@ use App\Notifications\ContactFormNotification;
 class PublicPageController extends Controller
 {
     public function index(){
-        SEOTools::setTitle('Padiush | La Herramienta Definitiva para Investigaciones Etnobotánicas');
+        SEOTools::setTitle('Padiush | Uniendo Saberes: Sistematizando el Conocimiento Ancestral');
         SEOTools::setDescription('Simplifica la recolección y el análisis de tus datos con nuestra plataforma intuitiva y personalizable.');
         SEOTools::opengraph()->setUrl(env('APP_URL'));
         SEOTools::setCanonical(env('APP_URL'));

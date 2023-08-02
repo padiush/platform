@@ -15,7 +15,7 @@
                 <p>¡Bienvenido a Padiush!</p>
             </div>
             <div class="text-justify lg:text-xl">
-                <p>Una plataforma de software con la meta de facilitar la investigación etnobotánica. Desde 2022, nos esforzamos por brindar herramientas que simplifican y agilizan la recolección y el análisis de datos a los investigadores.</p>
+                <p>Una plataforma de software con la meta de agilizar la investigación etnobotánica. Desde 2021, nos esforzamos por brindar herramientas que simplifican la recolección y el análisis de datos a los investigadores.</p>
             </div>
         </div>
     </div>
@@ -46,10 +46,10 @@
         <div class="flex justify-center">
             <div class="text-justify lg:max-w-[50vw]">
                 <p class="pt-4">
-                    El nombre <span class="italic">Padiush</span>, que significa 'gracias' en <span class="italic">nawat</span>, nos recuerda la profunda gratitud que debemos a las comunidades que comparten su conocimiento con nosotros. Este agradecimiento va más allá de las palabras; conlleva una responsabilidad de proteger ese conocimiento de la explotación y garantizar que se utilice de manera respetuosa y sostenible.
+                    El nombre <span class="italic">Padiush</span>, que en náhuat significa 'gracias', sirve como constante recordatorio de la profunda gratitud que debemos hacia las comunidades que nos comparten su sabiduría. Este agradecimiento trasciende las meras palabras y se traduce en un compromiso para devolver y proteger dichos conocimientos de la explotación, asegurando su uso de manera respetuosa y sostenible.
                 </p>
                 <p class="pt-4">
-                    En Padiush, somos conscientes de la historia de El Salvador, que ha presenciado dos masacres de sus pueblos originarios en 1832 y 1932. Nuestra misión es promover el respeto y la apreciación por el conocimiento de nuestros pueblos. Desarrollamos Padiush no solo como una herramienta para facilitar la investigación etnobotánica, sino también como un puente para unir a los investigadores y las comunidades en un espíritu de agradecimiento y respeto mutuo.
+                    Padiush es un proyecto que nace en el corazón de la historia salvadoreña, una que ha presenciado las terribles masacres de sus pueblos originarios en 1832 y 1932.  Nuestra visión se basa en fomentar el respeto y la valoración del conocimiento ancestral de nuestros pueblos. Creamos Padiush no solo como un recurso para facilitar la investigación etnobotánica, sino también como un enlace que conecta a investigadores y comunidades en un espíritu de reconocimiento y respeto mutuo.
                 </p>
             </div>
         </div>
