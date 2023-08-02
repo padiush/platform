@@ -7,8 +7,8 @@
   </div> 
   <div>
     <span class="footer-title">Legal</span> 
-    <a class="link link-hover">Política de privacidad</a> 
-    <a class="link link-hover">Términos y condiciones</a> 
+    <a class="link link-hover" href="{{ route('public.privacy') }}">Política de privacidad</a> 
+    <a class="link link-hover" href="{{ route('public.terms') }}">Términos y condiciones</a> 
   </div> 
   <div>
     <span class="footer-title">Social</span> 
