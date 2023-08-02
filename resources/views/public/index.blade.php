@@ -22,7 +22,7 @@
                 Nuestro diseñador de entrevistas es sumamente flexible y se puede adaptar a cualquier metodología, con secciones únicas y repetitivas que pueden contener campos de texto, números, fechas, de selección única y de selección múltiple.
             </x-feature-card>
             <x-feature-card image="{{ Storage::disk('s3')->temporaryUrl('catalog.png', now()->addMinutes(10)) }}" title="Catálogo de especies">
-                Añade tantas especies identificadas como necesites, con toda su información taxonómica (familia, género, nombre de la especie, variante y autoridad).
+                Añade tantas especies identificadas como necesites, con toda su información taxonómica (familia, género, especie, subespecie, variedad y autoridad).
             </x-feature-card>
             <x-feature-card image="{{ Storage::disk('s3')->temporaryUrl('usage.png', now()->addMinutes(10)) }}" title="Enlaza información">
                 Enlaza rápida y fácilmente los datos de las entrevistas de campo (usos) a los datos taxonómicos del catálogo de especies.
@@ -30,11 +30,12 @@
             <x-feature-card image="{{ Storage::disk('s3')->temporaryUrl('data.png', now()->addMinutes(10)) }}" title="Exportación de datos">
                 Los datos se pueden exportar directamente para usarse con el paquete ethnobotanyR, o se puede generar un informe personalizado de Excel en cualquier momento con todos los datos de investigación.
                 <div class="card-actions justify-end">
-                    <a class="btn btn-primary" href="https://cran.r-project.org/web/packages/ethnobotanyR/vignettes/ethnobotanyr_vignette.html">Conoce más sobre ethnobotanyR <i class="fa-solid fa-arrow-up-right-from-square pl-2"></i></a>
+                    <a class="btn btn-primary hidden lg:inline-flex" href="https://cran.r-project.org/web/packages/ethnobotanyR/vignettes/ethnobotanyr_vignette.html">Conoce más sobre ethnobotanyR <i class="fa-solid fa-arrow-up-right-from-square pl-2"></i></a>
+                    <a class="btn btn-primary lg:hidden" href="https://cran.r-project.org/web/packages/ethnobotanyR/vignettes/ethnobotanyr_vignette.html">ethnobotanyR <i class="fa-solid fa-arrow-up-right-from-square pl-2"></i></a>
                 </div>
             </x-feature-card>
             <x-feature-card image="{{ Storage::disk('s3')->temporaryUrl('community.png', now()->addMinutes(10)) }}" title="Comunidad">
-                Si el autor principal lo permite al final de la investigación, una selección limitada de datos se puede compartir con la comunidad para ayudar a otros investigadores y generar discusión.
+                Si el autor principal lo permite al final de la investigación, una selección limitada de datos se puede compartir con la comunidad para ayudar a otros investigadores a generar discusión.
             </x-feature-card>
         </div>
     </div>
