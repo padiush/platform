@@ -49,4 +49,21 @@ class PublicPageController extends Controller
         return redirect()->route('public.contact')->with('success', 'Tu mensaje ha sido enviado. ¡Gracias por contactarnos!');
     }
 
+    public function privacy(){
+        SEOTools::setTitle('Política de Privacidad');
+        SEOTools::setDescription('Conoce la Política de Privacidad de Padiush. Esta Política te explicará cómo recopilamos, usamos, protegemos y gestionamos tus datos.');
+        SEOTools::opengraph()->setUrl(env('APP_URL').'/privacidad');
+        SEOTools::setCanonical(env('APP_URL').'/privacidad');
+
+        return view('public.privacy');
+    }
+
+    public function terms(){
+        SEOTools::setTitle('Términos y Condiciones');
+        SEOTools::setDescription('Conoce los Términos y Condiciones de Padiush. Estos Términos te explicarán cómo puedes usar nuestra plataforma.');
+        SEOTools::opengraph()->setUrl(env('APP_URL').'/terminos');
+        SEOTools::setCanonical(env('APP_URL').'/terminos');
+
+        return view('public.terms');
+    }
 }
