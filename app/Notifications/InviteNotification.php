@@ -51,14 +51,14 @@ class InviteNotification extends Notification
                 'inviting_user' => $project_invite->invitingUser,
                 'invited_user' => $project_invite->invitedUser,
             ]);
-        } else {
-            return (new MailMessage)->subject('Has recibido una invitación a un proyecto en Padiush')->view('email.invite', [
-                'project' => $project_invite->project,
-                'inviting_user' => $project_invite->invitingUser,
-                'invited_name' => $project_invite->invited_name,
-                'invited_email' => $project_invite->invited_email,
-            ]);
         }
+
+        return (new MailMessage)->subject('Has recibido una invitación a un proyecto en Padiush')->view('email.invite', [
+            'project' => $project_invite->project,
+            'inviting_user' => $project_invite->invitingUser,
+            'invited_name' => $project_invite->invited_name,
+            'invited_email' => $project_invite->invited_email,
+        ]);
     }
 
     /**
@@ -69,8 +69,20 @@ class InviteNotification extends Notification
      */
     public function toArray($notifiable)
     {
+        $project_invite = $this->invite;
+        if($project_invite->invitedUser){
+            return [
+                'project' => $project_invite->project,
+                'inviting_user' => $project_invite->invitingUser,
+                'invited_user' => $project_invite->invitedUser,
+            ];
+        }
+
         return [
-            //
+            'project' => $project_invite->project,
+            'inviting_user' => $project_invite->invitingUser,
+            'invited_name' => $project_invite->invited_name,
+            'invited_email' => $project_invite->invited_email,
         ];
     }
 }
