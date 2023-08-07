@@ -13,14 +13,8 @@
   <div>
     <span class="footer-title">Social</span> 
     <div class="grid grid-flow-col gap-4 text-3xl">
-      <a>
-        <i class="fa-brands fa-twitter"></i>
-      </a>
-      <a>
-        <i class="fa-brands fa-instagram"></i>
-      </a>
-      <a>
-        <i class="fa-brands fa-facebook"></i>
+      <a href="https://linkedin.com/company/padiushbio" target="_blank">
+        <i class="fa-brands fa-linkedin"></i>
       </a>
     </div>
   </div>
