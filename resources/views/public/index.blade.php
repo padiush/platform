@@ -30,8 +30,8 @@
             <x-feature-card image="{{ Storage::disk('s3')->temporaryUrl('data.png', now()->addMinutes(10)) }}" title="Exportación de datos">
                 Los datos se pueden exportar directamente para usarse con el paquete ethnobotanyR, o se puede generar un informe personalizado de Excel en cualquier momento con todos los datos de investigación.
                 <div class="card-actions justify-end">
-                    <a class="btn btn-primary hidden lg:inline-flex" href="https://cran.r-project.org/web/packages/ethnobotanyR/vignettes/ethnobotanyr_vignette.html">Conoce más sobre ethnobotanyR <i class="fa-solid fa-arrow-up-right-from-square pl-2"></i></a>
-                    <a class="btn btn-primary lg:hidden" href="https://cran.r-project.org/web/packages/ethnobotanyR/vignettes/ethnobotanyr_vignette.html">ethnobotanyR <i class="fa-solid fa-arrow-up-right-from-square pl-2"></i></a>
+                    <a class="btn btn-primary hidden lg:inline-flex" href="https://cran.r-project.org/web/packages/ethnobotanyR/vignettes/ethnobotanyr_vignette.html" target="_blank">Conoce más sobre ethnobotanyR <i class="fa-solid fa-arrow-up-right-from-square pl-2"></i></a>
+                    <a class="btn btn-primary lg:hidden" href="https://cran.r-project.org/web/packages/ethnobotanyR/vignettes/ethnobotanyr_vignette.html" target="_blank">ethnobotanyR <i class="fa-solid fa-arrow-up-right-from-square pl-2"></i></a>
                 </div>
             </x-feature-card>
             <x-feature-card image="{{ Storage::disk('s3')->temporaryUrl('community.png', now()->addMinutes(10)) }}" title="Comunidad">
