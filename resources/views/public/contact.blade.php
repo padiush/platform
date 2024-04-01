@@ -12,6 +12,7 @@
                 </div>
                 <form action="{{ route('public.contact.handle') }}" method="post">
                     @csrf
+                    @honeypot
                     <div class="form-control w-full">
                         <label class="label">
                             <span class="label-text">Nombre</span>
