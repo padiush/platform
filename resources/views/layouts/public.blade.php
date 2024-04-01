@@ -17,7 +17,7 @@
     <!-- SEO -->
     {!! SEO::generate() !!}
 
-    @if($_ENV['APP_ENV'] == 'production')
+    @if(App::environment() == 'production')
     <!-- Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-JMVR4M354F"></script>
     <script>

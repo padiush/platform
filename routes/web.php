@@ -96,7 +96,7 @@ Route::controller(PublicPageController::class)->group(function(){
     Route::get('/', 'index')->name('public.index');
     Route::get('/acerca', 'about')->name('public.about');
     Route::get('/contacto', 'contact')->name('public.contact');
-    Route::post('/contacto', 'handleContactRequest')->name('public.contact.handle');
+    Route::post('/contacto', 'handleContactRequest')->middleware(['honeypot'])->name('public.contact.handle');
     Route::get('/privacidad', 'privacy')->name('public.privacy');
     Route::get('/terminos', 'terms')->name('public.terms');
 });

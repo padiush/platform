@@ -38,7 +38,7 @@
                         <div class="swiper-wrapper">
                             @foreach ($species->photos as $photo)
                             <div class="swiper-slide">
-                                <img src="{{ $_ENV['APP_URL']}}/storage/images/species/{{ $photo->name }}" alt="">
+                                <img src="{{ App::environment() }}/storage/images/species/{{ $photo->name }}" alt="">
                                 <a href="{{ route('catalog.species.photo.delete', ['species' => $species, 'photo' => $photo]) }}" onclick="return confirm_delete()" class="btn btn-error w-full">
                                     Eliminar foto
                                 </a>
