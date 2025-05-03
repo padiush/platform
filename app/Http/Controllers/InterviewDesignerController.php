@@ -83,7 +83,6 @@ class InterviewDesignerController extends Controller
             'max' =>  'nullable|numeric',
             'step' =>  'nullable|numeric',
             'options' =>  'nullable|array',
-            'link_to_species' =>  'nullable|boolean',
         ]);
 
         $section = InterviewSection::where('interview_form_id', $form->id)->orderBy('order', 'desc')->first();
@@ -142,7 +141,7 @@ class InterviewDesignerController extends Controller
         $item->max = $data->max;
         $item->step = $data->step;
         $item->options = $data->options;
-        $item->link_to_species = $data->link_to_species;
+        $item->link_to_species = $data->name === "especie" ? true : false;
         $item->save();
 
         return response()->json($item);
