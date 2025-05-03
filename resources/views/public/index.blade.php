@@ -39,6 +39,7 @@
             </x-feature-card>
         </div>
     </div>
+    @if(false)
     <div class="bg-primary text=primary-content p-12">
         <div class="flex justify-center pt-4">
             <div class="text-5xl">
@@ -55,7 +56,6 @@
             </div>
         </div>
     </div>
-    @if(false)
     <div class="p-12">
         <div class="flex justify-center text-3xl font-bold">
             Testimonios

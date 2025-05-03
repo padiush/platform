@@ -5,7 +5,7 @@
     <div class="grid grid-cols-1 gap-4 w-full">
         @foreach($projects as $project)
         <x-card title="{{ $project->name }}">
-            <div class="stats stats-vertical lg:stats-horizontal bg-base-200">
+            <div class="stats stats-vertical lg:stats-horizontal bg-base-300">
                 <div class="stat">
                     <div class="stat-value">{{ count($project->catalogSpecies )}}</div>
                     <div class="stat-title">Especies en el catálogo</div>

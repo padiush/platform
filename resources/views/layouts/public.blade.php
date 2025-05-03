@@ -30,7 +30,7 @@
     @endif
 </head>
 <body class="font-sans antialiased">
-    <div class="min-h-screen bg-neutral text-neutral-content">
+    <div class="min-h-screen bg-base-100 text-neutral-content">
     @include('layouts.public-navigation')
         <main class="z-0">
             <div class="overflow-hidden">

@@ -14,12 +14,12 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script src="https://kit.fontawesome.com/f77b4e0d38.js" crossorigin="anonymous"></script>
 </head>
-<body class="font-sans antialiased" data-theme="dark">
-    <div class="min-h-screen bg-neutral">
+<body class="font-sans antialiased">
+    <div class="min-h-screen bg-base-100">
         @include('layouts.navigation')
 
         <!-- Page Heading -->
-        <header class="bg-base-100 shadow">
+        <header class="bg-base-200 shadow-sm">
             <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 text-base-content flex items-center">
                 @isset($action)<span class="inline-block w-16">{{ $action }}</span>@endisset
                 <span class="inline-block grow">
