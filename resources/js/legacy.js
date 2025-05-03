@@ -174,13 +174,13 @@ function pushSection(
     cardTitle.classList.add("card-title");
     cardTitle.innerHTML = "Detalles de la sección";
 
-    var sectionNameFormControl = document.createElement("div");
-    sectionNameFormControl.classList.add("form-control");
+    var sectionNameFormControl = document.createElement("fieldset");
+    sectionNameFormControl.classList.add("fieldset");
 
-    var sectionNameLabel = document.createElement("label");
-    sectionNameLabel.classList.add("label");
+    var sectionNameLabel = document.createElement("legend");
+    sectionNameLabel.classList.add("fieldset-legend");
     sectionNameLabel.innerHTML =
-        '<span class="label-text">Nombre de la sección <span class="text-red-500">*</span></span>';
+        'Nombre de la sección <span class="text-error">*</span>';
 
     var sectionNameInput = document.createElement("input");
     sectionNameInput.classList.add("input", "input-bordered");
@@ -343,26 +343,25 @@ function pushTextInput(
     cardTitle.classList.add("card-title");
     cardTitle.innerHTML = "Campo de texto";
 
-    var labelFormControl = document.createElement("div");
-    labelFormControl.classList.add("form-control", "w-full");
+    var labelFormControl = document.createElement("fieldset");
+    labelFormControl.classList.add("fieldset", "w-full");
 
-    var labelLabel = document.createElement("label");
-    labelLabel.classList.add("label");
+    var labelLabel = document.createElement("legend");
+    labelLabel.classList.add("fieldset-legend");
     labelLabel.innerHTML =
-        '<span class="label-text">Etiqueta del campo <span class="text-red-500">*</span></span>';
+        'Etiqueta del campo <span class="text-error">*</span>';
 
     var labelInput = document.createElement("input");
     labelInput.classList.add("input", "input-bordered", "w-full");
     labelInput.setAttribute("type", "text");
     labelInput.setAttribute("placeholder", "Ingrese el texto de la etiqueta");
 
-    var nameFormControl = document.createElement("div");
-    nameFormControl.classList.add("form-control", "w-full");
+    var nameFormControl = document.createElement("fieldset");
+    nameFormControl.classList.add("fieldset", "w-full");
 
-    var nameLabel = document.createElement("label");
-    nameLabel.classList.add("label");
-    nameLabel.innerHTML =
-        '<span class="label-text">Nombre del campo <span class="text-red-500">*</span></span>';
+    var nameLabel = document.createElement("legend");
+    nameLabel.classList.add("fieldset-legend");
+    nameLabel.innerHTML = 'Nombre del campo <span class="text-error">*</span>';
 
     var nameInput = document.createElement("input");
     nameInput.classList.add("input", "input-bordered", "w-full");

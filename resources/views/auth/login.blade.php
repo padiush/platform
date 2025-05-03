@@ -24,24 +24,24 @@ $url = Storage::disk('s3')->temporaryUrl('public/bg.jpg', now()->addMinutes(5));
                 </p>
                 <form method="POST" action="{{ route('login') }}" class="sm:w-2/3 w-full px-4 lg:px-0 mx-auto pt-4">
                     @csrf
-                    <div class="form-control">
-                        <label class="label">
-                            <span class="label-text">Correo electrónico</span>
-                        </label>
+                    <fieldset class="fieldset">
+                        <legend class="fieldset-legend">
+                            Correo electrónico
+                        </legend>
                         <input type="email" name="email" id="email" class="input input-bordered w-full">
-                    </div>
-                    <div class="form-control">
-                        <label class="label">
-                            <span class="label-text">Contraseña</span>
-                        </label>
-                        <input class="input input-bordered w-full" type="password" name="password" id="password">
-                    </div>
-                    <div class="form-control">
+                    </fieldset>
+                    <fieldset class="fieldset">
+                        <legend class="fieldset-legend">
+                            Contraseña
+                        </legend>
+                            <input class="input input-bordered w-full" type="password" name="password" id="password">
+                    </fieldset>
+                    <fieldset class="fieldset">
                         <label class="label cursor-pointer">
-                            <span class="label-text">Mantener mi sesión activa en este navegador</span>
                             <input id="remember_me" type="checkbox" class="checkbox checkbox-primary" name="remember">
+                            <span class="label-text">Mantener mi sesión activa en este navegador</span>
                         </label>
-                    </div>
+                    </fieldset>
                     <div class="px-4 pb-2 pt-4">
                         <button class="btn btn-primary">Iniciar sesión</button>
                     </div>

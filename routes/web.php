@@ -8,10 +8,15 @@ use App\Http\Controllers\ProjectCatalogController;
 use App\Http\Controllers\InterviewInstancesController;
 use App\Http\Controllers\InterviewDataController;
 use App\Http\Controllers\PublicPageController;
+use Inertia\Inertia;
 
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth'])->name('dashboard');
+
+Route::get("/inertia", function () {
+    return Inertia::render("Dashboard");
+});
 
 Route::controller(ProjectController::class)->group(function(){
     Route::get('/projects', 'index')->middleware(['auth'])->name('projects.index');

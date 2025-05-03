@@ -105,7 +105,7 @@ class InterviewDesignerController extends Controller
         $item->max = $request->max;
         $item->step = $request->step;
         $item->options = $request->options;
-        $item->link_to_species = false;
+        $item->link_to_species = $request->name === 'especie' ? true : false;
         $item->save();
 
         return response()->json($item);
