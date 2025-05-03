@@ -39,9 +39,6 @@
         <button id="multiSelect">
             <span><i class="fa-solid fa-plus"></i><i class="fa-regular fa-list-check ml-2"></i></span><span class="hidden lg:inline-block text-sm">Selección múltiple</span>
         </button>
-        <button id="usageReport">
-            <span><i class="fa-solid fa-plus"></i><i class="fa-solid fa-seedling ml-2"></i></span><span class="hidden lg:inline-block text-sm">Reporte</span>
-        </button>
     </x-slot>
 
     <script type="module">

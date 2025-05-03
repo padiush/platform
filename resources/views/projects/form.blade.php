@@ -12,36 +12,36 @@
         <form action="@isset($project){{ route('projects.edit', ['project' => $project])}}@else{{ route('projects.create')}}@endif" method="post">
             @csrf
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 w-full">
-                <div class="form-control w-full lg:col-span-2">
-                    <label class="label">
-                        <span class="label-text">Nombre del proyecto <span class="text-red-500">*</span></span>
-                    </label>
+                <fieldset class="fieldset w-full lg:col-span-2">
+                    <legend class="fieldset-legend">
+                        Nombre del proyecto <span class="text-error">*</span>
+                    </legend>
                     <input type="text" class="input input-bordered w-full" name="name" value="@isset($project){{$project->name}}@endisset" />
-                </div>
-                <div class="form-control w-full">
-                    <label class="label">
-                        <span class="label-text">Autoría</span>
-                    </label>
+                </fieldset>
+                <fieldset class="fieldset w-full">
+                    <legend class="fieldset-legend">
+                        Autoría
+                    </legend>
                     <input type="text" class="input input-bordered w-full" name="author" value="@isset($project){{$project->author}}@else{{Auth::user()->name}}@endisset" />
-                </div>
-                <div class="form-control w-full">
-                    <label class="label">
-                        <span class="label-text">Institución</span>
-                    </label>
+                </fieldset>
+                <fieldset class="fieldset w-full">
+                    <legend class="fieldset-legend">
+                        Institución
+                    </legend>
                     <input type="text" class="input input-bordered w-full" name="institution" value="@isset($project){{$project->institution}}@endisset" />
-                </div>
-                <div class="form-control w-full">
-                    <label class="label">
-                        <span class="label-text">Correo electrónico del autor</span>
-                    </label>
+                </fieldset>
+                <fieldset class="fieldset w-full">
+                    <legend class="fieldset-legend">
+                        Correo electrónico del autor
+                    </legend>
                     <input type="email" class="input input-bordered w-full" name="author_email" value="@isset($project){{$project->author_email}}@else{{Auth::user()->email}}@endisset" />
-                </div>
-                <div class="form-control w-full">
-                    <label class="label">
-                        <span class="label-text">País</span>
-                    </label>
+                </fieldset>
+                <fieldset class="fieldset w-full">
+                    <legend class="fieldset-legend">
+                        País
+                    </legend>
                     <input type="text" class="input input-bordered w-full" name="country" value="@isset($project){{$project->country}}@endisset" />
-                </div>
+                </fieldset>
             </div>
             <div class="mt-4 w-full">
                 <a href="{{ route('projects.index') }}" class="btn btn-outline">Cancelar</a>

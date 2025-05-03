@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat">
 
     <!-- Scripts -->
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @vite(['resources/css/app.css', 'resources/js/legacy.js'])
     <script src="https://kit.fontawesome.com/f77b4e0d38.js" crossorigin="anonymous"></script>
 </head>
 <body class="font-sans antialiased">
@@ -43,7 +43,7 @@
                 </div>
             </div>
             @isset($bottom_bar)
-            <div class="btm-nav bg-primary text-primary-content">
+            <div class="dock bg-primary text-primary-content">
                 {{ $bottom_bar }}
             </div>
             @endisset

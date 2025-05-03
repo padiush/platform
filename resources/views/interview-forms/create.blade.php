@@ -12,18 +12,18 @@
             @csrf
             <input type="hidden" name="project_id" value="{{ $project->id }}" />
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 w-full">
-                <div class="form-control w-full lg:col-span-2">
-                    <label class="label">
-                        <span class="label-text">Título del formulario <span class="text-red-500">*</span></span>
-                    </label>
+                <fieldset class="fieldset w-full lg:col-span-2">
+                    <legend class="fieldset-legend">
+                        Título del formulario <span class="text-red-500">*</span>
+                    </legend>
                     <input type="text" class="input input-bordered w-full" name="name" value="" />
-                </div>
-                <div class="form-control w-full lg:col-span-2">
-                    <label class="label">
+                </fieldset>
+                <fieldset class="fieldset w-full lg:col-span-2">
+                    <legend class="fieldset-legend">
                         <span class="label-text">Descripción</span>
-                    </label>
+                    </legend>
                     <textarea class="textarea h-24 textarea-bordered w-full" name="description"></textarea>
-                </div>
+                </fieldset>
             </div>
             <div class="mt-4 w-full">
                 <a href="{{ route('designer.index') }}" class="btn btn-outline">Cancelar</a>

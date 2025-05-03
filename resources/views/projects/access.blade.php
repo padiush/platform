@@ -17,29 +17,29 @@
             <x-card title="Invitar usuario al proyecto">
                 <form action="{{ route('projects.accesses.invite', ['project' => $project]) }}" method="post">
                     @csrf
-                    <div class="form-control w-full">
-                        <label class="label">
-                            <span class="label-text">Nombre</span>
-                        </label>
+                    <fieldset class="fieldset w-full">
+                        <legend class="fieldset-legend">
+                            Nombre
+                        </legend>
                         <input type="name" class="input input-bordered w-full" name="name" />
-                    </div>
-                    <div class="form-control w-full">
-                        <label class="label">
-                            <span class="label-text">Correo electrónico</span>
-                        </label>
+                    </fieldset>
+                    <fieldset class="fieldset w-full">
+                        <legend class="fieldset-legend">
+                            Correo electrónico
+                        </legend>
                         <input type="email" class="input input-bordered w-full" name="email" />
-                    </div>
-                    <div class="form-control w-full">
-                        <label class="label">
-                            <span class="label-text">Permisos</span>
-                        </label>
+                    </fieldset>
+                    <fieldset class="fieldset w-full">
+                        <legend class="fieldset-legend">
+                            Permisos
+                        </legend>
                         <select name="capability_id" class="select select-bordered w-full">
                             <option value="0" selected disabled hidden>Selecciona un permiso</option>
                             @foreach($capabilities as $capability)
                             <option value="{{ $capability->id }}">{{ $capability->name }}</option>
                             @endforeach
                         </select>
-                    </div>
+                    </fieldset>
                     <div class="mt-4 w-full">
                         <button type="submit" class="btn btn-primary w-full">Invitar</button>
                     </div>
