@@ -9,6 +9,7 @@ use App\Models\InterviewForm;
 use App\Models\ProjectAccess;
 use App\Models\Project;
 use App\Models\User;
+use Inertia\Inertia;
 
 class InterviewFormController extends Controller
 {
@@ -29,7 +30,11 @@ class InterviewFormController extends Controller
             return redirect()->route('projects.index')->with('error', 'No tienes proyectos activos para diseñar entrevistas.');
         }
 
-        return view('interview-forms.index', compact('projects'));
+        $project->load("interviewForms", "interviewForms.instances");
+
+        return Inertia::render("Designer/Index", [
+            'projects' => $projects
+        ]);
     }
 
     public function create(Project $project){
