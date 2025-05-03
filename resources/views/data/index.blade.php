@@ -16,7 +16,7 @@
                 </div>
             </div>
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 w-full mt-4">
-                <a href="{{ route('data.link', ['project' => $project])}}" class="btn btn-primary w-full" @if(!Auth::user()->hasCapabilityOnProject($project, 'manage_data') || !count($project->unlinkedAnswers())) disabled @endif>Vincular especie</a>
+                <a href="{{ route('data.link', ['project' => $project])}}" class="btn btn-primary w-full" @if(!Auth::user()->hasCapabilityOnProject($project, 'manage_data') || !count($project->unlinkedAnswers())) @endif>Vincular especie</a>
                 <a href="{{ route('data.ethnobotanyR', ['project' => $project])}}" class="btn btn-primary w-full" @if(!Auth::user()->hasCapabilityOnProject($project, 'generate_reports')) disabled @endif>Generar reporte para EthnobotanyR</a>
                 <a href="{{ route('data.custom', ['project' => $project])}}" class="btn btn-primary w-full" @if(!Auth::user()->hasCapabilityOnProject($project, 'generate_reports')) disabled @endif>Exportación personalizada</a>
             </div>
