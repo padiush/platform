@@ -10,6 +10,7 @@
         "alpinejs": "^3.4.2",
         "autoprefixer": "^10.4.2",
         "axios": "^1.6.8",
+        "daisyui": "^4.12.24",
         "laravel-vite-plugin": "^0.6.0",
         "lodash": "^4.17.19",
         "postcss": "^8.4.6",
@@ -18,7 +19,6 @@
     },
     "dependencies": {
         "animate.css": "^4.1.1",
-        "daisyui": "^2.24.0",
         "jquery": "^3.7.0",
         "swiper": "^8.4.5",
         "theme-change": "^2.5.0"
