@@ -1,4 +1,4 @@
-<div {{ $attributes->merge(['class' => 'card w-full bg-base-100 shadow-xl text-base-content'])}}>
+<div {{ $attributes->merge(['class' => 'card w-full bg-base-200 shadow-xl text-base-content'])}}>
     @isset($image)
     <figure><img src="{!! $image !!}" /></figure>
     @endisset

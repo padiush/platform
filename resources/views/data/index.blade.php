@@ -5,7 +5,7 @@
     <div class="grid grid-cols-1 gap-4 w-full">
         @foreach($projects as $project)
         <x-card title="{{ $project->name }}">
-            <div class="stats stats-vertical lg:stats-horizontal bg-base-200">
+            <div class="stats stats-vertical lg:stats-horizontal bg-base-300">
                 <div class="stat">
                     <div class="stat-value">{{ count($project->unlinkedAnswers()) }}</div>
                     <div class="stat-title">Reportes de uso sin vincular a información taxonómica</div>

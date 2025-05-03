@@ -4,16 +4,16 @@ $url = Storage::disk('s3')->temporaryUrl('public/bg.jpg', now()->addMinutes(5));
 
 <x-guest-layout>
     <section class="min-h-screen flex items-stretch text-base-content">
-        <div class="lg:flex w-1/2 hidden bg-base-100 bg-no-repeat bg-cover relative items-center" style="background-image: url({{ $url }});">
+        <div class="lg:flex w-1/2 hidden bg-base-200 bg-no-repeat bg-cover relative items-center" style="background-image: url({{ $url }});">
             <div class="absolute bg-black opacity-60 inset-0 z-0"></div>
             <div class="w-full px-24 z-10">
                 <h1 class="text-5xl font-bold text-left tracking-wide">Padiush</h1>
                 <p class="text-3xl my-4">Sistema bioinformático que facilita la recolección y análisis de datos etnobotánicos</p>
             </div>
         </div>
-        <div class="lg:w-1/2 w-full flex items-center justify-center text-center md:px-16 px-0 z-0 bg-base-100">
+        <div class="lg:w-1/2 w-full flex items-center justify-center text-center md:px-16 px-0 z-0 bg-base-200">
             <div class="absolute lg:hidden z-10 inset-0 bg-black bg-no-repeat bg-cover items-center" style="background-image: url({{ $url }});">
-                <div class="absolute bg-base-100 opacity-60 inset-0 z-0"></div>
+                <div class="absolute bg-base-200 opacity-60 inset-0 z-0"></div>
             </div>
             <div class="w-full py-6 z-20">
                 <div class="flex justify-center">

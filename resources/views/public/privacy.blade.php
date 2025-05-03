@@ -1,5 +1,5 @@
 <x-public-layout>
-    <div class="py-12 bg-base-200 text-base-content">
+    <div class="py-12 bg-base-300 text-base-content">
         <h1 class="text-5xl font-bold text-center">Política de Privacidad</h1>
     </div>
     <div class="px-12 py-4 bg-white text-black">

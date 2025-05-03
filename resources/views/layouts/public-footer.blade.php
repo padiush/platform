@@ -1,4 +1,4 @@
-<footer class="footer p-10 bg-base-300 text-base-content">
+<footer class="footer sm:footer-horizontal p-10 bg-base-300 text-base-content">
   <div>
     <span class="footer-title">Acerca de</span> 
     <a class="link link-hover" href="{{ route('public.about') }}">Sobre nosotros</a> 

@@ -4,7 +4,7 @@
             <label tabindex="0" class="btn btn-ghost lg:hidden">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h8m-8 6h16" /></svg>
             </label>
-            <ul tabindex="0" class="menu menu-compact dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-52">
+            <ul tabindex="0" class="menu menu-compact dropdown-content mt-3 p-2 shadow-sm bg-base-200 rounded-box w-52">
                 <li><a href="{{ route('projects.index') }}">Proyectos</a></li>
                 @if(Auth::user()->projectAccesses->count() > 0)
                 <li tabindex="0">
@@ -12,7 +12,7 @@
                         Entrevistas
                         <i class="fa-solid fa-chevron-right text-xs"></i>
                     </a>
-                    <ul class="p-2 bg-base-200">
+                    <ul class="p-2 bg-base-300">
                         <li><a href="{{ route('designer.index') }}">Diseñar</a></li>
                         <li><a href="{{ route('interviews.index') }}">Entrevistar</a></li>
                     </ul>
@@ -20,7 +20,6 @@
                 <li><a href="{{ route('catalogs.index') }}">Catálogos</a></li>
                 <li><a href="{{ route('data.index') }}">Datos</a></li>
                 @endif
-                <li><a href="#">Comunidad</a></li>
             </ul>
         </div>
         <a class="btn btn-ghost normal-case text-xl" href="{{ route('dashboard') }}">
@@ -31,24 +30,25 @@
         <ul class="menu menu-horizontal p-0">
             <li><a href="{{ route('projects.index') }}">Proyectos</a></li>
             @if(Auth::user()->projectAccesses->count() > 0)
-            <li tabindex="0">
-                <a>
-                    Entrevistas
-                    <i class="fa-solid fa-chevron-down text-xs"></i>
-                </a>
-                <ul class="p-2 bg-base-100">
-                    <li><a href="{{ route('designer.index') }}">Diseñar</a></li>
-                    <li><a href="{{ route('interviews.index') }}">Entrevistar</a></li>
-                </ul>
+            <li>
+                <details>
+                    <summary>
+                        Entrevistas
+                    </summary>
+                    <ul class="p-2 bg-base-300">
+                        <li><a href="{{ route('designer.index') }}">Diseñar</a></li>
+                        <li><a href="{{ route('interviews.index') }}">Entrevistar</a></li>
+                    </ul>
+                </details>
+                
             </li>
             <li><a href="{{ route('catalogs.index') }}">Catálogos</a></li>
             <li><a href="{{ route('data.index') }}">Datos</a></li>
             @endif
-            <li><a href="#">Comunidad</a></li>
         </ul>
     </div>
     <div class="navbar-end">
-        <a class="btn btn-ghost btn-circle" data-toggle-theme="dark,light" data-act-class="ACTIVECLASS">
+        <a class="btn btn-ghost btn-circle" data-toggle-theme="padiushlight, padiushdark" data-act-class="ACTIVECLASS">
             <i class="fa-solid fa-lightbulb"></i>
         </a>
         <form method="POST" action="{{ route('logout') }}">
