@@ -22,5 +22,6 @@
         "jquery": "^3.7.0",
         "swiper": "^8.4.5",
         "theme-change": "^2.5.0"
-    }
+    },
+    "type": "module"
 }
