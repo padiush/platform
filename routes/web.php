@@ -71,10 +71,6 @@ Route::middleware(['auth'])->group(function () {
                     Route::put('/{project}/form/{form}/toggle', 'toggle')->name(
                         'form.toggle'
                     );
-                    Route::get(
-                        '/{project}/form/{form}/preview',
-                        'preview'
-                    )->name('form.preview');
                 }
             );
 
@@ -84,6 +80,10 @@ Route::middleware(['auth'])->group(function () {
                         '/{project}/form/{form}/wizard',
                         'designer'
                     )->name('form.wizard');
+                    Route::get(
+                        '/{project}/form/{form}/preview',
+                        'preview'
+                    )->name('form.preview');
                     Route::get(
                         '/{project}/form/{form}/sections',
                         'fetchSections'

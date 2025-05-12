@@ -232,28 +232,4 @@ class InterviewFormController extends Controller
             'form' => $form,
         ]);
     }
-
-    public function preview(Project $project, InterviewForm $form)
-    {
-        $access = ProjectAccess::where('user_id', Auth::id())
-            ->where('project_id', $project->id)
-            ->first();
-
-        if (
-            !$access ||
-            !Auth::user()->hasCapabilityOnProject($project, 'manage_forms')
-        ) {
-            return redirect()
-                ->route('projects.index')
-                ->with(
-                    'error',
-                    'No tienes permisos para editar formularios en este proyecto.'
-                );
-        }
-
-        return view('interview-forms.preview', [
-            'project' => $project,
-            'form' => $form,
-        ]);
-    }
 }
