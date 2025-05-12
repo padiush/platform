@@ -1,0 +1,89 @@
+{
+  "dashboard": {
+    "welcome_message": "Welcome to {{appName}}, {{name}}!",
+    "title": "Dashboard"
+  },
+  "app": {
+    "name": "Padiush"
+  },
+  "navigation": {
+    "projects": "Projects",
+    "interviews": "Interviews"
+  },
+  "titles": {
+    "my_projects": "My Projects"
+  },
+  "projects": {
+    "pending_invites": "Pending Invitations",
+    "invited_to": "You have been invited to the following projects:",
+    "invited_by": "Invited by",
+    "project": "Project",
+    "expires": "Expires",
+    "actions": "Actions",
+    "created_on_by": "Created on {{date}} by {{user}}.",
+    "no_projects": "You are not the author of any project nor have participated in one yet.",
+    "create": "Create Project",
+    "create_project": "Create Project",
+    "edit_project_details": "Edit Project Details",
+    "project_details": "Project Details",
+    "name": "Project Name",
+    "author": "Authorship",
+    "institution": "Institution",
+    "author_email": "Author Email",
+    "country": "Country",
+    "access": "Project Access",
+    "invite_user": "Invite User to Project",
+    "users_with_access": "Users with Access to the Project",
+    "view_pending_invites": "View Pending Invitations",
+    "no_other_users": "There are no other users with access to this project.",
+    "access_form": {
+      "name": "Name",
+      "email": "Email",
+      "permission": "Permissions",
+      "select_permission": "Select a permission",
+      "actions": "Actions",
+      "revoke_confirmation": "Are you sure you want to revoke this user's access?"
+    }
+  },
+  "actions": {
+    "accept": "Accept",
+    "decline": "Decline",
+    "edit_details": "Edit Details",
+    "manage_access": "Manage Access",
+    "cancel": "Cancel",
+    "create": "Create",
+    "update": "Update",
+    "delete": "Delete",
+    "invite": "Invite",
+    "revoke": "Revoke"
+  },
+  "lang": "en",
+  "project": {
+    "update_success": "Project details have been updated.",
+    "delete_success": "The project has been deleted.",
+    "create_success": "The project has been successfully created."
+  },
+  "deletion_modal": {
+    "title": "Confirm Deletion",
+    "warning": "Are you sure you want to delete the record \"{{name}}\" from the database? Please note that all related data will be permanently deleted.",
+    "has_to_write": "Delete",
+    "confirmation": "To authorize the deletion, please write \"{{hasToWrite}}\"",
+    "delete": "Delete Permanently"
+  },
+  "designer": {
+    "title": "Interview Designer",
+    "index": {
+      "enabled": "Enabled?",
+      "form_name": "Form Name",
+      "interviews": "Interviews",
+      "actions": "Actions",
+      "edit": "Edit",
+      "disable": "Disable",
+      "enable": "Enable",
+      "delete": "Delete",
+      "confirm_delete": "Are you sure you want to perform this action?\n\nNote that all interviews made with this form will be deleted.\n\nThis cannot be undone.",
+      "no_forms_yet": "No interviews have been designed for this project yet.",
+      "create": "Create form"
+    }
+  }
+}

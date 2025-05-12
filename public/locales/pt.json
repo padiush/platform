@@ -1,0 +1,89 @@
+{
+  "dashboard": {
+    "welcome_message": "Bem-vindo ao {{appName}}, {{name}}!",
+    "title": "Painel"
+  },
+  "app": {
+    "name": "Padiush"
+  },
+  "navigation": {
+    "projects": "Projetos",
+    "interviews": "Entrevistas"
+  },
+  "titles": {
+    "my_projects": "Meus Projetos"
+  },
+  "projects": {
+    "pending_invites": "Convites pendentes",
+    "invited_to": "Você foi convidado para os seguintes projetos:",
+    "invited_by": "Convidado por",
+    "project": "Projeto",
+    "expires": "Expira",
+    "actions": "Ações",
+    "created_on_by": "Criado em {{date}} por {{user}}.",
+    "no_projects": "Você ainda não é autor nem participou de nenhum projeto.",
+    "create": "Criar Projeto",
+    "create_project": "Criar Projeto",
+    "edit_project_details": "Editar detalhes do projeto",
+    "project_details": "Detalhes do projeto",
+    "name": "Nome do projeto",
+    "author": "Autor",
+    "institution": "Instituição",
+    "author_email": "Email do autor",
+    "country": "País",
+    "access": "Acesso ao projeto",
+    "invite_user": "Convidar usuário para o projeto",
+    "users_with_access": "Usuários com acesso ao projeto",
+    "view_pending_invites": "Ver convites pendentes",
+    "no_other_users": "Não há outros usuários com acesso a este projeto.",
+    "access_form": {
+      "name": "Nome",
+      "email": "Email",
+      "permission": "Permissões",
+      "select_permission": "Selecione uma permissão",
+      "actions": "Ações",
+      "revoke_confirmation": "Tem certeza de que deseja revogar o acesso deste usuário?"
+    }
+  },
+  "actions": {
+    "accept": "Aceitar",
+    "decline": "Recusar",
+    "edit_details": "Editar detalhes",
+    "manage_access": "Gerenciar acesso",
+    "cancel": "Cancelar",
+    "create": "Criar",
+    "update": "Atualizar",
+    "delete": "Excluir",
+    "invite": "Convidar",
+    "revoke": "Revogar"
+  },
+  "lang": "pt-BR",
+  "project": {
+    "update_success": "Os detalhes do projeto foram atualizados.",
+    "delete_success": "O projeto foi excluído.",
+    "create_success": "O projeto foi criado com sucesso."
+  },
+  "deletion_modal": {
+    "title": "Confirmar exclusão",
+    "warning": "Tem certeza de que deseja excluir o registro \"{{name}}\" do banco de dados? Todos os dados relacionados serão excluídos permanentemente.",
+    "has_to_write": "Excluir",
+    "confirmation": "Para autorizar a exclusão, escreva \"{{hasToWrite}}\"",
+    "delete": "Excluir permanentemente"
+  },
+  "designer": {
+    "title": "Designer de Entrevistas",
+    "index": {
+      "enabled": "Habilitado?",
+      "form_name": "Nome do formulário",
+      "interviews": "Entrevistas",
+      "actions": "Ações",
+      "edit": "Editar",
+      "disable": "Desabilitar",
+      "enable": "Habilitar",
+      "delete": "Excluir",
+      "confirm_delete": "Tem certeza de que deseja realizar esta ação?\n\nTodas as entrevistas feitas com este formulário serão excluídas.\n\nIsso não pode ser desfeito.",
+      "no_forms_yet": "Nenhuma entrevista foi criada para este projeto ainda.",
+      "create": "Criar formulário"
+    }
+  }
+}
