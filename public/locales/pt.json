@@ -8,7 +8,11 @@
   },
   "navigation": {
     "projects": "Projetos",
-    "interviews": "Entrevistas"
+    "interviews": "Entrevistas",
+    "catalogs": "Catálogos",
+    "data": "Dados",
+    "design": "Conceção de formulários",
+    "interview": "Passar nas entrevistas"
   },
   "titles": {
     "my_projects": "Meus Projetos"
@@ -43,7 +47,8 @@
       "select_permission": "Selecione uma permissão",
       "actions": "Ações",
       "revoke_confirmation": "Tem certeza de que deseja revogar o acesso deste usuário?"
-    }
+    },
+    "no_matching_invites": "Não foram encontrados convites com este critério de pesquisa."
   },
   "actions": {
     "accept": "Aceitar",
@@ -55,7 +60,8 @@
     "update": "Atualizar",
     "delete": "Excluir",
     "invite": "Convidar",
-    "revoke": "Revogar"
+    "revoke": "Revogar",
+    "close": "Fechar"
   },
   "lang": "pt-BR",
   "project": {
@@ -83,7 +89,53 @@
       "delete": "Excluir",
       "confirm_delete": "Tem certeza de que deseja realizar esta ação?\n\nTodas as entrevistas feitas com este formulário serão excluídas.\n\nIsso não pode ser desfeito.",
       "no_forms_yet": "Nenhuma entrevista foi criada para este projeto ainda.",
-      "create": "Criar formulário"
-    }
+      "create": "Criar formulário",
+      "edit_details": "Editar detalhes do formulário",
+      "wizard": "Designer aberto"
+    },
+    "add_section_instance": "Adicionar",
+    "create_form": {
+      "description_label": "Descrição",
+      "edit_title": "Editar formulário de entrevista",
+      "form_details": "Detalhes do formulário",
+      "form_title_label": "Título do formulário",
+      "title": "Novo formulário de entrevista"
+    },
+    "fields": {
+      "add_option": "Adicionar opção",
+      "label": "Etiqueta",
+      "label_description": "Aparecerá no formulário de entrevista quando a entrevista estiver a decorrer.",
+      "link_to_species": "As respostas neste campo serão associadas a um nome científico no catálogo.",
+      "max": "Valor máximo",
+      "min": "Valor mínimo",
+      "move_down": "Deslocar-se para baixo",
+      "move_up": "Subir",
+      "name": "Nome para relatórios descarregáveis",
+      "name_description": "Deve estar em minúsculas e sem espaços. O sistema elimina automaticamente todos os caracteres inválidos.",
+      "options": "Opções disponíveis",
+      "options_description": "Uma opção por linha. Estas aparecerão como opções na pergunta.",
+      "required": "Campo obrigatório",
+      "step": "Aumentar",
+      "type": "Tipo de campo"
+    },
+    "item_types": {
+      "checkbox": "Seleção múltipla",
+      "date_field": "Campo de data",
+      "number_field": "Campo numérico",
+      "single_choice": "Seleção única",
+      "text_field": "Campo de texto"
+    },
+    "new_section": "Nova secção",
+    "no_items": "Não existem itens nesta secção",
+    "no_sections": "Este formulário não tem secções.",
+    "no_sections_yet": "Ainda não foram adicionadas quaisquer secções a este formulário.",
+    "preview": "Pré-visualização",
+    "preview_title": "Formulário de entrevista prévia",
+    "repeatable": "Secção repetível",
+    "repeatable_updated": "Estado de repetibilidade atualizado.",
+    "section": "Secção",
+    "select_a_section": "Selecione uma secção para continuar.",
+    "select_placeholder": "Selecionar uma opção...",
+    "view_sections": "Ver secções"
   }
 }
