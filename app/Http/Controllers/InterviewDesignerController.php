@@ -77,6 +77,31 @@ class InterviewDesignerController extends Controller
         ]);
     }
 
+    public function preview(
+        Project $project,
+        InterviewForm $form
+    ): Response|RedirectResponse {
+        self::verifyAccess($project, $form);
+
+        $sections = InterviewSection::where('interview_form_id', $form->id)
+            ->orderBy('order', 'asc')
+            ->get();
+
+        foreach ($sections as $section) {
+            $items = InterviewItem::where('interview_section_id', $section->id)
+                ->orderBy('order', 'asc')
+                ->get();
+
+            $section->items = $items;
+        }
+        $form->sections = $sections;
+
+        return Inertia::render('Designer/Preview', [
+            'project' => $project,
+            'form' => $form,
+        ]);
+    }
+
     public function fetchSections(
         Project $project,
         InterviewForm $form

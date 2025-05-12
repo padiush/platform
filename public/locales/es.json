@@ -125,6 +125,8 @@
       "move_down": "Mover hacia abajo"
     },
     "view_sections": "Ver secciones",
-    "preview": "Previsualizar"
+    "preview": "Previsualizar",
+    "preview_title": "Previsualizar formulario de entrevista",
+    "select_placeholder": "Selecciona una opción..."
   }
 }
