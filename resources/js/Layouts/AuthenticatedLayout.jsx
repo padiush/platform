@@ -1,15 +1,27 @@
-import ApplicationLogo from "@/Components/ApplicationLogo";
-import { Link, Head, usePage } from "@inertiajs/react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faRightFromBracket } from "@fortawesome/pro-regular-svg-icons";
+import ApplicationLogo from '@/Components/ApplicationLogo';
+import ErrorBoundary from '@/Components/ErrorBoundary';
+import TranslationToggle from '@/Components/TranslationToggle';
+import { useFlashMessage } from '@/Hooks/useFlashMessage';
+import { faRightFromBracket } from '@fortawesome/pro-regular-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Head, Link, usePage } from '@inertiajs/react';
+import { useTranslation } from 'react-i18next';
 
-export default function AuthenticatedLayout({ children, title }) {
+export default function AuthenticatedLayout({
+    children,
+    title,
+    subtitle,
+    action,
+    actionRight,
+}) {
     const { auth } = usePage().props;
+    const { t } = useTranslation();
+    const { FlashAlert, flashShown } = useFlashMessage();
 
     return (
-        <div className="flex flex-col w-full z-10">
+        <div className="z-10 flex h-screen w-full flex-col overflow-hidden">
             <Head title={title} />
-            <div className="navbar bg-primary text-primary-content shadow-sm h-16">
+            <div className="navbar bg-primary text-primary-content sticky top-0 z-30 h-16 shadow-xl">
                 <div className="navbar-start">
                     <div className="dropdown">
                         <div
@@ -24,41 +36,66 @@ export default function AuthenticatedLayout({ children, title }) {
                                 viewBox="0 0 24 24"
                                 stroke="currentColor"
                             >
-                                {" "}
+                                {' '}
                                 <path
                                     strokeLinecap="round"
                                     strokeLinejoin="round"
                                     strokeWidth="2"
                                     d="M4 6h16M4 12h8m-8 6h16"
-                                />{" "}
+                                />{' '}
                             </svg>
                         </div>
                         <ul
                             tabIndex={0}
                             className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow"
                         >
-                            <li>
-                                <a>Item 1</a>
-                            </li>
-                            <li>
-                                <a>Parent</a>
-                                <ul className="p-2">
+                            <Link href={route('projects.index')}>
+                                {t('navigation.projects')}
+                            </Link>
+                            {auth.projects > 0 && (
+                                <>
                                     <li>
-                                        <a>Submenu 1</a>
+                                        <details>
+                                            <summary>
+                                                {t('navigation.interviews')}
+                                            </summary>
+                                            <ul className="bg-base-200 z-20 p-2 shadow-xl">
+                                                <li>
+                                                    <Link
+                                                        href={route(
+                                                            'designer.index',
+                                                        )}
+                                                    >
+                                                        Diseñar
+                                                    </Link>
+                                                </li>
+                                                <li>
+                                                    <a
+                                                        href={route(
+                                                            'interviews.index',
+                                                        )}
+                                                    >
+                                                        Entrevistar
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </details>
                                     </li>
                                     <li>
-                                        <a>Submenu 2</a>
+                                        <a href={route('catalogs.index')}>
+                                            Catálogos
+                                        </a>
                                     </li>
-                                </ul>
-                            </li>
-                            <li>
-                                <a>Item 3</a>
-                            </li>
+                                    <li>
+                                        <a href={route('data.index')}>Datos</a>
+                                    </li>
+                                </>
+                            )}
                         </ul>
                     </div>
                     <Link
                         className="btn btn-ghost text-xl"
-                        href={route("dashboard")}
+                        href={route('dashboard')}
                     >
                         <ApplicationLogo className="h-10 w-auto fill-current" />
                     </Link>
@@ -66,18 +103,22 @@ export default function AuthenticatedLayout({ children, title }) {
                 <div className="navbar-center hidden lg:flex">
                     <ul className="menu menu-horizontal px-1">
                         <li>
-                            <a href={route("projects.index")}>Proyectos</a>
+                            <Link href={route('projects.index')}>
+                                {t('navigation.projects')}
+                            </Link>
                         </li>
-                        {auth.projects >= 0 && (
+                        {auth.projects > 0 && (
                             <>
                                 <li>
                                     <details>
-                                        <summary>Entrevistas</summary>
-                                        <ul className="p-2 bg-base-200 z-20 shadow-xl">
+                                        <summary>
+                                            {t('navigation.interviews')}
+                                        </summary>
+                                        <ul className="bg-base-200 z-20 p-2 shadow-xl">
                                             <li>
                                                 <Link
                                                     href={route(
-                                                        "designer.index"
+                                                        'designer.index',
                                                     )}
                                                 >
                                                     Diseñar
@@ -86,7 +127,7 @@ export default function AuthenticatedLayout({ children, title }) {
                                             <li>
                                                 <a
                                                     href={route(
-                                                        "interviews.index"
+                                                        'interviews.index',
                                                     )}
                                                 >
                                                     Entrevistar
@@ -96,18 +137,20 @@ export default function AuthenticatedLayout({ children, title }) {
                                     </details>
                                 </li>
                                 <li>
-                                    <a href={route("catalogs.index")}>
+                                    <a href={route('catalogs.index')}>
                                         Catálogos
                                     </a>
                                 </li>
                                 <li>
-                                    <a href={route("data.index")}>Datos</a>
+                                    <a href={route('data.index')}>Datos</a>
                                 </li>
                             </>
                         )}
                     </ul>
                 </div>
                 <div className="navbar-end">
+                    <TranslationToggle />
+
                     <Link
                         className="btn btn-ghost"
                         href="/logout"
@@ -119,11 +162,22 @@ export default function AuthenticatedLayout({ children, title }) {
                 </div>
             </div>
 
-            <div className="bg-base-200 px-4 md:px-12 lg:px-24 py-4 md:py-6 text-lg md:text-xl lg:text-2xl font-semibold">
-                {title}
+            <div className="bg-base-200 sticky top-16 z-20 flex items-center justify-between gap-4 px-4 py-4 text-lg font-semibold shadow-xl md:px-12 md:py-6 md:text-xl lg:px-24 lg:text-2xl">
+                {action && action}
+
+                <div className="items-left flex grow flex-col">
+                    <div className="text-2xl font-bold">{title}</div>
+                    <div className="text-lg font-semibold">{subtitle}</div>
+                </div>
+
+                {actionRight && actionRight}
             </div>
 
-            <div className="flex-grow z-0">{children}</div>
+            <div className="bg-base-100 flex-1 overflow-y-auto">
+                {flashShown && <FlashAlert />}
+
+                <ErrorBoundary>{children}</ErrorBoundary>
+            </div>
         </div>
     );
 }
