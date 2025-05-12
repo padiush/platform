@@ -10,96 +10,201 @@ use App\Http\Controllers\InterviewDataController;
 use App\Http\Controllers\PublicPageController;
 use Inertia\Inertia;
 
-Route::get('/dashboard', function () {
-    return Inertia::render("Dashboard");
-})->middleware(['auth'])->name('dashboard');
+Route::middleware(['auth'])->group(function () {
+    Route::get('/dashboard', function () {
+        return Inertia::render('Dashboard');
+    })->name('dashboard');
 
-Route::controller(ProjectController::class)->group(function(){
-    Route::get('/projects', 'index')->middleware(['auth'])->name('projects.index');
-    Route::get('/projects/create', 'create')->middleware(['auth'])->name('projects.create');
-    Route::post('/projects/create', 'store')->middleware(['auth']);
+    Route::controller(ProjectController::class)
+        ->prefix('projects')
+        ->name('projects.')
+        ->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get('/create', 'create')->name('create');
+            Route::post('/create', 'store');
+            Route::get('/{project}/edit', 'edit')->name('edit');
+            Route::post('/{project}/edit', 'update');
+            Route::delete('/{project}/delete', 'destroy')->name('delete');
 
-    Route::get('/projects/{project}/edit', 'edit')->middleware(['auth'])->name('projects.edit');
-    Route::post('/projects/{project}/edit', 'update')->middleware(['auth']);
+            Route::get('/{project}/accesses', 'manageAccess')->name('accesses');
+            Route::delete(
+                '/{project}/accesses/{user}/revoke',
+                'revokeAccess'
+            )->name('accesses.revoke');
+            Route::post('/{project}/accesses/invite', 'inviteUser')->name(
+                'accesses.invite'
+            );
+            Route::get('/{project}/accesses/invites', 'projectInvites')->name(
+                'accesses.invites'
+            );
+            Route::delete(
+                '/{project}/accesses/invites/{invite}/revoke',
+                'revokeInvite'
+            )->name('accesses.invites.revoke');
 
-    Route::get('/projects/{project}/accesses', 'manageAccess')->middleware(['auth'])->name('projects.accesses');
-    Route::delete('/projects/{project}/accesses/{user}/revoke', 'revokeAccess')->middleware(['auth'])->name('projects.accesses.revoke');
-    Route::post('/projects/{project}/accesses/invite', 'inviteUser')->middleware(['auth'])->name('projects.accesses.invite');
-    Route::get('/project/{project}/accesses/invites', 'projectInvites')->middleware(['auth'])->name('projects.accesses.invites');
-    Route::delete('/project/{project}/accesses/invites/{invite}/revoke', 'revokeInvite')->middleware(['auth'])->name('projects.accesses.invites.revoke');
+            Route::get('/accept/{invite}', 'acceptInvite')->name(
+                'invites.accept'
+            );
+            Route::get('/decline/{invite}', 'declineInvite')->name(
+                'invites.decline'
+            );
+        });
 
-    Route::get('/projects/accept/{invite}', 'acceptInvite')->middleware(['auth'])->name('projects.invites.accept');
-    Route::get('/projects/decline/{invite}', 'declineInvite')->middleware(['auth'])->name('projects.invites.decline');
+    Route::prefix('designer')
+        ->name('designer.')
+        ->group(function () {
+            Route::controller(InterviewFormController::class)->group(
+                function () {
+                    Route::get('/', 'index')->name('index');
+                    Route::get('/{project}/create', 'create')->name('create');
+                    Route::post('/{project}/create', 'store');
+                    Route::get('/{project}/form/{form}', 'edit')->name(
+                        'form.edit'
+                    );
+                    Route::put('/{project}/form/{form}', 'update')->name(
+                        'form.update'
+                    );
+                    Route::delete(
+                        '/{project}/form/{form}/delete',
+                        'destroy'
+                    )->name('form.delete');
+                    Route::put('/{project}/form/{form}/toggle', 'toggle')->name(
+                        'form.toggle'
+                    );
+                    Route::get(
+                        '/{project}/form/{form}/preview',
+                        'preview'
+                    )->name('form.preview');
+                }
+            );
+
+            Route::controller(InterviewDesignerController::class)->group(
+                function () {
+                    Route::get(
+                        '/{project}/form/{form}/wizard',
+                        'designer'
+                    )->name('form.wizard');
+                    Route::get(
+                        '/{project}/form/{form}/sections',
+                        'fetchSections'
+                    )->name('form.sections');
+                    Route::post(
+                        '/{project}/form/{form}/section/create',
+                        'createSection'
+                    )->name('form.sections.create');
+                    Route::put(
+                        '/{project}/form/{form}/section/{section}/rename',
+                        'renameSection'
+                    )->name('form.sections.rename');
+                    Route::put(
+                        '/{project}/form/{form}/section/{section}/reorder',
+                        'reorderSection'
+                    )->name('form.sections.reorder');
+                    Route::put(
+                        '/projects/{project}/designer/{form}/section/{section}/repeatable',
+                        'toggleRepeatable'
+                    )->name('form.sections.repeatable');
+                    Route::delete(
+                        '/{project}/form/{form}/sections/{section}/delete',
+                        'deleteSection'
+                    )->name('form.sections.delete');
+                    Route::get(
+                        '/{project}/form/{form}/section/{section}/items',
+                        'fetchItems'
+                    )->name('form.section.items');
+                    Route::post(
+                        '/{project}/form/{form}/section/{section}/items/create',
+                        'createItem'
+                    )->name('form.section.items.create');
+                    Route::put(
+                        '/{project}/form/{form}/section/{section}/items/{item}',
+                        'updateItem'
+                    )->name('form.section.items.update');
+                    Route::delete(
+                        '/{project}/form/{form}/section/{section}/items/{item}/delete',
+                        'deleteItem'
+                    )->name('form.section.items.delete');
+                    Route::put(
+                        '/{project}/form/{form}/section/{section}/items/{item}/reorder',
+                        'reorderItem'
+                    )->name('form.section.items.reorder');
+                }
+            );
+        });
+
+    Route::controller(ProjectCatalogController::class)->group(function () {
+        Route::get('/catalogs', 'index')->name('catalogs.index');
+        Route::get('/catalogs/{project}', 'show')->name('catalogs.show');
+
+        Route::get(
+            '/catalogs/{project}/species/register',
+            'registerSpecies'
+        )->name('catalogs.species.register');
+        Route::post('/catalogs/{project}/species/register', 'storeSpecies');
+
+        Route::get('/catalogs/{project}/upload', 'uploadCatalog')->name(
+            'catalogs.upload'
+        );
+        Route::post('/catalogs/{project}/upload', 'handleUploadRequest');
+
+        Route::get(
+            '/catalogs/{project}/species/{species}',
+            'showSpecies'
+        )->name('catalogs.species.show');
+    });
+
+    Route::controller(InterviewInstancesController::class)->group(function () {
+        Route::get('/interviews', 'index')->name('interviews.index');
+        Route::get('/interviews/{form}/create', 'create')->name(
+            'interviews.create'
+        );
+        Route::get('/interviews/{form}/instances', 'list')->name(
+            'interviews.instances'
+        );
+        Route::get('/interviews/instance/{instance}', 'show')->name(
+            'interviews.show'
+        );
+        Route::post(
+            '/interviews/instance/{instance}/answer/store',
+            'storeAnswer'
+        )->name('interviews.answer');
+        Route::post(
+            '/interviews/instance/{instance}/answer/get',
+            'getAnswer'
+        )->name('interviews.answer.get');
+        Route::post(
+            '/interviews/instance/{instance}/repeating-section/populate',
+            'populateRepeatableSection'
+        )->name('interviews.repeating-section.populate');
+    });
+
+    Route::controller(InterviewDataController::class)->group(function () {
+        Route::get('/data', 'index')->name('data.index');
+        Route::get('/data/{project}/link', 'linkSpecies')->name('data.link');
+        Route::post('/data/{project}/link', 'handleLinkRequest');
+        Route::get('/data/{project}/ethnobotanyR', 'prepareEthnobotanyR')->name(
+            'data.ethnobotanyR'
+        );
+        Route::post(
+            '/data/{project}/ethnobotanyR',
+            'handleEthnobotanyRRequest'
+        );
+        Route::get('/data/{project}/custom', 'prepareCustom')->name(
+            'data.custom'
+        );
+        Route::post('/data/{project}/custom', 'handleCustomRequest');
+    });
 });
 
-Route::controller(InterviewFormController::class)->group(function(){
-    Route::get('/designer', 'index')->middleware(['auth'])->name('designer.index');
-    Route::get('/designer/{project}/create', 'create')->middleware(['auth'])->name('designer.create');
-    Route::post('/designer/{project}/create', 'store')->middleware(['auth']);
-
-    Route::get('/designer/{project}/form/{form}', 'edit')->middleware(['auth'])->name('designer.form.edit');
-    Route::delete('/designer/{project}/form/{form}/delete', 'destroy')->middleware(['auth'])->name('designer.form.delete');
-    Route::get('/designer/{project}/form/{form}/toggle', 'toggle')->middleware(['auth'])->name('designer.form.toggle');
-    Route::get('/designer/{project}/form/{form}/preview', 'preview')->middleware(['auth'])->name('designer.form.preview');
-});
-
-Route::controller(InterviewDesignerController::class)->group(function(){
-    Route::post('/designer/{form}/section/create', 'createSection')->middleware(['auth'])->name('designer.section.create');
-    Route::post('/designer/{form}/section/items', 'getSectionItems')->middleware(['auth'])->name('designer.section.items');
-
-    Route::post('/designer/{form}/item/create', 'createItem')->middleware(['auth'])->name('designer.item.create');
-
-    Route::post('/designer/{form}/item/data', 'getItem')->middleware(['auth'])->name('designer.item.data');
-    Route::post('/designer/{form}/item/update', 'updateItem')->middleware(['auth'])->name('designer.item.update');
-
-    Route::post('/designer/{form}/section/data', 'getSection')->middleware(['auth'])->name('designer.section.data');
-    Route::post('/designer/{form}/section/update', 'updateSection')->middleware(['auth'])->name('designer.section.update');
-});
-
-Route::controller(ProjectCatalogController::class)->group(function(){
-    Route::get('/catalogs', 'index')->middleware(['auth'])->name('catalogs.index');
-    Route::get('/catalogs/{project}', 'show')->middleware(['auth'])->name('catalogs.show');
-
-    Route::get('/catalogs/{project}/species/register', 'registerSpecies')->middleware(['auth'])->name('catalogs.species.register');
-    Route::post('/catalogs/{project}/species/register', 'storeSpecies')->middleware(['auth']);
-
-    Route::get('/catalogs/{project}/upload', 'uploadCatalog')->middleware(['auth'])->name('catalogs.upload');
-    Route::post('/catalogs/{project}/upload', 'handleUploadRequest')->middleware(['auth']);
-
-    Route::get('/catalogs/{project}/species/{species}', 'showSpecies')->middleware(['auth'])->name('catalogs.species.show');
-});
-
-Route::controller(InterviewInstancesController::class)->group(function(){
-    Route::get('/interviews', 'index')->middleware(['auth'])->name('interviews.index');
-    Route::get('/interviews/{form}/create', 'create')->middleware(['auth'])->name('interviews.create');
-
-    Route::get('/interviews/{form}/instances', 'list')->middleware(['auth'])->name('interviews.instances');
-    Route::get('/interviews/instance/{instance}', 'show')->middleware(['auth'])->name('interviews.show');
-
-    Route::post('/interviews/instance/{instance}/answer/store', 'storeAnswer')->middleware(['auth'])->name('interviews.answer');
-    Route::post('/interviews/instance/{instance}/answer/get', 'getAnswer')->middleware(['auth'])->name('interviews.answer.get');
-    Route::post('/interviews/instance/{instance}/repeating-section/populate', 'populateRepeatableSection')->middleware(['auth'])->name('interviews.repeating-section.populate');
-});
-
-Route::controller(InterviewDataController::class)->group(function(){
-    Route::get('/data', 'index')->middleware(['auth'])->name('data.index');
-    Route::get('/data/{project}/link', 'linkSpecies')->middleware(['auth'])->name('data.link');
-    Route::post('/data/{project}/link', 'handleLinkRequest')->middleware(['auth']);
-
-    Route::get('/data/{project}/ethnobotanyR', 'prepareEthnobotanyR')->middleware(['auth'])->name('data.ethnobotanyR');
-    Route::post('/data/{project}/ethnobotanyR', 'handleEthnobotanyRRequest')->middleware(['auth']);
-
-    Route::get('/data/{project}/custom', 'prepareCustom')->middleware(['auth'])->name('data.custom');
-    Route::post('/data/{project}/custom', 'handleCustomRequest')->middleware(['auth']);
-});
-
-Route::controller(PublicPageController::class)->group(function(){
+Route::controller(PublicPageController::class)->group(function () {
     Route::get('/', 'index')->name('public.index');
     Route::get('/acerca', 'about')->name('public.about');
     Route::get('/contacto', 'contact')->name('public.contact');
-    Route::post('/contacto', 'handleContactRequest')->middleware(['honeypot'])->name('public.contact.handle');
+    Route::post('/contacto', 'handleContactRequest')
+        ->middleware(['honeypot'])
+        ->name('public.contact.handle');
     Route::get('/privacidad', 'privacy')->name('public.privacy');
     Route::get('/terminos', 'terms')->name('public.terms');
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
