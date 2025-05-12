@@ -26,10 +26,14 @@ class InterviewItem extends Model
     protected $casts = [
         'required' => 'boolean',
         'link_to_species' => 'boolean',
+        'options' => 'array',
     ];
 
     public function section()
     {
-        return $this->belongsTo(InterviewSection::class, 'interview_section_id');
+        return $this->belongsTo(
+            InterviewSection::class,
+            'interview_section_id'
+        );
     }
 }
