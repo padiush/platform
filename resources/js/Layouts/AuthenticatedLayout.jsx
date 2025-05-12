@@ -49,9 +49,11 @@ export default function AuthenticatedLayout({
                             tabIndex={0}
                             className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow"
                         >
-                            <Link href={route('projects.index')}>
-                                {t('navigation.projects')}
-                            </Link>
+                            <li>
+                                <Link href={route('projects.index')}>
+                                    {t('navigation.projects')}
+                                </Link>
+                            </li>
                             {auth.projects > 0 && (
                                 <>
                                     <li>
@@ -66,7 +68,7 @@ export default function AuthenticatedLayout({
                                                             'designer.index',
                                                         )}
                                                     >
-                                                        Diseñar
+                                                        {t('navigation.design')}
                                                     </Link>
                                                 </li>
                                                 <li>
@@ -75,7 +77,9 @@ export default function AuthenticatedLayout({
                                                             'interviews.index',
                                                         )}
                                                     >
-                                                        Entrevistar
+                                                        {t(
+                                                            'navigation.interview',
+                                                        )}
                                                     </a>
                                                 </li>
                                             </ul>
@@ -83,11 +87,13 @@ export default function AuthenticatedLayout({
                                     </li>
                                     <li>
                                         <a href={route('catalogs.index')}>
-                                            Catálogos
+                                            {t('navigation.catalogs')}
                                         </a>
                                     </li>
                                     <li>
-                                        <a href={route('data.index')}>Datos</a>
+                                        <a href={route('data.index')}>
+                                            {t('navigation.data')}
+                                        </a>
                                     </li>
                                 </>
                             )}
@@ -121,7 +127,7 @@ export default function AuthenticatedLayout({
                                                         'designer.index',
                                                     )}
                                                 >
-                                                    Diseñar
+                                                    {t('navigation.design')}
                                                 </Link>
                                             </li>
                                             <li>
@@ -130,7 +136,7 @@ export default function AuthenticatedLayout({
                                                         'interviews.index',
                                                     )}
                                                 >
-                                                    Entrevistar
+                                                    {t('navigation.interview')}
                                                 </a>
                                             </li>
                                         </ul>
@@ -138,11 +144,13 @@ export default function AuthenticatedLayout({
                                 </li>
                                 <li>
                                     <a href={route('catalogs.index')}>
-                                        Catálogos
+                                        {t('navigation.catalogs')}
                                     </a>
                                 </li>
                                 <li>
-                                    <a href={route('data.index')}>Datos</a>
+                                    <a href={route('data.index')}>
+                                        {t('navigation.data')}
+                                    </a>
                                 </li>
                             </>
                         )}
