@@ -54,7 +54,7 @@ class Project extends Model
     {
         $users = collect();
 
-        foreach($this->accesses as $access){
+        foreach ($this->accesses as $access) {
             $users->push($access->user);
         }
 
@@ -85,15 +85,18 @@ class Project extends Model
     {
         $answers = collect();
 
-        foreach($this->interviewForms as $form){
+        foreach ($this->interviewForms as $form) {
             $sections = $form->sections;
-            foreach($sections as $section){
-                foreach($section->items as $item){
-                    if($item->link_to_species){
-                        $item_answers = InstanceAnswer::where('interview_item_id', $item->id)->get();
+            foreach ($sections as $section) {
+                foreach ($section->items as $item) {
+                    if ($item->link_to_species) {
+                        $item_answers = InstanceAnswer::where(
+                            'interview_item_id',
+                            $item->id
+                        )->get();
 
-                        foreach($item_answers as $answer){
-                            if($answer->catalog_species_id == null){
+                        foreach ($item_answers as $answer) {
+                            if ($answer->catalog_species_id == null) {
                                 $answers->push($answer);
                             }
                         }
@@ -109,15 +112,18 @@ class Project extends Model
     {
         $answers = collect();
 
-        foreach($this->interviewForms as $form){
+        foreach ($this->interviewForms as $form) {
             $sections = $form->sections;
-            foreach($sections as $section){
-                foreach($section->items as $item){
-                    if($item->link_to_species){
-                        $item_answers = InstanceAnswer::where('interview_item_id', $item->id)->get();
+            foreach ($sections as $section) {
+                foreach ($section->items as $item) {
+                    if ($item->link_to_species) {
+                        $item_answers = InstanceAnswer::where(
+                            'interview_item_id',
+                            $item->id
+                        )->get();
 
-                        foreach($item_answers as $answer){
-                            if($answer->catalog_species_id != null){
+                        foreach ($item_answers as $answer) {
+                            if ($answer->catalog_species_id != null) {
                                 $answers->push($answer);
                             }
                         }
@@ -129,11 +135,12 @@ class Project extends Model
         return $answers;
     }
 
-    public function linkedSpecies(){
+    public function linkedSpecies()
+    {
         $species = collect();
 
-        foreach($this->linkedAnswers() as $answer){
-            if(!$species->contains($answer->species)){
+        foreach ($this->linkedAnswers() as $answer) {
+            if (!$species->contains($answer->species)) {
                 $species->push($answer->species);
             }
         }
@@ -141,12 +148,13 @@ class Project extends Model
         return $species;
     }
 
-    public function linkedFamilies(){
+    public function linkedFamilies()
+    {
         $families = collect();
 
-        foreach($this->linkedSpecies() as $species){
+        foreach ($this->linkedSpecies() as $species) {
             $this_species = CatalogSpecies::find($species->id);
-            if(!$families->contains($this_species->family)){
+            if (!$families->contains($this_species->family)) {
                 $families->push($this_species->family);
             }
         }

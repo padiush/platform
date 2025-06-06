@@ -1,141 +1,162 @@
 {
-    "dashboard": {
-        "welcome_message": "¡Te damos la bienvenida a {{appName}}, {{name}}!",
-        "title": "Dashboard"
-    },
-    "app": {
-        "name": "Padiush"
-    },
-    "navigation": {
-        "projects": "Proyectos",
-        "interviews": "Entrevistas",
-        "design": "Diseñar formularios",
-        "interview": "Pasar entrevistas",
-        "catalogs": "Catálogos",
-        "data": "Datos"
-    },
-    "titles": {
-        "my_projects": "Mis proyectos"
-    },
-    "projects": {
-        "pending_invites": "Invitaciones pendientes",
-        "invited_to": "Has sido invitado a los siguientes proyectos:",
-        "invited_by": "Invitado por",
-        "project": "Proyecto",
-        "expires": "Expira",
-        "actions": "Acciones",
-        "created_on_by": "Creado el {{date}} por {{user}}.",
-        "no_projects": "No eres autor ni has participado en ningún proyecto aún.",
-        "create": "Crear proyecto",
-        "create_project": "Crear proyecto",
-        "edit_project_details": "Editar detalles del proyecto",
-        "project_details": "Detalles del proyecto",
-        "name": "Nombre del proyecto",
-        "author": "Autoría",
-        "institution": "Institución",
-        "author_email": "Correo electrónico del autor",
-        "country": "País",
-        "access": "Acceso al proyecto",
-        "invite_user": "Invitar usuario al proyecto",
-        "users_with_access": "Usuarios con acceso al proyecto",
-        "view_pending_invites": "Ver invitaciones pendientes",
-        "no_other_users": "No hay más usuarios con acceso a este proyecto.",
-        "no_matching_invites": "No se encontraron invitaciones con ese criterio de búsqueda.",
-        "access_form": {
-            "name": "Nombre",
-            "email": "Correo electrónico",
-            "permission": "Permisos",
-            "select_permission": "Selecciona un permiso",
-            "actions": "Acciones",
-            "revoke_confirmation": "¿Estás seguro de que deseas revocar el acceso de este usuario?"
-        }
-    },
-    "actions": {
-        "accept": "Aceptar",
-        "decline": "Rechazar",
-        "edit_details": "Editar detalles",
-        "manage_access": "Administrar acceso",
-        "cancel": "Cancelar",
-        "create": "Crear",
-        "update": "Actualizar",
-        "delete": "Eliminar",
-        "invite": "Invitar",
-        "revoke": "Revocar",
-        "close": "Cerrar"
-    },
-    "lang": "es",
-    "project": {
-        "update_success": "Se han actualizado los detalles del proyecto.",
-        "delete_success": "Se ha eliminado el proyecto.",
-        "create_success": "El proyecto ha sido creado satisfactoriamente."
-    },
-    "deletion_modal": {
-        "title": "Confirmar eliminación",
-        "warning": "¿Estás seguro de querer eliminar el registro \"{{name}}\" de la base de datos? Toma en cuenta que todos los datos relacionados se eliminarán permanentemente.",
-        "has_to_write": "Eliminar",
-        "confirmation": "Para autorizar la eliminación, por favor escribe \"{{hasToWrite}}\"",
-        "delete": "Eliminar permanentemente"
-    },
-    "designer": {
-        "title": "Diseñador de entrevistas",
-        "create_form": {
-            "title": "Nuevo formulario de entrevista",
-            "edit_title": "Editar formulario de entrevista",
-            "form_details": "Detalles del formulario",
-            "form_title_label": "Título del formulario",
-            "description_label": "Descripción"
-        },
-        "index": {
-            "enabled": "¿Habilitado?",
-            "form_name": "Nombre del formulario",
-            "interviews": "Entrevistas",
-            "actions": "Acciones",
-            "edit": "Editar",
-            "delete": "Eliminar",
-            "enable": "Habilitar",
-            "disable": "Deshabilitar",
-            "create": "Crear formulario",
-            "no_forms_yet": "No se han diseñado entrevistas para este proyecto aún.",
-            "confirm_delete": "¿Realmente deseas realizar esta acción?\n\nToma en cuenta que se eliminarán todas las entrevistas realizadas con este formulario.\n\nEsto no puede deshacerse.",
-            "edit_details": "Editar detalles del formulario",
-            "wizard": "Abrir diseñador"
-        },
-        "no_sections_yet": "Aún no se han agregado secciones a este formulario.",
-        "select_a_section": "Selecciona una sección para continuar.",
-        "new_section": "Nueva sección",
-        "section": "Sección",
-        "repeatable": "Sección repetible",
-        "repeatable_updated": "Estado de repetibilidad actualizado.",
-        "item_types": {
-            "text_field": "Campo de texto",
-            "number_field": "Campo numérico",
-            "checkbox": "Selección múltiple",
-            "single_choice": "Selección única",
-            "date_field": "Campo de fecha"
-        },
-        "fields": {
-            "label": "Etiqueta",
-            "name": "Nombre para los reportes descargables",
-            "type": "Tipo de campo",
-            "min": "Valor mínimo",
-            "max": "Valor máximo",
-            "step": "Incremento",
-            "label_description": "Aparecerá en el formulario de entrevista cuando se encuentre en curso.",
-            "name_description": "Debe ser en minúsculas y sin espacios. El sistema eliminará todos los caracteres inválidos automáticamente.",
-            "options": "Opciones disponibles",
-            "options_description": "Una opción por línea. Estas aparecerán como opciones en la pregunta.",
-            "add_option": "Agregar opción",
-            "required": "Campo requerido",
-            "link_to_species": "Las respuestas de este campo se vincularán a un nombre científico dentro del catálogo.",
-            "move_up": "Mover hacia arriba",
-            "move_down": "Mover hacia abajo"
-        },
-        "view_sections": "Ver secciones",
-        "preview": "Previsualizar",
-        "preview_title": "Previsualizar formulario de entrevista",
-        "select_placeholder": "Selecciona una opción...",
-        "add_section_instance": "Agregar",
-        "no_items": "No hay items en esta sección",
-        "no_sections": "Este formulario no cuenta con secciones."
+  "dashboard": {
+    "welcome_message": "¡Te damos la bienvenida a {{appName}}, {{name}}!",
+    "title": "Dashboard"
+  },
+  "app": {
+    "name": "Padiush"
+  },
+  "navigation": {
+    "projects": "Proyectos",
+    "interviews": "Entrevistas",
+    "design": "Diseñar formularios",
+    "interview": "Pasar entrevistas",
+    "catalogs": "Catálogos",
+    "data": "Datos"
+  },
+  "titles": {
+    "my_projects": "Mis proyectos"
+  },
+  "projects": {
+    "pending_invites": "Invitaciones pendientes",
+    "invited_to": "Has sido invitado a los siguientes proyectos:",
+    "invited_by": "Invitado por",
+    "project": "Proyecto",
+    "expires": "Expira",
+    "actions": "Acciones",
+    "created_on_by": "Creado el {{date}} por {{user}}.",
+    "no_projects": "No eres autor ni has participado en ningún proyecto aún.",
+    "create": "Crear proyecto",
+    "create_project": "Crear proyecto",
+    "edit_project_details": "Editar detalles del proyecto",
+    "project_details": "Detalles del proyecto",
+    "name": "Nombre del proyecto",
+    "author": "Autoría",
+    "institution": "Institución",
+    "author_email": "Correo electrónico del autor",
+    "country": "País",
+    "access": "Acceso al proyecto",
+    "invite_user": "Invitar usuario al proyecto",
+    "users_with_access": "Usuarios con acceso al proyecto",
+    "view_pending_invites": "Ver invitaciones pendientes",
+    "no_other_users": "No hay más usuarios con acceso a este proyecto.",
+    "no_matching_invites": "No se encontraron invitaciones con ese criterio de búsqueda.",
+    "access_form": {
+      "name": "Nombre",
+      "email": "Correo electrónico",
+      "permission": "Permisos",
+      "select_permission": "Selecciona un permiso",
+      "actions": "Acciones",
+      "revoke_confirmation": "¿Estás seguro de que deseas revocar el acceso de este usuario?"
     }
+  },
+  "actions": {
+    "accept": "Aceptar",
+    "decline": "Rechazar",
+    "edit_details": "Editar detalles",
+    "manage_access": "Administrar acceso",
+    "cancel": "Cancelar",
+    "create": "Crear",
+    "update": "Actualizar",
+    "delete": "Eliminar",
+    "invite": "Invitar",
+    "revoke": "Revocar",
+    "close": "Cerrar"
+  },
+  "lang": "es",
+  "project": {
+    "update_success": "Se han actualizado los detalles del proyecto.",
+    "delete_success": "Se ha eliminado el proyecto.",
+    "create_success": "El proyecto ha sido creado satisfactoriamente."
+  },
+  "deletion_modal": {
+    "title": "Confirmar eliminación",
+    "warning": "¿Estás seguro de querer eliminar el registro \"{{name}}\" de la base de datos? Toma en cuenta que todos los datos relacionados se eliminarán permanentemente.",
+    "has_to_write": "Eliminar",
+    "confirmation": "Para autorizar la eliminación, por favor escribe \"{{hasToWrite}}\"",
+    "delete": "Eliminar permanentemente"
+  },
+  "designer": {
+    "title": "Diseñador de entrevistas",
+    "create_form": {
+      "title": "Nuevo formulario de entrevista",
+      "edit_title": "Editar formulario de entrevista",
+      "form_details": "Detalles del formulario",
+      "form_title_label": "Título del formulario",
+      "description_label": "Descripción"
+    },
+    "index": {
+      "enabled": "¿Habilitado?",
+      "form_name": "Nombre del formulario",
+      "interviews": "Entrevistas",
+      "actions": "Acciones",
+      "edit": "Editar",
+      "delete": "Eliminar",
+      "enable": "Habilitar",
+      "disable": "Deshabilitar",
+      "create": "Crear formulario",
+      "no_forms_yet": "No se han diseñado entrevistas para este proyecto aún.",
+      "confirm_delete": "¿Realmente deseas realizar esta acción?\n\nToma en cuenta que se eliminarán todas las entrevistas realizadas con este formulario.\n\nEsto no puede deshacerse.",
+      "edit_details": "Editar detalles del formulario",
+      "wizard": "Abrir diseñador"
+    },
+    "no_sections_yet": "Aún no se han agregado secciones a este formulario.",
+    "select_a_section": "Selecciona una sección para continuar.",
+    "new_section": "Nueva sección",
+    "section": "Sección",
+    "repeatable": "Sección repetible",
+    "repeatable_updated": "Estado de repetibilidad actualizado.",
+    "item_types": {
+      "text_field": "Campo de texto",
+      "number_field": "Campo numérico",
+      "checkbox": "Selección múltiple",
+      "single_choice": "Selección única",
+      "date_field": "Campo de fecha"
+    },
+    "fields": {
+      "label": "Etiqueta",
+      "name": "Nombre para los reportes descargables",
+      "type": "Tipo de campo",
+      "min": "Valor mínimo",
+      "max": "Valor máximo",
+      "step": "Incremento",
+      "label_description": "Aparecerá en el formulario de entrevista cuando se encuentre en curso.",
+      "name_description": "Debe ser en minúsculas y sin espacios. El sistema eliminará todos los caracteres inválidos automáticamente.",
+      "options": "Opciones disponibles",
+      "options_description": "Una opción por línea. Estas aparecerán como opciones en la pregunta.",
+      "add_option": "Agregar opción",
+      "required": "Campo requerido",
+      "link_to_species": "Las respuestas de este campo se vincularán a un nombre científico dentro del catálogo.",
+      "move_up": "Mover hacia arriba",
+      "move_down": "Mover hacia abajo"
+    },
+    "view_sections": "Ver secciones",
+    "preview": "Previsualizar",
+    "preview_title": "Previsualizar formulario de entrevista",
+    "select_placeholder": "Selecciona una opción...",
+    "add_section_instance": "Agregar",
+    "no_items": "No hay items en esta sección",
+    "no_sections": "Este formulario no cuenta con secciones."
+  },
+  "interviews": {
+    "title": "Entrevistas",
+    "new_interview": "Nueva entrevista",
+    "view_existing": "Ver listado de entrevistas",
+    "no_interviews": "No hay formularios de entrevista activos para este proyecto.",
+    "timestamp": "Fecha y hora",
+    "created_by": "Creada por",
+    "identifier": "Identificador",
+    "form_on_project": "{{form}} en {{project}}",
+    "instance": {
+      "title": "Entrevista {{id}}"
+    },
+    "add_section": "Agregar {{section}}",
+    "remove_section": "Eliminar esta sección y sus respuestas",
+    "instance_created": "Se ha creado una nueva entrevista."
+  },
+  "common": {
+    "actions": {
+      "view": "Ver"
+    }
+  }
 }

@@ -37,9 +37,20 @@ class InterviewForm extends Model
         return $this->hasMany(InterviewSection::class);
     }
 
+    public function nonRepeatableSections()
+    {
+        return $this->hasMany(InterviewSection::class)->where(
+            'repeatable',
+            false
+        );
+    }
+
     public function repeatableSections()
     {
-        return $this->hasMany(InterviewSection::class)->where('repeatable', true);
+        return $this->hasMany(InterviewSection::class)->where(
+            'repeatable',
+            true
+        );
     }
 
     public function instances()

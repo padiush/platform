@@ -1,141 +1,162 @@
 {
-    "dashboard": {
-        "welcome_message": "Welcome to {{appName}}, {{name}}!",
-        "title": "Dashboard"
+  "dashboard": {
+    "welcome_message": "Welcome to {{appName}}, {{name}}!",
+    "title": "Dashboard"
+  },
+  "app": {
+    "name": "Padiush"
+  },
+  "navigation": {
+    "projects": "Projects",
+    "interviews": "Interviews",
+    "catalogs": "Catalogs",
+    "data": "Data",
+    "design": "Form Designer",
+    "interview": "Pass Interviews"
+  },
+  "titles": {
+    "my_projects": "My Projects"
+  },
+  "projects": {
+    "pending_invites": "Pending Invitations",
+    "invited_to": "You have been invited to the following projects:",
+    "invited_by": "Invited by",
+    "project": "Project",
+    "expires": "Expires",
+    "actions": "Actions",
+    "created_on_by": "Created on {{date}} by {{user}}.",
+    "no_projects": "You are not the author of any project nor have participated in one yet.",
+    "create": "Create Project",
+    "create_project": "Create Project",
+    "edit_project_details": "Edit Project Details",
+    "project_details": "Project Details",
+    "name": "Project Name",
+    "author": "Authorship",
+    "institution": "Institution",
+    "author_email": "Author Email",
+    "country": "Country",
+    "access": "Project Access",
+    "invite_user": "Invite User to Project",
+    "users_with_access": "Users with Access to the Project",
+    "view_pending_invites": "View Pending Invitations",
+    "no_other_users": "There are no other users with access to this project.",
+    "access_form": {
+      "name": "Name",
+      "email": "Email",
+      "permission": "Permissions",
+      "select_permission": "Select a permission",
+      "actions": "Actions",
+      "revoke_confirmation": "Are you sure you want to revoke this user's access?"
     },
-    "app": {
-        "name": "Padiush"
+    "no_matching_invites": "No invitations were found with this search criteria."
+  },
+  "actions": {
+    "accept": "Accept",
+    "decline": "Decline",
+    "edit_details": "Edit Details",
+    "manage_access": "Manage Access",
+    "cancel": "Cancel",
+    "create": "Create",
+    "update": "Update",
+    "delete": "Delete",
+    "invite": "Invite",
+    "revoke": "Revoke",
+    "close": "Close"
+  },
+  "lang": "en",
+  "project": {
+    "update_success": "Project details have been updated.",
+    "delete_success": "The project has been deleted.",
+    "create_success": "The project has been successfully created."
+  },
+  "deletion_modal": {
+    "title": "Confirm Deletion",
+    "warning": "Are you sure you want to delete the record \"{{name}}\" from the database? Please note that all related data will be permanently deleted.",
+    "has_to_write": "Delete",
+    "confirmation": "To authorize the deletion, please write \"{{hasToWrite}}\"",
+    "delete": "Delete Permanently"
+  },
+  "designer": {
+    "title": "Interview Designer",
+    "index": {
+      "enabled": "Enabled?",
+      "form_name": "Form Name",
+      "interviews": "Interviews",
+      "actions": "Actions",
+      "edit": "Edit",
+      "disable": "Disable",
+      "enable": "Enable",
+      "delete": "Delete",
+      "confirm_delete": "Are you sure you want to perform this action?\n\nNote that all interviews made with this form will be deleted.\n\nThis cannot be undone.",
+      "no_forms_yet": "No interviews have been designed for this project yet.",
+      "create": "Create form",
+      "edit_details": "Edit form details",
+      "wizard": "Open designer"
     },
-    "navigation": {
-        "projects": "Projects",
-        "interviews": "Interviews",
-        "catalogs": "Catalogs",
-        "data": "Data",
-        "design": "Form Designer",
-        "interview": "Pass Interviews"
+    "add_section_instance": "Add",
+    "create_form": {
+      "description_label": "Description",
+      "edit_title": "Edit interview form",
+      "form_details": "Form Details",
+      "form_title_label": "Form title",
+      "title": "New interview form"
     },
-    "titles": {
-        "my_projects": "My Projects"
+    "fields": {
+      "add_option": "Add option",
+      "label": "Label",
+      "label_description": "It will appear on the interview form when the interview is in progress.",
+      "link_to_species": "The answers in this field will be linked to a scientific name within the catalog.",
+      "max": "Maximum value",
+      "min": "Minimum value",
+      "move_down": "Move down",
+      "move_up": "Move up",
+      "name": "Name for downloadable reports",
+      "name_description": "Must be lowercase and without spaces. The system will remove all invalid characters automatically.",
+      "options": "Available options",
+      "options_description": "One choice per line. These will appear as options in the question.",
+      "required": "Required field",
+      "step": "Increase",
+      "type": "Field type"
     },
-    "projects": {
-        "pending_invites": "Pending Invitations",
-        "invited_to": "You have been invited to the following projects:",
-        "invited_by": "Invited by",
-        "project": "Project",
-        "expires": "Expires",
-        "actions": "Actions",
-        "created_on_by": "Created on {{date}} by {{user}}.",
-        "no_projects": "You are not the author of any project nor have participated in one yet.",
-        "create": "Create Project",
-        "create_project": "Create Project",
-        "edit_project_details": "Edit Project Details",
-        "project_details": "Project Details",
-        "name": "Project Name",
-        "author": "Authorship",
-        "institution": "Institution",
-        "author_email": "Author Email",
-        "country": "Country",
-        "access": "Project Access",
-        "invite_user": "Invite User to Project",
-        "users_with_access": "Users with Access to the Project",
-        "view_pending_invites": "View Pending Invitations",
-        "no_other_users": "There are no other users with access to this project.",
-        "access_form": {
-            "name": "Name",
-            "email": "Email",
-            "permission": "Permissions",
-            "select_permission": "Select a permission",
-            "actions": "Actions",
-            "revoke_confirmation": "Are you sure you want to revoke this user's access?"
-        },
-        "no_matching_invites": "No invitations were found with this search criteria."
+    "item_types": {
+      "checkbox": "Multiple selection",
+      "date_field": "Date field",
+      "number_field": "Numeric field",
+      "single_choice": "Unique selection",
+      "text_field": "Text field"
     },
+    "new_section": "New section",
+    "no_items": "There are no items in this section",
+    "no_sections": "This form does not have sections.",
+    "no_sections_yet": "No sections have been added to this form yet.",
+    "preview": "Preview",
+    "preview_title": "Preview interview form",
+    "repeatable": "Repeatable section",
+    "repeatable_updated": "Repeatability status updated.",
+    "section": "Section",
+    "select_a_section": "Select a section to continue.",
+    "select_placeholder": "Select an option...",
+    "view_sections": "See sections"
+  },
+  "interviews": {
+    "new_interview": "New interview",
+    "no_interviews": "There are no active interview forms for this project.",
+    "title": "Interviews",
+    "view_existing": "See list of interviews",
+    "add_section": "Add {{section}}",
+    "created_by": "Created by",
+    "form_on_project": "{{form}} in {{project}}",
+    "identifier": "Identifier",
+    "instance": {
+      "title": "Interview {{id}}"
+    },
+    "instance_created": "A new interview has been created.",
+    "remove_section": "Delete this section and its answers",
+    "timestamp": "Date and time"
+  },
+  "common": {
     "actions": {
-        "accept": "Accept",
-        "decline": "Decline",
-        "edit_details": "Edit Details",
-        "manage_access": "Manage Access",
-        "cancel": "Cancel",
-        "create": "Create",
-        "update": "Update",
-        "delete": "Delete",
-        "invite": "Invite",
-        "revoke": "Revoke",
-        "close": "Close"
-    },
-    "lang": "en",
-    "project": {
-        "update_success": "Project details have been updated.",
-        "delete_success": "The project has been deleted.",
-        "create_success": "The project has been successfully created."
-    },
-    "deletion_modal": {
-        "title": "Confirm Deletion",
-        "warning": "Are you sure you want to delete the record \"{{name}}\" from the database? Please note that all related data will be permanently deleted.",
-        "has_to_write": "Delete",
-        "confirmation": "To authorize the deletion, please write \"{{hasToWrite}}\"",
-        "delete": "Delete Permanently"
-    },
-    "designer": {
-        "title": "Interview Designer",
-        "index": {
-            "enabled": "Enabled?",
-            "form_name": "Form Name",
-            "interviews": "Interviews",
-            "actions": "Actions",
-            "edit": "Edit",
-            "disable": "Disable",
-            "enable": "Enable",
-            "delete": "Delete",
-            "confirm_delete": "Are you sure you want to perform this action?\n\nNote that all interviews made with this form will be deleted.\n\nThis cannot be undone.",
-            "no_forms_yet": "No interviews have been designed for this project yet.",
-            "create": "Create form",
-            "edit_details": "Edit form details",
-            "wizard": "Open designer"
-        },
-        "add_section_instance": "Add",
-        "create_form": {
-            "description_label": "Description",
-            "edit_title": "Edit interview form",
-            "form_details": "Form Details",
-            "form_title_label": "Form title",
-            "title": "New interview form"
-        },
-        "fields": {
-            "add_option": "Add option",
-            "label": "Label",
-            "label_description": "It will appear on the interview form when the interview is in progress.",
-            "link_to_species": "The answers in this field will be linked to a scientific name within the catalog.",
-            "max": "Maximum value",
-            "min": "Minimum value",
-            "move_down": "Move down",
-            "move_up": "Move up",
-            "name": "Name for downloadable reports",
-            "name_description": "Must be lowercase and without spaces. The system will remove all invalid characters automatically.",
-            "options": "Available options",
-            "options_description": "One choice per line. These will appear as options in the question.",
-            "required": "Required field",
-            "step": "Increase",
-            "type": "Field type"
-        },
-        "item_types": {
-            "checkbox": "Multiple selection",
-            "date_field": "Date field",
-            "number_field": "Numeric field",
-            "single_choice": "Unique selection",
-            "text_field": "Text field"
-        },
-        "new_section": "New section",
-        "no_items": "There are no items in this section",
-        "no_sections": "This form does not have sections.",
-        "no_sections_yet": "No sections have been added to this form yet.",
-        "preview": "Preview",
-        "preview_title": "Preview interview form",
-        "repeatable": "Repeatable section",
-        "repeatable_updated": "Repeatability status updated.",
-        "section": "Section",
-        "select_a_section": "Select a section to continue.",
-        "select_placeholder": "Select an option...",
-        "view_sections": "See sections"
+      "view": "See"
     }
+  }
 }

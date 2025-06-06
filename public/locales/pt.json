@@ -137,5 +137,26 @@
     "select_a_section": "Selecione uma secção para continuar.",
     "select_placeholder": "Selecionar uma opção...",
     "view_sections": "Ver secções"
+  },
+  "interviews": {
+    "new_interview": "Nova entrevista",
+    "no_interviews": "Não existem formulários de entrevista activos para este projeto.",
+    "title": "Entrevistas",
+    "view_existing": "Ver lista de entrevistas",
+    "add_section": "Adicionar {{secção}}",
+    "created_by": "Criado por",
+    "form_on_project": "{{form}} em {{projeto}}",
+    "identifier": "Identificador",
+    "instance": {
+      "title": "Entrevista {{id}}"
+    },
+    "instance_created": "Foi criada uma nova entrevista.",
+    "remove_section": "Eliminar esta secção e as respectivas respostas",
+    "timestamp": "Data e hora"
+  },
+  "common": {
+    "actions": {
+      "view": "Ver"
+    }
   }
 }

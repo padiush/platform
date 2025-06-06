@@ -8,15 +8,13 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\User;
 use App\Models\InterviewForm;
 use App\Models\InstanceAnswer;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 
 class InterviewInstance extends Model
 {
-    use HasFactory;
+    use HasFactory, HasUuids;
 
-    protected $fillable = [
-        'interview_form_id',
-        'user_id',
-    ];
+    protected $fillable = ['interview_form_id', 'user_id'];
 
     public function form()
     {

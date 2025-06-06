@@ -23,19 +23,33 @@ class InstanceAnswer extends Model
         'catalog_species_id',
     ];
 
-    public function instance(){
-        return $this->belongsTo(InterviewInstance::class, 'interview_instance_id');
+    protected $casts = [
+        'answer' => 'encrypted',
+    ];
+
+    public function instance()
+    {
+        return $this->belongsTo(
+            InterviewInstance::class,
+            'interview_instance_id'
+        );
     }
 
-    public function item(){
+    public function item()
+    {
         return $this->belongsTo(InterviewItem::class, 'interview_item_id');
     }
 
-    public function section(){
-        return $this->belongsTo(InterviewSection::class, 'interview_section_id');
+    public function section()
+    {
+        return $this->belongsTo(
+            InterviewSection::class,
+            'interview_section_id'
+        );
     }
 
-    public function species(){
+    public function species()
+    {
         return $this->belongsTo(CatalogSpecies::class, 'catalog_species_id');
     }
 }
