@@ -43,6 +43,10 @@ class ProjectController extends Controller
             ->where('expires_at', '>', Carbon::now())
             ->get();
 
+        $invites->each(function ($invite) {
+            $invite->load('invitingUser', 'capability');
+        });
+
         return Inertia::render('Projects/Index', [
             'projects' => $projects,
             'invites' => $invites,
