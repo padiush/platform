@@ -220,7 +220,6 @@ class InterviewInstancesController extends Controller
             'interview_item_id' => $item->id,
             'repeatable_index' => $repeatableIndex,
             'interview_section_id' => $item->interview_section_id ?? null,
-            'catalog_species_id' => $item->link_to_species ?? null,
         ]);
 
         if (in_array($item->type, ['multi'])) {
