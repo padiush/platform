@@ -194,5 +194,13 @@
     "subtitle": "Ethnobotanical catalog of",
     "taxonomic_cross_reference": "Taxonomic cross-reference",
     "wfo_query_info": "Results are displayed when querying for {{name}} against WFO records."
+  },
+  "data": {
+    "custom_export": "Customized export",
+    "data_processing": "Data processing",
+    "generate_ethnobotanyr": "Generate report for EthnobotanyR",
+    "link_species": "Link species",
+    "linked_reports": "Usage reports linked to taxonomic information",
+    "unlinked_reports": "Usage reports not linked to taxonomic information"
   }
 }

@@ -194,5 +194,13 @@
     "query": "Pesquisa efectuada",
     "references": "Referências online",
     "taxonomic_cross_reference": "Referência cruzada taxonómica"
+  },
+  "data": {
+    "custom_export": "Exportação personalizada",
+    "data_processing": "Processamento de dados",
+    "generate_ethnobotanyr": "Gerar relatório para EthnobotanyR",
+    "link_species": "Espécies de ligação",
+    "linked_reports": "Relatórios de utilização ligados a informações taxonómicas",
+    "unlinked_reports": "Relatórios de utilização sem ligação a informações taxonómicas"
   }
 }
