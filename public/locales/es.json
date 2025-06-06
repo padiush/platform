@@ -194,5 +194,19 @@
     "error_fetching_data": "Hubo un error al obtener los datos",
     "references": "Referencias en línea",
     "wfo_query_info": "Se muestran los resultados al consultar por {{name}} ante los registros de WFO."
+  },
+  "data": {
+    "data_processing": "Procesamiento de datos",
+    "unlinked_reports": "Reportes de uso sin vincular a información taxonómica",
+    "linked_reports": "Reportes de uso vinculados a información taxonómica",
+    "link_species": "Vincular especie",
+    "generate_ethnobotanyr": "Generar reporte para EthnobotanyR",
+    "custom_export": "Exportación personalizada",
+    "link_to": "Vincular a la especie",
+    "select_species": "Seleccione una especie",
+    "no_projects": "No tienes proyectos disponibles."
+  },
+  "catalog": {
+    "fetch_error": "Ha ocurrido un error al vincular la especie."
   }
 }
