@@ -132,6 +132,23 @@ Route::middleware(['auth'])->group(function () {
             );
         });
 
+    Route::controller(InterviewInstancesController::class)
+        ->prefix('interviews')
+        ->name('interviews.')
+        ->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get('/{form}/create', 'create')->name('create');
+            Route::get('/{form}/instances', 'list')->name('instances');
+            Route::get('/instance/{instance}', 'show')->name('show');
+            Route::post('/instance/{instance}/save', 'saveAnswer')->name(
+                'save_answer'
+            );
+            Route::delete(
+                '/instance/{instance}/sections/{section}',
+                'destroyRepeatableSet'
+            )->name('section.remove');
+        });
+
     Route::controller(ProjectCatalogController::class)->group(function () {
         Route::get('/catalogs', 'index')->name('catalogs.index');
         Route::get('/catalogs/{project}', 'show')->name('catalogs.show');
@@ -151,31 +168,6 @@ Route::middleware(['auth'])->group(function () {
             '/catalogs/{project}/species/{species}',
             'showSpecies'
         )->name('catalogs.species.show');
-    });
-
-    Route::controller(InterviewInstancesController::class)->group(function () {
-        Route::get('/interviews', 'index')->name('interviews.index');
-        Route::get('/interviews/{form}/create', 'create')->name(
-            'interviews.create'
-        );
-        Route::get('/interviews/{form}/instances', 'list')->name(
-            'interviews.instances'
-        );
-        Route::get('/interviews/instance/{instance}', 'show')->name(
-            'interviews.show'
-        );
-        Route::post(
-            '/interviews/instance/{instance}/answer/store',
-            'storeAnswer'
-        )->name('interviews.answer');
-        Route::post(
-            '/interviews/instance/{instance}/answer/get',
-            'getAnswer'
-        )->name('interviews.answer.get');
-        Route::post(
-            '/interviews/instance/{instance}/repeating-section/populate',
-            'populateRepeatableSection'
-        )->name('interviews.repeating-section.populate');
     });
 
     Route::controller(InterviewDataController::class)->group(function () {

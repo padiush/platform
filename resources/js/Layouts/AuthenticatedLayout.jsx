@@ -72,7 +72,7 @@ export default function AuthenticatedLayout({
                                                     </Link>
                                                 </li>
                                                 <li>
-                                                    <a
+                                                    <Link
                                                         href={route(
                                                             'interviews.index',
                                                         )}
@@ -80,7 +80,7 @@ export default function AuthenticatedLayout({
                                                         {t(
                                                             'navigation.interview',
                                                         )}
-                                                    </a>
+                                                    </Link>
                                                 </li>
                                             </ul>
                                         </details>
@@ -131,13 +131,13 @@ export default function AuthenticatedLayout({
                                                 </Link>
                                             </li>
                                             <li>
-                                                <a
+                                                <Link
                                                     href={route(
                                                         'interviews.index',
                                                     )}
                                                 >
                                                     {t('navigation.interview')}
-                                                </a>
+                                                </Link>
                                             </li>
                                         </ul>
                                     </details>
