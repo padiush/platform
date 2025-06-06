@@ -44,7 +44,7 @@ class ProjectController extends Controller
             ->get();
 
         $invites->each(function ($invite) {
-            $invite->load('invitingUser', 'capability');
+            $invite->load('invitingUser', 'capability', 'project');
         });
 
         return Inertia::render('Projects/Index', [
