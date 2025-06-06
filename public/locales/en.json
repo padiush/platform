@@ -158,5 +158,41 @@
     "actions": {
       "view": "See"
     }
+  },
+  "catalogs": {
+    "authority": "Abbreviation of authority",
+    "catalog_for_project": "Project catalog",
+    "ethnobotanical_catalog": "Ethnobotanical catalog",
+    "family": "Family",
+    "genus": "Genre",
+    "no_access": "You do not have access to edit the catalog of this project.",
+    "no_projects": "You have not participated in any project, so you do not have access to catalogs.",
+    "register_species": "Register species in the catalog",
+    "reported_families": "Families reported in interviews",
+    "reported_species": "Species reported in interviews",
+    "reports": "Reports",
+    "species": "Species",
+    "species_info": "Species information",
+    "species_list": "List of species",
+    "species_registered": "The species has been recorded in the catalog.",
+    "title": "Species catalogs",
+    "total_species": "Species registered in the catalog",
+    "view_catalog": "See catalog",
+    "taxonomic_info": "Taxonomic Information",
+    "loading": "Loading taxonomic data...",
+    "not_found": "No matching name found.",
+    "fetch_error": "Error fetching taxonomic information.",
+    "accepted_as": "Currently accepted as",
+    "no_preferred_usage": "No accepted usage listed.",
+    "view_on_wfo": "View on WFO",
+    "error_fetching_data": "There was an error in obtaining the data",
+    "external_references": "External references",
+    "match": "Exact match",
+    "no_match_found": "No matches found",
+    "query": "Search performed",
+    "references": "Online references",
+    "subtitle": "Ethnobotanical catalog of",
+    "taxonomic_cross_reference": "Taxonomic cross-reference",
+    "wfo_query_info": "Results are displayed when querying for {{name}} against WFO records."
   }
 }

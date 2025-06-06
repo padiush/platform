@@ -13,49 +13,91 @@ use App\Models\Project;
 use App\Models\User;
 use App\Models\CatalogSpecies;
 use App\Models\CatalogSpeciesPhoto;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Redirect;
+use Inertia\Inertia;
+use Inertia\Response;
 
-class ProjectCatalogController extends Controller{
-    public function index(){
-        $accesses = ProjectAccess::where('user_id', Auth::id())->get();
+class ProjectCatalogController extends Controller
+{
+    public function index(): Response|RedirectResponse
+    {
+        $user = Auth::user();
+
+        $accesses = ProjectAccess::where('user_id', $user->id)->get();
 
         $projects = collect();
 
-        foreach($accesses as $access){
-            $project = Project::find($access->project_id);
+        foreach ($accesses as $access) {
+            $project = Project::with('catalogSpecies')->find(
+                $access->project_id
+            );
 
-            if(Auth::user()->hasCapabilityOnProject($project, 'view_catalog')){
-                $projects->push($project);
+            if ($user->hasCapabilityOnProject($project, 'view_catalog')) {
+                $projects->push([
+                    'id' => $project->id,
+                    'name' => $project->name,
+                    'catalog_species_count' => $project->catalogSpecies->count(),
+                    'linked_species_count' => $project
+                        ->linkedSpecies()
+                        ->count(),
+                    'linked_families_count' => $project
+                        ->linkedFamilies()
+                        ->count(),
+                    'can_edit_catalog' => $user->hasCapabilityOnProject(
+                        $project,
+                        'edit_catalog'
+                    ),
+                    'can_view_catalog' => true, // already verified
+                ]);
             }
         }
 
-        if($projects->count() == 0){
-            return redirect()->route('projects.index')->with('error', 'No has participado en ningún proyecto.');
+        if ($projects->isEmpty()) {
+            return redirect()
+                ->route('projects.index')
+                ->with('message', 'catalogs.no_projects')
+                ->with('messsage_type', 'error');
         }
 
-        return view('catalogs.index', compact('projects'));
+        return Inertia::render('Catalog/Index', [
+            'projects' => $projects,
+        ]);
     }
 
-    public function registerSpecies(Project $project){
-        if(!Auth::user()->hasCapabilityOnProject($project, 'edit_catalog')){
-            return redirect()->route('catalogs.index')->with('error', 'No tienes permisos para agregar especies a este catálogo.');
+    public function registerSpecies(Project $project): Response|RedirectResponse
+    {
+        if (!Auth::user()->hasCapabilityOnProject($project, 'edit_catalog')) {
+            return redirect()
+                ->route('catalogs.index')
+                ->with('message', 'catalogs.no_access')
+                ->with('messsage_type', 'error');
         }
 
-        return view('catalogs.register_species', compact('project'));
+        return Inertia::render('Catalog/Form', [
+            'project' => $project,
+        ]);
     }
 
-    public function storeSpecies(Request $request, Project $project){
+    public function storeSpecies(
+        Request $request,
+        Project $project
+    ): RedirectResponse {
         $request->validate([
-            'family' => 'required|string',
+            'family' => 'nullable|string',
             'genus' => 'required|string',
             'name' => 'required|string',
-            'authority' => 'required|string',
+            'authority' => 'nullable|string',
         ]);
 
-        if(!Auth::user()->hasCapabilityOnProject($project, 'edit_catalog')){
-            return redirect()->route('catalogs.index')->with('error', 'No tienes permisos para agregar especies a este catálogo.');
+        if (!Auth::user()->hasCapabilityOnProject($project, 'edit_catalog')) {
+            return redirect()
+                ->route('catalogs.index')
+                ->with('message', 'catalogs.no_access')
+                ->with('messsage_type', 'error');
         }
 
-        $species = CatalogSpecies::create([
+        CatalogSpecies::create([
             'project_id' => $project->id,
             'family' => $request->family,
             'genus' => $request->genus,
@@ -63,84 +105,76 @@ class ProjectCatalogController extends Controller{
             'authority' => $request->authority,
         ]);
 
-        return redirect()->route('catalogs.index')->with('success', 'La especie ha sido registrada en el catálogo.');
+        return redirect()
+            ->route('catalogs.index')
+            ->with('message', 'catalogs.species_registered')
+            ->with('messsage_type', 'success');
     }
 
-    public function uploadCatalog(Project $project){
-        if(!Auth::user()->hasCapabilityOnProject($project, 'edit_catalog')){
-            return redirect()->route('catalogs.index')->with('error', 'No tienes permisos para agregar especies a este catálogo.');
+    public function show(Project $project): Response|RedirectResponse
+    {
+        if (!Auth::user()->hasCapabilityOnProject($project, 'view_catalog')) {
+            return redirect()
+                ->route('catalogs.index')
+                ->with('error', 'No tienes permisos para ver este catálogo.');
         }
 
-        return view('catalogs.upload', compact('project'));
-    }
+        $speciesQuery = CatalogSpecies::withCount('answers')
+            ->where('project_id', $project->id)
+            ->orderBy('family', 'asc')
+            ->orderBy('genus', 'asc')
+            ->orderBy('name', 'asc');
 
-    public function handleUploadRequest(Project $project, Request $request){
-        if(!Auth::user()->hasCapabilityOnProject($project, 'edit_catalog')){
-            return redirect()->route('catalogs.index')->with('error', 'No tienes permisos para agregar especies a este catálogo.');
+        if ($speciesQuery->count() === 0) {
+            return redirect()
+                ->route('catalogs.index')
+                ->with('error', 'Este catálogo no tiene especies registradas.');
         }
 
-        $request->validate([
-            'file' => 'required|file|mimes:xlsx',
+        $species = $speciesQuery->paginate(20)->through(
+            fn($sp) => [
+                'id' => $sp->id,
+                'family' => $sp->family,
+                'genus' => $sp->genus,
+                'name' => $sp->name,
+                'authority' => $sp->authority,
+                'answers' => [
+                    'length' => $sp->answers_count,
+                ],
+            ]
+        );
+
+        return Inertia::render('Catalog/SpeciesIndex', [
+            'project' => [
+                'id' => $project->id,
+                'name' => $project->name,
+            ],
+            'species' => $species,
         ]);
-
-        $file = $request->file('file');
-
-        Excel::import(new CatalogSpeciesImport($project), $file);
-
-        return redirect()->route('catalogs.index')->with('success', 'El catálogo ha sido actualizado.');
     }
 
-    public function show(Project $project){
-        if(!Auth::user()->hasCapabilityOnProject($project, 'view_catalog')){
-            return redirect()->route('catalogs.index')->with('error', 'No tienes permisos para ver este catálogo.');
+    public function showSpecies(
+        Project $project,
+        CatalogSpecies $species
+    ): Response|RedirectResponse {
+        if (!Auth::user()->hasCapabilityOnProject($project, 'view_catalog')) {
+            return redirect()
+                ->route('catalogs.index')
+                ->with('error', 'No tienes permisos para ver este catálogo.');
         }
 
-        if($project->catalogSpecies->count() == 0){
-            return redirect()->route('catalogs.index')->with('error', 'Este catálogo no tiene especies registradas.');
-        }
-
-        $species = CatalogSpecies::where('project_id', $project->id)->orderBy('family', 'asc')->orderBy('genus', 'asc')->orderBy('name', 'asc')->paginate(20);
-
-        return view('catalogs.list', compact('project', 'species'));
-    }
-
-    public function showSpecies(Project $project, CatalogSpecies $species){
-        if(!Auth::user()->hasCapabilityOnProject($project, 'view_catalog')){
-            return redirect()->route('catalogs.index')->with('error', 'No tienes permisos para ver este catálogo.');
-        }
-
-        return view('catalogs.show', compact('project', 'species'));
-    }
-
-    public function addPhoto(Request $request, CatalogSpecies $species){
-        if(!Auth::user()->hasCapabilityOnProject($project, 'view_catalog')){
-            return redirect()->route('catalogs.index')->with('error', 'No tienes permisos para ver este catálogo.');
-        }
-
-        $this->validate($request, [
-            'photo' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:4096',
-            'caption' => 'nullable|string',
-            'author' => 'nullable|string',
-            'license' => 'nullable|string',
-            'license_url' => 'nullable|string',
+        return Inertia::render('Catalog/SpeciesShow', [
+            'project' => [
+                'id' => $project->id,
+                'name' => $project->name,
+            ],
+            'species' => [
+                'id' => $species->id,
+                'family' => $species->family,
+                'genus' => $species->genus,
+                'name' => $species->name,
+                'authority' => $species->authority,
+            ],
         ]);
-
-        $user = Auth::user();
-
-        $photo = $request->file('photo');
-        $name = $species->id . '-' . $user->id . '-' . time() . '.' . $photo->getClientOriginalExtension();
-        $path = public_path('storage/images/species/' . $name);
-        $photo->move(public_path('storage/images/species/'), $name);
-
-        CatalogSpeciesPhoto::create([
-            'catalog_species_id' => $species->id,
-            'path' => $name,
-            'caption' => $request->caption,
-            'author' => $request->author,
-            'license' => $request->license,
-            'license_url' => $request->license_url,
-        ]);
-
-        return redirect()->back()->with('success', 'La foto ha sido agregada a la especie.');
     }
 }

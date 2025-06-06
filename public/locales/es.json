@@ -158,5 +158,41 @@
     "actions": {
       "view": "Ver"
     }
+  },
+  "catalogs": {
+    "title": "Catálogos de especies",
+    "total_species": "Especies registradas en el catálogo",
+    "reported_species": "Especies reportadas en entrevistas",
+    "reported_families": "Familias reportadas en entrevistas",
+    "register_species": "Registrar especie en el catálogo",
+    "view_catalog": "Ver catálogo",
+    "catalog_for_project": "Catálogo del proyecto",
+    "species_info": "Información de la especie",
+    "family": "Familia",
+    "genus": "Género",
+    "species": "Especie",
+    "authority": "Abreviatura de la autoridad",
+    "no_projects": "No has participado en ningún proyecto, por lo que no tienes acceso a catálogos.",
+    "no_access": "No tienes acceso a editar el catálogo de este proyecto.",
+    "species_registered": "Se ha registrado la especie en el catálogo.",
+    "ethnobotanical_catalog": "Catálogo etnobotánico",
+    "reports": "Reportes",
+    "species_list": "Listado de especies",
+    "accepted_as": "El nombre actualmente aceptado para esta especie es",
+    "fetch_error": "Ha ocurrido un error al obtener la información taxonómica.",
+    "loading": "Cargando información taxonómica...",
+    "no_preferred_usage": "No hay un nombre aceptado para este registro específico por WFO.",
+    "not_found": "No se ha encontrado un nombre que concuerde.",
+    "taxonomic_info": "Información Taxonómica",
+    "view_on_wfo": "Ver este registro en WFO",
+    "external_references": "Referencias externas",
+    "subtitle": "Catálogo etnobotánico de",
+    "taxonomic_cross_reference": "Referencia taxonómica cruzada",
+    "query": "Búsqueda realizada",
+    "match": "Coincidencia exacta",
+    "no_match_found": "No se encontraron coincidencias",
+    "error_fetching_data": "Hubo un error al obtener los datos",
+    "references": "Referencias en línea",
+    "wfo_query_info": "Se muestran los resultados al consultar por {{name}} ante los registros de WFO."
   }
 }

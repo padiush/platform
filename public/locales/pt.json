@@ -158,5 +158,41 @@
     "actions": {
       "view": "Ver"
     }
+  },
+  "catalogs": {
+    "authority": "Abreviatura da autoridade",
+    "catalog_for_project": "Catálogo de projectos",
+    "ethnobotanical_catalog": "Catálogo etnobotânico",
+    "family": "Família",
+    "fetch_error": "Ocorreu um erro na obtenção de informações taxonómicas.",
+    "genus": "Género",
+    "loading": "Carregar informações taxonómicas...",
+    "no_access": "Não tem acesso para editar o catálogo deste projeto.",
+    "no_preferred_usage": "Não existe uma utilização aceite descrita.",
+    "no_projects": "Não participou em nenhum projeto, pelo que não tem acesso aos catálogos.",
+    "not_found": "Não foi encontrado nenhum nome correspondente.",
+    "register_species": "Registar espécies no catálogo",
+    "reported_families": "Famílias que responderam nas entrevistas",
+    "reported_species": "Espécies referidas nas entrevistas",
+    "reports": "Relatórios",
+    "species": "Espécies",
+    "species_info": "Informações sobre as espécies",
+    "species_list": "Lista de espécies",
+    "species_registered": "A espécie foi registada no catálogo.",
+    "taxonomic_info": "Informação taxonómica",
+    "title": "Catálogos de espécies",
+    "total_species": "Espécies constantes do catálogo",
+    "view_catalog": "Ver catálogo",
+    "view_on_wfo": "Ver em WFO",
+    "error_fetching_data": "Houve um erro na obtenção dos dados",
+    "external_references": "Referências externas",
+    "subtitle": "Catálogo etnobotânico de",
+    "wfo_query_info": "Os resultados são apresentados quando se consulta o {{name}} nos registos WFO.",
+    "accepted_as": "O nome atualmente aceite para esta espécie é",
+    "match": "Correspondência exacta",
+    "no_match_found": "Não foram encontradas correspondências",
+    "query": "Pesquisa efectuada",
+    "references": "Referências online",
+    "taxonomic_cross_reference": "Referência cruzada taxonómica"
   }
 }
