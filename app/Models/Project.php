@@ -83,82 +83,63 @@ class Project extends Model
 
     public function unlinkedAnswers()
     {
-        $answers = collect();
-
-        foreach ($this->interviewForms as $form) {
-            $sections = $form->sections;
-            foreach ($sections as $section) {
-                foreach ($section->items as $item) {
-                    if ($item->link_to_species) {
-                        $item_answers = InstanceAnswer::where(
-                            'interview_item_id',
-                            $item->id
-                        )->get();
-
-                        foreach ($item_answers as $answer) {
-                            if ($answer->catalog_species_id == null) {
-                                $answers->push($answer);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        return $answers;
+        return InstanceAnswer::whereNull('catalog_species_id')
+            ->whereIn('interview_item_id', function ($query) {
+                $query
+                    ->select('id')
+                    ->from('interview_items')
+                    ->where('link_to_species', true)
+                    ->whereIn('interview_section_id', function ($subquery) {
+                        $subquery
+                            ->select('id')
+                            ->from('interview_sections')
+                            ->whereIn(
+                                'interview_form_id',
+                                $this->interviewForms()->pluck('id')
+                            );
+                    });
+            })
+            ->get();
     }
 
     public function linkedAnswers()
     {
-        $answers = collect();
-
-        foreach ($this->interviewForms as $form) {
-            $sections = $form->sections;
-            foreach ($sections as $section) {
-                foreach ($section->items as $item) {
-                    if ($item->link_to_species) {
-                        $item_answers = InstanceAnswer::where(
-                            'interview_item_id',
-                            $item->id
-                        )->get();
-
-                        foreach ($item_answers as $answer) {
-                            if ($answer->catalog_species_id != null) {
-                                $answers->push($answer);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        return $answers;
+        return InstanceAnswer::whereNotNull('catalog_species_id')
+            ->whereIn('interview_item_id', function ($query) {
+                $query
+                    ->select('id')
+                    ->from('interview_items')
+                    ->where('link_to_species', true)
+                    ->whereIn('interview_section_id', function ($subquery) {
+                        $subquery
+                            ->select('id')
+                            ->from('interview_sections')
+                            ->whereIn(
+                                'interview_form_id',
+                                $this->interviewForms()->pluck('id')
+                            );
+                    });
+            })
+            ->get();
     }
 
     public function linkedSpecies()
     {
-        $species = collect();
-
-        foreach ($this->linkedAnswers() as $answer) {
-            if (!$species->contains($answer->species)) {
-                $species->push($answer->species);
-            }
-        }
-
-        return $species;
+        return CatalogSpecies::whereIn(
+            'id',
+            $this->linkedAnswers()
+                ->pluck('catalog_species_id')
+                ->filter() // removes nulls
+                ->unique()
+        )->get();
     }
 
     public function linkedFamilies()
     {
-        $families = collect();
-
-        foreach ($this->linkedSpecies() as $species) {
-            $this_species = CatalogSpecies::find($species->id);
-            if (!$families->contains($this_species->family)) {
-                $families->push($this_species->family);
-            }
-        }
-
-        return $families;
+        return $this->linkedSpecies()
+            ->pluck('family')
+            ->filter()
+            ->unique()
+            ->values();
     }
 }
