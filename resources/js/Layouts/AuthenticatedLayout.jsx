@@ -86,9 +86,9 @@ export default function AuthenticatedLayout({
                                         </details>
                                     </li>
                                     <li>
-                                        <a href={route('catalogs.index')}>
+                                        <Link href={route('catalogs.index')}>
                                             {t('navigation.catalogs')}
-                                        </a>
+                                        </Link>
                                     </li>
                                     <li>
                                         <a href={route('data.index')}>
@@ -143,9 +143,9 @@ export default function AuthenticatedLayout({
                                     </details>
                                 </li>
                                 <li>
-                                    <a href={route('catalogs.index')}>
+                                    <Link href={route('catalogs.index')}>
                                         {t('navigation.catalogs')}
-                                    </a>
+                                    </Link>
                                 </li>
                                 <li>
                                     <a href={route('data.index')}>
