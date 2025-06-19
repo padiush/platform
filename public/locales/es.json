@@ -247,6 +247,19 @@
     "message": "Mensaje",
     "send": "Enviar"
   },
+  "auth": {
+    "login": "Iniciar sesión",
+    "login_prompt": "Ingresa tus credenciales a continuación",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "remember_me": "Mantener mi sesión activa en este navegador",
+    "forgot_password": "¿Olvidaste tu contraseña?",
+    "register": "Registrarse",
+    "register_prompt": "Crea tu cuenta a continuación",
+    "name": "Nombre",
+    "confirm_password": "Confirmar contraseña",
+    "already_registered": "¿Ya se registró?"
+  },
   "catalog": {
     "fetch_error": "Ha ocurrido un error al vincular la especie."
   }

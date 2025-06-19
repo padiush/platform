@@ -10,6 +10,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
+use Illuminate\Support\Facades\Storage;
+use Inertia\Inertia;
 
 use App\Models\ProjectInvite;
 use App\Models\ProjectAccess;
@@ -25,7 +27,10 @@ class RegisteredUserController extends Controller
      */
     public function create()
     {
-        return view('auth.register');
+        $url = \Storage::disk('s3')->temporaryUrl('public/bg.jpg', now()->addMinutes(5));
+        return \Inertia\Inertia::render('Auth/Register', [
+            'bgImage' => $url,
+        ]);
     }
 
     /**
