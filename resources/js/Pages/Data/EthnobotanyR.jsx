@@ -1,10 +1,11 @@
 import Card from '@/Components/Card';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { useTranslation } from 'react-i18next';
-import { Link } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 
 export default function EthnobotanyR({ project, forms }) {
     const { t } = useTranslation();
+    const { csrf_token } = usePage().props;
 
     const handleSubmit = (e) => {
         const form = e.target;
@@ -31,6 +32,7 @@ export default function EthnobotanyR({ project, forms }) {
                                     method="post"
                                     onSubmit={handleSubmit}
                                 >
+                                    <input type="hidden" name="_token" value={csrf_token} />
                                     <input type="hidden" name="form_id" value={form.id} />
                                     <div className="form-control">
                                         <label className="label">

@@ -242,6 +242,7 @@ class InterviewDataController extends Controller
                     }),
                 ];
             }),
+            'csrf_token' => csrf_token(),
         ]);
     }
 
@@ -329,6 +330,7 @@ class InterviewDataController extends Controller
                     }),
                 ];
             }),
+            'csrf_token' => csrf_token(),
         ]);
     }
 
