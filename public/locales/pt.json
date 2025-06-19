@@ -243,5 +243,18 @@
     "email": "Email",
     "message": "Mensagem",
     "send": "Enviar"
+  },
+  "auth": {
+    "login": "Entrar",
+    "login_prompt": "Insira suas credenciais abaixo",
+    "email": "Email",
+    "password": "Senha",
+    "remember_me": "Manter sessão ativa neste navegador",
+    "forgot_password": "Esqueceu sua senha?",
+    "register": "Registrar",
+    "register_prompt": "Crie sua conta abaixo",
+    "name": "Nome",
+    "confirm_password": "Confirmar senha",
+    "already_registered": "Já possui cadastro?"
   }
 }
