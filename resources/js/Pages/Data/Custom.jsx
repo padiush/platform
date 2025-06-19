@@ -2,6 +2,8 @@ import Card from '@/Components/Card';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { useTranslation } from 'react-i18next';
 import { Link, usePage } from '@inertiajs/react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowLeft } from '@fortawesome/pro-regular-svg-icons';
 import { useState } from 'react';
 
 export default function CustomExport({ project, forms }) {
@@ -31,7 +33,11 @@ export default function CustomExport({ project, forms }) {
         <AuthenticatedLayout
             title={t('data.custom_export')}
             subtitle={project.name}
-            action={<Link className="btn btn-ghost" href={route('data.index')}> <i className="fa-solid fa-arrow-left"/> </Link>}
+            action={
+                <Link className="btn btn-ghost" href={route('data.index')}>
+                    <FontAwesomeIcon icon={faArrowLeft} />
+                </Link>
+            }
         >
             <div className="p-4 md:pt-8 lg:pt-12">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">

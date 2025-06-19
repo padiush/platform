@@ -3,6 +3,8 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { router, usePage, Link } from '@inertiajs/react';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowLeft } from '@fortawesome/pro-regular-svg-icons';
 
 export default function LinkSpecies({ project, answered_sections, species }) {
     const { t } = useTranslation();
@@ -85,7 +87,7 @@ export default function LinkSpecies({ project, answered_sections, species }) {
                     className="btn btn-ghost btn-circle"
                     href={route('data.index')}
                 >
-                    <i className="fa-solid fa-arrow-left" />
+                    <FontAwesomeIcon icon={faArrowLeft} />
                 </Link>
             }
         >
