@@ -61,7 +61,9 @@
     "delete": "Eliminar",
     "invite": "Invitar",
     "revoke": "Revocar",
-    "close": "Cerrar"
+    "close": "Cerrar",
+    "select": "Seleccionar",
+    "generate": "Generar"
   },
   "lang": "es",
   "project": {
@@ -200,6 +202,7 @@
     "unlinked_reports": "Reportes de uso sin vincular a información taxonómica",
     "linked_reports": "Reportes de uso vinculados a información taxonómica",
     "link_species": "Vincular especie",
+    "title": "Vincular especies",
     "generate_ethnobotanyr": "Generar reporte para EthnobotanyR",
     "custom_export": "Exportación personalizada",
     "link_to": "Vincular a la especie",
