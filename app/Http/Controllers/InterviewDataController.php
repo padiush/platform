@@ -219,7 +219,30 @@ class InterviewDataController extends Controller
             $form->load('sections.items');
         }
 
-        return view('data.ethnobotanyr', compact('project', 'forms'));
+        return Inertia::render('Data/EthnobotanyR', [
+            'project' => [
+                'id' => $project->id,
+                'name' => $project->name,
+            ],
+            'forms' => $forms->map(function ($form) {
+                return [
+                    'id' => $form->id,
+                    'name' => $form->name,
+                    'sections' => $form->sections->map(function ($section) {
+                        return [
+                            'id' => $section->id,
+                            'name' => $section->name,
+                            'items' => $section->items->map(function ($item) {
+                                return [
+                                    'id' => $item->id,
+                                    'label' => $item->label,
+                                ];
+                            }),
+                        ];
+                    }),
+                ];
+            }),
+        ]);
     }
 
     public function handleEthnobotanyRRequest(
@@ -282,7 +305,31 @@ class InterviewDataController extends Controller
             $form->load('sections', 'sections.items');
         }
 
-        return view('data.custom', compact('project', 'forms'));
+        return Inertia::render('Data/Custom', [
+            'project' => [
+                'id' => $project->id,
+                'name' => $project->name,
+            ],
+            'forms' => $forms->map(function ($form) {
+                return [
+                    'id' => $form->id,
+                    'name' => $form->name,
+                    'sections' => $form->sections->map(function ($section) {
+                        return [
+                            'id' => $section->id,
+                            'name' => $section->name,
+                            'repeatable' => $section->repeatable,
+                            'items' => $section->items->map(function ($item) {
+                                return [
+                                    'id' => $item->id,
+                                    'label' => $item->label,
+                                ];
+                            }),
+                        ];
+                    }),
+                ];
+            }),
+        ]);
     }
 
     public function handleCustomRequest(Project $project, Request $request)

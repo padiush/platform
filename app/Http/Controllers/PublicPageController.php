@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Artesaos\SEOTools\Facades\SEOTools;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Storage;
+use Inertia\Inertia;
 
 use App\Notifications\ContactFormNotification;
 
@@ -16,7 +18,17 @@ class PublicPageController extends Controller
         SEOTools::opengraph()->setUrl(env('APP_URL'));
         SEOTools::setCanonical(env('APP_URL'));
 
-        return view('public.index');
+        return Inertia::render('Public/Index', [
+            'images' => [
+                'hero' => Storage::disk('s3')->temporaryUrl('hero.jpg', now()->addMinutes(10)),
+                'collab' => Storage::disk('s3')->temporaryUrl('collab.png', now()->addMinutes(10)),
+                'custom' => Storage::disk('s3')->temporaryUrl('custom.png', now()->addMinutes(10)),
+                'catalog' => Storage::disk('s3')->temporaryUrl('catalog.png', now()->addMinutes(10)),
+                'usage' => Storage::disk('s3')->temporaryUrl('usage.png', now()->addMinutes(10)),
+                'data' => Storage::disk('s3')->temporaryUrl('data.png', now()->addMinutes(10)),
+                'community' => Storage::disk('s3')->temporaryUrl('community.png', now()->addMinutes(10)),
+            ],
+        ]);
     }
 
     public function about(){
@@ -25,7 +37,13 @@ class PublicPageController extends Controller
         SEOTools::opengraph()->setUrl(env('APP_URL').'/acerca');
         SEOTools::setCanonical(env('APP_URL').'/acerca');
 
-        return view('public.about');
+        return Inertia::render('Public/About', [
+            'images' => [
+                'about1' => Storage::disk('s3')->temporaryUrl('about1.webp', now()->addMinutes(10)),
+                'mercedes' => Storage::disk('s3')->temporaryUrl('Mercedes.webp', now()->addMinutes(10)),
+                'rodrigo' => Storage::disk('s3')->temporaryUrl('Rodrigo.webp', now()->addMinutes(10)),
+            ],
+        ]);
     }
 
     public function contact(){
@@ -34,7 +52,7 @@ class PublicPageController extends Controller
         SEOTools::opengraph()->setUrl(env('APP_URL').'/contacto');
         SEOTools::setCanonical(env('APP_URL').'/contacto');
 
-        return view('public.contact');
+        return Inertia::render('Public/Contact');
     }
 
     public function handleContactRequest(Request $request){
@@ -55,7 +73,9 @@ class PublicPageController extends Controller
         SEOTools::opengraph()->setUrl(env('APP_URL').'/privacidad');
         SEOTools::setCanonical(env('APP_URL').'/privacidad');
 
-        return view('public.privacy');
+        return Inertia::render('Public/Privacy', [
+            'pageContent' => view('public.privacy')->render(),
+        ]);
     }
 
     public function terms(){
@@ -64,6 +84,8 @@ class PublicPageController extends Controller
         SEOTools::opengraph()->setUrl(env('APP_URL').'/terminos');
         SEOTools::setCanonical(env('APP_URL').'/terminos');
 
-        return view('public.terms');
+        return Inertia::render('Public/Terms', [
+            'pageContent' => view('public.terms')->render(),
+        ]);
     }
 }
