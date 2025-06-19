@@ -1,11 +1,12 @@
 import Card from '@/Components/Card';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { useTranslation } from 'react-i18next';
-import { Link } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 
 export default function CustomExport({ project, forms }) {
     const { t } = useTranslation();
+    const { csrf_token } = usePage().props;
     const [selected, setSelected] = useState({});
 
     const toggle = (formId, itemId, checked) => {
@@ -45,6 +46,7 @@ export default function CustomExport({ project, forms }) {
                                     action={route('data.custom', { project: project.id })}
                                     method="post"
                                 >
+                                    <input type="hidden" name="_token" value={csrf_token} />
                                     <input type="hidden" name="form_id" value={form.id} />
                                     <input type="hidden" name="selected_fields" />
                                     {form.sections.map((section) => (
