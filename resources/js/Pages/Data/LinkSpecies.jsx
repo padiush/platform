@@ -1,6 +1,6 @@
 import Card from '@/Components/Card';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { router, usePage } from '@inertiajs/react';
+import { router, usePage, Link } from '@inertiajs/react';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 
@@ -81,12 +81,12 @@ export default function LinkSpecies({ project, answered_sections, species }) {
             title={t('data.title')}
             subtitle={project.name}
             action={
-                <a
+                <Link
                     className="btn btn-ghost btn-circle"
                     href={route('data.index')}
                 >
                     <i className="fa-solid fa-arrow-left" />
-                </a>
+                </Link>
             }
         >
             <div className="p-4 md:pt-8 lg:pt-12">
