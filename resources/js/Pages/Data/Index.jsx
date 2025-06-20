@@ -1,6 +1,6 @@
 import Card from '@/Components/Card';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { usePage } from '@inertiajs/react';
+import { usePage, Link } from '@inertiajs/react';
 import { useTranslation } from 'react-i18next';
 
 export default function DataProcessing({ projects }) {
@@ -44,7 +44,7 @@ export default function DataProcessing({ projects }) {
                                         </div>
 
                                         <div className="mt-4 grid w-full grid-cols-1 gap-4 lg:grid-cols-3">
-                                            <a
+                                            <Link
                                                 href={route('data.link', {
                                                     project: project.id,
                                                 })}
@@ -55,9 +55,9 @@ export default function DataProcessing({ projects }) {
                                                     : {})}
                                             >
                                                 {t('data.link_species')}
-                                            </a>
+                                            </Link>
 
-                                            <a
+                                            <Link
                                                 href={route(
                                                     'data.ethnobotanyR',
                                                     {
@@ -69,12 +69,10 @@ export default function DataProcessing({ projects }) {
                                                     ? { disabled: true }
                                                     : {})}
                                             >
-                                                {t(
-                                                    'data.generate_ethnobotanyr',
-                                                )}
-                                            </a>
+                                                {t('data.generate_ethnobotanyr')}
+                                            </Link>
 
-                                            <a
+                                            <Link
                                                 href={route('data.custom', {
                                                     project: project.id,
                                                 })}
@@ -84,7 +82,7 @@ export default function DataProcessing({ projects }) {
                                                     : {})}
                                             >
                                                 {t('data.custom_export')}
-                                            </a>
+                                            </Link>
                                         </div>
                                     </Card>
                                 );
