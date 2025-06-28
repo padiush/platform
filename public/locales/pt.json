@@ -63,7 +63,8 @@
     "revoke": "Revogar",
     "close": "Fechar",
     "select": "Selecionar",
-    "generate": "Gerar"
+    "generate": "Gerar",
+    "delete_selected": "Excluir selecionados"
   },
   "lang": "pt-BR",
   "project": {
@@ -263,5 +264,14 @@
     "name": "Nome",
     "confirm_password": "Confirmar senha",
     "already_registered": "Já possui cadastro?"
+  },
+  "system": {
+    "dashboard": "Painel do sistema",
+    "summary": "Resumo",
+    "total_users": "Usuários totais: {{count}}",
+    "total_projects": "Projetos totais: {{count}}",
+    "users": "Usuários",
+    "user_deleted": "Usuário excluído",
+    "users_deleted": "Usuários excluídos"
   }
 }
