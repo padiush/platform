@@ -269,4 +269,23 @@ class InterviewInstancesController extends Controller
             ->with('message', 'interviews.repeatable_set_deleted')
             ->with('message_type', 'success');
     }
+
+    public function destroy(InterviewInstance $instance): RedirectResponse
+    {
+        $form = $instance->form;
+        $project = $form->project;
+
+        self::verifyAccess($project, $form, $instance);
+
+        foreach ($instance->answers as $answer) {
+            $answer->delete();
+        }
+
+        $instance->delete();
+
+        return redirect()
+            ->route('interviews.instances', ['form' => $form->id])
+            ->with('message', 'interviews.instance_deleted')
+            ->with('message_type', 'success');
+    }
 }
