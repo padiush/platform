@@ -64,7 +64,8 @@
     "revoke": "Revoke",
     "close": "Close",
     "select": "Select",
-    "generate": "Generate"
+    "generate": "Generate",
+    "delete_selected": "Delete Selected"
   },
   "lang": "en",
   "project": {
@@ -271,6 +272,7 @@
     "total_users": "Total users: {{count}}",
     "total_projects": "Total projects: {{count}}",
     "users": "Users",
-    "user_deleted": "User deleted"
+    "user_deleted": "User deleted",
+    "users_deleted": "Users deleted"
   }
 }

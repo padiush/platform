@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Project;
 use App\Models\User;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -44,6 +45,20 @@ class SystemController extends Controller
         return redirect()
             ->route('system.index')
             ->with('message', 'system.user_deleted')
+            ->with('message_type', 'success');
+    }
+
+    public function destroyUsers(Request $request)
+    {
+        $ids = $request->input('ids', []);
+
+        if (!empty($ids)) {
+            User::whereIn('id', $ids)->delete();
+        }
+
+        return redirect()
+            ->route('system.index')
+            ->with('message', 'system.users_deleted')
             ->with('message_type', 'success');
     }
 }
