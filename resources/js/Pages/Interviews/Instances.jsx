@@ -1,12 +1,28 @@
 import Card from '@/Components/Card';
+import DeletionModal from '@/Components/DeletionModal';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { faArrowLeft } from '@fortawesome/pro-regular-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link } from '@inertiajs/react';
+import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export default function InterviewInstances({ project, form, instances }) {
     const { t } = useTranslation();
+    const deletionModalRef = useRef();
+    const [deletionModalOptions, setDeletionModalOptions] = useState({
+        url: '',
+        name: '',
+    });
+
+    const handleDelete = (instance) => {
+        setDeletionModalOptions({
+            name: t('interviews.instance.title', { id: instance.id }),
+            url: route('interviews.destroy', instance.id),
+        });
+
+        deletionModalRef.current.showModal();
+    };
 
     return (
         <AuthenticatedLayout
@@ -43,15 +59,23 @@ export default function InterviewInstances({ project, form, instances }) {
                                         <td>{instance.id}</td>
                                         <td>{instance.user.name}</td>
                                         <td>
-                                            <Link
-                                                href={route(
-                                                    'interviews.show',
-                                                    instance.id,
-                                                )}
-                                                className="btn btn-xs btn-primary"
-                                            >
-                                                {t('common.actions.view')}
-                                            </Link>
+                                            <div className="join join-vertical lg:join-horizontal">
+                                                <Link
+                                                    href={route(
+                                                        'interviews.show',
+                                                        instance.id,
+                                                    )}
+                                                    className="btn btn-xs btn-primary join-item"
+                                                >
+                                                    {t('common.actions.view')}
+                                                </Link>
+                                                <div
+                                                    className="btn btn-error btn-xs join-item"
+                                                    onClick={() => handleDelete(instance)}
+                                                >
+                                                    {t('actions.delete')}
+                                                </div>
+                                            </div>
                                         </td>
                                     </tr>
                                 ))}
@@ -82,6 +106,11 @@ export default function InterviewInstances({ project, form, instances }) {
                     </Card>
                 </div>
             </div>
+            <DeletionModal
+                modalRef={deletionModalRef}
+                name={deletionModalOptions.name}
+                url={deletionModalOptions.url}
+            />
         </AuthenticatedLayout>
     );
 }
