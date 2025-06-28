@@ -3,13 +3,19 @@ import Input from '@/Components/Input';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { useTranslation } from 'react-i18next';
 
-export default function Register({ bgImage }) {
+export default function Register({ bgImage, honeypot }) {
     const { t } = useTranslation();
     const { data, setData, post, processing, errors } = useForm({
         name: '',
         email: '',
         password: '',
         password_confirmation: '',
+        ...(honeypot
+            ? {
+                  [honeypot.nameFieldName]: '',
+                  [honeypot.validFromFieldName]: honeypot.encryptedValidFrom,
+              }
+            : {}),
     });
 
     const submit = (e) => {
@@ -57,6 +63,33 @@ export default function Register({ bgImage }) {
                     error={errors.password_confirmation}
                     required
                 />
+                {honeypot?.enabled && (
+                    <div
+                        name={`${honeypot.nameFieldName}_wrap`}
+                        style={{ display: 'none' }}
+                    >
+                        <input
+                            type="text"
+                            name={honeypot.nameFieldName}
+                            id={honeypot.nameFieldName}
+                            value={data[honeypot.nameFieldName]}
+                            onChange={(e) =>
+                                setData(honeypot.nameFieldName, e.target.value)
+                            }
+                        />
+                        <input
+                            type="text"
+                            name={honeypot.validFromFieldName}
+                            value={data[honeypot.validFromFieldName]}
+                            onChange={(e) =>
+                                setData(
+                                    honeypot.validFromFieldName,
+                                    e.target.value,
+                                )
+                            }
+                        />
+                    </div>
+                )}
                 <div className="px-4 pb-2 pt-4">
                     <button type="submit" className="btn btn-primary" disabled={processing}>
                         {t('auth.register')}

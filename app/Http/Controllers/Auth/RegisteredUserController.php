@@ -25,11 +25,12 @@ class RegisteredUserController extends Controller
      *
      * @return \Illuminate\View\View
      */
-    public function create()
+    public function create(\Spatie\Honeypot\Honeypot $honeypot)
     {
         $url = \Storage::disk('s3')->temporaryUrl('public/bg.jpg', now()->addMinutes(5));
         return \Inertia\Inertia::render('Auth/Register', [
             'bgImage' => $url,
+            'honeypot' => $honeypot,
         ]);
     }
 
