@@ -23,6 +23,8 @@ Route::middleware(['auth'])->group(function () {
                 ->name('index');
             Route::delete('/users/{user}', [\App\Http\Controllers\SystemController::class, 'destroyUser'])
                 ->name('users.delete');
+            Route::delete('/users/bulk-delete', [\App\Http\Controllers\SystemController::class, 'destroyUsers'])
+                ->name('users.bulk-delete');
         });
 
     Route::controller(ProjectController::class)
