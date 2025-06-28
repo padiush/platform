@@ -147,6 +147,10 @@ Route::middleware(['auth'])->group(function () {
                 '/instance/{instance}/sections/{section}',
                 'destroyRepeatableSet'
             )->name('section.remove');
+
+            Route::delete('/instance/{instance}/delete', 'destroy')->name(
+                'destroy'
+            );
         });
 
     Route::controller(ProjectCatalogController::class)->group(function () {
@@ -168,6 +172,11 @@ Route::middleware(['auth'])->group(function () {
             '/catalogs/{project}/species/{species}',
             'showSpecies'
         )->name('catalogs.species.show');
+
+        Route::delete(
+            '/catalogs/{project}/species/{species}/delete',
+            'destroySpecies'
+        )->name('catalogs.species.delete');
     });
 
     Route::controller(InterviewDataController::class)->group(function () {

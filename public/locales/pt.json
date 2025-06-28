@@ -153,6 +153,7 @@
       "title": "Entrevista {{id}}"
     },
     "instance_created": "Foi criada uma nova entrevista.",
+    "instance_deleted": "A entrevista foi eliminada.",
     "remove_section": "Eliminar esta secção e as respectivas respostas",
     "timestamp": "Data e hora"
   },
@@ -181,6 +182,7 @@
     "species_info": "Informações sobre as espécies",
     "species_list": "Lista de espécies",
     "species_registered": "A espécie foi registada no catálogo.",
+    "species_deleted": "A espécie foi eliminada do catálogo.",
     "taxonomic_info": "Informação taxonómica",
     "title": "Catálogos de espécies",
     "total_species": "Espécies constantes do catálogo",

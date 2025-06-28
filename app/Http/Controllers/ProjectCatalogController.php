@@ -177,4 +177,32 @@ class ProjectCatalogController extends Controller
             ],
         ]);
     }
+
+    public function destroySpecies(
+        Project $project,
+        CatalogSpecies $species
+    ): RedirectResponse {
+        if (!Auth::user()->hasCapabilityOnProject($project, 'edit_catalog')) {
+            return redirect()
+                ->route('catalogs.index')
+                ->with('message', 'catalogs.no_access')
+                ->with('messsage_type', 'error');
+        }
+
+        foreach ($species->photos as $photo) {
+            $photo->delete();
+        }
+
+        foreach ($species->answers as $answer) {
+            $answer->catalog_species_id = null;
+            $answer->save();
+        }
+
+        $species->delete();
+
+        return redirect()
+            ->route('catalogs.show', ['project' => $project->id])
+            ->with('message', 'catalogs.species_deleted')
+            ->with('messsage_type', 'success');
+    }
 }

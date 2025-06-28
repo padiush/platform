@@ -4,9 +4,28 @@ import { faArrowLeft, faEye } from '@fortawesome/pro-regular-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link } from '@inertiajs/react';
 import { useTranslation } from 'react-i18next';
+import { useRef, useState } from 'react';
+import DeletionModal from '@/Components/DeletionModal';
 
 export default function CatalogSpeciesIndex({ project, species }) {
     const { t } = useTranslation();
+    const deletionModalRef = useRef();
+    const [deletionModalOptions, setDeletionModalOptions] = useState({
+        url: '',
+        name: '',
+    });
+
+    const handleDelete = (sp) => {
+        setDeletionModalOptions({
+            name: `${sp.genus} ${sp.name}`,
+            url: route('catalogs.species.delete', {
+                project: project.id,
+                species: sp.id,
+            }),
+        });
+
+        deletionModalRef.current.showModal();
+    };
 
     return (
         <AuthenticatedLayout
@@ -57,22 +76,30 @@ export default function CatalogSpeciesIndex({ project, species }) {
                                             {sp.answers.length}
                                         </td>
                                         <td>
-                                            <Link
-                                                href={route(
-                                                    'catalogs.species.show',
-                                                    {
-                                                        project: project.id,
-                                                        species: sp.id,
-                                                    },
-                                                )}
-                                                className="btn btn-primary btn-xs"
-                                            >
-                                                <FontAwesomeIcon
-                                                    icon={faEye}
-                                                    className="mr-2"
-                                                />
-                                                {t('common.actions.view')}
-                                            </Link>
+                                            <div className="join join-vertical lg:join-horizontal">
+                                                <Link
+                                                    href={route(
+                                                        'catalogs.species.show',
+                                                        {
+                                                            project: project.id,
+                                                            species: sp.id,
+                                                        },
+                                                    )}
+                                                    className="btn btn-primary btn-xs join-item"
+                                                >
+                                                    <FontAwesomeIcon
+                                                        icon={faEye}
+                                                        className="mr-2"
+                                                    />
+                                                    {t('common.actions.view')}
+                                                </Link>
+                                                <div
+                                                    className="btn btn-error btn-xs join-item"
+                                                    onClick={() => handleDelete(sp)}
+                                                >
+                                                    {t('actions.delete')}
+                                                </div>
+                                            </div>
                                         </td>
                                     </tr>
                                 ))}
@@ -103,6 +130,11 @@ export default function CatalogSpeciesIndex({ project, species }) {
                     </Card>
                 </div>
             </div>
+            <DeletionModal
+                modalRef={deletionModalRef}
+                name={deletionModalOptions.name}
+                url={deletionModalOptions.url}
+            />
         </AuthenticatedLayout>
     );
 }
