@@ -12,7 +12,8 @@
     "catalogs": "Catalogs",
     "data": "Data",
     "design": "Form Designer",
-    "interview": "Pass Interviews"
+    "interview": "Pass Interviews",
+    "system_dashboard": "System Dashboard"
   },
   "titles": {
     "my_projects": "My Projects"
@@ -263,5 +264,13 @@
     "name": "Name",
     "confirm_password": "Confirm Password",
     "already_registered": "Already registered?"
+  },
+  "system": {
+    "dashboard": "System Dashboard",
+    "summary": "Summary",
+    "total_users": "Total users: {{count}}",
+    "total_projects": "Total projects: {{count}}",
+    "users": "Users",
+    "user_deleted": "User deleted"
   }
 }

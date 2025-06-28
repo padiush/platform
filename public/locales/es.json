@@ -12,7 +12,8 @@
     "design": "Diseñar formularios",
     "interview": "Pasar entrevistas",
     "catalogs": "Catálogos",
-    "data": "Datos"
+    "data": "Datos",
+    "system_dashboard": "Panel del sistema"
   },
   "titles": {
     "my_projects": "Mis proyectos"
@@ -267,5 +268,13 @@
   },
   "catalog": {
     "fetch_error": "Ha ocurrido un error al vincular la especie."
+  },
+  "system": {
+    "dashboard": "Panel del sistema",
+    "summary": "Resumen",
+    "total_users": "Usuarios totales: {{count}}",
+    "total_projects": "Proyectos totales: {{count}}",
+    "users": "Usuarios",
+    "user_deleted": "Usuario eliminado"
   }
 }
