@@ -43,6 +43,7 @@ class HandleInertiaRequests extends Middleware
                     ? $request->user()->projects->count()
                     : [],
             ],
+            'honeypot' => new \Spatie\Honeypot\Honeypot(config('honeypot')),
             'ziggy' => fn() => [
                 ...(new Ziggy())->toArray(),
                 'location' => $request->url(),
