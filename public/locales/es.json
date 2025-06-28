@@ -154,7 +154,8 @@
     },
     "add_section": "Agregar {{section}}",
     "remove_section": "Eliminar esta sección y sus respuestas",
-    "instance_created": "Se ha creado una nueva entrevista."
+    "instance_created": "Se ha creado una nueva entrevista.",
+    "instance_deleted": "La entrevista ha sido eliminada."
   },
   "common": {
     "actions": {
@@ -177,6 +178,7 @@
     "no_projects": "No has participado en ningún proyecto, por lo que no tienes acceso a catálogos.",
     "no_access": "No tienes acceso a editar el catálogo de este proyecto.",
     "species_registered": "Se ha registrado la especie en el catálogo.",
+    "species_deleted": "La especie ha sido eliminada del catálogo.",
     "ethnobotanical_catalog": "Catálogo etnobotánico",
     "reports": "Reportes",
     "species_list": "Listado de especies",

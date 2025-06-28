@@ -153,6 +153,7 @@
       "title": "Interview {{id}}"
     },
     "instance_created": "A new interview has been created.",
+    "instance_deleted": "The interview has been deleted.",
     "remove_section": "Delete this section and its answers",
     "timestamp": "Date and time"
   },
@@ -177,6 +178,7 @@
     "species_info": "Species information",
     "species_list": "List of species",
     "species_registered": "The species has been recorded in the catalog.",
+    "species_deleted": "The species has been removed from the catalog.",
     "title": "Species catalogs",
     "total_species": "Species registered in the catalog",
     "view_catalog": "See catalog",
