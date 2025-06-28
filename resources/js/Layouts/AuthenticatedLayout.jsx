@@ -54,6 +54,13 @@ export default function AuthenticatedLayout({
                                     {t('navigation.projects')}
                                 </Link>
                             </li>
+                            {auth.user.system_admin && (
+                                <li>
+                                    <Link href={route('system.index')}>
+                                        {t('navigation.system_dashboard')}
+                                    </Link>
+                                </li>
+                            )}
                             {auth.projects > 0 && (
                                 <>
                                     <li>
@@ -113,6 +120,13 @@ export default function AuthenticatedLayout({
                                 {t('navigation.projects')}
                             </Link>
                         </li>
+                        {auth.user.system_admin && (
+                            <li>
+                                <Link href={route('system.index')}>
+                                    {t('navigation.system_dashboard')}
+                                </Link>
+                            </li>
+                        )}
                         {auth.projects > 0 && (
                             <>
                                 <li>

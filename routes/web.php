@@ -1,19 +1,29 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\ProjectController;
-use App\Http\Controllers\InterviewFormController;
-use App\Http\Controllers\InterviewDesignerController;
-use App\Http\Controllers\ProjectCatalogController;
-use App\Http\Controllers\InterviewInstancesController;
 use App\Http\Controllers\InterviewDataController;
+use App\Http\Controllers\InterviewDesignerController;
+use App\Http\Controllers\InterviewFormController;
+use App\Http\Controllers\InterviewInstancesController;
+use App\Http\Controllers\ProjectCatalogController;
+use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\PublicPageController;
+use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', function () {
         return Inertia::render('Dashboard');
     })->name('dashboard');
+
+    Route::middleware('system_admin')
+        ->prefix('system')
+        ->name('system.')
+        ->group(function () {
+            Route::get('/', [\App\Http\Controllers\SystemController::class, 'index'])
+                ->name('index');
+            Route::delete('/users/{user}', [\App\Http\Controllers\SystemController::class, 'destroyUser'])
+                ->name('users.delete');
+        });
 
     Route::controller(ProjectController::class)
         ->prefix('projects')
@@ -211,4 +221,4 @@ Route::controller(PublicPageController::class)->group(function () {
     Route::get('/terminos', 'terms')->name('public.terms');
 });
 
-require __DIR__ . '/auth.php';
+require __DIR__.'/auth.php';
