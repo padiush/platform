@@ -8,6 +8,7 @@ export default function DeletionModal({
     modalRef,
     name,
     url,
+    data = null,
     useRouter = true,
     onDeleted = () => {},
 }) {
@@ -20,7 +21,11 @@ export default function DeletionModal({
             e.preventDefault();
 
             if (useRouter) {
-                router.delete(url);
+                if (data) {
+                    router.delete(url, { data });
+                } else {
+                    router.delete(url);
+                }
             } else {
                 fetch(url, {
                     method: 'DELETE',
