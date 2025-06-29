@@ -94,16 +94,19 @@ class InterviewDataController extends Controller
 
             if ($answer->section->repeatable) {
                 $section_answers = InstanceAnswer::where(
-                    'interview_section_id',
-                    $answer->section->id
+                    'interview_instance_id',
+                    $answer->interview_instance_id
                 )
+                    ->where('interview_section_id', $answer->section->id)
                     ->where('repeatable_index', $answer->repeatable_index)
                     ->get();
             } else {
                 $section_answers = InstanceAnswer::where(
-                    'interview_section_id',
-                    $answer->section->id
-                )->get();
+                    'interview_instance_id',
+                    $answer->interview_instance_id
+                )
+                    ->where('interview_section_id', $answer->section->id)
+                    ->get();
             }
 
             $this_section->section = [
