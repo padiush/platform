@@ -7,7 +7,7 @@
     </tr>
     @foreach($instances as $instance)
         @if($repeatable)
-            @for($i = 0; $i < $instance->max_repeatable_index; $i++)
+            @for($i = 0; $i <= $instance->max_repeatable_index; $i++)
             <tr>
                 <td>PADIUSH_INST_{{ $instance->id }}</td>
                 @foreach($items as $item)
