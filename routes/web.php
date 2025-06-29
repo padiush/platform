@@ -21,10 +21,12 @@ Route::middleware(['auth'])->group(function () {
         ->group(function () {
             Route::get('/', [\App\Http\Controllers\SystemController::class, 'index'])
                 ->name('index');
-            Route::delete('/users/{user}', [\App\Http\Controllers\SystemController::class, 'destroyUser'])
-                ->name('users.delete');
+            // Bulk delete must be defined before single delete to avoid
+            // "bulk-delete" being treated as a {user} parameter.
             Route::delete('/users/bulk-delete', [\App\Http\Controllers\SystemController::class, 'destroyUsers'])
                 ->name('users.bulk-delete');
+            Route::delete('/users/{user}', [\App\Http\Controllers\SystemController::class, 'destroyUser'])
+                ->name('users.delete');
         });
 
     Route::controller(ProjectController::class)
