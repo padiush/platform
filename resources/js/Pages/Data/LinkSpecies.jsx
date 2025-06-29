@@ -1,10 +1,10 @@
 import Card from '@/Components/Card';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { router, usePage, Link } from '@inertiajs/react';
+import { faArrowLeft } from '@fortawesome/pro-regular-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Link, router, usePage } from '@inertiajs/react';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowLeft } from '@fortawesome/pro-regular-svg-icons';
 
 export default function LinkSpecies({ project, answered_sections, species }) {
     const { t } = useTranslation();
@@ -60,7 +60,7 @@ export default function LinkSpecies({ project, answered_sections, species }) {
             <select
                 id={sectionId}
                 className="select select-bordered w-full"
-                defaultValue=""
+                defaultValue={section.catalog_species_id ?? ''}
                 onChange={(e) => handleSpeciesChange(section, e.target.value)}
             >
                 <option value="" disabled hidden>
