@@ -1,6 +1,6 @@
 import Card from '@/Components/Card';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { usePage, Link } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import { useTranslation } from 'react-i18next';
 
 export default function DataProcessing({ projects }) {
@@ -49,8 +49,7 @@ export default function DataProcessing({ projects }) {
                                                     project: project.id,
                                                 })}
                                                 className="btn btn-primary w-full"
-                                                {...(!canManageData ||
-                                                unlinkedCount === 0
+                                                {...(!canManageData
                                                     ? { disabled: true }
                                                     : {})}
                                             >
@@ -69,7 +68,9 @@ export default function DataProcessing({ projects }) {
                                                     ? { disabled: true }
                                                     : {})}
                                             >
-                                                {t('data.generate_ethnobotanyr')}
+                                                {t(
+                                                    'data.generate_ethnobotanyr',
+                                                )}
                                             </Link>
 
                                             <Link
