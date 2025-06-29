@@ -5,14 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-use App\Models\User;
-use App\Models\ProjectAccess;
-use App\Models\ProjectCapability;
-use App\Models\ProjectInvite;
-use App\Models\InterviewForm;
-use App\Models\CatalogSpecies;
-use App\Models\InstanceAnswer;
-
 class Project extends Model
 {
     use HasFactory;
@@ -120,6 +112,26 @@ class Project extends Model
                             );
                     });
             })
+            ->get();
+    }
+
+    public function speciesAnswers()
+    {
+        return InstanceAnswer::whereIn('interview_item_id', function ($query) {
+            $query
+                ->select('id')
+                ->from('interview_items')
+                ->where('link_to_species', true)
+                ->whereIn('interview_section_id', function ($subquery) {
+                    $subquery
+                        ->select('id')
+                        ->from('interview_sections')
+                        ->whereIn(
+                            'interview_form_id',
+                            $this->interviewForms()->pluck('id')
+                        );
+                });
+        })
             ->get();
     }
 

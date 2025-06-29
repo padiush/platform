@@ -2,24 +2,22 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Maatwebsite\Excel\Facades\Excel;
-
-use App\Exports\EthnobotanyRExport;
 use App\Exports\CustomExport;
-
-use App\Models\ProjectAccess;
-use App\Models\Project;
-use App\Models\User;
-use App\Models\InstanceAnswer;
+use App\Exports\EthnobotanyRExport;
 use App\Models\CatalogSpecies;
-use App\Models\InterviewItem;
+use App\Models\InstanceAnswer;
 use App\Models\InterviewInstance;
+use App\Models\InterviewItem;
+use App\Models\Project;
+use App\Models\ProjectAccess;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
+use Maatwebsite\Excel\Facades\Excel;
 
 class InterviewDataController extends Controller
 {
@@ -34,7 +32,7 @@ class InterviewDataController extends Controller
         foreach ($accesses as $access) {
             $project = Project::find($access->project_id);
 
-            if (!$project) {
+            if (! $project) {
                 continue;
             }
 
@@ -78,21 +76,21 @@ class InterviewDataController extends Controller
     {
         $this->checkPermission($project);
 
-        $unlinked_answers = $project->unlinkedAnswers();
+        $linkable_answers = $project->speciesAnswers();
 
-        if ($unlinked_answers->count() === 0) {
+        if ($linkable_answers->count() === 0) {
             return redirect()
                 ->route('data.index')
                 ->with(
                     'error',
-                    'No hay respuestas sin vincular en este proyecto.'
+                    'No hay respuestas en este proyecto que puedan vincularse a especies.'
                 );
         }
 
         $answered_sections = collect();
 
-        foreach ($unlinked_answers as $answer) {
-            $this_section = new \stdClass();
+        foreach ($linkable_answers as $answer) {
+            $this_section = new \stdClass;
 
             if ($answer->section->repeatable) {
                 $section_answers = InstanceAnswer::where(
@@ -127,6 +125,7 @@ class InterviewDataController extends Controller
                     'label' => $item->label,
                 ];
             });
+            $this_section->catalog_species_id = $answer->catalog_species_id;
             $this_section->answers = $section_answers->map(function ($ans) {
                 return [
                     'id' => $ans->id,
@@ -417,7 +416,7 @@ class InterviewDataController extends Controller
             ->where('project_id', $project->id)
             ->first();
 
-        if (!$access) {
+        if (! $access) {
             if ($json) {
                 return response()->json(
                     ['error' => 'No tienes acceso a este proyecto.'],
@@ -431,14 +430,13 @@ class InterviewDataController extends Controller
         }
 
         if (
-            !Auth::user()->hasCapabilityOnProject($project, 'manage_data') &&
-            !Auth::user()->hasCapabilityOnProject($project, 'generate_reports')
+            ! Auth::user()->hasCapabilityOnProject($project, 'manage_data') &&
+            ! Auth::user()->hasCapabilityOnProject($project, 'generate_reports')
         ) {
             if ($json) {
                 return response()->json(
                     [
-                        'error' =>
-                            'No tienes permisos para acceder a los datos de este proyecto.',
+                        'error' => 'No tienes permisos para acceder a los datos de este proyecto.',
                     ],
                     403
                 );
