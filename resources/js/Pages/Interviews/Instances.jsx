@@ -71,7 +71,9 @@ export default function InterviewInstances({ project, form, instances }) {
                                                 </Link>
                                                 <div
                                                     className="btn btn-error btn-xs join-item"
-                                                    onClick={() => handleDelete(instance)}
+                                                    onClick={() =>
+                                                        handleDelete(instance)
+                                                    }
                                                 >
                                                     {t('actions.delete')}
                                                 </div>

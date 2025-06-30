@@ -1,9 +1,9 @@
 import Card from '@/Components/Card';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { useTranslation } from 'react-i18next';
-import { Link, usePage } from '@inertiajs/react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft } from '@fortawesome/pro-regular-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Link, usePage } from '@inertiajs/react';
+import { useTranslation } from 'react-i18next';
 
 export default function EthnobotanyR({ project, forms }) {
     const { t } = useTranslation();
@@ -34,31 +34,54 @@ export default function EthnobotanyR({ project, forms }) {
                         {forms.map((form) => (
                             <Card key={form.id} title={form.name}>
                                 <form
-                                    action={route('data.ethnobotanyR', { project: project.id })}
+                                    action={route('data.ethnobotanyR', {
+                                        project: project.id,
+                                    })}
                                     method="post"
                                     onSubmit={handleSubmit}
                                 >
-                                    <input type="hidden" name="_token" value={csrf_token} />
-                                    <input type="hidden" name="form_id" value={form.id} />
+                                    <input
+                                        type="hidden"
+                                        name="_token"
+                                        value={csrf_token}
+                                    />
+                                    <input
+                                        type="hidden"
+                                        name="form_id"
+                                        value={form.id}
+                                    />
                                     <div className="form-control">
                                         <label className="label">
-                                            <span className="label-text">{t('data.select_usage_field')}</span>
+                                            <span className="label-text">
+                                                {t('data.select_usage_field')}
+                                            </span>
                                         </label>
-                                        <select name="field_id" className="select select-bordered w-full" defaultValue="">
+                                        <select
+                                            name="field_id"
+                                            className="select select-bordered w-full"
+                                            defaultValue=""
+                                        >
                                             <option value="" disabled hidden>
                                                 {t('actions.select')}
                                             </option>
                                             {form.sections.map((section) =>
                                                 section.items.map((item) => (
-                                                    <option key={item.id} value={item.id}>
-                                                        ({section.name}) {item.label}
+                                                    <option
+                                                        key={item.id}
+                                                        value={item.id}
+                                                    >
+                                                        ({section.name}){' '}
+                                                        {item.label}
                                                     </option>
                                                 )),
                                             )}
                                         </select>
                                     </div>
                                     <div className="pt-4">
-                                        <button type="submit" className="btn btn-primary">
+                                        <button
+                                            type="submit"
+                                            className="btn btn-primary"
+                                        >
                                             {t('actions.generate')}
                                         </button>
                                     </div>

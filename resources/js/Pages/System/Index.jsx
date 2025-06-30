@@ -85,7 +85,7 @@ export default function SystemIndex({ users, user_count, project_count }) {
                                             onChange={toggleAll}
                                             checked={
                                                 selectedUsers.length ===
-                                                users.length &&
+                                                    users.length &&
                                                 users.length > 0
                                             }
                                         />
@@ -105,7 +105,9 @@ export default function SystemIndex({ users, user_count, project_count }) {
                                             <input
                                                 type="checkbox"
                                                 className="checkbox"
-                                                onChange={() => toggleUser(user)}
+                                                onChange={() =>
+                                                    toggleUser(user)
+                                                }
                                                 checked={selectedUsers.some(
                                                     (u) => u.id === user.id,
                                                 )}

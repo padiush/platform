@@ -1,11 +1,11 @@
 import Card from '@/Components/Card';
+import DeletionModal from '@/Components/DeletionModal';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { faArrowLeft, faEye } from '@fortawesome/pro-regular-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link } from '@inertiajs/react';
-import { useTranslation } from 'react-i18next';
 import { useRef, useState } from 'react';
-import DeletionModal from '@/Components/DeletionModal';
+import { useTranslation } from 'react-i18next';
 
 export default function CatalogSpeciesIndex({ project, species }) {
     const { t } = useTranslation();
@@ -95,7 +95,9 @@ export default function CatalogSpeciesIndex({ project, species }) {
                                                 </Link>
                                                 <div
                                                     className="btn btn-error btn-xs join-item"
-                                                    onClick={() => handleDelete(sp)}
+                                                    onClick={() =>
+                                                        handleDelete(sp)
+                                                    }
                                                 >
                                                     {t('actions.delete')}
                                                 </div>

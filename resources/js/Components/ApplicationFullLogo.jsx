@@ -19,10 +19,10 @@ export default function ApplicationFullLogo(props) {
                 x2="1571.55005"
                 y2="844.15997"
                 style={{
-                    fill: "none",
-                    strokeLinecap: "round",
-                    strokeLinejoin: "round",
-                    strokeWidth: "5px",
+                    fill: 'none',
+                    strokeLinecap: 'round',
+                    strokeLinejoin: 'round',
+                    strokeWidth: '5px',
                 }}
             />
             <g>
