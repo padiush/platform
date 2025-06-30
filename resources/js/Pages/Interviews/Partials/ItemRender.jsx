@@ -161,7 +161,7 @@ export default function ItemRender({
                     onBlur={submit}
                     error={error}
                 >
-                    <option disabled selected={!value}>
+                    <option selected={!value}>
                         {t('designer.select_placeholder')}
                     </option>
                     {options.map((opt, idx) => (
