@@ -6,8 +6,8 @@ export default function Contact() {
 
     return (
         <PublicLayout title={t('public.contact')}>
-            <div className="py-12 bg-base-300 text-base-content">
-                <h1 className="text-3xl md:text-5xl font-bold text-center">
+            <div className="bg-base-300 text-base-content py-12">
+                <h1 className="text-center text-3xl font-bold md:text-5xl">
                     {t('public.contact')}
                 </h1>
             </div>
@@ -16,35 +16,69 @@ export default function Contact() {
                     <div className="card bg-base-200 text-base-content shadow-xl">
                         <div className="card-body">
                             <div>
-                                <h2 className="text-2xl font-bold">{t('public.doubts')}</h2>
+                                <h2 className="text-2xl font-bold">
+                                    {t('public.doubts')}
+                                </h2>
                                 <p>{t('public.contact_desc')}</p>
                             </div>
                             <form
                                 action={route('public.contact.handle')}
                                 method="post"
                             >
-                                <input type="hidden" name="_token" value={document.head.querySelector('meta[name=csrf-token]').content} />
-                                <input type="hidden" name="_honeypot" className="hidden" />
+                                <input
+                                    type="hidden"
+                                    name="_token"
+                                    value={
+                                        document.head.querySelector(
+                                            'meta[name=csrf-token]',
+                                        ).content
+                                    }
+                                />
+                                <input
+                                    type="hidden"
+                                    name="_honeypot"
+                                    className="hidden"
+                                />
                                 <div className="form-control w-full">
                                     <label className="label">
-                                        <span className="label-text">{t('public.name')}</span>
+                                        <span className="label-text">
+                                            {t('public.name')}
+                                        </span>
                                     </label>
-                                    <input type="text" name="name" className="input input-bordered w-full" />
+                                    <input
+                                        type="text"
+                                        name="name"
+                                        className="input input-bordered w-full"
+                                    />
                                 </div>
                                 <div className="form-control w-full">
                                     <label className="label">
-                                        <span className="label-text">{t('public.email')}</span>
+                                        <span className="label-text">
+                                            {t('public.email')}
+                                        </span>
                                     </label>
-                                    <input type="email" name="email" className="input input-bordered w-full" />
+                                    <input
+                                        type="email"
+                                        name="email"
+                                        className="input input-bordered w-full"
+                                    />
                                 </div>
                                 <div className="form-control w-full">
                                     <label className="label">
-                                        <span className="label-text">{t('public.message')}</span>
+                                        <span className="label-text">
+                                            {t('public.message')}
+                                        </span>
                                     </label>
-                                    <textarea name="message" className="textarea textarea-bordered w-full" />
+                                    <textarea
+                                        name="message"
+                                        className="textarea textarea-bordered w-full"
+                                    />
                                 </div>
                                 <div className="pt-4">
-                                    <button type="submit" className="btn btn-primary">
+                                    <button
+                                        type="submit"
+                                        className="btn btn-primary"
+                                    >
                                         {t('public.send')}
                                     </button>
                                 </div>

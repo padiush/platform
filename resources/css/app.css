@@ -1,13 +1,13 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 @plugin "daisyui" {
     themes: padiushlight --default;
 }
 
 @plugin "daisyui/theme" {
-    name: "padiushlight";
+    name: 'padiushlight';
     default: true;
     prefersdark: false;
-    color-scheme: "light";
+    color-scheme: 'light';
     --color-base-100: oklch(97% 0 0);
     --color-base-200: oklch(92% 0 0);
     --color-base-300: oklch(87% 0 0);
@@ -39,10 +39,10 @@
 }
 
 @plugin "daisyui/theme" {
-    name: "padiushdark";
+    name: 'padiushdark';
     default: false;
     prefersdark: true;
-    color-scheme: "dark";
+    color-scheme: 'dark';
     --color-base-100: oklch(0.45 0.0217 137.84);
     --color-base-200: oklch(0.35 0.0217 137.84);
     --color-base-300: oklch(0.24 0.0217 137.84);

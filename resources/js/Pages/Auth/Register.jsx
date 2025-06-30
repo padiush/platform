@@ -1,5 +1,5 @@
-import AuthLayout from '@/Layouts/AuthLayout';
 import Input from '@/Components/Input';
+import AuthLayout from '@/Layouts/AuthLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { useTranslation } from 'react-i18next';
 
@@ -27,7 +27,10 @@ export default function Register({ bgImage, honeypot }) {
         <AuthLayout title={t('auth.register')} bgUrl={bgImage}>
             <Head title={t('auth.register')} />
             <p className="text-base-content">{t('auth.register_prompt')}</p>
-            <form onSubmit={submit} className="sm:w-2/3 w-full px-4 lg:px-0 mx-auto pt-4">
+            <form
+                onSubmit={submit}
+                className="mx-auto w-full px-4 pt-4 sm:w-2/3 lg:px-0"
+            >
                 <Input
                     name="name"
                     label={t('auth.name')}
@@ -59,7 +62,9 @@ export default function Register({ bgImage, honeypot }) {
                     type="password"
                     label={t('auth.confirm_password')}
                     value={data.password_confirmation}
-                    onChange={(e) => setData('password_confirmation', e.target.value)}
+                    onChange={(e) =>
+                        setData('password_confirmation', e.target.value)
+                    }
                     error={errors.password_confirmation}
                     required
                 />
@@ -90,8 +95,12 @@ export default function Register({ bgImage, honeypot }) {
                         />
                     </div>
                 )}
-                <div className="px-4 pb-2 pt-4">
-                    <button type="submit" className="btn btn-primary" disabled={processing}>
+                <div className="px-4 pt-4 pb-2">
+                    <button
+                        type="submit"
+                        className="btn btn-primary"
+                        disabled={processing}
+                    >
                         {t('auth.register')}
                     </button>
                 </div>
@@ -104,4 +113,3 @@ export default function Register({ bgImage, honeypot }) {
         </AuthLayout>
     );
 }
-

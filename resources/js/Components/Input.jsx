@@ -1,10 +1,10 @@
 export default function Input({
-    className = "",
-    type = "text",
+    className = '',
+    type = 'text',
     disabled = false,
-    label = "",
-    bottomLabel = "",
-    placeholder = "",
+    label = '',
+    bottomLabel = '',
+    placeholder = '',
     required = false,
     leftAddon = null,
     rightAddon = null,
@@ -13,19 +13,19 @@ export default function Input({
     ...props
 }) {
     const inputClassName = className
-        .split(" ")
-        .filter((c) => c.startsWith("input-"))
-        .join(" ");
+        .split(' ')
+        .filter((c) => c.startsWith('input-'))
+        .join(' ');
 
-    className = className.replace(inputClassName, "");
+    className = className.replace(inputClassName, '');
 
-    if (type === "textarea") {
+    if (type === 'textarea') {
         return (
             <div className={`form-control w-full ${className}`}>
                 {label && (
                     <fieldset className="fieldset">
                         <legend className="fieldset-legend">
-                            {label}{" "}
+                            {label}{' '}
                             {required && (
                                 <span
                                     className="text-error tooltip tooltip-bottom select-none"
@@ -33,7 +33,7 @@ export default function Input({
                                 >
                                     *
                                 </span>
-                            )}{" "}
+                            )}{' '}
                             {selective && (
                                 <span
                                     className="text-warning tooltip tooltip-bottom select-none"
@@ -72,7 +72,7 @@ export default function Input({
         );
     }
 
-    if (type === "checkbox") {
+    if (type === 'checkbox') {
         return (
             <>
                 <div className={`justify-left flex flex-row ${className}`}>
@@ -82,7 +82,7 @@ export default function Input({
                             className="checkbox"
                             {...props}
                         />
-                        {label}{" "}
+                        {label}{' '}
                         {required && (
                             <span
                                 className="text-error tooltip tooltip-bottom select-none"
@@ -90,7 +90,7 @@ export default function Input({
                             >
                                 *
                             </span>
-                        )}{" "}
+                        )}{' '}
                         {selective && (
                             <span
                                 className="text-warning tooltip tooltip-bottom select-none"
@@ -112,13 +112,13 @@ export default function Input({
         );
     }
 
-    if (type === "file") {
+    if (type === 'file') {
         return (
             <div className={`form-control w-full ${className}`}>
                 {label && (
                     <fieldset className="fieldset">
                         <legend className="fieldset-legend">
-                            {label}{" "}
+                            {label}{' '}
                             {required && (
                                 <span
                                     className="text-error tooltip tooltip-bottom select-none"
@@ -126,7 +126,7 @@ export default function Input({
                                 >
                                     *
                                 </span>
-                            )}{" "}
+                            )}{' '}
                             {selective && (
                                 <span
                                     className="text-warning tooltip tooltip-bottom select-none"
@@ -163,13 +163,13 @@ export default function Input({
         );
     }
 
-    if (type === "range") {
+    if (type === 'range') {
         return (
             <div className={`form-control w-full ${className}`}>
                 {label && (
                     <fieldset className="fieldset">
                         <legend className="fieldset-legend">
-                            {label}{" "}
+                            {label}{' '}
                             {required && (
                                 <span
                                     className="text-error tooltip tooltip-bottom select-none"
@@ -177,7 +177,7 @@ export default function Input({
                                 >
                                     *
                                 </span>
-                            )}{" "}
+                            )}{' '}
                             {selective && (
                                 <span
                                     className="text-warning tooltip tooltip-bottom select-none"
@@ -228,7 +228,7 @@ export default function Input({
             {label && (
                 <fieldset className="fieldset">
                     <legend className="fieldset-legend">
-                        {label}{" "}
+                        {label}{' '}
                         {required && (
                             <span
                                 className="text-error tooltip tooltip-bottom select-none"
@@ -236,7 +236,7 @@ export default function Input({
                             >
                                 *
                             </span>
-                        )}{" "}
+                        )}{' '}
                         {selective && (
                             <span
                                 className="text-warning tooltip tooltip-bottom select-none"
@@ -248,13 +248,13 @@ export default function Input({
                     </legend>
                 </fieldset>
             )}
-            <div className={`${(leftAddon || rightAddon) && "join"} w-full`}>
+            <div className={`${(leftAddon || rightAddon) && 'join'} w-full`}>
                 {leftAddon && leftAddon}
                 <input
                     type={type}
                     placeholder={placeholder}
                     className={`input text-base-content w-full ${inputClassName} ${
-                        (leftAddon || rightAddon) && "join-item"
+                        (leftAddon || rightAddon) && 'join-item'
                     }`}
                     disabled={disabled}
                     required={required}

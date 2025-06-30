@@ -1,9 +1,9 @@
 export default function Select({
-    className = "",
+    className = '',
     disabled = false,
-    label = "",
-    bottomLabel = "",
-    placeholder = "",
+    label = '',
+    bottomLabel = '',
+    placeholder = '',
     children,
     required = false,
     selective = false,
@@ -11,17 +11,17 @@ export default function Select({
     ...props
 }) {
     const selectClassName = className
-        .split(" ")
-        .filter((c) => c.startsWith("select-"))
-        .join(" ");
+        .split(' ')
+        .filter((c) => c.startsWith('select-'))
+        .join(' ');
 
-    className = className.replace(selectClassName, "");
+    className = className.replace(selectClassName, '');
 
     return (
         <fieldset className={`fieldset w-full ${className}`}>
             {label && (
                 <legend className="fieldset-legend">
-                    {label}{" "}
+                    {label}{' '}
                     {required && (
                         <span
                             className="text-error tooltip tooltip-bottom"
@@ -29,7 +29,7 @@ export default function Select({
                         >
                             *
                         </span>
-                    )}{" "}
+                    )}{' '}
                     {selective && (
                         <span
                             className="text-warning tooltip tooltip-bottom"
