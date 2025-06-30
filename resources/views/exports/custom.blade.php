@@ -12,7 +12,11 @@
                 <td>PADIUSH_INST_{{ $instance->id }}</td>
                 @foreach($items as $item)
                     @foreach($item->answers as $answer)
-                        @if($answer->interview_item_id == $item->id && $answer->interview_instance_id == $instance->id && $answer->repeatable_index == ($i + 1))
+                        @if(
+                            $answer->interview_item_id == $item->id &&
+                            $answer->interview_instance_id == $instance->id &&
+                            $answer->repeatable_index == $i
+                        )
                             <td>{{ $answer->answer }}</td>
                         @endif
                     @endforeach
