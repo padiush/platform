@@ -16,36 +16,36 @@ export default function DeletionModal({
 
     const [confirmation, setConfirmation] = useState('');
 
-    const handleDelete = (e) => {
-        if (confirmation === t('deletion_modal.has_to_write')) {
-            e.preventDefault();
+    const handleDelete = async (e) => {
+        if (confirmation !== t('deletion_modal.has_to_write')) return;
 
+        e.preventDefault();
+
+        try {
             if (useRouter) {
-                if (data) {
-                    router.delete(url, { data });
-                } else {
-                    router.delete(url);
-                }
+                await new Promise((resolve) => {
+                    if (data) {
+                        router.delete(url, { data, onFinish: resolve });
+                    } else {
+                        router.delete(url, { onFinish: resolve });
+                    }
+                });
             } else {
-                fetch(url, {
+                const response = await fetch(url, {
                     method: 'DELETE',
                     headers: requestHeaders(),
-                })
-                    .then((response) => {
-                        if (response.ok) {
-                            modalRef.current.close();
-                        }
-                    })
-                    .catch((error) => {
-                        console.error('Error deleting item:', error);
-                    });
+                });
+
+                if (!response.ok) {
+                    throw new Error('Error deleting item');
+                }
             }
 
             setConfirmation('');
-
             modalRef.current.close();
-
             onDeleted();
+        } catch (error) {
+            console.error('Error deleting item:', error);
         }
     };
 

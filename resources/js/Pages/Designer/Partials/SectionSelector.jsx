@@ -88,7 +88,12 @@ export default function SectionSelector({
                 }),
                 { headers: requestHeaders() },
             );
-            if (res.status === 200) onModified();
+            if (res.status === 200) {
+                onModified();
+                if (selectedSectionId === section.id) {
+                    onClick(null);
+                }
+            }
         } catch (error) {
             console.error('Deletion failed:', error);
         }
