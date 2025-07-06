@@ -3,6 +3,7 @@ import { requestHeaders } from '@/utils/requestHeaders';
 import { faArrowLeft, faEye, faPlus } from '@fortawesome/pro-regular-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link } from '@inertiajs/react';
+import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import ItemAdder from './Partials/ItemAdder';
@@ -43,22 +44,25 @@ export default function Wizard({ project, form }) {
     };
 
     const createSection = async () => {
-        const response = await fetch(
-            route('designer.form.sections.create', {
-                project: project.id,
-                form: form.id,
-            }),
-            {
-                method: 'POST',
-                headers: requestHeaders(),
-                body: JSON.stringify({
-                    name: t('designer.new_section'),
+        try {
+            const res = await axios.post(
+                route('designer.form.sections.create', {
+                    project: project.id,
+                    form: form.id,
                 }),
-            },
-        );
+                {
+                    name: t('designer.new_section'),
+                },
+                {
+                    headers: requestHeaders(),
+                },
+            );
 
-        if (response.ok) {
-            await fetchSections(); // refresh section list
+            if (res.status === 200) {
+                await fetchSections();
+            }
+        } catch (error) {
+            console.error('Section creation failed:', error);
         }
     };
 
