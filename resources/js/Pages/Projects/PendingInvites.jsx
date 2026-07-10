@@ -2,7 +2,7 @@ import Alert from '@/Components/Alert';
 import Card from '@/Components/Card';
 import Input from '@/Components/Input';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { formatRelativeTime } from '@/utils/relativeTime';
+import { formatRelativeTime } from '@/utils/datetime';
 import { faArrowLeft, faTrash } from '@fortawesome/pro-regular-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link, router, useForm } from '@inertiajs/react';

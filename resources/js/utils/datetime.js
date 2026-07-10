@@ -31,3 +31,19 @@ export function formatRelativeTime(iso, locale) {
 
     return '';
 }
+
+/**
+ * Format an ISO timestamp as a localized long date (e.g. "July 10, 2026",
+ * "10 de julio de 2026") in the given locale. Returns '' for a missing or
+ * unparseable value.
+ */
+export function formatLongDate(iso, locale) {
+    if (!iso) return '';
+
+    const target = new Date(iso);
+    if (Number.isNaN(target.getTime())) return '';
+
+    return new Intl.DateTimeFormat(locale, { dateStyle: 'long' }).format(
+        target,
+    );
+}
