@@ -47,3 +47,20 @@ export function formatLongDate(iso, locale) {
         target,
     );
 }
+
+/**
+ * Format an ISO timestamp as a localized date and time (e.g.
+ * "Jul 10, 2026, 2:30 PM", "10 jul 2026, 14:30") in the given locale.
+ * Returns '' for a missing or unparseable value.
+ */
+export function formatDateTime(iso, locale) {
+    if (!iso) return '';
+
+    const target = new Date(iso);
+    if (Number.isNaN(target.getTime())) return '';
+
+    return new Intl.DateTimeFormat(locale, {
+        dateStyle: 'medium',
+        timeStyle: 'short',
+    }).format(target);
+}
