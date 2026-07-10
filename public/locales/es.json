@@ -315,6 +315,8 @@
         "total_projects": "Proyectos totales: {{count}}",
         "users": "Usuarios",
         "user_deleted": "Usuario eliminado",
-        "users_deleted": "Usuarios eliminados"
+        "users_deleted": "Usuarios eliminados",
+        "cannot_delete_self": "No puedes eliminar tu propia cuenta.",
+        "cannot_delete_last_admin": "No puedes eliminar al último administrador del sistema."
     }
 }
