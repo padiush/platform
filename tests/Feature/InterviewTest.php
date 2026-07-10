@@ -2,14 +2,13 @@
 
 namespace Tests\Feature;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Inertia\Testing\AssertableInertia as Assert;
-use Tests\TestCase;
-
-use App\Models\User;
 use App\Models\Project;
 use App\Models\ProjectAccess;
 use App\Models\ProjectCapability;
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Inertia\Testing\AssertableInertia as Assert;
+use Tests\TestCase;
 
 class InterviewTest extends TestCase
 {
@@ -38,7 +37,8 @@ class InterviewTest extends TestCase
         );
     }
 
-    public function test_interview_designer_does_not_show_finished_projects(){
+    public function test_interview_designer_does_not_show_finished_projects()
+    {
         $user = User::factory()->create();
 
         $project = Project::factory()->create([
@@ -71,7 +71,8 @@ class InterviewTest extends TestCase
         );
     }
 
-    public function test_interview_designer_does_not_show_projects_without_manage_forms_capability(){
+    public function test_interview_designer_does_not_show_projects_without_manage_forms_capability()
+    {
         $user = User::factory()->create();
 
         $project = Project::factory()->create(['user_id' => $user->id]);

@@ -2,26 +2,29 @@
 
 namespace Tests\Feature;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Inertia\Testing\AssertableInertia as Assert;
-use Tests\Concerns\InteractsWithProjects;
-use Tests\TestCase;
-
 use App\Models\InstanceAnswer;
 use App\Models\InterviewForm;
 use App\Models\InterviewInstance;
 use App\Models\InterviewItem;
 use App\Models\InterviewSection;
 use App\Models\Project;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Inertia\Testing\AssertableInertia as Assert;
+use Tests\Concerns\InteractsWithProjects;
+use Tests\TestCase;
 
 class InterviewInstancesAuthorizationTest extends TestCase
 {
-    use RefreshDatabase, InteractsWithProjects;
+    use InteractsWithProjects, RefreshDatabase;
 
     private Project $project;
+
     private InterviewForm $form;
+
     private InterviewSection $section;
+
     private InterviewItem $item;
+
     private InterviewInstance $instance;
 
     protected function setUp(): void

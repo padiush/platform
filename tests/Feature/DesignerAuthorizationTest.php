@@ -2,22 +2,24 @@
 
 namespace Tests\Feature;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\Concerns\InteractsWithProjects;
-use Tests\TestCase;
-
 use App\Models\InterviewForm;
 use App\Models\InterviewItem;
 use App\Models\InterviewSection;
 use App\Models\Project;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Concerns\InteractsWithProjects;
+use Tests\TestCase;
 
 class DesignerAuthorizationTest extends TestCase
 {
-    use RefreshDatabase, InteractsWithProjects;
+    use InteractsWithProjects, RefreshDatabase;
 
     private Project $project;
+
     private InterviewForm $form;
+
     private InterviewSection $section;
+
     private InterviewItem $item;
 
     protected function setUp(): void
