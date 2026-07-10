@@ -15,6 +15,16 @@ class ProjectTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        // Freeze time so the controller's Carbon::now()->addDays(7) and the
+        // assertions' now()->addDays(7) can't straddle a second boundary and
+        // differ by a second (a latent flake in the invite tests).
+        $this->freezeTime();
+    }
+
     public function test_projects_index_can_be_rendered()
     {
         $user = User::factory()->create();
