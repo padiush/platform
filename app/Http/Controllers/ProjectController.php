@@ -200,6 +200,11 @@ class ProjectController extends Controller
                 ->with('message_type', 'error');
         }
 
+        // The Access page reads each access's nested capability and user, so
+        // load them here — otherwise project.accesses[i].capability is
+        // undefined on the client and the page crashes on render.
+        $project->load('accesses.capability', 'accesses.user');
+
         $users = $project->users();
         $invites = $project->invites;
 

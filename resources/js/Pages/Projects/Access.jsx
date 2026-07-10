@@ -4,7 +4,7 @@ import Input from '@/Components/Input';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { faArrowLeft, faTrash } from '@fortawesome/pro-regular-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Link, useForm } from '@inertiajs/react';
+import { Link, router, useForm } from '@inertiajs/react';
 import { useTranslation } from 'react-i18next';
 
 export default function Accesses({
@@ -186,54 +186,47 @@ export default function Accesses({
                                                         }
                                                     </td>
                                                     <td>
-                                                        <form
-                                                            method="post"
-                                                            action={route(
-                                                                'projects.accesses.revoke',
-                                                                {
-                                                                    project:
-                                                                        project.id,
-                                                                    user: user.id,
-                                                                },
-                                                            )}
-                                                            onSubmit={(e) => {
+                                                        <button
+                                                            type="button"
+                                                            className="btn btn-error btn-xs"
+                                                            disabled={
+                                                                user.id ===
+                                                                auth.user.id
+                                                            }
+                                                            onClick={() => {
                                                                 if (
-                                                                    !confirm(
+                                                                    confirm(
                                                                         t(
                                                                             'projects.access_form.revoke_confirmation',
                                                                         ),
                                                                     )
                                                                 ) {
-                                                                    e.preventDefault();
+                                                                    router.delete(
+                                                                        route(
+                                                                            'projects.accesses.revoke',
+                                                                            {
+                                                                                project:
+                                                                                    project.id,
+                                                                                user: user.id,
+                                                                            },
+                                                                        ),
+                                                                        {
+                                                                            preserveScroll: true,
+                                                                        },
+                                                                    );
                                                                 }
                                                             }}
                                                         >
-                                                            <input
-                                                                type="hidden"
-                                                                name="_method"
-                                                                value="DELETE"
+                                                            <FontAwesomeIcon
+                                                                icon={faTrash}
+                                                                className="lg:mr-2"
                                                             />
-                                                            <button
-                                                                type="submit"
-                                                                className="btn btn-error btn-xs"
-                                                                disabled={
-                                                                    user.id ===
-                                                                    auth.user.id
-                                                                }
-                                                            >
-                                                                <FontAwesomeIcon
-                                                                    icon={
-                                                                        faTrash
-                                                                    }
-                                                                    className="lg:mr-2"
-                                                                />
-                                                                <span className="hidden lg:inline">
-                                                                    {t(
-                                                                        'actions.revoke',
-                                                                    )}
-                                                                </span>
-                                                            </button>
-                                                        </form>
+                                                            <span className="hidden lg:inline">
+                                                                {t(
+                                                                    'actions.revoke',
+                                                                )}
+                                                            </span>
+                                                        </button>
                                                     </td>
                                                 </tr>
                                             );
