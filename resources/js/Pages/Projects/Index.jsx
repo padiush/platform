@@ -1,17 +1,15 @@
 import Card from '@/Components/Card';
 import DeletionModal from '@/Components/DeletionModal';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { formatRelativeTime } from '@/utils/relativeTime';
+import { formatLongDate, formatRelativeTime } from '@/utils/datetime';
 import { faCircleInfo } from '@fortawesome/pro-regular-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link } from '@inertiajs/react';
-import moment from 'moment/min/moment-with-locales';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export default function Index({ projects, invites }) {
     const { t, i18n } = useTranslation();
-    moment.locale(t('lang'));
 
     const deletionModalRef = useRef();
     const [deletionModalOptions, setDeletionModalOptions] = useState({
@@ -103,9 +101,10 @@ export default function Index({ projects, invites }) {
                                     {project.author && (
                                         <p>
                                             {t('projects.created_on_by', {
-                                                date: moment(
+                                                date: formatLongDate(
                                                     project.created_at,
-                                                ).format('LL'),
+                                                    i18n.language,
+                                                ),
                                                 user: project.user.name,
                                             })}
                                         </p>
