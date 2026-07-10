@@ -4,11 +4,12 @@ namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Models\InterviewForm;
+use App\Models\User;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\InterviewSection>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\InterviewInstance>
  */
-class InterviewSectionFactory extends Factory
+class InterviewInstanceFactory extends Factory
 {
     /**
      * Define the model's default state.
@@ -19,9 +20,7 @@ class InterviewSectionFactory extends Factory
     {
         return [
             'interview_form_id' => InterviewForm::factory(),
-            'name' => fake()->sentence(2),
-            'order' => 1,
-            'repeatable' => false,
+            'user_id' => User::factory(),
         ];
     }
 }

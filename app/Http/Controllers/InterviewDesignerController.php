@@ -10,6 +10,7 @@ use App\Models\InterviewSection;
 use App\Models\InterviewItem;
 use App\Models\Project;
 use App\Models\ProjectAccess;
+use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Str;
@@ -18,12 +19,17 @@ use Inertia\Response;
 
 class InterviewDesignerController extends Controller
 {
+    /**
+     * Aborts the request (403 JSON or redirect with a flash) unless the user
+     * has manage_forms on the project and each given resource belongs to its
+     * parent.
+     */
     private static function verifyAccess(
         Project $project,
         InterviewForm $form = null,
         InterviewSection $section = null,
         InterviewItem $item = null
-    ): RedirectResponse|bool {
+    ): void {
         $access = ProjectAccess::where('user_id', Auth::id())
             ->where('project_id', $project->id)
             ->first();
@@ -32,37 +38,38 @@ class InterviewDesignerController extends Controller
             !$access ||
             !Auth::user()->hasCapabilityOnProject($project, 'manage_forms')
         ) {
-            return redirect()
-                ->route('designer.index')
-                ->with('message', 'designer.no_access')
-                ->with('messsage_type', 'error');
+            self::deny('designer.no_access');
         }
 
         // Check if the form belongs to the project
         if ($form && $form->project_id !== $project->id) {
-            return redirect()
-                ->route('designer.index')
-                ->with('message', 'designer.form_not_found')
-                ->with('messsage_type', 'error');
+            self::deny('designer.form_not_found');
         }
 
         // Check if the section belongs to the form
-        if ($section && $section->interview_form_id !== $project->id) {
-            return redirect()
-                ->route('designer.index')
-                ->with('message', 'designer.section_not_found')
-                ->with('messsage_type', 'error');
+        if ($section && $section->interview_form_id !== $form->id) {
+            self::deny('designer.section_not_found');
         }
 
         // Check if the item belongs to the section
         if ($item && $item->interview_section_id !== $section->id) {
-            return redirect()
-                ->route('designer.index')
-                ->with('message', 'designer.item_not_found')
-                ->with('messsage_type', 'error');
+            self::deny('designer.item_not_found');
         }
+    }
 
-        return true;
+    private static function deny(string $message): never
+    {
+        throw new HttpResponseException(
+            request()->expectsJson()
+                ? response()->json(
+                    ['message' => $message, 'message_type' => 'error'],
+                    403
+                )
+                : redirect()
+                    ->route('designer.index')
+                    ->with('message', $message)
+                    ->with('message_type', 'error')
+        );
     }
 
     public function designer(

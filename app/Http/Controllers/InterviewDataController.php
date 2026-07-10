@@ -11,6 +11,7 @@ use App\Models\InterviewItem;
 use App\Models\Project;
 use App\Models\ProjectAccess;
 use App\Models\User;
+use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -413,44 +414,39 @@ class InterviewDataController extends Controller
         );
     }
 
-    private function checkPermission(Project $project, $json = false)
+    /**
+     * Aborts the request (403 JSON or redirect with a flash) unless the user
+     * has manage_data or generate_reports on the project.
+     */
+    private function checkPermission(Project $project, $json = false): void
     {
         $access = ProjectAccess::where('user_id', Auth::id())
             ->where('project_id', $project->id)
             ->first();
 
         if (! $access) {
-            if ($json) {
-                return response()->json(
-                    ['error' => 'No tienes acceso a este proyecto.'],
-                    403
-                );
-            }
-
-            return redirect()
-                ->route('projects.index')
-                ->with('error', 'No tienes acceso a este proyecto.');
+            $this->deny('No tienes acceso a este proyecto.', $json);
         }
 
         if (
             ! Auth::user()->hasCapabilityOnProject($project, 'manage_data') &&
             ! Auth::user()->hasCapabilityOnProject($project, 'generate_reports')
         ) {
-            if ($json) {
-                return response()->json(
-                    [
-                        'error' => 'No tienes permisos para acceder a los datos de este proyecto.',
-                    ],
-                    403
-                );
-            }
-
-            return redirect()
-                ->route('projects.index')
-                ->with(
-                    'error',
-                    'No tienes permisos para acceder a los datos de este proyecto.'
-                );
+            $this->deny(
+                'No tienes permisos para acceder a los datos de este proyecto.',
+                $json
+            );
         }
+    }
+
+    private function deny(string $message, bool $json): never
+    {
+        throw new HttpResponseException(
+            $json || request()->expectsJson()
+                ? response()->json(['error' => $message], 403)
+                : redirect()
+                    ->route('projects.index')
+                    ->with('error', $message)
+        );
     }
 }

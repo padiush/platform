@@ -13,6 +13,7 @@ use App\Models\User;
 use App\Models\InstanceAnswer;
 use App\Models\InterviewSection;
 use App\Models\InterviewItem;
+use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
@@ -20,12 +21,17 @@ use Inertia\Response;
 
 class InterviewInstancesController extends Controller
 {
+    /**
+     * Aborts the request (403 JSON or redirect with a flash) unless the user
+     * has the given capability on the project and each given resource belongs
+     * to its parent.
+     */
     private static function verifyAccess(
         Project $project,
         InterviewForm $form = null,
         InterviewInstance $instance = null,
         string $permission = 'record_data'
-    ): RedirectResponse|bool {
+    ): void {
         $access = ProjectAccess::where('user_id', Auth::id())
             ->where('project_id', $project->id)
             ->first();
@@ -34,29 +40,33 @@ class InterviewInstancesController extends Controller
             !$access ||
             !Auth::user()->hasCapabilityOnProject($project, $permission)
         ) {
-            return redirect()
-                ->route('interviews.index')
-                ->with('message', 'interviews.no_access')
-                ->with('messsage_type', 'error');
+            self::deny('interviews.no_access');
         }
 
         // Check if the form belongs to the project
         if ($form && $form->project_id !== $project->id) {
-            return redirect()
-                ->route('interviews.index')
-                ->with('message', 'interviews.form_not_found')
-                ->with('messsage_type', 'error');
+            self::deny('interviews.form_not_found');
         }
 
         // Check if the instance belongs to the form
         if ($instance && $instance->interview_form_id !== $form->id) {
-            return redirect()
-                ->route('interviews.index')
-                ->with('message', 'interviews.instance_not_found')
-                ->with('messsage_type', 'error');
+            self::deny('interviews.instance_not_found');
         }
+    }
 
-        return true;
+    private static function deny(string $message): never
+    {
+        throw new HttpResponseException(
+            request()->expectsJson()
+                ? response()->json(
+                    ['message' => $message, 'message_type' => 'error'],
+                    403
+                )
+                : redirect()
+                    ->route('interviews.index')
+                    ->with('message', $message)
+                    ->with('message_type', 'error')
+        );
     }
 
     public function index(): Response|RedirectResponse
@@ -84,7 +94,7 @@ class InterviewInstancesController extends Controller
             return redirect()
                 ->route('projects.index')
                 ->with('message', 'interviews.no_projects_available')
-                ->with('messsage_type', 'error');
+                ->with('message_type', 'error');
         }
 
         return Inertia::render('Interviews/Index', [
@@ -115,7 +125,7 @@ class InterviewInstancesController extends Controller
                 'instance' => $instance->id,
             ])
             ->with('message', 'interviews.instance_created')
-            ->with('messsage_type', 'success');
+            ->with('message_type', 'success');
     }
 
     public function list(InterviewForm $form): Response|RedirectResponse
@@ -157,14 +167,7 @@ class InterviewInstancesController extends Controller
         $form = $instance->form;
         $project = $form->project;
 
-        if (!self::verifyAccess($project, $form, $instance)) {
-            return redirect()
-                ->route('projects.index')
-                ->with(
-                    'error',
-                    'No tienes permisos para tomar entrevistas en este proyecto.'
-                );
-        }
+        self::verifyAccess($project, $form, $instance);
 
         if ($project->finished) {
             return redirect()
@@ -211,7 +214,28 @@ class InterviewInstancesController extends Controller
             'value' => 'nullable',
         ]);
 
+        $form = $instance->form;
+        $project = $form->project;
+
+        self::verifyAccess($project, $form, $instance);
+
+        if ($project->finished) {
+            return response()->json(
+                ['success' => false, 'message' => 'interviews.project_finished'],
+                403
+            );
+        }
+
         $item = InterviewItem::findOrFail($validated['item_id']);
+
+        // The item must belong to the same form as the instance
+        if ($item->section->interview_form_id !== $form->id) {
+            return response()->json(
+                ['success' => false, 'message' => 'interviews.item_not_found'],
+                422
+            );
+        }
+
         $repeatableIndex = $validated['repeatable_index'] ?? null;
 
         // Find or create the answer
