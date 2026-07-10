@@ -2,6 +2,7 @@ import Alert from '@/Components/Alert';
 import Card from '@/Components/Card';
 import Input from '@/Components/Input';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import { formatRelativeTime } from '@/utils/relativeTime';
 import { faArrowLeft, faTrash } from '@fortawesome/pro-regular-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link, router, useForm } from '@inertiajs/react';
@@ -9,7 +10,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export default function PendingInvites({ project, invites, filters }) {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const { data, setData } = useForm({
         search: filters?.search || '',
     });
@@ -119,9 +120,10 @@ export default function PendingInvites({ project, invites, filters }) {
                                                         {invite.capability.name}
                                                     </td>
                                                     <td>
-                                                        {
-                                                            invite.expires_at_human
-                                                        }
+                                                        {formatRelativeTime(
+                                                            invite.expires_at,
+                                                            i18n.language,
+                                                        )}
                                                     </td>
                                                     <td>
                                                         <button

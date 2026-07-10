@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -21,22 +20,10 @@ class ProjectInvite extends Model
     ];
 
     protected $casts = [
+        // Serialized as an ISO string; the invite tables format it into a
+        // relative "expires in…" client-side, in the user's UI language.
         'expires_at' => 'datetime',
     ];
-
-    /**
-     * The invite tables render this as the "Expires" column; without it being
-     * appended, invite.expires_at_human is undefined on the client and the
-     * column shows blank.
-     */
-    protected $appends = ['expires_at_human'];
-
-    protected function expiresAtHuman(): Attribute
-    {
-        return Attribute::make(
-            get: fn () => $this->expires_at?->diffForHumans()
-        );
-    }
 
     public function project()
     {
