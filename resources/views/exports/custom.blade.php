@@ -2,7 +2,7 @@
     <tr>
         <th>Entrevista</th>
         @foreach($items as $item)
-        <th>{{ $item->label }}</th>
+        <th>{{ \App\Support\Spreadsheet::safe($item->label) }}</th>
         @endforeach
     </tr>
     @foreach($instances as $instance)
@@ -17,7 +17,7 @@
                             $answer->interview_instance_id == $instance->id &&
                             $answer->repeatable_index == $i
                         )
-                            <td>{{ $answer->answer }}</td>
+                            <td>{{ \App\Support\Spreadsheet::safe($answer->answer) }}</td>
                         @endif
                     @endforeach
                 @endforeach
@@ -29,7 +29,7 @@
                 @foreach($items as $item)
                     @foreach($item->answers as $answer)
                         @if($answer->interview_item_id == $item->id && $answer->interview_instance_id == $instance->id)
-                            <td>{{ $answer->answer }}</td>
+                            <td>{{ \App\Support\Spreadsheet::safe($answer->answer) }}</td>
                         @endif
                     @endforeach
                 @endforeach
