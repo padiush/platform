@@ -6,33 +6,25 @@ import { useTranslation } from 'react-i18next';
 export function useFlashMessage() {
     const { flash } = usePage().props;
     const [flashShown, setFlashShown] = useState(false);
-    const [toastOpacity, setToastOpacity] = useState(0);
 
     useEffect(() => {
-        if (flash.message) {
-            setToastOpacity(1);
-            setFlashShown(true);
+        if (!flash.message) {
+            return;
         }
+
+        setFlashShown(true);
+
+        const timeout = setTimeout(() => setFlashShown(false), 5000);
+
+        return () => clearTimeout(timeout);
     }, [flash]);
-
-    useEffect(() => {
-        if (flashShown) {
-            setTimeout(() => {
-                setFlashShown(false);
-            }, 5000);
-
-            setTimeout(() => {
-                setToastOpacity(0);
-            }, 3000);
-        }
-    });
 
     const FlashAlert = () => {
         const { t } = useTranslation();
 
         return (
             <div className="toast z-1">
-                <Alert type={flash.type} message={t(flash.message)} />
+                <Alert type={flash.message_type} message={t(flash.message)} />
             </div>
         );
     };
