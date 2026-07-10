@@ -2,17 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-
 use App\Models\InterviewForm;
-use App\Models\InterviewSection;
 use App\Models\InterviewItem;
+use App\Models\InterviewSection;
 use App\Models\Project;
 use App\Models\ProjectAccess;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -26,17 +25,17 @@ class InterviewDesignerController extends Controller
      */
     private static function verifyAccess(
         Project $project,
-        InterviewForm $form = null,
-        InterviewSection $section = null,
-        InterviewItem $item = null
+        ?InterviewForm $form = null,
+        ?InterviewSection $section = null,
+        ?InterviewItem $item = null
     ): void {
         $access = ProjectAccess::where('user_id', Auth::id())
             ->where('project_id', $project->id)
             ->first();
 
         if (
-            !$access ||
-            !Auth::user()->hasCapabilityOnProject($project, 'manage_forms')
+            ! $access ||
+            ! Auth::user()->hasCapabilityOnProject($project, 'manage_forms')
         ) {
             self::deny('designer.no_access');
         }
@@ -179,7 +178,7 @@ class InterviewDesignerController extends Controller
 
         $allSections = $form->sections()->orderBy('order')->get();
 
-        $currentIndex = $allSections->search(fn($s) => $s->id === $section->id);
+        $currentIndex = $allSections->search(fn ($s) => $s->id === $section->id);
 
         if ($currentIndex === false) {
             return response()->json(
@@ -364,7 +363,7 @@ class InterviewDesignerController extends Controller
         $direction = $request->input('direction');
 
         $items = $section->items()->orderBy('order')->get();
-        $index = $items->search(fn($i) => $i->id === $item->id);
+        $index = $items->search(fn ($i) => $i->id === $item->id);
 
         if ($index === false) {
             return response()->json(

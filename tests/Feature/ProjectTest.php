@@ -2,17 +2,14 @@
 
 namespace Tests\Feature;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
-
-use Inertia\Testing\AssertableInertia as Assert;
-use Tests\TestCase;
-
 use App\Models\Project;
-use App\Models\User;
 use App\Models\ProjectAccess;
 use App\Models\ProjectCapability;
 use App\Models\ProjectInvite;
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Inertia\Testing\AssertableInertia as Assert;
+use Tests\TestCase;
 
 class ProjectTest extends TestCase
 {
@@ -64,7 +61,8 @@ class ProjectTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function test_projects_can_be_created(){
+    public function test_projects_can_be_created()
+    {
         $user = User::factory()->create();
 
         $response = $this->actingAs($user)->post(route('projects.create'), [
@@ -145,7 +143,8 @@ class ProjectTest extends TestCase
         $response->assertSessionHas('message_type', 'error');
     }
 
-    public function test_projects_can_be_updated(){
+    public function test_projects_can_be_updated()
+    {
         $user = User::factory()->create();
 
         $project = Project::factory()->create(['user_id' => $user->id]);
@@ -284,7 +283,8 @@ class ProjectTest extends TestCase
         ]);
     }
 
-    public function test_registered_users_can_be_invited(){
+    public function test_registered_users_can_be_invited()
+    {
         $user = User::factory()->create();
         $anotherUser = User::factory()->create(['email' => 'testing@avalontechsv.dev']);
 
@@ -316,7 +316,8 @@ class ProjectTest extends TestCase
         ]);
     }
 
-    public function test_not_registered_users_can_be_invited(){
+    public function test_not_registered_users_can_be_invited()
+    {
         $user = User::factory()->create();
 
         $project = Project::factory()->create(['user_id' => $user->id]);
@@ -347,7 +348,8 @@ class ProjectTest extends TestCase
         ]);
     }
 
-    public function test_users_with_access_cannot_be_invited_again(){
+    public function test_users_with_access_cannot_be_invited_again()
+    {
         $user = User::factory()->create();
         $anotherUser = User::factory()->create();
 
@@ -385,7 +387,8 @@ class ProjectTest extends TestCase
         ]);
     }
 
-    public function test_users_cannot_be_invited_without_access(){
+    public function test_users_cannot_be_invited_without_access()
+    {
         $user = User::factory()->create();
 
         $project = Project::factory()->create();
@@ -406,7 +409,8 @@ class ProjectTest extends TestCase
         ]);
     }
 
-    public function test_users_cannot_be_invited_without_manage_users_capability(){
+    public function test_users_cannot_be_invited_without_manage_users_capability()
+    {
         $user = User::factory()->create();
 
         $project = Project::factory()->create();
@@ -433,7 +437,8 @@ class ProjectTest extends TestCase
         ]);
     }
 
-    public function test_project_invitations_can_be_rendered_with_manage_users_capability(){
+    public function test_project_invitations_can_be_rendered_with_manage_users_capability()
+    {
         $user = User::factory()->create();
 
         $project = Project::factory()->create();
@@ -462,7 +467,8 @@ class ProjectTest extends TestCase
         );
     }
 
-    public function test_project_invitations_cannot_be_rendered_without_access(){
+    public function test_project_invitations_cannot_be_rendered_without_access()
+    {
         $user = User::factory()->create();
 
         $project = Project::factory()->create();
@@ -474,7 +480,8 @@ class ProjectTest extends TestCase
         $response->assertSessionHas('message_type', 'error');
     }
 
-    public function test_project_invitations_cannot_be_rendered_without_manage_users_capability(){
+    public function test_project_invitations_cannot_be_rendered_without_manage_users_capability()
+    {
         $user = User::factory()->create();
 
         $project = Project::factory()->create();
@@ -492,7 +499,8 @@ class ProjectTest extends TestCase
         $response->assertSessionHas('message_type', 'error');
     }
 
-    public function test_invitations_appear_in_projects_index(){
+    public function test_invitations_appear_in_projects_index()
+    {
         $user = User::factory()->create();
         $anotherUser = User::factory()->create();
 
@@ -525,8 +533,9 @@ class ProjectTest extends TestCase
         );
     }
 
-    public function test_invitations_can_be_accepted_by_invited_user(){
-                $user = User::factory()->create();
+    public function test_invitations_can_be_accepted_by_invited_user()
+    {
+        $user = User::factory()->create();
         $anotherUser = User::factory()->create();
 
         $project = Project::factory()->create();
@@ -568,7 +577,8 @@ class ProjectTest extends TestCase
         ]);
     }
 
-    public function test_invitations_can_be_declined_by_invited_user(){
+    public function test_invitations_can_be_declined_by_invited_user()
+    {
         $user = User::factory()->create();
         $anotherUser = User::factory()->create();
 
@@ -611,7 +621,8 @@ class ProjectTest extends TestCase
         ]);
     }
 
-    public function test_invitations_cannot_be_accepted_by_other_users(){
+    public function test_invitations_cannot_be_accepted_by_other_users()
+    {
         $user = User::factory()->create();
         $anotherUser = User::factory()->create();
         $yetAnotherUser = User::factory()->create();
@@ -655,7 +666,8 @@ class ProjectTest extends TestCase
         ]);
     }
 
-    public function test_invitations_cannot_be_declined_by_other_users(){
+    public function test_invitations_cannot_be_declined_by_other_users()
+    {
         $user = User::factory()->create();
         $anotherUser = User::factory()->create();
         $yetAnotherUser = User::factory()->create();
