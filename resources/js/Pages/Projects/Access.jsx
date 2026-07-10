@@ -182,7 +182,7 @@ export default function Accesses({
                                                     <td className="text-wrap">
                                                         {
                                                             access?.capability
-                                                                .name
+                                                                ?.name
                                                         }
                                                     </td>
                                                     <td>
