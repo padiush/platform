@@ -1,5 +1,6 @@
 import DeletionModal from '@/Components/DeletionModal';
 import Input from '@/Components/Input';
+import { requestHeaders } from '@/utils/requestHeaders';
 import {
     faArrowDown,
     faArrowUp,
@@ -78,22 +79,6 @@ export default function SectionSelector({
         }
     };
 
-    const deleteSection = async () => {
-        try {
-            const res = await axios.delete(
-                route('designer.form.sections.delete', {
-                    project: project.id,
-                    form: form.id,
-                    section: section.id,
-                }),
-                { headers: requestHeaders() },
-            );
-            if (res.status === 200) onModified();
-        } catch (error) {
-            console.error('Deletion failed:', error);
-        }
-    };
-
     const handleSectionNameChange = (e) => {
         const newName = e.target.value;
         setSectionName(newName);
@@ -102,14 +87,6 @@ export default function SectionSelector({
             renameSection(section.id, newName);
         }, 400);
     };
-
-    const requestHeaders = () => ({
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-        'X-CSRF-TOKEN': document
-            .querySelector('meta[name="csrf-token"]')
-            .getAttribute('content'),
-    });
 
     useEffect(() => {
         return () => {
