@@ -42,6 +42,11 @@ class InterviewFormController extends Controller
 
         foreach ($accesses as $access) {
             $project = Project::find($access->project_id);
+            if (! $project) {
+                // Access row pointing at a deleted project — skip it.
+                continue;
+            }
+
             $project->load('interviewForms', 'interviewForms.instances');
 
             if (
