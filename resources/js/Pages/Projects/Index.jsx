@@ -1,6 +1,7 @@
 import Card from '@/Components/Card';
 import DeletionModal from '@/Components/DeletionModal';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import { formatRelativeTime } from '@/utils/relativeTime';
 import { faCircleInfo } from '@fortawesome/pro-regular-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link } from '@inertiajs/react';
@@ -9,7 +10,7 @@ import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export default function Index({ projects, invites }) {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     moment.locale(t('lang'));
 
     const deletionModalRef = useRef();
@@ -55,7 +56,10 @@ export default function Index({ projects, invites }) {
                                                 </td>
                                                 <td>{invite.project.name}</td>
                                                 <td>
-                                                    {invite.expires_at_human}
+                                                    {formatRelativeTime(
+                                                        invite.expires_at,
+                                                        i18n.language,
+                                                    )}
                                                 </td>
                                                 <td>
                                                     <div className="btn-group">
