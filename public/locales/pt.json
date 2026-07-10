@@ -12,7 +12,8 @@
         "catalogs": "Catálogos",
         "data": "Dados",
         "design": "Conceção de formulários",
-        "interview": "Passar nas entrevistas"
+        "interview": "Passar nas entrevistas",
+        "system_dashboard": "Painel do sistema"
     },
     "titles": {
         "my_projects": "Meus Projetos"
@@ -169,7 +170,9 @@
         "section_renamed": "A seção foi renomeada.",
         "section_deleted": "A seção foi excluída.",
         "section_reordered": "A seção foi reordenada.",
-        "section_not_found": "A seção não foi encontrada."
+        "section_not_found": "A seção não foi encontrada.",
+        "required": "Campo obrigatório",
+        "save_error": "Ocorreu um erro ao salvar a resposta."
     },
     "interviews": {
         "new_interview": "Nova entrevista",
@@ -314,5 +317,11 @@
         "users_deleted": "Usuários excluídos",
         "cannot_delete_self": "Você não pode excluir sua própria conta.",
         "cannot_delete_last_admin": "Você não pode excluir o último administrador do sistema."
+    },
+    "catalog": {
+        "fetch_error": "Ocorreu um erro ao vincular a espécie."
+    },
+    "validation": {
+        "required": "Este campo é obrigatório."
     }
 }

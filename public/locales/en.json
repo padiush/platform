@@ -170,7 +170,9 @@
         "section_renamed": "The section has been renamed.",
         "section_deleted": "The section has been deleted.",
         "section_reordered": "The section has been reordered.",
-        "section_not_found": "The section was not found."
+        "section_not_found": "The section was not found.",
+        "required": "Required field",
+        "save_error": "An error occurred while saving the answer."
     },
     "interviews": {
         "new_interview": "New interview",
@@ -315,5 +317,11 @@
         "users_deleted": "Users deleted",
         "cannot_delete_self": "You cannot delete your own account.",
         "cannot_delete_last_admin": "You cannot delete the last system administrator."
+    },
+    "catalog": {
+        "fetch_error": "An error occurred while linking the species."
+    },
+    "validation": {
+        "required": "This field is required."
     }
 }

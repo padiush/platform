@@ -170,7 +170,9 @@
         "section_renamed": "Se ha renombrado la sección.",
         "section_deleted": "Se ha eliminado la sección.",
         "section_reordered": "Se ha reordenado la sección.",
-        "section_not_found": "No se ha encontrado la sección."
+        "section_not_found": "No se ha encontrado la sección.",
+        "required": "Campo requerido",
+        "save_error": "Ha ocurrido un error al guardar la respuesta."
     },
     "interviews": {
         "title": "Entrevistas",
@@ -318,5 +320,8 @@
         "users_deleted": "Usuarios eliminados",
         "cannot_delete_self": "No puedes eliminar tu propia cuenta.",
         "cannot_delete_last_admin": "No puedes eliminar al último administrador del sistema."
+    },
+    "validation": {
+        "required": "Este campo es obligatorio."
     }
 }
