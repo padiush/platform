@@ -46,7 +46,6 @@
         "motion": "^12.10.5",
         "react-dom": "^19.1.0",
         "react-i18next": "^15.5.1",
-        "swiper": "^8.4.5",
         "theme-change": "^2.5.0"
     },
     "type": "module"
