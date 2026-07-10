@@ -6,9 +6,9 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Models\Project;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\CatalogSpecies>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\InterviewForm>
  */
-class CatalogSpeciesFactory extends Factory
+class InterviewFormFactory extends Factory
 {
     /**
      * Define the model's default state.
@@ -19,10 +19,9 @@ class CatalogSpeciesFactory extends Factory
     {
         return [
             'project_id' => Project::factory(),
-            'family' => fake()->word(),
-            'genus' => fake()->word(),
-            'name' => fake()->words(2, true),
-            'authority' => fake()->name(),
+            'name' => fake()->sentence(3),
+            'description' => fake()->sentence(),
+            'is_active' => true,
         ];
     }
 }
