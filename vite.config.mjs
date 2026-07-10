@@ -14,4 +14,15 @@ export default defineConfig({
         }),
         react(),
     ],
+    // Set by docker-compose: listen on all interfaces inside the container,
+    // but point the browser's HMR websocket at the published localhost port.
+    server: process.env.VITE_DOCKER
+        ? {
+              host: '0.0.0.0',
+              port: 5173,
+              strictPort: true,
+              hmr: { host: 'localhost' },
+              watch: { usePolling: true },
+          }
+        : undefined,
 });
