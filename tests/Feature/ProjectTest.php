@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 
+use Inertia\Testing\AssertableInertia as Assert;
 use Tests\TestCase;
 
 use App\Models\Project;
@@ -75,7 +76,8 @@ class ProjectTest extends TestCase
         ]);
 
         $response->assertRedirect(route('projects.index'));
-        $response->assertSessionHas('success', 'Se ha creado el proyecto exitosamente.');
+        $response->assertSessionHas('message', 'project.create_success');
+        $response->assertSessionHas('message_type', 'success');
         $this->assertDatabaseHas('projects', [
             'user_id' => $user->id,
             'name' => 'Proyecto de prueba',
@@ -139,7 +141,8 @@ class ProjectTest extends TestCase
         $response = $this->actingAs($user)->get(route('projects.edit', $project));
 
         $response->assertRedirect(route('projects.index'));
-        $response->assertSessionHas('error', 'No cuentas con los permisos necesarios para editar este proyecto.');
+        $response->assertSessionHas('message', 'projects.no_edit_permission');
+        $response->assertSessionHas('message_type', 'error');
     }
 
     public function test_projects_can_be_updated(){
@@ -162,7 +165,8 @@ class ProjectTest extends TestCase
         ]);
 
         $response->assertRedirect(route('projects.index'));
-        $response->assertSessionHas('success', 'Se ha actualizado el proyecto exitosamente.');
+        $response->assertSessionHas('message', 'project.update_success');
+        $response->assertSessionHas('message_type', 'success');
         $this->assertDatabaseHas('projects', [
             'user_id' => $user->id,
             'name' => 'Proyecto de prueba',
@@ -220,7 +224,8 @@ class ProjectTest extends TestCase
         $response = $this->actingAs($user)->get(route('projects.accesses', $project));
 
         $response->assertRedirect(route('projects.index'));
-        $response->assertSessionHas('error', 'No cuentas con los permisos necesarios para editar este proyecto.');
+        $response->assertSessionHas('message', 'projects.no_edit_permission');
+        $response->assertSessionHas('message_type', 'error');
     }
 
     public function test_project_access_cannot_be_revoked_for_own_user()
@@ -238,7 +243,8 @@ class ProjectTest extends TestCase
         $response = $this->actingAs($user)->delete(route('projects.accesses.revoke', ['project' => $project, 'user' => $user]));
 
         $response->assertRedirect(route('projects.accesses', $project));
-        $response->assertSessionHas('error', 'No puedes revocar tu propio acceso a este proyecto.');
+        $response->assertSessionHas('message', 'projects.no_revoke_own_access');
+        $response->assertSessionHas('message_type', 'error');
         $this->assertDatabaseHas('project_accesses', [
             'project_id' => $project->id,
             'user_id' => $user->id,
@@ -269,7 +275,8 @@ class ProjectTest extends TestCase
         $response = $this->actingAs($user)->delete(route('projects.accesses.revoke', ['project' => $project, 'user' => $otherUser]));
 
         $response->assertRedirect(route('projects.accesses', $project));
-        $response->assertSessionHas('success', 'Se ha revocado el acceso al proyecto exitosamente.');
+        $response->assertSessionHas('message', 'projects.revoke_access_success');
+        $response->assertSessionHas('message_type', 'success');
         $this->assertDatabaseMissing('project_accesses', [
             'project_id' => $project->id,
             'user_id' => $otherUser->id,
@@ -296,7 +303,8 @@ class ProjectTest extends TestCase
         ]);
 
         $response->assertRedirect(route('projects.accesses', $project));
-        $response->assertSessionHas('success', 'Se ha enviado la invitación al proyecto exitosamente.');
+        $response->assertSessionHas('message', 'projects.invite_sent');
+        $response->assertSessionHas('message_type', 'success');
         $this->assertDatabaseHas('project_invites', [
             'project_id' => $project->id,
             'inviting_user_id' => $user->id,
@@ -326,7 +334,8 @@ class ProjectTest extends TestCase
         ]);
 
         $response->assertRedirect(route('projects.accesses', $project));
-        $response->assertSessionHas('success', 'Se ha enviado la invitación al proyecto exitosamente.');
+        $response->assertSessionHas('message', 'projects.invite_sent');
+        $response->assertSessionHas('message_type', 'success');
         $this->assertDatabaseHas('project_invites', [
             'project_id' => $project->id,
             'inviting_user_id' => $user->id,
@@ -363,7 +372,8 @@ class ProjectTest extends TestCase
         ]);
 
         $response->assertRedirect(route('projects.accesses', $project));
-        $response->assertSessionHas('error', 'Este usuario ya tiene acceso al proyecto.');
+        $response->assertSessionHas('message', 'projects.user_already_in_project');
+        $response->assertSessionHas('message_type', 'error');
         $this->assertDatabaseMissing('project_invites', [
             'project_id' => $project->id,
             'inviting_user_id' => $user->id,
@@ -387,7 +397,8 @@ class ProjectTest extends TestCase
         ]);
 
         $response->assertRedirect(route('projects.index'));
-        $response->assertSessionHas('error', 'No tienes acceso a este proyecto.');
+        $response->assertSessionHas('message', 'projects.no_edit_permission');
+        $response->assertSessionHas('message_type', 'error');
         $this->assertDatabaseMissing('project_invites', [
             'project_id' => $project->id,
             'inviting_user_id' => $user->id,
@@ -413,7 +424,8 @@ class ProjectTest extends TestCase
         ]);
 
         $response->assertRedirect(route('projects.index'));
-        $response->assertSessionHas('error', 'No cuentas con los permisos necesarios para editar este proyecto.');
+        $response->assertSessionHas('message', 'projects.no_edit_permission');
+        $response->assertSessionHas('message_type', 'error');
         $this->assertDatabaseMissing('project_invites', [
             'project_id' => $project->id,
             'inviting_user_id' => $user->id,
@@ -445,7 +457,9 @@ class ProjectTest extends TestCase
         $response = $this->actingAs($user)->get(route('projects.accesses.invites', $project));
 
         $response->assertStatus(200);
-        $response->assertViewIs('projects.project-invites');
+        $response->assertInertia(
+            fn (Assert $page) => $page->component('Projects/PendingInvites')
+        );
     }
 
     public function test_project_invitations_cannot_be_rendered_without_access(){
@@ -456,7 +470,8 @@ class ProjectTest extends TestCase
         $response = $this->actingAs($user)->get(route('projects.accesses.invites', $project));
 
         $response->assertRedirect(route('projects.index'));
-        $response->assertSessionHas('error', 'No tienes acceso a este proyecto.');
+        $response->assertSessionHas('message', 'projects.no_edit_permission');
+        $response->assertSessionHas('message_type', 'error');
     }
 
     public function test_project_invitations_cannot_be_rendered_without_manage_users_capability(){
@@ -473,7 +488,8 @@ class ProjectTest extends TestCase
         $response = $this->actingAs($user)->get(route('projects.accesses.invites', $project));
 
         $response->assertRedirect(route('projects.index'));
-        $response->assertSessionHas('error', 'No cuentas con los permisos necesarios para editar este proyecto.');
+        $response->assertSessionHas('message', 'projects.no_edit_permission');
+        $response->assertSessionHas('message_type', 'error');
     }
 
     public function test_invitations_appear_in_projects_index(){
@@ -501,8 +517,12 @@ class ProjectTest extends TestCase
         $response = $this->actingAs($anotherUser)->get(route('projects.index'));
 
         $response->assertStatus(200);
-        $response->assertViewIs('projects.index');
-        $response->assertSee($project->name);
+        $response->assertInertia(
+            fn (Assert $page) => $page
+                ->component('Projects/Index')
+                ->has('invites', 1)
+                ->where('invites.0.project.name', $project->name)
+        );
     }
 
     public function test_invitations_can_be_accepted_by_invited_user(){
@@ -530,7 +550,8 @@ class ProjectTest extends TestCase
         $response = $this->actingAs($anotherUser)->get(route('projects.invites.accept', $invite));
 
         $response->assertRedirect(route('projects.index'));
-        $response->assertSessionHas('success', 'Se ha aceptado la invitación a participar en el proyecto.');
+        $response->assertSessionHas('message', 'projects.invite_accepted');
+        $response->assertSessionHas('message_type', 'success');
         $this->assertDatabaseHas('project_accesses', [
             'project_id' => $project->id,
             'user_id' => $anotherUser->id,
@@ -572,7 +593,8 @@ class ProjectTest extends TestCase
         $response = $this->actingAs($anotherUser)->get(route('projects.invites.decline', $invite));
 
         $response->assertRedirect(route('projects.index'));
-        $response->assertSessionHas('success', 'Se ha rechazado la invitación a participar en el proyecto.');
+        $response->assertSessionHas('message', 'projects.invite_declined');
+        $response->assertSessionHas('message_type', 'success');
         $this->assertDatabaseMissing('project_accesses', [
             'project_id' => $project->id,
             'user_id' => $anotherUser->id,
@@ -615,7 +637,8 @@ class ProjectTest extends TestCase
         $response = $this->actingAs($yetAnotherUser)->get(route('projects.invites.accept', $invite));
 
         $response->assertRedirect(route('projects.index'));
-        $response->assertSessionHas('error', 'No puedes aceptar esta invitación.');
+        $response->assertSessionHas('message', 'projects.cannot_accept_another_user_invite');
+        $response->assertSessionHas('message_type', 'error');
         $this->assertDatabaseMissing('project_accesses', [
             'project_id' => $project->id,
             'user_id' => $yetAnotherUser->id,
@@ -658,7 +681,8 @@ class ProjectTest extends TestCase
         $response = $this->actingAs($yetAnotherUser)->get(route('projects.invites.decline', $invite));
 
         $response->assertRedirect(route('projects.index'));
-        $response->assertSessionHas('error', 'No puedes declinar esta invitación.');
+        $response->assertSessionHas('message', 'projects.cannot_decline_another_user_invite');
+        $response->assertSessionHas('message_type', 'error');
         $this->assertDatabaseMissing('project_accesses', [
             'project_id' => $project->id,
             'user_id' => $yetAnotherUser->id,
