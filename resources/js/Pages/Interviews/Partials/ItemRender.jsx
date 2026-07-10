@@ -161,11 +161,11 @@ export default function ItemRender({
                     onBlur={submit}
                     error={error}
                 >
-                    <option selected={!value}>
-                        {t('designer.select_placeholder')}
-                    </option>
+                    <option value="">{t('designer.select_placeholder')}</option>
                     {options.map((opt, idx) => (
-                        <option key={idx}>{opt}</option>
+                        <option key={idx} value={opt}>
+                            {opt}
+                        </option>
                     ))}
                 </Select>
             );
