@@ -1,7 +1,7 @@
 import Input from '@/Components/Input';
 import Select from '@/Components/Select';
 import axios from 'axios';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export default function ItemRender({
@@ -18,20 +18,31 @@ export default function ItemRender({
             (ans.repeatable_index ?? null) === (repeatableIndex ?? null),
     );
 
-    const initialValue =
+    const persistedValue = matchingAnswer?.value ?? null;
+
+    const deriveValue = () =>
         item.type === 'multi'
             ? (() => {
                   try {
-                      const parsed = JSON.parse(matchingAnswer?.value || '[]');
+                      const parsed = JSON.parse(persistedValue || '[]');
                       return Array.isArray(parsed) ? parsed : [];
                   } catch {
                       return [];
                   }
               })()
-            : matchingAnswer?.value || '';
+            : (persistedValue ?? '');
 
-    const [value, setValue] = useState(initialValue);
+    const [value, setValue] = useState(deriveValue);
     const [error, setError] = useState(null);
+
+    // Re-sync the field when the stored answer changes underneath us — e.g.
+    // after a repeatable set is removed, the remaining sets are reindexed and
+    // the page reloads, so this component now maps to a different answer.
+    // Without this, the field would keep showing its old (stale) value.
+    useEffect(() => {
+        setValue(deriveValue());
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [persistedValue, repeatableIndex]);
 
     const submit = async () => {
         try {
