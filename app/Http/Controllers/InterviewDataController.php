@@ -313,13 +313,15 @@ class InterviewDataController extends Controller
 
         foreach ($answers as $answer) {
             $answer->load('species');
+            // May be null when this instance has no category answer for the
+            // selected field; the export treats a null category as no match.
             $answer->category = InstanceAnswer::where(
                 'interview_item_id',
                 $request->field_id
             )
                 ->where('interview_instance_id', $answer->interview_instance_id)
                 ->where('repeatable_index', $answer->repeatable_index)
-                ->first()->answer;
+                ->first()?->answer;
         }
 
         return Excel::download(
