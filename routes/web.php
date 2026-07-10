@@ -177,11 +177,6 @@ Route::middleware(['auth'])->group(function () {
         )->name('catalogs.species.register');
         Route::post('/catalogs/{project}/species/register', 'storeSpecies');
 
-        Route::get('/catalogs/{project}/upload', 'uploadCatalog')->name(
-            'catalogs.upload'
-        );
-        Route::post('/catalogs/{project}/upload', 'handleUploadRequest');
-
         Route::get(
             '/catalogs/{project}/species/{species}',
             'showSpecies'
