@@ -20,8 +20,13 @@ return new class extends Migration {
             );
         }
 
-        // Confirm with the user before proceeding, this will drop and recreate the table
+        // Confirm with the user before proceeding, this will drop and recreate
+        // the table. Only prompt when there is actually data at risk — on a
+        // fresh database (tests, new installs, automated deploys) the table is
+        // empty and prompting would break non-interactive runs.
         if (
+            DB::table('interview_instances')->exists() &&
+            !app()->runningUnitTests() &&
             !confirm(
                 "This migration will drop and recreate the 'interview_instances' table, truncating all data. Are you sure you want to proceed? (yes/no)"
             )

@@ -3,7 +3,7 @@
 namespace Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
+use Inertia\Testing\AssertableInertia as Assert;
 use Tests\TestCase;
 
 use App\Models\User;
@@ -13,6 +13,8 @@ use App\Models\ProjectCapability;
 
 class InterviewTest extends TestCase
 {
+    use RefreshDatabase;
+
     public function test_interview_designer_renders()
     {
         $user = User::factory()->create();
@@ -28,8 +30,12 @@ class InterviewTest extends TestCase
         $response = $this->actingAs($user)->get(route('designer.index'));
 
         $response->assertStatus(200);
-        $response->assertViewIs('interview-forms.index');
-        $response->assertSee($project->name);
+        $response->assertInertia(
+            fn (Assert $page) => $page
+                ->component('Designer/Index')
+                ->has('projects', 1)
+                ->where('projects.0.name', $project->name)
+        );
     }
 
     public function test_interview_designer_does_not_show_finished_projects(){
@@ -57,8 +63,12 @@ class InterviewTest extends TestCase
         $response = $this->actingAs($user)->get(route('designer.index'));
 
         $response->assertStatus(200);
-        $response->assertViewIs('interview-forms.index');
-        $response->assertDontSee($project->name);
+        $response->assertInertia(
+            fn (Assert $page) => $page
+                ->component('Designer/Index')
+                ->has('projects', 1)
+                ->where('projects.0.name', $anotherProject->name)
+        );
     }
 
     public function test_interview_designer_does_not_show_projects_without_manage_forms_capability(){
@@ -82,9 +92,12 @@ class InterviewTest extends TestCase
         $response = $this->actingAs($user)->get(route('designer.index'));
 
         $response->assertStatus(200);
-        $response->assertViewIs('interview-forms.index');
-        $response->assertDontSee($project->name);
-        $response->assertSee($anotherProject->name);
+        $response->assertInertia(
+            fn (Assert $page) => $page
+                ->component('Designer/Index')
+                ->has('projects', 1)
+                ->where('projects.0.name', $anotherProject->name)
+        );
     }
 
     public function test_interview_designer_does_not_render_if_all_projects_are_finished()
