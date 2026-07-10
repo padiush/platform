@@ -2,19 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CatalogSpecies;
+use App\Models\Project;
+use App\Models\ProjectAccess;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Maatwebsite\Excel\Facades\Excel;
-
-use App\Imports\CatalogSpeciesImport;
-
-use App\Models\ProjectAccess;
-use App\Models\Project;
-use App\Models\User;
-use App\Models\CatalogSpecies;
-use App\Models\CatalogSpeciesPhoto;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Redirect;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -57,7 +50,7 @@ class ProjectCatalogController extends Controller
             return redirect()
                 ->route('projects.index')
                 ->with('message', 'catalogs.no_projects')
-                ->with('messsage_type', 'error');
+                ->with('message_type', 'error');
         }
 
         return Inertia::render('Catalog/Index', [
@@ -67,11 +60,11 @@ class ProjectCatalogController extends Controller
 
     public function registerSpecies(Project $project): Response|RedirectResponse
     {
-        if (!Auth::user()->hasCapabilityOnProject($project, 'edit_catalog')) {
+        if (! Auth::user()->hasCapabilityOnProject($project, 'edit_catalog')) {
             return redirect()
                 ->route('catalogs.index')
                 ->with('message', 'catalogs.no_access')
-                ->with('messsage_type', 'error');
+                ->with('message_type', 'error');
         }
 
         return Inertia::render('Catalog/Form', [
@@ -90,11 +83,11 @@ class ProjectCatalogController extends Controller
             'authority' => 'nullable|string',
         ]);
 
-        if (!Auth::user()->hasCapabilityOnProject($project, 'edit_catalog')) {
+        if (! Auth::user()->hasCapabilityOnProject($project, 'edit_catalog')) {
             return redirect()
                 ->route('catalogs.index')
                 ->with('message', 'catalogs.no_access')
-                ->with('messsage_type', 'error');
+                ->with('message_type', 'error');
         }
 
         CatalogSpecies::create([
@@ -108,12 +101,12 @@ class ProjectCatalogController extends Controller
         return redirect()
             ->route('catalogs.index')
             ->with('message', 'catalogs.species_registered')
-            ->with('messsage_type', 'success');
+            ->with('message_type', 'success');
     }
 
     public function show(Project $project): Response|RedirectResponse
     {
-        if (!Auth::user()->hasCapabilityOnProject($project, 'view_catalog')) {
+        if (! Auth::user()->hasCapabilityOnProject($project, 'view_catalog')) {
             return redirect()
                 ->route('catalogs.index')
                 ->with('error', 'No tienes permisos para ver este catálogo.');
@@ -132,7 +125,7 @@ class ProjectCatalogController extends Controller
         }
 
         $species = $speciesQuery->paginate(20)->through(
-            fn($sp) => [
+            fn ($sp) => [
                 'id' => $sp->id,
                 'family' => $sp->family,
                 'genus' => $sp->genus,
@@ -157,10 +150,17 @@ class ProjectCatalogController extends Controller
         Project $project,
         CatalogSpecies $species
     ): Response|RedirectResponse {
-        if (!Auth::user()->hasCapabilityOnProject($project, 'view_catalog')) {
+        if (! Auth::user()->hasCapabilityOnProject($project, 'view_catalog')) {
             return redirect()
                 ->route('catalogs.index')
                 ->with('error', 'No tienes permisos para ver este catálogo.');
+        }
+
+        if ($species->project_id !== $project->id) {
+            return redirect()
+                ->route('catalogs.index')
+                ->with('message', 'catalogs.species_not_found')
+                ->with('message_type', 'error');
         }
 
         return Inertia::render('Catalog/SpeciesShow', [
@@ -182,11 +182,18 @@ class ProjectCatalogController extends Controller
         Project $project,
         CatalogSpecies $species
     ): RedirectResponse {
-        if (!Auth::user()->hasCapabilityOnProject($project, 'edit_catalog')) {
+        if (! Auth::user()->hasCapabilityOnProject($project, 'edit_catalog')) {
             return redirect()
                 ->route('catalogs.index')
                 ->with('message', 'catalogs.no_access')
-                ->with('messsage_type', 'error');
+                ->with('message_type', 'error');
+        }
+
+        if ($species->project_id !== $project->id) {
+            return redirect()
+                ->route('catalogs.index')
+                ->with('message', 'catalogs.species_not_found')
+                ->with('message_type', 'error');
         }
 
         foreach ($species->photos as $photo) {
@@ -203,6 +210,6 @@ class ProjectCatalogController extends Controller
         return redirect()
             ->route('catalogs.show', ['project' => $project->id])
             ->with('message', 'catalogs.species_deleted')
-            ->with('messsage_type', 'success');
+            ->with('message_type', 'success');
     }
 }
