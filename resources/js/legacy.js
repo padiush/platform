@@ -1,11 +1,9 @@
 import Alpine from 'alpinejs';
 import 'animate.css';
 import $ from 'jquery';
-import Swiper from 'swiper';
 import { themeChange } from 'theme-change';
 import './bootstrap';
 
-window.Swiper = Swiper;
 window.Alpine = Alpine;
 window.$ = $;
 Alpine.start();
