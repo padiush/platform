@@ -17,35 +17,42 @@ export default function DeletionModal({
     const [confirmation, setConfirmation] = useState('');
 
     const handleDelete = (e) => {
-        if (confirmation === t('deletion_modal.has_to_write')) {
-            e.preventDefault();
+        if (confirmation !== t('deletion_modal.has_to_write')) {
+            return;
+        }
 
-            if (useRouter) {
-                if (data) {
-                    router.delete(url, { data });
-                } else {
-                    router.delete(url);
-                }
-            } else {
-                fetch(url, {
-                    method: 'DELETE',
-                    headers: requestHeaders(),
-                })
-                    .then((response) => {
-                        if (response.ok) {
-                            modalRef.current.close();
-                        }
-                    })
-                    .catch((error) => {
-                        console.error('Error deleting item:', error);
-                    });
-            }
+        e.preventDefault();
 
+        // Only close the modal and notify the parent (which typically refetches
+        // the list) once the deletion has actually succeeded — otherwise the
+        // refetch can race the in-flight DELETE and still show the deleted item.
+        const finish = () => {
             setConfirmation('');
-
-            modalRef.current.close();
-
+            modalRef.current?.close();
             onDeleted();
+        };
+
+        if (useRouter) {
+            router.delete(url, {
+                ...(data ? { data } : {}),
+                preserveScroll: true,
+                onSuccess: finish,
+            });
+        } else {
+            fetch(url, {
+                method: 'DELETE',
+                headers: requestHeaders(),
+            })
+                .then((response) => {
+                    if (response.ok) {
+                        finish();
+                    } else {
+                        console.error('Error deleting item:', response.status);
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error deleting item:', error);
+                });
         }
     };
 
