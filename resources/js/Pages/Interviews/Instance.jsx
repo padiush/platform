@@ -8,8 +8,6 @@ import SectionRender from './Partials/SectionRender';
 export default function Instance({ project, form, instance, answers }) {
     const { t } = useTranslation();
 
-    console.log('form', form);
-
     return (
         <AuthenticatedLayout
             title={t('interviews.instance.title', { id: instance.id })}
