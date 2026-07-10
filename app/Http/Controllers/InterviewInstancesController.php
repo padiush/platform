@@ -140,7 +140,8 @@ class InterviewInstancesController extends Controller
             ->through(
                 fn ($instance) => [
                     'id' => $instance->id,
-                    'created_at' => $instance->created_at->format('Y-m-d H:i'),
+                    // Sent as ISO; the page formats it in the user's language.
+                    'created_at' => $instance->created_at->toIso8601String(),
                     'user' => [
                         'id' => $instance->user->id,
                         'name' => $instance->user->name,

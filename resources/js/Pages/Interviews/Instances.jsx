@@ -1,6 +1,7 @@
 import Card from '@/Components/Card';
 import DeletionModal from '@/Components/DeletionModal';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import { formatDateTime } from '@/utils/datetime';
 import { faArrowLeft } from '@fortawesome/pro-regular-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link } from '@inertiajs/react';
@@ -8,7 +9,7 @@ import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export default function InterviewInstances({ project, form, instances }) {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const deletionModalRef = useRef();
     const [deletionModalOptions, setDeletionModalOptions] = useState({
         url: '',
@@ -55,7 +56,12 @@ export default function InterviewInstances({ project, form, instances }) {
                             <tbody>
                                 {instances.data.map((instance) => (
                                     <tr key={instance.id}>
-                                        <td>{instance.created_at}</td>
+                                        <td>
+                                            {formatDateTime(
+                                                instance.created_at,
+                                                i18n.language,
+                                            )}
+                                        </td>
                                         <td>{instance.id}</td>
                                         <td>{instance.user.name}</td>
                                         <td>
