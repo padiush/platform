@@ -21,6 +21,15 @@
         <env name="APP_ENV" value="testing"/>
         <env name="BCRYPT_ROUNDS" value="4"/>
         <env name="CACHE_DRIVER" value="array"/>
+        <!--
+            DB_* are set as <server> (not just <env>) with force="true":
+            container/CI environments inject DB_CONNECTION into $_SERVER, which
+            Laravel's env() reads before $_ENV/getenv, so a plain <env> override
+            loses and the suite would run against the real database. Forcing the
+            $_SERVER entries keeps every test on an isolated in-memory sqlite db.
+        -->
+        <server name="DB_CONNECTION" value="sqlite" force="true"/>
+        <server name="DB_DATABASE" value=":memory:" force="true"/>
         <env name="DB_CONNECTION" value="sqlite" force="true"/>
         <env name="DB_DATABASE" value=":memory:" force="true"/>
         <env name="MAIL_MAILER" value="array"/>

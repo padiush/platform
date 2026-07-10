@@ -8,6 +8,7 @@ use App\Models\CatalogSpecies;
 use App\Models\InstanceAnswer;
 use App\Models\InterviewInstance;
 use App\Models\InterviewItem;
+use App\Models\InterviewSection;
 use App\Models\Project;
 use App\Models\ProjectAccess;
 use App\Models\User;
@@ -187,6 +188,25 @@ class InterviewDataController extends Controller
             'repeatable_index' => 'nullable|integer',
         ]);
 
+        // Every referenced resource must belong to this project, otherwise an
+        // authorized user could link across projects by mixing ids.
+        $projectFormIds = $project->interviewForms()->pluck('id');
+        $species = CatalogSpecies::findOrFail($request->catalog_species_id);
+        $instance = InterviewInstance::findOrFail(
+            $request->interview_instance_id
+        );
+        $section = InterviewSection::findOrFail(
+            $request->interview_section_id
+        );
+
+        if (
+            $species->project_id !== $project->id ||
+            ! $projectFormIds->contains($instance->interview_form_id) ||
+            ! $projectFormIds->contains($section->interview_form_id)
+        ) {
+            $this->deny('Recurso no válido para este proyecto.', true);
+        }
+
         $answers = InstanceAnswer::where(
             'interview_instance_id',
             $request->interview_instance_id
@@ -265,6 +285,16 @@ class InterviewDataController extends Controller
             ->first();
 
         $item = InterviewItem::find($request->field_id);
+
+        // The selected form and field must belong to this project.
+        if (
+            ! $form ||
+            ! $item ||
+            $item->section->interview_form_id !== $form->id
+        ) {
+            $this->deny('El campo no pertenece a este proyecto.', false);
+        }
+
         $categories = InstanceAnswer::where(
             'interview_item_id',
             $item->id
@@ -350,9 +380,25 @@ class InterviewDataController extends Controller
             ->where('id', $request->form_id)
             ->first();
 
+        if (! $form) {
+            $this->deny('El formulario no pertenece a este proyecto.', false);
+        }
+
         $selected_fields = json_decode($request->selected_fields);
 
         $items = InterviewItem::whereIn('id', $selected_fields)->get();
+
+        // Every selected field must belong to a section of the selected form.
+        $formSectionIds = $form->sections()->pluck('id');
+
+        foreach ($items as $item) {
+            if (! $formSectionIds->contains($item->interview_section_id)) {
+                $this->deny(
+                    'Los campos seleccionados no pertenecen a este proyecto.',
+                    false
+                );
+            }
+        }
 
         // Check if all items belong to a section with the same repeatable value
         $repeatable = collect();

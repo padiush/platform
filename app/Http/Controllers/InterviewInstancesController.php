@@ -2,20 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-
+use App\Models\InstanceAnswer;
 use App\Models\InterviewForm;
 use App\Models\InterviewInstance;
-use App\Models\ProjectAccess;
-use App\Models\Project;
-use App\Models\User;
-use App\Models\InstanceAnswer;
-use App\Models\InterviewSection;
 use App\Models\InterviewItem;
+use App\Models\InterviewSection;
+use App\Models\Project;
+use App\Models\ProjectAccess;
+use App\Models\User;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -28,8 +27,8 @@ class InterviewInstancesController extends Controller
      */
     private static function verifyAccess(
         Project $project,
-        InterviewForm $form = null,
-        InterviewInstance $instance = null,
+        ?InterviewForm $form = null,
+        ?InterviewInstance $instance = null,
         string $permission = 'record_data'
     ): void {
         $access = ProjectAccess::where('user_id', Auth::id())
@@ -37,8 +36,8 @@ class InterviewInstancesController extends Controller
             ->first();
 
         if (
-            !$access ||
-            !Auth::user()->hasCapabilityOnProject($project, $permission)
+            ! $access ||
+            ! Auth::user()->hasCapabilityOnProject($project, $permission)
         ) {
             self::deny('interviews.no_access');
         }
@@ -79,7 +78,7 @@ class InterviewInstancesController extends Controller
             $project = Project::find($access->project_id);
 
             if (
-                !$project->finished &&
+                ! $project->finished &&
                 Auth::user()->hasCapabilityOnProject($project, 'record_data')
             ) {
                 $project->load(
@@ -139,7 +138,7 @@ class InterviewInstancesController extends Controller
             ->orderByDesc('created_at')
             ->paginate(20)
             ->through(
-                fn($instance) => [
+                fn ($instance) => [
                     'id' => $instance->id,
                     'created_at' => $instance->created_at->format('Y-m-d H:i'),
                     'user' => [
@@ -269,6 +268,12 @@ class InterviewInstancesController extends Controller
         $project = $form->project;
 
         self::verifyAccess($project, $form, $instance);
+
+        // The section must belong to the instance's form, otherwise this
+        // could delete answers from another form's section.
+        if ($section->interview_form_id !== $form->id) {
+            self::deny('interviews.instance_not_found');
+        }
 
         // Delete all answers for the section at that index
         InstanceAnswer::where('interview_instance_id', $instance->id)
