@@ -1,5 +1,7 @@
 import Card from '@/Components/Card';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import { faCircleInfo } from '@fortawesome/pro-regular-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link } from '@inertiajs/react';
 import { useTranslation } from 'react-i18next';
 
@@ -83,7 +85,9 @@ export default function InterviewOverview({ projects }) {
                                     ) : (
                                         <div className="alert shadow-lg">
                                             <div>
-                                                <i className="fa-solid fa-circle-info"></i>
+                                                <FontAwesomeIcon
+                                                    icon={faCircleInfo}
+                                                />
                                                 <span>
                                                     {t(
                                                         'interviews.no_interviews',

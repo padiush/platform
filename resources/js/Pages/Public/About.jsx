@@ -1,5 +1,8 @@
 import ApplicationFullLogo from '@/Components/ApplicationFullLogo';
 import PublicLayout from '@/Layouts/PublicLayout';
+import { faGithub, faLinkedin } from '@fortawesome/free-brands-svg-icons';
+import { faEnvelope } from '@fortawesome/pro-regular-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { usePage } from '@inertiajs/react';
 import { useTranslation } from 'react-i18next';
 
@@ -79,7 +82,7 @@ function Person({ image, name, title, linkedin, github, email }) {
                             className="link link-hover"
                             rel="noreferrer"
                         >
-                            <i className="fa-brands fa-linkedin" />
+                            <FontAwesomeIcon icon={faLinkedin} />
                         </a>
                     )}
                     {github && (
@@ -89,7 +92,7 @@ function Person({ image, name, title, linkedin, github, email }) {
                             className="link link-hover"
                             rel="noreferrer"
                         >
-                            <i className="fa-brands fa-github" />
+                            <FontAwesomeIcon icon={faGithub} />
                         </a>
                     )}
                     {email && (
@@ -99,7 +102,7 @@ function Person({ image, name, title, linkedin, github, email }) {
                             className="link link-hover"
                             rel="noreferrer"
                         >
-                            <i className="fa-solid fa-envelope" />
+                            <FontAwesomeIcon icon={faEnvelope} />
                         </a>
                     )}
                 </div>
