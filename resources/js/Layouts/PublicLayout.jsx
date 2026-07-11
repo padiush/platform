@@ -1,6 +1,8 @@
 import ApplicationFullLogo from '@/Components/ApplicationFullLogo';
 import TranslationToggle from '@/Components/TranslationToggle';
 import { useFlashMessage } from '@/Hooks/useFlashMessage';
+import { faLinkedin } from '@fortawesome/free-brands-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Head, Link, usePage } from '@inertiajs/react';
 import { useTranslation } from 'react-i18next';
 
@@ -156,7 +158,7 @@ export default function PublicLayout({ children, title }) {
                             target="_blank"
                             rel="noopener noreferrer"
                         >
-                            <i className="fa-brands fa-linkedin" />
+                            <FontAwesomeIcon icon={faLinkedin} />
                         </a>
                     </div>
                 </div>
