@@ -1,11 +1,10 @@
 import Card from '@/Components/Card';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Link, usePage } from '@inertiajs/react';
+import { Link } from '@inertiajs/react';
 import { useTranslation } from 'react-i18next';
 
 export default function DataProcessing({ projects }) {
     const { t } = useTranslation();
-    const { auth } = usePage().props;
 
     return (
         <AuthenticatedLayout title={t('data.data_processing')}>
@@ -44,46 +43,66 @@ export default function DataProcessing({ projects }) {
                                         </div>
 
                                         <div className="mt-4 grid w-full grid-cols-1 gap-4 lg:grid-cols-3">
-                                            <Link
-                                                href={route('data.link', {
-                                                    project: project.id,
-                                                })}
-                                                className="btn btn-primary w-full"
-                                                {...(!canManageData
-                                                    ? { disabled: true }
-                                                    : {})}
-                                            >
-                                                {t('data.link_species')}
-                                            </Link>
-
-                                            <Link
-                                                href={route(
-                                                    'data.ethnobotanyR',
-                                                    {
+                                            {canManageData ? (
+                                                <Link
+                                                    href={route('data.link', {
                                                         project: project.id,
-                                                    },
-                                                )}
-                                                className="btn btn-primary w-full"
-                                                {...(!canGenerateReports
-                                                    ? { disabled: true }
-                                                    : {})}
-                                            >
-                                                {t(
-                                                    'data.generate_ethnobotanyr',
-                                                )}
-                                            </Link>
+                                                    })}
+                                                    className="btn btn-primary w-full"
+                                                >
+                                                    {t('data.link_species')}
+                                                </Link>
+                                            ) : (
+                                                <span
+                                                    className="btn btn-primary btn-disabled w-full"
+                                                    aria-disabled="true"
+                                                >
+                                                    {t('data.link_species')}
+                                                </span>
+                                            )}
 
-                                            <Link
-                                                href={route('data.custom', {
-                                                    project: project.id,
-                                                })}
-                                                className="btn btn-primary w-full"
-                                                {...(!canGenerateReports
-                                                    ? { disabled: true }
-                                                    : {})}
-                                            >
-                                                {t('data.custom_export')}
-                                            </Link>
+                                            {canGenerateReports ? (
+                                                <Link
+                                                    href={route(
+                                                        'data.ethnobotanyR',
+                                                        {
+                                                            project: project.id,
+                                                        },
+                                                    )}
+                                                    className="btn btn-primary w-full"
+                                                >
+                                                    {t(
+                                                        'data.generate_ethnobotanyr',
+                                                    )}
+                                                </Link>
+                                            ) : (
+                                                <span
+                                                    className="btn btn-primary btn-disabled w-full"
+                                                    aria-disabled="true"
+                                                >
+                                                    {t(
+                                                        'data.generate_ethnobotanyr',
+                                                    )}
+                                                </span>
+                                            )}
+
+                                            {canGenerateReports ? (
+                                                <Link
+                                                    href={route('data.custom', {
+                                                        project: project.id,
+                                                    })}
+                                                    className="btn btn-primary w-full"
+                                                >
+                                                    {t('data.custom_export')}
+                                                </Link>
+                                            ) : (
+                                                <span
+                                                    className="btn btn-primary btn-disabled w-full"
+                                                    aria-disabled="true"
+                                                >
+                                                    {t('data.custom_export')}
+                                                </span>
+                                            )}
                                         </div>
                                     </Card>
                                 );

@@ -3,7 +3,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Link } from '@inertiajs/react';
 import { useTranslation } from 'react-i18next';
 
-export default function CatalogOverview({ projects, auth }) {
+export default function CatalogOverview({ projects }) {
     const { t } = useTranslation();
 
     return (
@@ -44,30 +44,43 @@ export default function CatalogOverview({ projects, auth }) {
                                     </div>
 
                                     <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
-                                        <Link
-                                            href={route(
-                                                'catalogs.species.register',
-                                                { project: project.id },
-                                            )}
-                                            className="btn btn-primary w-full"
-                                            disabled={!project.can_edit_catalog}
-                                        >
-                                            {t('catalogs.register_species')}
-                                        </Link>
+                                        {project.can_edit_catalog ? (
+                                            <Link
+                                                href={route(
+                                                    'catalogs.species.register',
+                                                    { project: project.id },
+                                                )}
+                                                className="btn btn-primary w-full"
+                                            >
+                                                {t('catalogs.register_species')}
+                                            </Link>
+                                        ) : (
+                                            <span
+                                                className="btn btn-primary btn-disabled w-full"
+                                                aria-disabled="true"
+                                            >
+                                                {t('catalogs.register_species')}
+                                            </span>
+                                        )}
 
-                                        <Link
-                                            href={route('catalogs.show', {
-                                                project: project.id,
-                                            })}
-                                            className="btn btn-primary w-full"
-                                            disabled={
-                                                !project.can_view_catalog ||
-                                                project.catalog_species_count ===
-                                                    0
-                                            }
-                                        >
-                                            {t('catalogs.view_catalog')}
-                                        </Link>
+                                        {project.can_view_catalog &&
+                                        project.catalog_species_count > 0 ? (
+                                            <Link
+                                                href={route('catalogs.show', {
+                                                    project: project.id,
+                                                })}
+                                                className="btn btn-primary w-full"
+                                            >
+                                                {t('catalogs.view_catalog')}
+                                            </Link>
+                                        ) : (
+                                            <span
+                                                className="btn btn-primary btn-disabled w-full"
+                                                aria-disabled="true"
+                                            >
+                                                {t('catalogs.view_catalog')}
+                                            </span>
+                                        )}
                                     </div>
                                 </Card>
                             ))}
