@@ -38,10 +38,15 @@
     --noise: 0;
 }
 
+/*
+  padiushdark is intentionally not auto-applied (prefersdark: false):
+  there is no theme toggle yet, so OS-dark users would be locked into
+  it. Re-enable via data-theme once a toggle exists.
+*/
 @plugin "daisyui/theme" {
     name: 'padiushdark';
     default: false;
-    prefersdark: true;
+    prefersdark: false;
     color-scheme: 'dark';
     --color-base-100: oklch(0.45 0.0217 137.84);
     --color-base-200: oklch(0.35 0.0217 137.84);
