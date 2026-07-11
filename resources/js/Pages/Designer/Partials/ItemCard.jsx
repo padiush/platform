@@ -2,7 +2,6 @@ import Card from '@/Components/Card';
 import DeletionModal from '@/Components/DeletionModal';
 import Input from '@/Components/Input';
 import Select from '@/Components/Select';
-import { requestHeaders } from '@/utils/requestHeaders';
 import {
     faArrowDown,
     faArrowUp,
@@ -10,6 +9,7 @@ import {
     faTrashCan,
 } from '@fortawesome/pro-regular-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import axios from 'axios';
 import { motion } from 'motion/react';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -76,39 +76,38 @@ export default function ItemCard({
     };
 
     const updateItem = async (payload) => {
-        await fetch(
-            route('designer.form.section.items.update', {
-                project: project.id,
-                form: form.id,
-                section,
-                item: item.id,
-            }),
-            {
-                method: 'PUT',
-                headers: requestHeaders(),
-                body: JSON.stringify(payload),
-            },
-        );
-        if (onItemUpdated) onItemUpdated();
+        try {
+            await axios.put(
+                route('designer.form.section.items.update', {
+                    project: project.id,
+                    form: form.id,
+                    section,
+                    item: item.id,
+                }),
+                payload,
+            );
+        } catch (error) {
+            console.error('Failed to update item:', error);
+        } finally {
+            // Refetch even on failure so the card re-syncs to server state.
+            if (onItemUpdated) onItemUpdated();
+        }
     };
 
     const moveItem = async (direction) => {
-        const res = await fetch(
-            route('designer.form.section.items.reorder', {
-                project: project.id,
-                form: form.id,
-                section,
-                item: item.id,
-            }),
-            {
-                method: 'PUT',
-                headers: requestHeaders(),
-                body: JSON.stringify({ direction }),
-            },
-        );
-
-        if (res.ok) {
+        try {
+            await axios.put(
+                route('designer.form.section.items.reorder', {
+                    project: project.id,
+                    form: form.id,
+                    section,
+                    item: item.id,
+                }),
+                { direction },
+            );
             onItemMoved();
+        } catch (error) {
+            console.error('Failed to move item:', error);
         }
     };
 

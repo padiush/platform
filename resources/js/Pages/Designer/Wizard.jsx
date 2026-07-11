@@ -1,5 +1,4 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { requestHeaders } from '@/utils/requestHeaders';
 import { faArrowLeft, faEye, faPlus } from '@fortawesome/pro-regular-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link } from '@inertiajs/react';
@@ -18,16 +17,13 @@ export default function Wizard({ project, form }) {
 
     const fetchSections = async () => {
         try {
-            const response = await fetch(
+            const response = await axios.get(
                 route('designer.form.sections', {
                     project: project.id,
                     form: form.id,
                 }),
             );
-            if (!response.ok) {
-                return;
-            }
-            setSections(await response.json());
+            setSections(response.data);
         } catch (error) {
             console.error('Failed to load sections:', error);
         }
@@ -38,7 +34,7 @@ export default function Wizard({ project, form }) {
             return [];
         }
 
-        const response = await fetch(
+        const response = await axios.get(
             route('designer.form.section.items', {
                 project: project.id,
                 form: form.id,
@@ -47,27 +43,21 @@ export default function Wizard({ project, form }) {
             signal ? { signal } : undefined,
         );
 
-        if (!response.ok) {
-            throw new Error(
-                `Failed to load section items (${response.status})`,
-            );
-        }
-
-        return response.json();
+        return response.data;
     };
 
     const reloadSectionItems = (signal) =>
         fetchSectionItems(signal)
             .then(setSectionItems)
             .catch((error) => {
-                if (error.name !== 'AbortError') {
+                if (!axios.isCancel(error)) {
                     console.error('Failed to load section items:', error);
                 }
             });
 
     const createSection = async () => {
         try {
-            const res = await axios.post(
+            await axios.post(
                 route('designer.form.sections.create', {
                     project: project.id,
                     form: form.id,
@@ -75,14 +65,9 @@ export default function Wizard({ project, form }) {
                 {
                     name: t('designer.new_section'),
                 },
-                {
-                    headers: requestHeaders(),
-                },
             );
 
-            if (res.status === 200) {
-                await fetchSections();
-            }
+            await fetchSections();
         } catch (error) {
             console.error('Section creation failed:', error);
         }

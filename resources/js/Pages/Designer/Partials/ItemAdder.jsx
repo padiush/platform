@@ -1,4 +1,3 @@
-import { requestHeaders } from '@/utils/requestHeaders';
 import {
     faCalendarDay,
     faCircleDot,
@@ -27,9 +26,6 @@ export default function ItemAdder({
             }),
             {
                 type: itemType,
-            },
-            {
-                headers: requestHeaders(),
             },
         );
 
