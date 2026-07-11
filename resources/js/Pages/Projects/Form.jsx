@@ -9,7 +9,7 @@ import { useTranslation } from 'react-i18next';
 export default function ProjectForm({ project = null, auth }) {
     const { t } = useTranslation();
 
-    const { data, setData, post, processing } = useForm({
+    const { data, setData, post, processing, errors } = useForm({
         name: project?.name || '',
         author: project?.author || auth.user.name,
         institution: project?.institution || '',
@@ -54,6 +54,7 @@ export default function ProjectForm({ project = null, auth }) {
                                     onChange={(e) =>
                                         setData('name', e.target.value)
                                     }
+                                    error={errors.name}
                                     required
                                 />
                                 <Input
@@ -63,6 +64,7 @@ export default function ProjectForm({ project = null, auth }) {
                                     onChange={(e) =>
                                         setData('author', e.target.value)
                                     }
+                                    error={errors.author}
                                 />
                                 <Input
                                     name="institution"
@@ -71,6 +73,7 @@ export default function ProjectForm({ project = null, auth }) {
                                     onChange={(e) =>
                                         setData('institution', e.target.value)
                                     }
+                                    error={errors.institution}
                                 />
                                 <Input
                                     name="author_email"
@@ -80,6 +83,7 @@ export default function ProjectForm({ project = null, auth }) {
                                     onChange={(e) =>
                                         setData('author_email', e.target.value)
                                     }
+                                    error={errors.author_email}
                                 />
                                 <Input
                                     name="country"
@@ -88,6 +92,7 @@ export default function ProjectForm({ project = null, auth }) {
                                     onChange={(e) =>
                                         setData('country', e.target.value)
                                     }
+                                    error={errors.country}
                                 />
                             </div>
                             <div className="mt-4 flex gap-2">

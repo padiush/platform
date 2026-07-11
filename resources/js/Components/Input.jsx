@@ -248,13 +248,13 @@ export default function Input({
                     </legend>
                 </fieldset>
             )}
-            <div className={`${(leftAddon || rightAddon) && 'join'} w-full`}>
+            <div className={`${leftAddon || rightAddon ? 'join' : ''} w-full`}>
                 {leftAddon && leftAddon}
                 <input
                     type={type}
                     placeholder={placeholder}
                     className={`input text-base-content w-full ${inputClassName} ${
-                        (leftAddon || rightAddon) && 'join-item'
+                        leftAddon || rightAddon ? 'join-item' : ''
                     }`}
                     disabled={disabled}
                     required={required}
