@@ -15,6 +15,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -31,14 +32,7 @@ class InterviewInstancesController extends Controller
         ?InterviewInstance $instance = null,
         string $permission = 'record_data'
     ): void {
-        $access = ProjectAccess::where('user_id', Auth::id())
-            ->where('project_id', $project->id)
-            ->first();
-
-        if (
-            ! $access ||
-            ! Auth::user()->hasCapabilityOnProject($project, $permission)
-        ) {
+        if (! Auth::user()->can(Str::camel($permission), $project)) {
             self::deny('interviews.no_access');
         }
 

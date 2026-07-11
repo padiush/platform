@@ -97,19 +97,12 @@ class ProjectController extends Controller
 
     public function edit(Project $project): Response|RedirectResponse
     {
-        $access = Auth::user()->hasAccessToProject($project);
-
-        if (! $access) {
-            return redirect()
-                ->route('projects.index')
-                ->with('error', 'No tienes acceso a este proyecto.');
+        if (! Auth::user()->can('view', $project)) {
+            return $this->denyNoAccess();
         }
 
-        if (! $access->capability->manage_project) {
-            return redirect()
-                ->route('projects.index')
-                ->with('message', 'projects.no_edit_permission')
-                ->with('message_type', 'error');
+        if (! Auth::user()->can('manageProject', $project)) {
+            return $this->denyNoPermission();
         }
 
         return Inertia::render('Projects/Form', [
@@ -119,19 +112,12 @@ class ProjectController extends Controller
 
     public function update(Request $request, Project $project)
     {
-        $access = Auth::user()->hasAccessToProject($project);
-
-        if (! $access) {
-            return redirect()
-                ->route('projects.index')
-                ->with('error', 'No tienes acceso a este proyecto.');
+        if (! Auth::user()->can('view', $project)) {
+            return $this->denyNoAccess();
         }
 
-        if (! $access->capability->manage_project) {
-            return redirect()
-                ->route('projects.index')
-                ->with('message', 'projects.no_edit_permission')
-                ->with('message_type', 'error');
+        if (! Auth::user()->can('manageProject', $project)) {
+            return $this->denyNoPermission();
         }
 
         $request->validate([
@@ -158,20 +144,8 @@ class ProjectController extends Controller
 
     public function destroy(Project $project): RedirectResponse
     {
-        $access = Auth::user()->hasAccessToProject($project);
-
-        if (! $access) {
-            return redirect()
-                ->route('projects.index')
-                ->with('message', 'projects.no_edit_permission')
-                ->with('message_type', 'error');
-        }
-
-        if (! $access->capability->manage_project) {
-            return redirect()
-                ->route('projects.index')
-                ->with('message', 'projects.no_edit_permission')
-                ->with('message_type', 'error');
+        if (! Auth::user()->can('manageProject', $project)) {
+            return $this->denyNoPermission();
         }
 
         $project->delete();
@@ -184,21 +158,15 @@ class ProjectController extends Controller
 
     public function manageAccess(Project $project): RedirectResponse|Response
     {
-        $access = Auth::user()->hasAccessToProject($project);
+        if (! Auth::user()->can('view', $project)) {
+            return $this->denyNoAccess();
+        }
+
+        if (! Auth::user()->can('manageUsers', $project)) {
+            return $this->denyNoPermission();
+        }
+
         $capabilities = ProjectCapability::all();
-
-        if (! $access) {
-            return redirect()
-                ->route('projects.index')
-                ->with('error', 'No tienes acceso a este proyecto.');
-        }
-
-        if (! $access->capability->manage_users) {
-            return redirect()
-                ->route('projects.index')
-                ->with('message', 'projects.no_edit_permission')
-                ->with('message_type', 'error');
-        }
 
         // The Access page reads each access's nested capability and user, so
         // load them here — otherwise project.accesses[i].capability is
@@ -218,19 +186,12 @@ class ProjectController extends Controller
 
     public function revokeAccess(Project $project, User $user)
     {
-        $access = Auth::user()->hasAccessToProject($project);
-
-        if (! $access) {
-            return redirect()
-                ->route('projects.index')
-                ->with('error', 'No tienes acceso a este proyecto.');
+        if (! Auth::user()->can('view', $project)) {
+            return $this->denyNoAccess();
         }
 
-        if (! $access->capability->manage_users) {
-            return redirect()
-                ->route('projects.index')
-                ->with('message', 'projects.no_edit_permission')
-                ->with('message_type', 'error');
+        if (! Auth::user()->can('manageUsers', $project)) {
+            return $this->denyNoPermission();
         }
 
         if ($user->id == Auth::user()->id) {
@@ -256,20 +217,8 @@ class ProjectController extends Controller
             'capability_id' => 'required|numeric|exists:project_capabilities,id',
         ]);
 
-        $access = Auth::user()->hasAccessToProject($project);
-
-        if (! $access) {
-            return redirect()
-                ->route('projects.index')
-                ->with('message', 'projects.no_edit_permission')
-                ->with('message_type', 'error');
-        }
-
-        if (! $access->capability->manage_users) {
-            return redirect()
-                ->route('projects.index')
-                ->with('message', 'projects.no_edit_permission')
-                ->with('message_type', 'error');
+        if (! Auth::user()->can('manageUsers', $project)) {
+            return $this->denyNoPermission();
         }
 
         $existingInvite = ProjectInvite::where('invited_email', $request->email)
@@ -340,13 +289,8 @@ class ProjectController extends Controller
 
     public function projectInvites(Project $project, Request $request)
     {
-        $access = Auth::user()->hasAccessToProject($project);
-
-        if (! $access || ! $access->capability->manage_users) {
-            return redirect()
-                ->route('projects.index')
-                ->with('message', 'projects.no_edit_permission')
-                ->with('message_type', 'error');
+        if (! Auth::user()->can('manageUsers', $project)) {
+            return $this->denyNoPermission();
         }
 
         $query = $project->invites()->with(['capability', 'invitedUser']);
@@ -373,20 +317,8 @@ class ProjectController extends Controller
 
     public function revokeInvite(Project $project, ProjectInvite $invite)
     {
-        $access = Auth::user()->hasAccessToProject($project);
-
-        if (! $access) {
-            return redirect()
-                ->route('projects.index')
-                ->with('message', 'projects.no_edit_permission')
-                ->with('message_type', 'error');
-        }
-
-        if (! $access->capability->manage_users) {
-            return redirect()
-                ->route('projects.index')
-                ->with('message', 'projects.no_edit_permission')
-                ->with('message_type', 'error');
+        if (! Auth::user()->can('manageUsers', $project)) {
+            return $this->denyNoPermission();
         }
 
         $invite->delete();
@@ -462,5 +394,20 @@ class ProjectController extends Controller
             ->route('projects.index')
             ->with('message', 'projects.invite_accepted')
             ->with('message_type', 'success');
+    }
+
+    private function denyNoAccess(): RedirectResponse
+    {
+        return redirect()
+            ->route('projects.index')
+            ->with('error', 'No tienes acceso a este proyecto.');
+    }
+
+    private function denyNoPermission(): RedirectResponse
+    {
+        return redirect()
+            ->route('projects.index')
+            ->with('message', 'projects.no_edit_permission')
+            ->with('message_type', 'error');
     }
 }

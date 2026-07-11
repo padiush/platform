@@ -468,17 +468,15 @@ class InterviewDataController extends Controller
      */
     private function checkPermission(Project $project, $json = false): void
     {
-        $access = ProjectAccess::where('user_id', Auth::id())
-            ->where('project_id', $project->id)
-            ->first();
+        $user = Auth::user();
 
-        if (! $access) {
+        if (! $user->can('view', $project)) {
             $this->deny('No tienes acceso a este proyecto.', $json);
         }
 
         if (
-            ! Auth::user()->hasCapabilityOnProject($project, 'manage_data') &&
-            ! Auth::user()->hasCapabilityOnProject($project, 'generate_reports')
+            ! $user->can('manageData', $project) &&
+            ! $user->can('generateReports', $project)
         ) {
             $this->deny(
                 'No tienes permisos para acceder a los datos de este proyecto.',

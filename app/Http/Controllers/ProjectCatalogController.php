@@ -60,7 +60,7 @@ class ProjectCatalogController extends Controller
 
     public function registerSpecies(Project $project): Response|RedirectResponse
     {
-        if (! Auth::user()->hasCapabilityOnProject($project, 'edit_catalog')) {
+        if (! Auth::user()->can('editCatalog', $project)) {
             return redirect()
                 ->route('catalogs.index')
                 ->with('message', 'catalogs.no_access')
@@ -83,7 +83,7 @@ class ProjectCatalogController extends Controller
             'authority' => 'nullable|string',
         ]);
 
-        if (! Auth::user()->hasCapabilityOnProject($project, 'edit_catalog')) {
+        if (! Auth::user()->can('editCatalog', $project)) {
             return redirect()
                 ->route('catalogs.index')
                 ->with('message', 'catalogs.no_access')
@@ -106,7 +106,7 @@ class ProjectCatalogController extends Controller
 
     public function show(Project $project): Response|RedirectResponse
     {
-        if (! Auth::user()->hasCapabilityOnProject($project, 'view_catalog')) {
+        if (! Auth::user()->can('viewCatalog', $project)) {
             return redirect()
                 ->route('catalogs.index')
                 ->with('error', 'No tienes permisos para ver este catálogo.');
@@ -150,7 +150,7 @@ class ProjectCatalogController extends Controller
         Project $project,
         CatalogSpecies $species
     ): Response|RedirectResponse {
-        if (! Auth::user()->hasCapabilityOnProject($project, 'view_catalog')) {
+        if (! Auth::user()->can('viewCatalog', $project)) {
             return redirect()
                 ->route('catalogs.index')
                 ->with('error', 'No tienes permisos para ver este catálogo.');
@@ -182,7 +182,7 @@ class ProjectCatalogController extends Controller
         Project $project,
         CatalogSpecies $species
     ): RedirectResponse {
-        if (! Auth::user()->hasCapabilityOnProject($project, 'edit_catalog')) {
+        if (! Auth::user()->can('editCatalog', $project)) {
             return redirect()
                 ->route('catalogs.index')
                 ->with('message', 'catalogs.no_access')

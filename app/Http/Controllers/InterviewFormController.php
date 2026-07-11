@@ -73,18 +73,8 @@ class InterviewFormController extends Controller
 
     public function create(Project $project): RedirectResponse|Response
     {
-        $access = ProjectAccess::where('user_id', Auth::id())
-            ->where('project_id', $project->id)
-            ->first();
-
-        if (
-            ! $access ||
-            ! Auth::user()->hasCapabilityOnProject($project, 'manage_forms')
-        ) {
-            return redirect()
-                ->route('projects.index')
-                ->with('message', 'designer.no_access')
-                ->with('message_type', 'error');
+        if (! Auth::user()->can('manageForms', $project)) {
+            return $this->denyNoAccess();
         }
 
         return Inertia::render('Designer/Form', [
@@ -99,18 +89,8 @@ class InterviewFormController extends Controller
             'description' => 'nullable|string',
         ]);
 
-        $access = ProjectAccess::where('user_id', Auth::id())
-            ->where('project_id', $project->id)
-            ->first();
-
-        if (
-            ! $access ||
-            ! Auth::user()->hasCapabilityOnProject($project, 'manage_forms')
-        ) {
-            return redirect()
-                ->route('projects.index')
-                ->with('message', 'designer.no_access')
-                ->with('message_type', 'error');
+        if (! Auth::user()->can('manageForms', $project)) {
+            return $this->denyNoAccess();
         }
 
         // Bind the form to the authorized route project, never to a
@@ -140,18 +120,8 @@ class InterviewFormController extends Controller
             'description' => 'nullable|string',
         ]);
 
-        $access = ProjectAccess::where('user_id', Auth::id())
-            ->where('project_id', $project->id)
-            ->first();
-
-        if (
-            ! $access ||
-            ! Auth::user()->hasCapabilityOnProject($project, 'manage_forms')
-        ) {
-            return redirect()
-                ->route('projects.index')
-                ->with('message', 'designer.no_access')
-                ->with('message_type', 'error');
+        if (! Auth::user()->can('manageForms', $project)) {
+            return $this->denyNoAccess();
         }
 
         self::ensureFormBelongsToProject($project, $form);
@@ -171,18 +141,8 @@ class InterviewFormController extends Controller
         Project $project,
         InterviewForm $form
     ): RedirectResponse {
-        $access = ProjectAccess::where('user_id', Auth::id())
-            ->where('project_id', $project->id)
-            ->first();
-
-        if (
-            ! $access ||
-            ! Auth::user()->hasCapabilityOnProject($project, 'manage_forms')
-        ) {
-            return redirect()
-                ->route('projects.index')
-                ->with('message', 'designer.no_access')
-                ->with('message_type', 'error');
+        if (! Auth::user()->can('manageForms', $project)) {
+            return $this->denyNoAccess();
         }
 
         self::ensureFormBelongsToProject($project, $form);
@@ -215,18 +175,8 @@ class InterviewFormController extends Controller
         Project $project,
         InterviewForm $form
     ): RedirectResponse {
-        $access = ProjectAccess::where('user_id', Auth::id())
-            ->where('project_id', $project->id)
-            ->first();
-
-        if (
-            ! $access ||
-            ! Auth::user()->hasCapabilityOnProject($project, 'manage_forms')
-        ) {
-            return redirect()
-                ->route('projects.index')
-                ->with('message', 'designer.no_access')
-                ->with('message_type', 'error');
+        if (! Auth::user()->can('manageForms', $project)) {
+            return $this->denyNoAccess();
         }
 
         self::ensureFormBelongsToProject($project, $form);
@@ -244,18 +194,8 @@ class InterviewFormController extends Controller
         Project $project,
         InterviewForm $form
     ): RedirectResponse|Response {
-        $access = ProjectAccess::where('user_id', Auth::id())
-            ->where('project_id', $project->id)
-            ->first();
-
-        if (
-            ! $access ||
-            ! Auth::user()->hasCapabilityOnProject($project, 'manage_forms')
-        ) {
-            return redirect()
-                ->route('projects.index')
-                ->with('message', 'designer.no_access')
-                ->with('message_type', 'error');
+        if (! Auth::user()->can('manageForms', $project)) {
+            return $this->denyNoAccess();
         }
 
         self::ensureFormBelongsToProject($project, $form);
@@ -264,5 +204,13 @@ class InterviewFormController extends Controller
             'project' => $project,
             'form' => $form,
         ]);
+    }
+
+    private function denyNoAccess(): RedirectResponse
+    {
+        return redirect()
+            ->route('projects.index')
+            ->with('message', 'designer.no_access')
+            ->with('message_type', 'error');
     }
 }
