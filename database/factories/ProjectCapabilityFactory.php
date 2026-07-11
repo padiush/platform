@@ -2,10 +2,11 @@
 
 namespace Database\Factories;
 
+use App\Models\ProjectCapability;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\ProjectCapability>
+ * @extends Factory<ProjectCapability>
  */
 class ProjectCapabilityFactory extends Factory
 {

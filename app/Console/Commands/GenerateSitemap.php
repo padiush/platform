@@ -3,8 +3,8 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
-use Spatie\Sitemap\SitemapGenerator;
 use Illuminate\Support\Facades\Log;
+use Spatie\Sitemap\SitemapGenerator;
 
 class GenerateSitemap extends Command
 {

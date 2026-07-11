@@ -2,16 +2,15 @@
 
 namespace App\Notifications;
 
+use App\Models\ProjectInvite;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
-
-use App\Models\ProjectInvite;
 
 class InviteNotification extends Notification
 {
     use Queueable;
+
     protected ProjectInvite $invite;
 
     /**
@@ -39,13 +38,13 @@ class InviteNotification extends Notification
      * Get the mail representation of the notification.
      *
      * @param  mixed  $notifiable
-     * @return \Illuminate\Notifications\Messages\MailMessage
+     * @return MailMessage
      */
     public function toMail($notifiable)
     {
         $project_invite = $this->invite;
 
-        if($project_invite->invitedUser){
+        if ($project_invite->invitedUser) {
             return (new MailMessage)->subject('Has recibido una invitación a un proyecto en Padiush')->view('email.invite', [
                 'project' => $project_invite->project,
                 'inviting_user' => $project_invite->invitingUser,
@@ -70,7 +69,7 @@ class InviteNotification extends Notification
     public function toArray($notifiable)
     {
         $project_invite = $this->invite;
-        if($project_invite->invitedUser){
+        if ($project_invite->invitedUser) {
             return [
                 'project' => $project_invite->project,
                 'inviting_user' => $project_invite->invitingUser,

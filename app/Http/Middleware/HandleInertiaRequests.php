@@ -4,8 +4,7 @@ namespace App\Http\Middleware;
 
 use Illuminate\Http\Request;
 use Inertia\Middleware;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Auth;
+use Spatie\Honeypot\Honeypot;
 use Tighten\Ziggy\Ziggy;
 
 /**
@@ -23,7 +22,7 @@ class HandleInertiaRequests extends Middleware
     /**
      * Determine the current asset version.
      */
-    public function version(Request $request): string|null
+    public function version(Request $request): ?string
     {
         return parent::version($request);
     }
@@ -43,9 +42,9 @@ class HandleInertiaRequests extends Middleware
                     ? $request->user()->projects->count()
                     : [],
             ],
-            'honeypot' => new \Spatie\Honeypot\Honeypot(config('honeypot')),
-            'ziggy' => fn() => [
-                ...(new Ziggy())->toArray(),
+            'honeypot' => new Honeypot(config('honeypot')),
+            'ziggy' => fn () => [
+                ...(new Ziggy)->toArray(),
                 'location' => $request->url(),
             ],
             'flash' => [

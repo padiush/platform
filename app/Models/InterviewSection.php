@@ -5,9 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-use App\Models\InterviewForm;
-use App\Models\InterviewItem;
-
 class InterviewSection extends Model
 {
     use HasFactory;

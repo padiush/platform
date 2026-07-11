@@ -2,11 +2,12 @@
 
 namespace Database\Factories;
 
+use App\Models\InterviewItem;
 use App\Models\InterviewSection;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\InterviewItem>
+ * @extends Factory<InterviewItem>
  */
 class InterviewItemFactory extends Factory
 {

@@ -2,17 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Notifications\ContactFormNotification;
 use Artesaos\SEOTools\Facades\SEOTools;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
-use App\Notifications\ContactFormNotification;
-
 class PublicPageController extends Controller
 {
-    public function index(){
+    public function index()
+    {
         SEOTools::setTitle('Padiush | Uniendo Saberes: Sistematizando el Conocimiento Ancestral');
         SEOTools::setDescription('Simplifica la recolección y el análisis de tus datos con nuestra plataforma intuitiva y personalizable.');
         SEOTools::opengraph()->setUrl(config('app.url'));
@@ -31,7 +31,8 @@ class PublicPageController extends Controller
         ]);
     }
 
-    public function about(){
+    public function about()
+    {
         SEOTools::setTitle('Sobre nosotros');
         SEOTools::setDescription('Conoce más sobre el equipo detrás de Padiush.');
         SEOTools::opengraph()->setUrl(config('app.url').'/acerca');
@@ -46,7 +47,8 @@ class PublicPageController extends Controller
         ]);
     }
 
-    public function contact(){
+    public function contact()
+    {
         SEOTools::setTitle('Contacto');
         SEOTools::setDescription('Contáctanos para cualquier duda o sugerencia.');
         SEOTools::opengraph()->setUrl(config('app.url').'/contacto');
@@ -55,11 +57,12 @@ class PublicPageController extends Controller
         return Inertia::render('Public/Contact');
     }
 
-    public function handleContactRequest(Request $request){
+    public function handleContactRequest(Request $request)
+    {
         $request->validate([
             'name' => 'required|string',
             'email' => 'required|email',
-            'message' => 'required|string'
+            'message' => 'required|string',
         ]);
 
         Notification::route('mail', config('padiush.contact_email'))->notify(new ContactFormNotification($request->name, $request->email, $request->message));
@@ -67,7 +70,8 @@ class PublicPageController extends Controller
         return redirect()->route('public.contact')->with('success', 'Tu mensaje ha sido enviado. ¡Gracias por contactarnos!');
     }
 
-    public function privacy(){
+    public function privacy()
+    {
         SEOTools::setTitle('Política de Privacidad');
         SEOTools::setDescription('Conoce la Política de Privacidad de Padiush. Esta Política te explicará cómo recopilamos, usamos, protegemos y gestionamos tus datos.');
         SEOTools::opengraph()->setUrl(config('app.url').'/privacidad');
@@ -78,7 +82,8 @@ class PublicPageController extends Controller
         ]);
     }
 
-    public function terms(){
+    public function terms()
+    {
         SEOTools::setTitle('Términos y Condiciones');
         SEOTools::setDescription('Conoce los Términos y Condiciones de Padiush. Estos Términos te explicarán cómo puedes usar nuestra plataforma.');
         SEOTools::opengraph()->setUrl(config('app.url').'/terminos');

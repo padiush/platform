@@ -5,10 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-use App\Models\Project;
-use App\Models\InstanceAnswer;
-use App\Models\CatalogSpeciesPhoto;
-
 class CatalogSpecies extends Model
 {
     use HasFactory;
@@ -18,18 +14,21 @@ class CatalogSpecies extends Model
         'family',
         'genus',
         'name',
-        'authority'
+        'authority',
     ];
 
-    public function project(){
+    public function project()
+    {
         return $this->belongsTo(Project::class);
     }
 
-    public function answers(){
+    public function answers()
+    {
         return $this->hasMany(InstanceAnswer::class);
     }
 
-    public function photos(){
+    public function photos()
+    {
         return $this->hasMany(CatalogSpeciesPhoto::class);
     }
 }
