@@ -45,5 +45,7 @@ jobs:
       run: npm run lint
     - name: Check formatting (Prettier)
       run: npm run format:check
+    - name: Run tests (Vitest)
+      run: npm test
     - name: Build (Vite)
       run: npm run build
