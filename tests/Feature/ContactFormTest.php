@@ -37,7 +37,8 @@ class ContactFormTest extends TestCase
         ] + $this->honeypotFields());
 
         $response->assertRedirect(route('public.contact'));
-        $response->assertSessionHas('success');
+        $response->assertSessionHas('message', 'public.contact_success');
+        $response->assertSessionHas('message_type', 'success');
 
         Notification::assertSentOnDemand(
             ContactFormNotification::class,

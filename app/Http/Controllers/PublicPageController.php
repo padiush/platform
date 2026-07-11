@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
+use Spatie\Honeypot\Honeypot;
 
 class PublicPageController extends Controller
 {
@@ -47,14 +48,16 @@ class PublicPageController extends Controller
         ]);
     }
 
-    public function contact()
+    public function contact(Honeypot $honeypot)
     {
         SEOTools::setTitle('Contacto');
         SEOTools::setDescription('Contáctanos para cualquier duda o sugerencia.');
         SEOTools::opengraph()->setUrl(config('app.url').'/contacto');
         SEOTools::setCanonical(config('app.url').'/contacto');
 
-        return Inertia::render('Public/Contact');
+        return Inertia::render('Public/Contact', [
+            'honeypot' => $honeypot,
+        ]);
     }
 
     public function handleContactRequest(Request $request)
@@ -67,7 +70,10 @@ class PublicPageController extends Controller
 
         Notification::route('mail', config('padiush.contact_email'))->notify(new ContactFormNotification($request->name, $request->email, $request->message));
 
-        return redirect()->route('public.contact')->with('success', 'Tu mensaje ha sido enviado. ¡Gracias por contactarnos!');
+        return redirect()
+            ->route('public.contact')
+            ->with('message', 'public.contact_success')
+            ->with('message_type', 'success');
     }
 
     public function privacy()
