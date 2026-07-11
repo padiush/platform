@@ -209,6 +209,11 @@ Route::middleware(['auth'])->group(function () {
     });
 });
 
+// Session-authenticated: called via axios from the catalog species page.
+Route::post('/api/wfo-query', [App\Http\Controllers\WfoController::class, 'query'])
+    ->middleware(['auth', 'throttle:api'])
+    ->name('wfo.query');
+
 Route::controller(PublicPageController::class)->group(function () {
     Route::get('/', 'index')->name('public.index');
     Route::get('/acerca', 'about')->name('public.about');
