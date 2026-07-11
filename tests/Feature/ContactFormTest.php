@@ -45,6 +45,25 @@ class ContactFormTest extends TestCase
         );
     }
 
+    public function test_contact_form_is_rejected_when_honeypot_filled()
+    {
+        Notification::fake();
+        config()->set('padiush.contact_email', 'contact@example.com');
+
+        $fields = $this->honeypotFields();
+        $honeypot = new Honeypot(config('honeypot'));
+        $fields[$honeypot->unrandomizedNameFieldName()] = 'spam';
+
+        $response = $this->post(route('public.contact.handle'), [
+            'name' => 'Bot',
+            'email' => 'bot@example.com',
+            'message' => 'spam',
+        ] + $fields);
+
+        $response->assertOk();
+        Notification::assertNothingSent();
+    }
+
     public function test_contact_form_requires_all_fields()
     {
         Notification::fake();
