@@ -4,6 +4,7 @@ namespace Tests\Feature\Auth;
 
 use App\Providers\RouteServiceProvider;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Spatie\Honeypot\Honeypot;
 use Tests\TestCase;
 
 class RegistrationTest extends TestCase
@@ -22,7 +23,7 @@ class RegistrationTest extends TestCase
         config()->set('honeypot.randomize_name_field_name', false);
         config()->set('honeypot.valid_from_timestamp', false);
 
-        $honeypot = new \Spatie\Honeypot\Honeypot(config('honeypot'));
+        $honeypot = new Honeypot(config('honeypot'));
 
         $response = $this->post('/register', [
             'name' => 'Test User',
@@ -52,7 +53,7 @@ class RegistrationTest extends TestCase
         config()->set('honeypot.randomize_name_field_name', false);
         config()->set('honeypot.valid_from_timestamp', false);
 
-        $honeypot = new \Spatie\Honeypot\Honeypot(config('honeypot'));
+        $honeypot = new Honeypot(config('honeypot'));
 
         $response = $this->post('/register', [
             'name' => 'Test User',
@@ -73,7 +74,7 @@ class RegistrationTest extends TestCase
         config()->set('honeypot.randomize_name_field_name', false);
         config()->set('honeypot.valid_from_timestamp', false);
 
-        $honeypot = new \Spatie\Honeypot\Honeypot(config('honeypot'));
+        $honeypot = new Honeypot(config('honeypot'));
 
         $this->post('/register', [
             'name' => 'Sneaky User',
@@ -97,7 +98,7 @@ class RegistrationTest extends TestCase
         config()->set('honeypot.randomize_name_field_name', false);
         config()->set('honeypot.valid_from_timestamp', false);
 
-        $honeypot = new \Spatie\Honeypot\Honeypot(config('honeypot'));
+        $honeypot = new Honeypot(config('honeypot'));
 
         $response = $this->post('/register', [
             'name' => 'Spam User',

@@ -2,11 +2,12 @@
 
 namespace Database\Factories;
 
+use App\Models\Project;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Project>
+ * @extends Factory<Project>
  */
 class ProjectFactory extends Factory
 {
@@ -33,7 +34,7 @@ class ProjectFactory extends Factory
     /**
      * Indicate that the project is finished.
      *
-     * @return \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Project>
+     * @return Factory<Project>
      */
     public function finished()
     {
@@ -47,7 +48,7 @@ class ProjectFactory extends Factory
     /**
      * Indicate that the project is published.
      *
-     * @return \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Project>
+     * @return Factory<Project>
      */
     public function published()
     {
@@ -61,7 +62,7 @@ class ProjectFactory extends Factory
     /**
      * Indicate that the project is shared.
      *
-     * @return \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Project>
+     * @return Factory<Project>
      */
     public function shared()
     {

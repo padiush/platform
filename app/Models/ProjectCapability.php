@@ -18,7 +18,7 @@ class ProjectCapability extends Model
         'manage_data',
         'generate_reports',
         'view_catalog',
-        'edit_catalog'
+        'edit_catalog',
     ];
 
     protected $casts = [
@@ -29,7 +29,7 @@ class ProjectCapability extends Model
         'manage_data' => 'boolean',
         'generate_reports' => 'boolean',
         'view_catalog' => 'boolean',
-        'edit_catalog' => 'boolean'
+        'edit_catalog' => 'boolean',
     ];
 
     public function projectAccesses()

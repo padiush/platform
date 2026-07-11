@@ -2,19 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Notification;
-use Carbon\Carbon;
 use App\Models\Project;
 use App\Models\ProjectAccess;
 use App\Models\ProjectCapability;
 use App\Models\ProjectInvite;
 use App\Models\User;
 use App\Notifications\InviteNotification;
+use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
-use Inertia\Response;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Notification;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class ProjectController extends Controller
 {
@@ -26,7 +26,7 @@ class ProjectController extends Controller
 
         foreach ($accesses as $access) {
             $project = Project::find($access->project_id);
-            if (!$project) {
+            if (! $project) {
                 continue;
             }
 
@@ -99,13 +99,13 @@ class ProjectController extends Controller
     {
         $access = Auth::user()->hasAccessToProject($project);
 
-        if (!$access) {
+        if (! $access) {
             return redirect()
                 ->route('projects.index')
                 ->with('error', 'No tienes acceso a este proyecto.');
         }
 
-        if (!$access->capability->manage_project) {
+        if (! $access->capability->manage_project) {
             return redirect()
                 ->route('projects.index')
                 ->with('message', 'projects.no_edit_permission')
@@ -121,13 +121,13 @@ class ProjectController extends Controller
     {
         $access = Auth::user()->hasAccessToProject($project);
 
-        if (!$access) {
+        if (! $access) {
             return redirect()
                 ->route('projects.index')
                 ->with('error', 'No tienes acceso a este proyecto.');
         }
 
-        if (!$access->capability->manage_project) {
+        if (! $access->capability->manage_project) {
             return redirect()
                 ->route('projects.index')
                 ->with('message', 'projects.no_edit_permission')
@@ -160,14 +160,14 @@ class ProjectController extends Controller
     {
         $access = Auth::user()->hasAccessToProject($project);
 
-        if (!$access) {
+        if (! $access) {
             return redirect()
                 ->route('projects.index')
                 ->with('message', 'projects.no_edit_permission')
                 ->with('message_type', 'error');
         }
 
-        if (!$access->capability->manage_project) {
+        if (! $access->capability->manage_project) {
             return redirect()
                 ->route('projects.index')
                 ->with('message', 'projects.no_edit_permission')
@@ -187,13 +187,13 @@ class ProjectController extends Controller
         $access = Auth::user()->hasAccessToProject($project);
         $capabilities = ProjectCapability::all();
 
-        if (!$access) {
+        if (! $access) {
             return redirect()
                 ->route('projects.index')
                 ->with('error', 'No tienes acceso a este proyecto.');
         }
 
-        if (!$access->capability->manage_users) {
+        if (! $access->capability->manage_users) {
             return redirect()
                 ->route('projects.index')
                 ->with('message', 'projects.no_edit_permission')
@@ -220,13 +220,13 @@ class ProjectController extends Controller
     {
         $access = Auth::user()->hasAccessToProject($project);
 
-        if (!$access) {
+        if (! $access) {
             return redirect()
                 ->route('projects.index')
                 ->with('error', 'No tienes acceso a este proyecto.');
         }
 
-        if (!$access->capability->manage_users) {
+        if (! $access->capability->manage_users) {
             return redirect()
                 ->route('projects.index')
                 ->with('message', 'projects.no_edit_permission')
@@ -253,20 +253,19 @@ class ProjectController extends Controller
         $request->validate([
             'name' => 'required|string',
             'email' => 'required|email',
-            'capability_id' =>
-                'required|numeric|exists:project_capabilities,id',
+            'capability_id' => 'required|numeric|exists:project_capabilities,id',
         ]);
 
         $access = Auth::user()->hasAccessToProject($project);
 
-        if (!$access) {
+        if (! $access) {
             return redirect()
                 ->route('projects.index')
                 ->with('message', 'projects.no_edit_permission')
                 ->with('message_type', 'error');
         }
 
-        if (!$access->capability->manage_users) {
+        if (! $access->capability->manage_users) {
             return redirect()
                 ->route('projects.index')
                 ->with('message', 'projects.no_edit_permission')
@@ -300,7 +299,7 @@ class ProjectController extends Controller
         $capability = ProjectCapability::find($request->capability_id);
         $expiringDate = Carbon::now()->addDays(7);
 
-        if (!$invitedUser) {
+        if (! $invitedUser) {
             $invite = ProjectInvite::create([
                 'project_id' => $project->id,
                 'inviting_user_id' => $invitingUser->id,
@@ -343,7 +342,7 @@ class ProjectController extends Controller
     {
         $access = Auth::user()->hasAccessToProject($project);
 
-        if (!$access || !$access->capability->manage_users) {
+        if (! $access || ! $access->capability->manage_users) {
             return redirect()
                 ->route('projects.index')
                 ->with('message', 'projects.no_edit_permission')
@@ -376,14 +375,14 @@ class ProjectController extends Controller
     {
         $access = Auth::user()->hasAccessToProject($project);
 
-        if (!$access) {
+        if (! $access) {
             return redirect()
                 ->route('projects.index')
                 ->with('message', 'projects.no_edit_permission')
                 ->with('message_type', 'error');
         }
 
-        if (!$access->capability->manage_users) {
+        if (! $access->capability->manage_users) {
             return redirect()
                 ->route('projects.index')
                 ->with('message', 'projects.no_edit_permission')
@@ -445,6 +444,7 @@ class ProjectController extends Controller
 
         if ($existingAccess) {
             $invite->delete();
+
             return redirect()
                 ->route('projects.index')
                 ->with('message', 'projects.already_in_project')

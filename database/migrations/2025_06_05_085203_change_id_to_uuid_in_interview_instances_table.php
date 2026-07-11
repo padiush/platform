@@ -7,15 +7,16 @@ use Illuminate\Support\Facades\Schema;
 
 use function Laravel\Prompts\confirm;
 
-return new class extends Migration {
+return new class extends Migration
+{
     /**
      * Run the migrations.
      */
     public function up(): void
     {
         // Ask the user to confirm the migration
-        if (!app()->runningInConsole()) {
-            throw new \Exception(
+        if (! app()->runningInConsole()) {
+            throw new Exception(
                 'This migration is intended to be run in console only.'
             );
         }
@@ -26,8 +27,8 @@ return new class extends Migration {
         // empty and prompting would break non-interactive runs.
         if (
             DB::table('interview_instances')->exists() &&
-            !app()->runningUnitTests() &&
-            !confirm(
+            ! app()->runningUnitTests() &&
+            ! confirm(
                 "This migration will drop and recreate the 'interview_instances' table, truncating all data. Are you sure you want to proceed? (yes/no)"
             )
         ) {

@@ -3,36 +3,37 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\ProjectInvite;
 use App\Models\User;
 use App\Providers\RouteServiceProvider;
+use Carbon\Carbon;
 use Illuminate\Auth\Events\Registered;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
+use Illuminate\View\View;
 use Inertia\Inertia;
-
-use App\Models\ProjectInvite;
-use App\Models\ProjectAccess;
-
-use Carbon\Carbon;
+use Spatie\Honeypot\Honeypot;
 
 class RegisteredUserController extends Controller
 {
     /**
      * Display the registration view.
      *
-     * @return \Illuminate\View\View
+     * @return View
      */
-    public function create(\Spatie\Honeypot\Honeypot $honeypot)
+    public function create(Honeypot $honeypot)
     {
         if (! config('padiush.registration_enabled')) {
             return redirect()->route('login');
         }
 
         $url = \Storage::disk('s3')->temporaryUrl('public/bg.jpg', now()->addMinutes(5));
-        return \Inertia\Inertia::render('Auth/Register', [
+
+        return Inertia::render('Auth/Register', [
             'bgImage' => $url,
             'honeypot' => $honeypot,
         ]);
@@ -41,10 +42,9 @@ class RegisteredUserController extends Controller
     /**
      * Handle an incoming registration request.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      *
-     * @throws \Illuminate\Validation\ValidationException
+     * @throws ValidationException
      */
     public function store(Request $request)
     {
@@ -71,8 +71,8 @@ class RegisteredUserController extends Controller
         // Check if the user was invited to a project
         $invites = ProjectInvite::where('invited_email', $user->email)->where('expires_at', '>', Carbon::now())->get();
 
-        if($invites){
-            foreach($invites as $invite){
+        if ($invites) {
+            foreach ($invites as $invite) {
                 $project = $invite->project;
 
                 $project->accesses()->create([
@@ -86,8 +86,8 @@ class RegisteredUserController extends Controller
 
         $expired_invites = ProjectInvite::where('invited_email', $user->email)->where('expires_at', '<', Carbon::now())->get();
 
-        if($expired_invites){
-            foreach($expired_invites as $expired_invite){
+        if ($expired_invites) {
+            foreach ($expired_invites as $expired_invite) {
                 $expired_invite->delete();
             }
         }

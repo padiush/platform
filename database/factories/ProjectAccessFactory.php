@@ -3,12 +3,13 @@
 namespace Database\Factories;
 
 use App\Models\Project;
+use App\Models\ProjectAccess;
 use App\Models\ProjectCapability;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\ProjectAccess>
+ * @extends Factory<ProjectAccess>
  */
 class ProjectAccessFactory extends Factory
 {

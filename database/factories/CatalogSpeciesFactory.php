@@ -2,11 +2,12 @@
 
 namespace Database\Factories;
 
+use App\Models\CatalogSpecies;
 use App\Models\Project;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\CatalogSpecies>
+ * @extends Factory<CatalogSpecies>
  */
 class CatalogSpeciesFactory extends Factory
 {

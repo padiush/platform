@@ -39,11 +39,11 @@ GRAPHQL;
             ->withHeaders([
                 'Content-Type' => 'application/json',
             ])->post('https://list.worldfloraonline.org/gql.php', [
-            'query' => $query,
-            'variables' => [
-                'terms' => $terms,
-            ],
-        ]);
+                'query' => $query,
+                'variables' => [
+                    'terms' => $terms,
+                ],
+            ]);
 
         return response()->json($response->json());
     }

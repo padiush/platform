@@ -7,6 +7,8 @@ use App\Http\Controllers\InterviewInstancesController;
 use App\Http\Controllers\ProjectCatalogController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\PublicPageController;
+use App\Http\Controllers\SystemController;
+use App\Http\Controllers\WfoController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -19,13 +21,13 @@ Route::middleware(['auth'])->group(function () {
         ->prefix('system')
         ->name('system.')
         ->group(function () {
-            Route::get('/', [\App\Http\Controllers\SystemController::class, 'index'])
+            Route::get('/', [SystemController::class, 'index'])
                 ->name('index');
             // Bulk delete must be defined before single delete to avoid
             // "bulk-delete" being treated as a {user} parameter.
-            Route::delete('/users/bulk-delete', [\App\Http\Controllers\SystemController::class, 'destroyUsers'])
+            Route::delete('/users/bulk-delete', [SystemController::class, 'destroyUsers'])
                 ->name('users.bulk-delete');
-            Route::delete('/users/{user}', [\App\Http\Controllers\SystemController::class, 'destroyUser'])
+            Route::delete('/users/{user}', [SystemController::class, 'destroyUser'])
                 ->name('users.delete');
         });
 
@@ -210,7 +212,7 @@ Route::middleware(['auth'])->group(function () {
 });
 
 // Session-authenticated: called via axios from the catalog species page.
-Route::post('/api/wfo-query', [App\Http\Controllers\WfoController::class, 'query'])
+Route::post('/api/wfo-query', [WfoController::class, 'query'])
     ->middleware(['auth', 'throttle:api'])
     ->name('wfo.query');
 

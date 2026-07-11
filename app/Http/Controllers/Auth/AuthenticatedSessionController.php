@@ -5,23 +5,24 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Providers\RouteServiceProvider;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\View\View;
 use Inertia\Inertia;
-use Illuminate\Support\Facades\Route;
 
 class AuthenticatedSessionController extends Controller
 {
     /**
      * Display the login view.
      *
-     * @return \Illuminate\View\View
+     * @return View
      */
     public function create()
     {
         $url = \Storage::disk('s3')->temporaryUrl('public/bg.jpg', now()->addMinutes(5));
-        return \Inertia\Inertia::render('Auth/Login', [
+
+        return Inertia::render('Auth/Login', [
             'bgImage' => $url,
             'canResetPassword' => \Route::has('password.request'),
         ]);
@@ -30,8 +31,7 @@ class AuthenticatedSessionController extends Controller
     /**
      * Handle an incoming authentication request.
      *
-     * @param  \App\Http\Requests\Auth\LoginRequest  $request
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function store(LoginRequest $request)
     {
@@ -45,8 +45,7 @@ class AuthenticatedSessionController extends Controller
     /**
      * Destroy an authenticated session.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function destroy(Request $request)
     {

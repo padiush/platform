@@ -4,11 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\InterviewSection;
 
 class InterviewItem extends Model
 {
     use HasFactory;
+
     protected $fillable = [
         'interview_section_id',
         'label',

@@ -2,13 +2,9 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
-use App\Models\User;
-use App\Models\InterviewForm;
-use App\Models\InstanceAnswer;
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
 
 class InterviewInstance extends Model
 {

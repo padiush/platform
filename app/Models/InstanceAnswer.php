@@ -5,11 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-use App\Models\InterviewInstance;
-use App\Models\InterviewItem;
-use App\Models\CatalogSpecies;
-use App\Models\InterviewSection;
-
 class InstanceAnswer extends Model
 {
     use HasFactory;

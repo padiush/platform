@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\User;
 use Illuminate\Console\Command;
 
 class PromoteSystemAdmin extends Command
@@ -27,7 +28,7 @@ class PromoteSystemAdmin extends Command
     {
         $email = $this->argument('email');
 
-        $user = \App\Models\User::where('email', $email)->first();
+        $user = User::where('email', $email)->first();
 
         if (! $user) {
             $this->error('User not found');

@@ -2,10 +2,8 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
-
 use App\Models\ProjectCapability;
+use Illuminate\Database\Seeder;
 
 class ProjectCapabilitySeeder extends Seeder
 {
@@ -20,7 +18,7 @@ class ProjectCapabilitySeeder extends Seeder
             'manage_data' => true,
             'generate_reports' => true,
             'view_catalog' => true,
-            'edit_catalog' => true
+            'edit_catalog' => true,
         ]);
 
         ProjectCapability::factory()->create([
@@ -32,7 +30,7 @@ class ProjectCapabilitySeeder extends Seeder
             'manage_data' => false,
             'generate_reports' => true,
             'view_catalog' => true,
-            'edit_catalog' => true
+            'edit_catalog' => true,
         ]);
 
         ProjectCapability::factory()->create([
@@ -44,7 +42,7 @@ class ProjectCapabilitySeeder extends Seeder
             'manage_data' => false,
             'generate_reports' => true,
             'view_catalog' => true,
-            'edit_catalog' => false
+            'edit_catalog' => false,
         ]);
     }
 }
