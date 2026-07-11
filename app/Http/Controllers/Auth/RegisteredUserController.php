@@ -27,6 +27,10 @@ class RegisteredUserController extends Controller
      */
     public function create(\Spatie\Honeypot\Honeypot $honeypot)
     {
+        if (! config('padiush.registration_enabled')) {
+            return redirect()->route('login');
+        }
+
         $url = \Storage::disk('s3')->temporaryUrl('public/bg.jpg', now()->addMinutes(5));
         return \Inertia\Inertia::render('Auth/Register', [
             'bgImage' => $url,
@@ -44,6 +48,10 @@ class RegisteredUserController extends Controller
      */
     public function store(Request $request)
     {
+        if (! config('padiush.registration_enabled')) {
+            return redirect()->route('login');
+        }
+
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
