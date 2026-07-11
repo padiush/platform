@@ -17,17 +17,23 @@ export default function Wizard({ project, form }) {
     const [sectionItems, setSectionItems] = useState([]);
 
     const fetchSections = async () => {
-        const response = await fetch(
-            route('designer.form.sections', {
-                project: project.id,
-                form: form.id,
-            }),
-        );
-        const data = await response.json();
-        setSections(data);
+        try {
+            const response = await fetch(
+                route('designer.form.sections', {
+                    project: project.id,
+                    form: form.id,
+                }),
+            );
+            if (!response.ok) {
+                return;
+            }
+            setSections(await response.json());
+        } catch (error) {
+            console.error('Failed to load sections:', error);
+        }
     };
 
-    const fetchSectionItems = async () => {
+    const fetchSectionItems = async (signal) => {
         if (!selectedSectionId) {
             return [];
         }
@@ -38,10 +44,26 @@ export default function Wizard({ project, form }) {
                 form: form.id,
                 section: selectedSectionId,
             }),
+            signal ? { signal } : undefined,
         );
-        const data = await response.json();
-        return data;
+
+        if (!response.ok) {
+            throw new Error(
+                `Failed to load section items (${response.status})`,
+            );
+        }
+
+        return response.json();
     };
+
+    const reloadSectionItems = (signal) =>
+        fetchSectionItems(signal)
+            .then(setSectionItems)
+            .catch((error) => {
+                if (error.name !== 'AbortError') {
+                    console.error('Failed to load section items:', error);
+                }
+            });
 
     const createSection = async () => {
         try {
@@ -68,10 +90,22 @@ export default function Wizard({ project, form }) {
 
     useEffect(() => {
         fetchSections();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     useEffect(() => {
-        fetchSectionItems().then(setSectionItems);
+        if (!selectedSectionId) {
+            setSectionItems([]);
+            return;
+        }
+
+        // Abort the in-flight request when the selected section changes, so a
+        // slow response for a previously-selected section can't overwrite the
+        // items of the one now shown.
+        const controller = new AbortController();
+        reloadSectionItems(controller.signal);
+        return () => controller.abort();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedSectionId]);
 
     return (
@@ -123,7 +157,7 @@ export default function Wizard({ project, form }) {
 
                         {selectedSectionId && sectionItems.length > 0 && (
                             <div className="grid w-full grid-cols-1 gap-8">
-                                {sectionItems
+                                {[...sectionItems]
                                     .sort((a, b) => a.order - b.order)
                                     .map((item) => (
                                         <ItemCard
@@ -133,19 +167,13 @@ export default function Wizard({ project, form }) {
                                             section={selectedSectionId}
                                             item={item}
                                             onItemUpdated={() =>
-                                                fetchSectionItems().then(
-                                                    setSectionItems,
-                                                )
+                                                reloadSectionItems()
                                             }
                                             onItemDeleted={() =>
-                                                fetchSectionItems().then(
-                                                    setSectionItems,
-                                                )
+                                                reloadSectionItems()
                                             }
                                             onItemMoved={() =>
-                                                fetchSectionItems().then(
-                                                    setSectionItems,
-                                                )
+                                                reloadSectionItems()
                                             }
                                         />
                                     ))}
@@ -157,9 +185,7 @@ export default function Wizard({ project, form }) {
                                 project={project}
                                 form={form}
                                 section={selectedSectionId}
-                                onItemAdded={() =>
-                                    fetchSectionItems().then(setSectionItems)
-                                }
+                                onItemAdded={() => reloadSectionItems()}
                             />
                         )}
                     </div>
