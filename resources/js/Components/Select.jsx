@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+
 export default function Select({
     className = '',
     disabled = false,
@@ -10,6 +12,8 @@ export default function Select({
     error = null,
     ...props
 }) {
+    const { t } = useTranslation();
+
     const selectClassName = className
         .split(' ')
         .filter((c) => c.startsWith('select-'))
@@ -25,7 +29,7 @@ export default function Select({
                     {required && (
                         <span
                             className="text-error tooltip tooltip-bottom"
-                            data-tip="Campo requerido"
+                            data-tip={t('designer.required')}
                         >
                             *
                         </span>
@@ -33,7 +37,7 @@ export default function Select({
                     {selective && (
                         <span
                             className="text-warning tooltip tooltip-bottom"
-                            data-tip="Al menos uno es requerido"
+                            data-tip={t('validation.at_least_one')}
                         >
                             *
                         </span>
