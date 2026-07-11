@@ -12,11 +12,11 @@
             <directory suffix="Test.php">./tests/Feature</directory>
         </testsuite>
     </testsuites>
-    <coverage processUncoveredFiles="true">
+    <source>
         <include>
             <directory suffix=".php">./app</directory>
         </include>
-    </coverage>
+    </source>
     <php>
         <env name="APP_ENV" value="testing"/>
         <env name="BCRYPT_ROUNDS" value="4"/>
@@ -32,6 +32,19 @@
         <server name="DB_DATABASE" value=":memory:" force="true"/>
         <env name="DB_CONNECTION" value="sqlite" force="true"/>
         <env name="DB_DATABASE" value=":memory:" force="true"/>
+        <!--
+            Fake AWS credentials (forced like DB_* above): the only S3 use in
+            tests is temporaryUrl(), which presigns locally without network.
+            This keeps the suite hermetic and CI free of real secrets.
+        -->
+        <server name="AWS_ACCESS_KEY_ID" value="testing" force="true"/>
+        <server name="AWS_SECRET_ACCESS_KEY" value="testing" force="true"/>
+        <server name="AWS_DEFAULT_REGION" value="us-east-1" force="true"/>
+        <server name="AWS_BUCKET" value="testing" force="true"/>
+        <env name="AWS_ACCESS_KEY_ID" value="testing" force="true"/>
+        <env name="AWS_SECRET_ACCESS_KEY" value="testing" force="true"/>
+        <env name="AWS_DEFAULT_REGION" value="us-east-1" force="true"/>
+        <env name="AWS_BUCKET" value="testing" force="true"/>
         <env name="MAIL_MAILER" value="array"/>
         <env name="QUEUE_CONNECTION" value="sync"/>
         <env name="SESSION_DRIVER" value="array"/>
