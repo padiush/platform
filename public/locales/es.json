@@ -324,5 +324,9 @@
     "validation": {
         "required": "Este campo es obligatorio.",
         "at_least_one": "Al menos uno es requerido"
+    },
+    "errors": {
+        "unexpected_title": "Ha ocurrido un error inesperado",
+        "unexpected_body": "Por favor, recarga la página; si el error persiste, contacta a soporte técnico y proporciona la información mostrada arriba."
     }
 }

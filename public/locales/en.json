@@ -324,5 +324,9 @@
     "validation": {
         "required": "This field is required.",
         "at_least_one": "At least one is required"
+    },
+    "errors": {
+        "unexpected_title": "An unexpected error occurred",
+        "unexpected_body": "Please reload the page; if the error persists, contact technical support and provide the information shown above."
     }
 }
