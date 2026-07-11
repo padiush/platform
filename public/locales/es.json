@@ -292,7 +292,8 @@
         "name": "Nombre",
         "email": "Correo electrónico",
         "message": "Mensaje",
-        "send": "Enviar"
+        "send": "Enviar",
+        "contact_success": "Tu mensaje ha sido enviado. ¡Gracias por contactarnos!"
     },
     "auth": {
         "login": "Iniciar sesión",

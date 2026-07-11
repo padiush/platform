@@ -30,13 +30,20 @@ class PublicPagesTest extends TestCase
         );
     }
 
-    public function test_contact_page_renders()
+    public function test_contact_page_renders_with_honeypot_fields()
     {
         $response = $this->get(route('public.contact'));
 
         $response->assertOk();
         $response->assertInertia(
-            fn (Assert $page) => $page->component('Public/Contact')
+            fn (Assert $page) => $page
+                ->component('Public/Contact')
+                // Without these props the form can't render the fields the
+                // honeypot middleware requires, and every real submission
+                // gets silently swallowed as spam.
+                ->has('honeypot.nameFieldName')
+                ->has('honeypot.validFromFieldName')
+                ->has('honeypot.encryptedValidFrom')
         );
     }
 

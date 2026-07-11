@@ -1,8 +1,10 @@
 import PublicLayout from '@/Layouts/PublicLayout';
+import { usePage } from '@inertiajs/react';
 import { useTranslation } from 'react-i18next';
 
 export default function Contact() {
     const { t } = useTranslation();
+    const { honeypot } = usePage().props;
 
     return (
         <PublicLayout title={t('public.contact')}>
@@ -34,11 +36,26 @@ export default function Contact() {
                                         ).content
                                     }
                                 />
-                                <input
-                                    type="hidden"
-                                    name="_honeypot"
-                                    className="hidden"
-                                />
+                                {honeypot?.enabled && (
+                                    <div style={{ display: 'none' }}>
+                                        <input
+                                            type="text"
+                                            name={honeypot.nameFieldName}
+                                            id={honeypot.nameFieldName}
+                                            defaultValue=""
+                                            tabIndex={-1}
+                                            autoComplete="off"
+                                        />
+                                        <input
+                                            type="text"
+                                            name={honeypot.validFromFieldName}
+                                            defaultValue={
+                                                honeypot.encryptedValidFrom
+                                            }
+                                            readOnly
+                                        />
+                                    </div>
+                                )}
                                 <div className="form-control w-full">
                                     <label className="label">
                                         <span className="label-text">
