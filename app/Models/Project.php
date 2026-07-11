@@ -36,11 +36,6 @@ class Project extends Model
         return $this->hasMany(ProjectAccess::class);
     }
 
-    public function capabilities()
-    {
-        return $this->hasMany(ProjectCapability::class);
-    }
-
     public function users()
     {
         $users = collect();

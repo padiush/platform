@@ -11,7 +11,6 @@ class InterviewForm extends Model
 
     protected $fillable = [
         'project_id',
-        'designed_by',
         'name',
         'description',
         'is_active',
@@ -22,30 +21,9 @@ class InterviewForm extends Model
         return $this->belongsTo(Project::class);
     }
 
-    public function designer()
-    {
-        return $this->belongsTo(User::class, 'designed_by');
-    }
-
     public function sections()
     {
         return $this->hasMany(InterviewSection::class);
-    }
-
-    public function nonRepeatableSections()
-    {
-        return $this->hasMany(InterviewSection::class)->where(
-            'repeatable',
-            false
-        );
-    }
-
-    public function repeatableSections()
-    {
-        return $this->hasMany(InterviewSection::class)->where(
-            'repeatable',
-            true
-        );
     }
 
     public function instances()

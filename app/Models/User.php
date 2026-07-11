@@ -53,11 +53,6 @@ class User extends Authenticatable
         return $this->hasMany(ProjectAccess::class);
     }
 
-    public function projectCapabilities()
-    {
-        return $this->hasMany(ProjectCapability::class);
-    }
-
     public function hasAccessToProject(Project $project)
     {
         $access = $this->projectAccesses()->where('project_id', $project->id)->first();

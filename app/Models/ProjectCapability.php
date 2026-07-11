@@ -31,9 +31,4 @@ class ProjectCapability extends Model
         'view_catalog' => 'boolean',
         'edit_catalog' => 'boolean',
     ];
-
-    public function projectAccesses()
-    {
-        return $this->belongsToMany(ProjectAccess::class);
-    }
 }

@@ -17,12 +17,10 @@ return new class extends Migration
             $table->id();
             $table->timestamps();
             $table->unsignedBigInteger('project_id');
-            $table->unsignedBigInteger('designed_by')->nullable();
             $table->string('name');
             $table->string('description')->nullable();
             $table->boolean('is_active')->default(false);
             $table->foreign('project_id')->references('id')->on('projects')->onDelete('cascade');
-            $table->foreign('designed_by')->references('id')->on('users')->onDelete('cascade');
         });
     }
 
