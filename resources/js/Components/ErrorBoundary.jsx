@@ -1,3 +1,4 @@
+import i18n from '@/i18n';
 import { faExclamationTriangle } from '@fortawesome/pro-regular-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
@@ -34,7 +35,7 @@ class ErrorBoundary extends React.Component {
                         className="text-5xl text-yellow-500"
                     />
                     <h1 className="mt-4 text-2xl font-semibold">
-                        Ha ocurrido un error inesperado
+                        {i18n.t('errors.unexpected_title')}
                     </h1>
                     <div className="mockup-code bg-base-200 text-base-content mt-8 p-4">
                         {/** Pretty print the error info */}
@@ -47,9 +48,7 @@ class ErrorBoundary extends React.Component {
                         </pre>
                     </div>
                     <div className="mt-4">
-                        Por favor, recarga la página, si el error persiste,
-                        contacta a soporte técnico y proporciona la información
-                        mostrada arriba.
+                        {i18n.t('errors.unexpected_body')}
                     </div>
                 </div>
             );
