@@ -6,7 +6,6 @@ use App\Models\InterviewForm;
 use App\Models\InterviewItem;
 use App\Models\InterviewSection;
 use App\Models\Project;
-use App\Models\ProjectAccess;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -29,14 +28,7 @@ class InterviewDesignerController extends Controller
         ?InterviewSection $section = null,
         ?InterviewItem $item = null
     ): void {
-        $access = ProjectAccess::where('user_id', Auth::id())
-            ->where('project_id', $project->id)
-            ->first();
-
-        if (
-            ! $access ||
-            ! Auth::user()->hasCapabilityOnProject($project, 'manage_forms')
-        ) {
+        if (! Auth::user()->can('manageForms', $project)) {
             self::deny('designer.no_access');
         }
 

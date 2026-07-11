@@ -55,9 +55,11 @@ class User extends Authenticatable
 
     public function hasAccessToProject(Project $project)
     {
-        $access = $this->projectAccesses()->where('project_id', $project->id)->first();
+        // Loaded once and cached on the instance: policy checks call this
+        // repeatedly within a request.
+        $this->loadMissing('projectAccesses.capability');
 
-        return $access ? $access : false;
+        return $this->projectAccesses->firstWhere('project_id', $project->id) ?: false;
     }
 
     public function hasCapabilityOnProject(Project $project, string $query)
