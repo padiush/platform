@@ -38,13 +38,9 @@ class Project extends Model
 
     public function users()
     {
-        $users = collect();
+        $this->loadMissing('accesses.user');
 
-        foreach ($this->accesses as $access) {
-            $users->push($access->user);
-        }
-
-        return $users;
+        return $this->accesses->pluck('user');
     }
 
     public function invites()
@@ -67,48 +63,11 @@ class Project extends Model
         return $this->hasMany(CatalogSpecies::class);
     }
 
-    public function unlinkedAnswers()
-    {
-        return InstanceAnswer::whereNull('catalog_species_id')
-            ->whereIn('interview_item_id', function ($query) {
-                $query
-                    ->select('id')
-                    ->from('interview_items')
-                    ->where('link_to_species', true)
-                    ->whereIn('interview_section_id', function ($subquery) {
-                        $subquery
-                            ->select('id')
-                            ->from('interview_sections')
-                            ->whereIn(
-                                'interview_form_id',
-                                $this->interviewForms()->pluck('id')
-                            );
-                    });
-            })
-            ->get();
-    }
-
-    public function linkedAnswers()
-    {
-        return InstanceAnswer::whereNotNull('catalog_species_id')
-            ->whereIn('interview_item_id', function ($query) {
-                $query
-                    ->select('id')
-                    ->from('interview_items')
-                    ->where('link_to_species', true)
-                    ->whereIn('interview_section_id', function ($subquery) {
-                        $subquery
-                            ->select('id')
-                            ->from('interview_sections')
-                            ->whereIn(
-                                'interview_form_id',
-                                $this->interviewForms()->pluck('id')
-                            );
-                    });
-            })
-            ->get();
-    }
-
+    /**
+     * Query for answers to species-linkable items across all of this
+     * project's forms. Returns a builder so callers can count() in SQL
+     * instead of materializing every row.
+     */
     public function speciesAnswers()
     {
         return InstanceAnswer::whereIn('interview_item_id', function ($query) {
@@ -122,22 +81,28 @@ class Project extends Model
                         ->from('interview_sections')
                         ->whereIn(
                             'interview_form_id',
-                            $this->interviewForms()->pluck('id')
+                            $this->interviewForms()->select('id')
                         );
                 });
-        })
-            ->get();
+        });
+    }
+
+    public function unlinkedAnswers()
+    {
+        return $this->speciesAnswers()->whereNull('catalog_species_id');
+    }
+
+    public function linkedAnswers()
+    {
+        return $this->speciesAnswers()->whereNotNull('catalog_species_id');
     }
 
     public function linkedSpecies()
     {
         return CatalogSpecies::whereIn(
             'id',
-            $this->linkedAnswers()
-                ->pluck('catalog_species_id')
-                ->filter() // removes nulls
-                ->unique()
-        )->get();
+            $this->linkedAnswers()->select('catalog_species_id')
+        );
     }
 
     public function linkedFamilies()

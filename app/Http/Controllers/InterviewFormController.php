@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\InterviewForm;
 use App\Models\Project;
-use App\Models\ProjectAccess;
 use App\Models\User;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\RedirectResponse;
@@ -36,23 +35,21 @@ class InterviewFormController extends Controller
 
     public function index(): Response|RedirectResponse
     {
-        $accesses = ProjectAccess::where('user_id', Auth::id())->get();
+        $accesses = Auth::user()
+            ->projectAccesses()
+            ->with(['project.interviewForms.instances', 'capability'])
+            ->get();
 
         $projects = collect();
 
         foreach ($accesses as $access) {
-            $project = Project::find($access->project_id);
+            $project = $access->project;
             if (! $project) {
                 // Access row pointing at a deleted project — skip it.
                 continue;
             }
 
-            $project->load('interviewForms', 'interviewForms.instances');
-
-            if (
-                ! $project->finished &&
-                Auth::user()->hasCapabilityOnProject($project, 'manage_forms')
-            ) {
+            if (! $project->finished && $access->capability->manage_forms) {
                 $projects->push($project);
             }
         }

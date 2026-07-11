@@ -8,7 +8,6 @@ use App\Models\InterviewInstance;
 use App\Models\InterviewItem;
 use App\Models\InterviewSection;
 use App\Models\Project;
-use App\Models\ProjectAccess;
 use App\Models\User;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\JsonResponse;
@@ -64,21 +63,21 @@ class InterviewInstancesController extends Controller
 
     public function index(): Response|RedirectResponse
     {
-        $accesses = ProjectAccess::where('user_id', Auth::id())->get();
+        $accesses = Auth::user()
+            ->projectAccesses()
+            ->with(['project.activeInterviewForms.instances', 'capability'])
+            ->get();
 
         $projects = collect();
 
         foreach ($accesses as $access) {
-            $project = Project::find($access->project_id);
+            $project = $access->project;
 
-            if (
-                ! $project->finished &&
-                Auth::user()->hasCapabilityOnProject($project, 'record_data')
-            ) {
-                $project->load(
-                    'activeInterviewForms',
-                    'activeInterviewForms.instances'
-                );
+            if (! $project) {
+                continue;
+            }
+
+            if (! $project->finished && $access->capability->record_data) {
                 $projects->push($project);
             }
         }
