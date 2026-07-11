@@ -329,5 +329,9 @@
     "errors": {
         "unexpected_title": "Ocorreu um erro inesperado",
         "unexpected_body": "Por favor, recarregue a página; se o erro persistir, entre em contato com o suporte técnico e forneça as informações mostradas acima."
+    },
+    "theme": {
+        "switch_to_light": "Mudar para tema claro",
+        "switch_to_dark": "Mudar para tema escuro"
     }
 }

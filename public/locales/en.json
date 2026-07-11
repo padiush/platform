@@ -329,5 +329,9 @@
     "errors": {
         "unexpected_title": "An unexpected error occurred",
         "unexpected_body": "Please reload the page; if the error persists, contact technical support and provide the information shown above."
+    },
+    "theme": {
+        "switch_to_light": "Switch to light theme",
+        "switch_to_dark": "Switch to dark theme"
     }
 }

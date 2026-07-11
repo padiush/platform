@@ -4,6 +4,18 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    {{-- Resolve the theme before first paint to avoid a flash: the stored
+         choice wins, otherwise the OS preference. Keep in sync with
+         ThemeToggle.jsx. --}}
+    <script>
+      try {
+        document.documentElement.dataset.theme =
+          localStorage.getItem('theme') ||
+          (window.matchMedia('(prefers-color-scheme: dark)').matches
+            ? 'padiushdark'
+            : 'padiushlight');
+      } catch (e) {}
+    </script>
     @routes
     @viteReactRefresh
     @vite('resources/js/app.jsx')

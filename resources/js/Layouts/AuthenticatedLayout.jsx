@@ -1,5 +1,6 @@
 import ApplicationLogo from '@/Components/ApplicationLogo';
 import ErrorBoundary from '@/Components/ErrorBoundary';
+import ThemeToggle from '@/Components/ThemeToggle';
 import TranslationToggle from '@/Components/TranslationToggle';
 import { useFlashMessage } from '@/Hooks/useFlashMessage';
 import { faRightFromBracket } from '@fortawesome/pro-regular-svg-icons';
@@ -171,6 +172,7 @@ export default function AuthenticatedLayout({
                     </ul>
                 </div>
                 <div className="navbar-end">
+                    <ThemeToggle />
                     <TranslationToggle />
 
                     <Link
