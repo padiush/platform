@@ -10,7 +10,6 @@ use App\Models\InterviewInstance;
 use App\Models\InterviewItem;
 use App\Models\InterviewSection;
 use App\Models\Project;
-use App\Models\ProjectAccess;
 use App\Models\User;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\JsonResponse;
@@ -25,28 +24,23 @@ class InterviewDataController extends Controller
 {
     public function index(): Response|RedirectResponse
     {
-        $user = Auth::user();
-
-        $accesses = ProjectAccess::where('user_id', $user->id)->get();
+        $accesses = Auth::user()
+            ->projectAccesses()
+            ->with(['project', 'capability'])
+            ->get();
 
         $projects = collect();
 
         foreach ($accesses as $access) {
-            $project = Project::find($access->project_id);
+            $project = $access->project;
 
             if (! $project) {
                 continue;
             }
 
             // Only include projects where the user has at least one relevant capability
-            $canManageData = $user->hasCapabilityOnProject(
-                $project,
-                'manage_data'
-            );
-            $canGenerateReports = $user->hasCapabilityOnProject(
-                $project,
-                'generate_reports'
-            );
+            $canManageData = (bool) $access->capability->manage_data;
+            $canGenerateReports = (bool) $access->capability->generate_reports;
 
             if ($canManageData || $canGenerateReports) {
                 $projects->push([
@@ -78,7 +72,7 @@ class InterviewDataController extends Controller
     {
         $this->checkPermission($project);
 
-        $linkable_answers = $project->speciesAnswers();
+        $linkable_answers = $project->speciesAnswers()->get();
 
         if ($linkable_answers->count() === 0) {
             return redirect()

@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\CatalogSpecies;
 use App\Models\Project;
-use App\Models\ProjectAccess;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -15,32 +14,35 @@ class ProjectCatalogController extends Controller
 {
     public function index(): Response|RedirectResponse
     {
-        $user = Auth::user();
-
-        $accesses = ProjectAccess::where('user_id', $user->id)->get();
+        $accesses = Auth::user()
+            ->projectAccesses()
+            ->with([
+                'capability',
+                'project' => fn ($query) => $query->withCount('catalogSpecies'),
+            ])
+            ->get();
 
         $projects = collect();
 
         foreach ($accesses as $access) {
-            $project = Project::with('catalogSpecies')->find(
-                $access->project_id
-            );
+            $project = $access->project;
 
-            if ($user->hasCapabilityOnProject($project, 'view_catalog')) {
+            if (! $project) {
+                continue;
+            }
+
+            if ($access->capability->view_catalog) {
                 $projects->push([
                     'id' => $project->id,
                     'name' => $project->name,
-                    'catalog_species_count' => $project->catalogSpecies->count(),
+                    'catalog_species_count' => $project->catalog_species_count,
                     'linked_species_count' => $project
                         ->linkedSpecies()
                         ->count(),
                     'linked_families_count' => $project
                         ->linkedFamilies()
                         ->count(),
-                    'can_edit_catalog' => $user->hasCapabilityOnProject(
-                        $project,
-                        'edit_catalog'
-                    ),
+                    'can_edit_catalog' => (bool) $access->capability->edit_catalog,
                     'can_view_catalog' => true, // already verified
                 ]);
             }

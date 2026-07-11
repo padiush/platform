@@ -20,32 +20,27 @@ class ProjectController extends Controller
 {
     public function index(): Response
     {
-        $accesses = ProjectAccess::where('user_id', Auth::id())->get();
+        $accesses = Auth::user()
+            ->projectAccesses()
+            ->with(['project.user', 'capability'])
+            ->get();
 
         $projects = collect();
 
         foreach ($accesses as $access) {
-            $project = Project::find($access->project_id);
+            $project = $access->project;
             if (! $project) {
                 continue;
             }
 
-            $project->load('user');
+            $project->can_manage = (bool) $access->capability->manage_project;
             $projects->push($project);
-
-            $project->can_manage = Auth::user()->hasCapabilityOnProject(
-                $project,
-                'manage_project'
-            );
         }
 
         $invites = ProjectInvite::where('invited_user_id', Auth::id())
             ->where('expires_at', '>', Carbon::now())
+            ->with(['invitingUser', 'capability', 'project'])
             ->get();
-
-        $invites->each(function ($invite) {
-            $invite->load('invitingUser', 'capability', 'project');
-        });
 
         return Inertia::render('Projects/Index', [
             'projects' => $projects,
