@@ -1,7 +1,15 @@
 {
     "dashboard": {
         "welcome_message": "Welcome to {{appName}}, {{name}}!",
-        "title": "Dashboard"
+        "title": "Dashboard",
+        "greeting": "Hello, {{name}}!",
+        "subtitle": "Where do you want to continue today?",
+        "projects_desc": "Create and manage your research projects and their collaborators.",
+        "design_desc": "Design the interview forms your team uses in the field.",
+        "interview_desc": "Record new interviews for your active projects.",
+        "catalogs_desc": "Keep your species catalogs identified and up to date.",
+        "data_desc": "Link answers to species and export publishable datasets.",
+        "no_projects_hint": "Start by creating your first project — everything else builds on it."
     },
     "app": {
         "name": "Padiush"

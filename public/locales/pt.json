@@ -1,7 +1,15 @@
 {
     "dashboard": {
         "welcome_message": "Bem-vindo ao {{appName}}, {{name}}!",
-        "title": "Painel"
+        "title": "Painel",
+        "greeting": "Olá, {{name}}!",
+        "subtitle": "Onde você quer continuar hoje?",
+        "projects_desc": "Crie e gerencie seus projetos de pesquisa e seus colaboradores.",
+        "design_desc": "Desenhe os formulários de entrevista que sua equipe usa em campo.",
+        "interview_desc": "Registre novas entrevistas para seus projetos ativos.",
+        "catalogs_desc": "Mantenha seus catálogos de espécies identificados e atualizados.",
+        "data_desc": "Vincule respostas a espécies e exporte dados prontos para publicar.",
+        "no_projects_hint": "Comece criando seu primeiro projeto — todo o resto parte daí."
     },
     "app": {
         "name": "Padiush"

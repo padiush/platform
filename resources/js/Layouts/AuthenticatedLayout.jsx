@@ -19,6 +19,9 @@ export default function AuthenticatedLayout({
     const { t } = useTranslation();
     const { FlashAlert, flashShown } = useFlashMessage();
 
+    const activeWhen = (pattern) =>
+        route().current(pattern) ? 'menu-active' : '';
+
     return (
         <div className="z-10 flex h-screen w-full flex-col overflow-hidden">
             <Head title={title} />
@@ -51,13 +54,19 @@ export default function AuthenticatedLayout({
                             className="menu menu-sm dropdown-content bg-base-100 text-base-content rounded-box z-1 mt-3 w-52 p-2 shadow"
                         >
                             <li>
-                                <Link href={route('projects.index')}>
+                                <Link
+                                    href={route('projects.index')}
+                                    className={activeWhen('projects.*')}
+                                >
                                     {t('navigation.projects')}
                                 </Link>
                             </li>
                             {auth.user.system_admin && (
                                 <li>
-                                    <Link href={route('system.index')}>
+                                    <Link
+                                        href={route('system.index')}
+                                        className={activeWhen('system.*')}
+                                    >
                                         {t('navigation.system_dashboard')}
                                     </Link>
                                 </li>
@@ -94,12 +103,18 @@ export default function AuthenticatedLayout({
                                         </details>
                                     </li>
                                     <li>
-                                        <Link href={route('catalogs.index')}>
+                                        <Link
+                                            href={route('catalogs.index')}
+                                            className={activeWhen('catalogs.*')}
+                                        >
                                             {t('navigation.catalogs')}
                                         </Link>
                                     </li>
                                     <li>
-                                        <Link href={route('data.index')}>
+                                        <Link
+                                            href={route('data.index')}
+                                            className={activeWhen('data.*')}
+                                        >
                                             {t('navigation.data')}
                                         </Link>
                                     </li>
@@ -117,13 +132,19 @@ export default function AuthenticatedLayout({
                 <div className="navbar-center hidden lg:flex">
                     <ul className="menu menu-horizontal px-1">
                         <li>
-                            <Link href={route('projects.index')}>
+                            <Link
+                                href={route('projects.index')}
+                                className={activeWhen('projects.*')}
+                            >
                                 {t('navigation.projects')}
                             </Link>
                         </li>
                         {auth.user.system_admin && (
                             <li>
-                                <Link href={route('system.index')}>
+                                <Link
+                                    href={route('system.index')}
+                                    className={activeWhen('system.*')}
+                                >
                                     {t('navigation.system_dashboard')}
                                 </Link>
                             </li>
@@ -158,12 +179,18 @@ export default function AuthenticatedLayout({
                                     </details>
                                 </li>
                                 <li>
-                                    <Link href={route('catalogs.index')}>
+                                    <Link
+                                        href={route('catalogs.index')}
+                                        className={activeWhen('catalogs.*')}
+                                    >
                                         {t('navigation.catalogs')}
                                     </Link>
                                 </li>
                                 <li>
-                                    <Link href={route('data.index')}>
+                                    <Link
+                                        href={route('data.index')}
+                                        className={activeWhen('data.*')}
+                                    >
                                         {t('navigation.data')}
                                     </Link>
                                 </li>
