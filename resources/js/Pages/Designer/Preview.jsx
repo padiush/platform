@@ -36,7 +36,7 @@ export default function Preview({ project, form }) {
             });
             setScrollToId(null);
         }
-    }, [sectionInstances]);
+    }, [sectionInstances, scrollToId]);
 
     const handleRemoveInstance = (sectionId, instanceId) => {
         setSectionInstances((prev) => ({

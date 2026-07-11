@@ -1,3 +1,4 @@
+import { useId } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export default function Select({
@@ -13,6 +14,13 @@ export default function Select({
     ...props
 }) {
     const { t } = useTranslation();
+    const generatedId = useId();
+    const id = props.id ?? generatedId;
+
+    const describedBy =
+        [error && `${id}-error`, bottomLabel && `${id}-hint`]
+            .filter(Boolean)
+            .join(' ') || undefined;
 
     const selectClassName = className
         .split(' ')
@@ -22,9 +30,9 @@ export default function Select({
     className = className.replace(selectClassName, '');
 
     return (
-        <fieldset className={`fieldset w-full ${className}`}>
+        <div className={`fieldset w-full ${className}`}>
             {label && (
-                <legend className="fieldset-legend">
+                <label htmlFor={id} className="fieldset-legend">
                     {label}{' '}
                     {required && (
                         <span
@@ -42,25 +50,34 @@ export default function Select({
                             *
                         </span>
                     )}
-                </legend>
+                </label>
             )}
             <select
                 placeholder={placeholder}
                 className={`select select-bordered w-full ${selectClassName}`}
                 disabled={disabled}
                 required={required}
+                id={id}
+                aria-invalid={error ? true : undefined}
+                aria-describedby={describedBy}
                 {...props}
             >
                 {children}
             </select>
             {bottomLabel && (
-                <span className="fieldset-label">{bottomLabel}</span>
+                <span className="fieldset-label" id={`${id}-hint`}>
+                    {bottomLabel}
+                </span>
             )}
             {error && (
-                <span className="fieldset-label">
+                <span
+                    className="fieldset-label"
+                    id={`${id}-error`}
+                    role="alert"
+                >
                     <span className="text-error">{error}</span>
                 </span>
             )}
-        </fieldset>
+        </div>
     );
 }
