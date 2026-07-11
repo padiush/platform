@@ -118,8 +118,8 @@ export default function CatalogSpeciesIndex({ project, species }) {
                                             href={link.url || '#'}
                                             className={`join-item btn btn-sm ${
                                                 link.active
-                                                    ? 'btn-ghost'
-                                                    : 'btn-primary'
+                                                    ? 'btn-primary'
+                                                    : 'btn-ghost'
                                             }`}
                                             dangerouslySetInnerHTML={{
                                                 __html: link.label,
