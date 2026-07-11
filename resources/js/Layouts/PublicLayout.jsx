@@ -123,6 +123,12 @@ export default function PublicLayout({ children, title }) {
                 <div id="content">{children}</div>
             </main>
             <footer className="footer sm:footer-horizontal bg-base-300 text-base-content p-10">
+                <aside>
+                    <ApplicationFullLogo className="text-primary h-12 w-auto fill-current" />
+                    <p className="text-base-content/70 max-w-xs">
+                        {t('public.hero_subtitle')}
+                    </p>
+                </aside>
                 <div>
                     <span className="footer-title">{t('public.about')}</span>
                     <Link
