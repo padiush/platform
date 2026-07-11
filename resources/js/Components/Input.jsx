@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+
 export default function Input({
     className = '',
     type = 'text',
@@ -12,6 +14,8 @@ export default function Input({
     selective = false,
     ...props
 }) {
+    const { t } = useTranslation();
+
     const inputClassName = className
         .split(' ')
         .filter((c) => c.startsWith('input-'))
@@ -29,7 +33,7 @@ export default function Input({
                             {required && (
                                 <span
                                     className="text-error tooltip tooltip-bottom select-none"
-                                    data-tip="Campo requerido"
+                                    data-tip={t('designer.required')}
                                 >
                                     *
                                 </span>
@@ -37,7 +41,7 @@ export default function Input({
                             {selective && (
                                 <span
                                     className="text-warning tooltip tooltip-bottom select-none"
-                                    data-tip="Al menos uno es requerido"
+                                    data-tip={t('validation.at_least_one')}
                                 >
                                     *
                                 </span>
@@ -86,7 +90,7 @@ export default function Input({
                         {required && (
                             <span
                                 className="text-error tooltip tooltip-bottom select-none"
-                                data-tip="Campo requerido"
+                                data-tip={t('designer.required')}
                             >
                                 *
                             </span>
@@ -94,7 +98,7 @@ export default function Input({
                         {selective && (
                             <span
                                 className="text-warning tooltip tooltip-bottom select-none"
-                                data-tip="Al menos uno es requerido"
+                                data-tip={t('validation.at_least_one')}
                             >
                                 *
                             </span>
@@ -122,7 +126,7 @@ export default function Input({
                             {required && (
                                 <span
                                     className="text-error tooltip tooltip-bottom select-none"
-                                    data-tip="Campo requerido"
+                                    data-tip={t('designer.required')}
                                 >
                                     *
                                 </span>
@@ -130,7 +134,7 @@ export default function Input({
                             {selective && (
                                 <span
                                     className="text-warning tooltip tooltip-bottom select-none"
-                                    data-tip="Al menos uno es requerido"
+                                    data-tip={t('validation.at_least_one')}
                                 >
                                     *
                                 </span>
@@ -173,7 +177,7 @@ export default function Input({
                             {required && (
                                 <span
                                     className="text-error tooltip tooltip-bottom select-none"
-                                    data-tip="Campo requerido"
+                                    data-tip={t('designer.required')}
                                 >
                                     *
                                 </span>
@@ -181,7 +185,7 @@ export default function Input({
                             {selective && (
                                 <span
                                     className="text-warning tooltip tooltip-bottom select-none"
-                                    data-tip="Al menos uno es requerido"
+                                    data-tip={t('validation.at_least_one')}
                                 >
                                     *
                                 </span>
@@ -232,7 +236,7 @@ export default function Input({
                         {required && (
                             <span
                                 className="text-error tooltip tooltip-bottom select-none"
-                                data-tip="Campo requerido"
+                                data-tip={t('designer.required')}
                             >
                                 *
                             </span>
@@ -240,7 +244,7 @@ export default function Input({
                         {selective && (
                             <span
                                 className="text-warning tooltip tooltip-bottom select-none"
-                                data-tip="Al menos uno es requerido"
+                                data-tip={t('validation.at_least_one')}
                             >
                                 *
                             </span>

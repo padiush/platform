@@ -322,6 +322,7 @@
         "fetch_error": "Ocorreu um erro ao vincular a espécie."
     },
     "validation": {
-        "required": "Este campo é obrigatório."
+        "required": "Este campo é obrigatório.",
+        "at_least_one": "Pelo menos um é obrigatório"
     }
 }

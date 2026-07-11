@@ -322,6 +322,7 @@
         "cannot_delete_last_admin": "No puedes eliminar al último administrador del sistema."
     },
     "validation": {
-        "required": "Este campo es obligatorio."
+        "required": "Este campo es obligatorio.",
+        "at_least_one": "Al menos uno es requerido"
     }
 }

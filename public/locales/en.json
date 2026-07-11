@@ -322,6 +322,7 @@
         "fetch_error": "An error occurred while linking the species."
     },
     "validation": {
-        "required": "This field is required."
+        "required": "This field is required.",
+        "at_least_one": "At least one is required"
     }
 }
