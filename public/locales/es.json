@@ -293,7 +293,11 @@
         "email": "Correo electrónico",
         "message": "Mensaje",
         "send": "Enviar",
-        "contact_success": "Tu mensaje ha sido enviado. ¡Gracias por contactarnos!"
+        "contact_success": "Tu mensaje ha sido enviado. ¡Gracias por contactarnos!",
+        "features_title": "¿Qué puedes hacer con Padiush?",
+        "features_subtitle": "Del diseño de entrevistas a datos listos para publicar: todo lo que tu investigación etnobotánica necesita, en un solo lugar.",
+        "cta_title": "Empieza a sistematizar tu investigación hoy",
+        "learn_more": "Conoce más"
     },
     "auth": {
         "login": "Iniciar sesión",

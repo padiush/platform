@@ -293,7 +293,11 @@
         "email": "Email",
         "message": "Message",
         "send": "Send",
-        "contact_success": "Your message has been sent. Thank you for contacting us!"
+        "contact_success": "Your message has been sent. Thank you for contacting us!",
+        "features_title": "What can you do with Padiush?",
+        "features_subtitle": "From interview design to publishable datasets — everything your ethnobotanical research needs, in one place.",
+        "cta_title": "Start systematizing your research today",
+        "learn_more": "Learn more"
     },
     "auth": {
         "login": "Log in",
