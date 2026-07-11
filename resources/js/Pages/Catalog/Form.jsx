@@ -9,7 +9,7 @@ import { useTranslation } from 'react-i18next';
 export default function CatalogSpeciesForm({ project }) {
     const { t } = useTranslation();
 
-    const { data, setData, post, processing } = useForm({
+    const { data, setData, post, processing, errors } = useForm({
         family: '',
         genus: '',
         name: '',
@@ -46,6 +46,7 @@ export default function CatalogSpeciesForm({ project }) {
                                     onChange={(e) =>
                                         setData('family', e.target.value)
                                     }
+                                    error={errors.family}
                                 />
                                 <Input
                                     name="genus"
@@ -54,6 +55,7 @@ export default function CatalogSpeciesForm({ project }) {
                                     onChange={(e) =>
                                         setData('genus', e.target.value)
                                     }
+                                    error={errors.genus}
                                     required
                                 />
                                 <Input
@@ -63,6 +65,7 @@ export default function CatalogSpeciesForm({ project }) {
                                     onChange={(e) =>
                                         setData('name', e.target.value)
                                     }
+                                    error={errors.name}
                                     required
                                 />
                                 <Input
@@ -72,6 +75,7 @@ export default function CatalogSpeciesForm({ project }) {
                                     onChange={(e) =>
                                         setData('authority', e.target.value)
                                     }
+                                    error={errors.authority}
                                 />
                             </div>
 

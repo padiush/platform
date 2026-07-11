@@ -10,7 +10,7 @@ export default function DesignerForm({ project, form = null }) {
     const { t } = useTranslation();
 
     const isEdit = Boolean(form);
-    const { data, setData, post, put, processing } = useForm({
+    const { data, setData, post, put, processing, errors } = useForm({
         project_id: project.id,
         name: form?.name || '',
         description: form?.description || '',
@@ -65,6 +65,7 @@ export default function DesignerForm({ project, form = null }) {
                                     onChange={(e) =>
                                         setData('name', e.target.value)
                                     }
+                                    error={errors.name}
                                     className="lg:col-span-2"
                                 />
 
@@ -78,6 +79,7 @@ export default function DesignerForm({ project, form = null }) {
                                     onChange={(e) =>
                                         setData('description', e.target.value)
                                     }
+                                    error={errors.description}
                                     className="lg:col-span-2"
                                 />
                             </div>
