@@ -70,7 +70,11 @@ export default function About() {
 function Person({ image, name, title, linkedin, github, email }) {
     return (
         <div className="grid grid-cols-1 gap-4">
-            <img className="mask h-auto w-full mask-circle" src={image} />
+            <img
+                className="mask h-auto w-full mask-circle"
+                src={image}
+                alt={name}
+            />
             <div className="text-center">
                 <span className="text-xl md:text-2xl">{name}</span>
                 <div className="text-lg md:text-xl">{title}</div>

@@ -1,4 +1,55 @@
+import { useId } from 'react';
 import { useTranslation } from 'react-i18next';
+
+function RequiredMarks({ required, selective }) {
+    const { t } = useTranslation();
+
+    return (
+        <>
+            {required && (
+                <span
+                    className="text-error tooltip tooltip-bottom select-none"
+                    data-tip={t('designer.required')}
+                >
+                    *
+                </span>
+            )}{' '}
+            {selective && (
+                <span
+                    className="text-warning tooltip tooltip-bottom select-none"
+                    data-tip={t('validation.at_least_one')}
+                >
+                    *
+                </span>
+            )}
+        </>
+    );
+}
+
+function FieldLabel({ id, label, required, selective }) {
+    if (!label) return null;
+
+    return (
+        <div className="fieldset">
+            <label htmlFor={id} className="fieldset-legend">
+                {label}{' '}
+                <RequiredMarks required={required} selective={selective} />
+            </label>
+        </div>
+    );
+}
+
+function FieldError({ id, error }) {
+    if (!error) return null;
+
+    return (
+        <div className="fieldset-label">
+            <span className="fieldset-legend" id={`${id}-error`} role="alert">
+                <span className="text-error text-sm">{error}</span>
+            </span>
+        </div>
+    );
+}
 
 export default function Input({
     className = '',
@@ -14,7 +65,19 @@ export default function Input({
     selective = false,
     ...props
 }) {
-    const { t } = useTranslation();
+    const generatedId = useId();
+    const id = props.id ?? generatedId;
+
+    const describedBy =
+        [error && `${id}-error`, bottomLabel && `${id}-hint`]
+            .filter(Boolean)
+            .join(' ') || undefined;
+
+    const a11yProps = {
+        id,
+        'aria-invalid': error ? true : undefined,
+        'aria-describedby': describedBy,
+    };
 
     const inputClassName = className
         .split(' ')
@@ -26,52 +89,30 @@ export default function Input({
     if (type === 'textarea') {
         return (
             <div className={`form-control w-full ${className}`}>
-                {label && (
-                    <fieldset className="fieldset">
-                        <legend className="fieldset-legend">
-                            {label}{' '}
-                            {required && (
-                                <span
-                                    className="text-error tooltip tooltip-bottom select-none"
-                                    data-tip={t('designer.required')}
-                                >
-                                    *
-                                </span>
-                            )}{' '}
-                            {selective && (
-                                <span
-                                    className="text-warning tooltip tooltip-bottom select-none"
-                                    data-tip={t('validation.at_least_one')}
-                                >
-                                    *
-                                </span>
-                            )}
-                        </legend>
-                    </fieldset>
-                )}
+                <FieldLabel
+                    id={id}
+                    label={label}
+                    required={required}
+                    selective={selective}
+                />
                 <textarea
                     placeholder={placeholder}
                     className={`textarea w-full ${inputClassName}`}
                     disabled={disabled}
                     required={required}
+                    {...a11yProps}
                     {...props}
                 />
                 {bottomLabel && (
                     <div className="fieldset-label">
-                        <legend className="fieldset-legend">
+                        <span className="fieldset-legend" id={`${id}-hint`}>
                             <span className="label-text-alt">
                                 {bottomLabel}
                             </span>
-                        </legend>
+                        </span>
                     </div>
                 )}
-                {error && (
-                    <div className="fieldset-label">
-                        <legend className="fieldset-legend">
-                            <span className="text-error text-sm">{error}</span>
-                        </legend>
-                    </div>
-                )}
+                <FieldError id={id} error={error} />
             </div>
         );
     }
@@ -84,34 +125,17 @@ export default function Input({
                         <input
                             type="checkbox"
                             className="checkbox"
+                            aria-invalid={error ? true : undefined}
                             {...props}
                         />
                         {label}{' '}
-                        {required && (
-                            <span
-                                className="text-error tooltip tooltip-bottom select-none"
-                                data-tip={t('designer.required')}
-                            >
-                                *
-                            </span>
-                        )}{' '}
-                        {selective && (
-                            <span
-                                className="text-warning tooltip tooltip-bottom select-none"
-                                data-tip={t('validation.at_least_one')}
-                            >
-                                *
-                            </span>
-                        )}
+                        <RequiredMarks
+                            required={required}
+                            selective={selective}
+                        />
                     </label>
                 </div>
-                {error && (
-                    <div className="fieldset-label">
-                        <legend className="fieldset-legend">
-                            <span className="text-error text-sm">{error}</span>
-                        </legend>
-                    </div>
-                )}
+                <FieldError id={id} error={error} />
             </>
         );
     }
@@ -119,50 +143,31 @@ export default function Input({
     if (type === 'file') {
         return (
             <div className={`form-control w-full ${className}`}>
-                {label && (
-                    <fieldset className="fieldset">
-                        <legend className="fieldset-legend">
-                            {label}{' '}
-                            {required && (
-                                <span
-                                    className="text-error tooltip tooltip-bottom select-none"
-                                    data-tip={t('designer.required')}
-                                >
-                                    *
-                                </span>
-                            )}{' '}
-                            {selective && (
-                                <span
-                                    className="text-warning tooltip tooltip-bottom select-none"
-                                    data-tip={t('validation.at_least_one')}
-                                >
-                                    *
-                                </span>
-                            )}
-                        </legend>
-                    </fieldset>
-                )}
+                <FieldLabel
+                    id={id}
+                    label={label}
+                    required={required}
+                    selective={selective}
+                />
                 <input
                     type={type}
                     className={`file-input w-full ${inputClassName}`}
                     disabled={disabled}
                     required={required}
+                    {...a11yProps}
                     {...props}
                 />
                 {bottomLabel && (
                     <div className="fieldset-label mt-2">
-                        <span className="label-text-alt text-sm">
+                        <span
+                            className="label-text-alt text-sm"
+                            id={`${id}-hint`}
+                        >
                             {bottomLabel}
                         </span>
                     </div>
                 )}
-                {error && (
-                    <div className="fieldset-label">
-                        <legend className="fieldset-legend">
-                            <span className="text-error text-sm">{error}</span>
-                        </legend>
-                    </div>
-                )}
+                <FieldError id={id} error={error} />
             </div>
         );
     }
@@ -170,29 +175,12 @@ export default function Input({
     if (type === 'range') {
         return (
             <div className={`form-control w-full ${className}`}>
-                {label && (
-                    <fieldset className="fieldset">
-                        <legend className="fieldset-legend">
-                            {label}{' '}
-                            {required && (
-                                <span
-                                    className="text-error tooltip tooltip-bottom select-none"
-                                    data-tip={t('designer.required')}
-                                >
-                                    *
-                                </span>
-                            )}{' '}
-                            {selective && (
-                                <span
-                                    className="text-warning tooltip tooltip-bottom select-none"
-                                    data-tip={t('validation.at_least_one')}
-                                >
-                                    *
-                                </span>
-                            )}
-                        </legend>
-                    </fieldset>
-                )}
+                <FieldLabel
+                    id={id}
+                    label={label}
+                    required={required}
+                    selective={selective}
+                />
                 <div className="flex justify-center">
                     {props.value}
                     {props.unit && props.unit}
@@ -202,6 +190,7 @@ export default function Input({
                     className={`range w-full ${inputClassName}`}
                     disabled={disabled}
                     required={required}
+                    {...a11yProps}
                     {...props}
                 />
                 {props.step && (
@@ -218,7 +207,10 @@ export default function Input({
                 )}
                 {bottomLabel && (
                     <div className="fieldset-label mt-2">
-                        <span className="label-text-alt text-sm">
+                        <span
+                            className="label-text-alt text-sm"
+                            id={`${id}-hint`}
+                        >
                             {bottomLabel}
                         </span>
                     </div>
@@ -229,29 +221,12 @@ export default function Input({
 
     return (
         <div className={`form-control w-full ${className}`}>
-            {label && (
-                <fieldset className="fieldset">
-                    <legend className="fieldset-legend">
-                        {label}{' '}
-                        {required && (
-                            <span
-                                className="text-error tooltip tooltip-bottom select-none"
-                                data-tip={t('designer.required')}
-                            >
-                                *
-                            </span>
-                        )}{' '}
-                        {selective && (
-                            <span
-                                className="text-warning tooltip tooltip-bottom select-none"
-                                data-tip={t('validation.at_least_one')}
-                            >
-                                *
-                            </span>
-                        )}
-                    </legend>
-                </fieldset>
-            )}
+            <FieldLabel
+                id={id}
+                label={label}
+                required={required}
+                selective={selective}
+            />
             <div className={`${leftAddon || rightAddon ? 'join' : ''} w-full`}>
                 {leftAddon && leftAddon}
                 <input
@@ -262,24 +237,19 @@ export default function Input({
                     }`}
                     disabled={disabled}
                     required={required}
+                    {...a11yProps}
                     {...props}
                 />
                 {rightAddon && rightAddon}
             </div>
             {bottomLabel && (
                 <div className="fieldset-label mt-2">
-                    <span className="label-text-alt text-sm">
+                    <span className="label-text-alt text-sm" id={`${id}-hint`}>
                         {bottomLabel}
                     </span>
                 </div>
             )}
-            {error && (
-                <div className="fieldset-label">
-                    <legend className="fieldset-legend">
-                        <span className="text-error text-sm">{error}</span>
-                    </legend>
-                </div>
-            )}
+            <FieldError id={id} error={error} />
         </div>
     );
 }
