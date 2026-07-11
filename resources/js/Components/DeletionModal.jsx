@@ -1,6 +1,6 @@
 import Input from '@/Components/Input';
-import { requestHeaders } from '@/utils/requestHeaders';
 import { router } from '@inertiajs/react';
+import axios from 'axios';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -39,17 +39,9 @@ export default function DeletionModal({
                 onSuccess: finish,
             });
         } else {
-            fetch(url, {
-                method: 'DELETE',
-                headers: requestHeaders(),
-            })
-                .then((response) => {
-                    if (response.ok) {
-                        finish();
-                    } else {
-                        console.error('Error deleting item:', response.status);
-                    }
-                })
+            axios
+                .delete(url)
+                .then(finish)
                 .catch((error) => {
                     console.error('Error deleting item:', error);
                 });

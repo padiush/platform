@@ -1,6 +1,5 @@
 import DeletionModal from '@/Components/DeletionModal';
 import Input from '@/Components/Input';
-import { requestHeaders } from '@/utils/requestHeaders';
 import {
     faArrowDown,
     faArrowUp,
@@ -34,7 +33,6 @@ export default function SectionSelector({
                     section: sectionId,
                 }),
                 { name: newName },
-                { headers: requestHeaders() },
             );
             if (res.status === 200) onModified();
         } catch (error) {
@@ -51,7 +49,6 @@ export default function SectionSelector({
                     section: section.id,
                 }),
                 { direction },
-                { headers: requestHeaders() },
             );
             if (res.status === 200) onModified();
         } catch (error) {
@@ -71,7 +68,6 @@ export default function SectionSelector({
                     section: section.id,
                 }),
                 { repeatable: newValue },
-                { headers: requestHeaders() },
             );
             if (res.status === 200) onModified();
         } catch (error) {
