@@ -8,12 +8,15 @@
         "lint": "eslint --ext .js,.jsx,.ts,.tsx resources/js",
         "lint:fix": "eslint --ext .js,.jsx,.ts,.tsx resources/js --fix",
         "format": "prettier --write \"resources/**/*.{js,jsx,ts,tsx,json,css,scss,html}\"",
-        "format:check": "prettier --check \"resources/**/*.{js,jsx,ts,tsx,json,css,scss,html}\""
+        "format:check": "prettier --check \"resources/**/*.{js,jsx,ts,tsx,json,css,scss,html}\"",
+        "test": "vitest run"
     },
     "devDependencies": {
         "@prettier/plugin-php": "^0.22.4",
         "@tailwindcss/forms": "^0.5.2",
         "@tailwindcss/postcss": "^4.1.5",
+        "@testing-library/jest-dom": "^6.9.1",
+        "@testing-library/react": "^16.3.2",
         "@vitejs/plugin-react": "^4.4.1",
         "axios": "^1.6.8",
         "daisyui": "^5.0.35",
@@ -22,13 +25,15 @@
         "eslint-plugin-prettier": "^5.1.3",
         "eslint-plugin-react": "^7.34.4",
         "eslint-plugin-react-hooks": "^4.6.2",
+        "jsdom": "^29.1.1",
         "laravel-vite-plugin": "^1.2.0",
         "postcss": "^8.4.6",
         "prettier": "^3.5.3",
         "prettier-plugin-organize-imports": "^4.0.0",
         "prettier-plugin-tailwindcss": "^0.6.11",
         "tailwindcss": "^4.1.5",
-        "vite": "^6.3.4"
+        "vite": "^6.3.4",
+        "vitest": "^4.1.10"
     },
     "dependencies": {
         "@fortawesome/fontawesome-svg-core": "^6.7.2",
