@@ -29,6 +29,11 @@ This documentation layer covers everything that vertical needs before building:
 the index math to implement, the API and sync contracts the companion apps build
 against, the data model they extend, and the decisions that frame them.
 
+**Progress:** the built-in indices are complete — the use-category role, the
+[computation](analysis/ethnobotany-indices.md) (`EthnobiologyIndices`), and the
+report page + export. The **companion capture apps** are the remaining piece of
+the ethnobotany vertical.
+
 ## Decisions register
 
 ### ✅ Settled
