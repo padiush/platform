@@ -50,6 +50,17 @@ export default function PendingInvites({ project, invites, filters }) {
     return (
         <AuthenticatedLayout
             title={t('projects.pending_invites')}
+            breadcrumbs={[
+                {
+                    label: t('navigation.projects'),
+                    href: route('projects.index'),
+                },
+                {
+                    label: project.name,
+                    href: route('projects.accesses', { project: project.id }),
+                },
+                { label: t('projects.pending_invites') },
+            ]}
             subtitle={project.name}
             action={
                 <Link

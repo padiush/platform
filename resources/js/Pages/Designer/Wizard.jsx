@@ -147,6 +147,13 @@ export default function Wizard({ project, form, structure, instancesCount }) {
         <AuthenticatedLayout
             title={t('designer.title')}
             subtitle={form.name}
+            breadcrumbs={[
+                {
+                    label: t('navigation.design'),
+                    href: route('designer.index'),
+                },
+                { label: form.name },
+            ]}
             action={
                 <Link href={route('designer.index')} className="btn btn-ghost">
                     <FontAwesomeIcon

@@ -30,6 +30,13 @@ export default function Accesses({
     return (
         <AuthenticatedLayout
             title={t('projects.access')}
+            breadcrumbs={[
+                {
+                    label: t('navigation.projects'),
+                    href: route('projects.index'),
+                },
+                { label: project.name },
+            ]}
             subtitle={project.name}
             action={
                 <Link

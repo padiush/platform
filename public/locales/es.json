@@ -21,7 +21,8 @@
         "interview": "Pasar entrevistas",
         "catalogs": "Catálogos",
         "data": "Datos",
-        "system_dashboard": "Panel del sistema"
+        "system_dashboard": "Panel del sistema",
+        "breadcrumb": "Ruta de navegación"
     },
     "titles": {
         "my_projects": "Mis proyectos"
@@ -258,7 +259,8 @@
         "no_access": "No tienes permisos para tomar entrevistas en este proyecto.",
         "form_not_found": "No se ha encontrado el formulario en este proyecto.",
         "instance_not_found": "No se ha encontrado la entrevista.",
-        "item_not_found": "No se ha encontrado el campo en esta entrevista."
+        "item_not_found": "No se ha encontrado el campo en esta entrevista.",
+        "instance_label": "Entrevista"
     },
     "common": {
         "actions": {

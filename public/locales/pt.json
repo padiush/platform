@@ -21,7 +21,8 @@
         "data": "Dados",
         "design": "Conceção de formulários",
         "interview": "Passar nas entrevistas",
-        "system_dashboard": "Painel do sistema"
+        "system_dashboard": "Painel do sistema",
+        "breadcrumb": "Trilha de navegação"
     },
     "titles": {
         "my_projects": "Meus Projetos"
@@ -258,7 +259,8 @@
         "no_access": "Você não tem permissão para registrar entrevistas neste projeto.",
         "form_not_found": "O formulário não foi encontrado neste projeto.",
         "instance_not_found": "A entrevista não foi encontrada.",
-        "item_not_found": "O campo não foi encontrado nesta entrevista."
+        "item_not_found": "O campo não foi encontrado nesta entrevista.",
+        "instance_label": "Entrevista"
     },
     "common": {
         "actions": {

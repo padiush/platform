@@ -1,4 +1,5 @@
 import ApplicationLogo from '@/Components/ApplicationLogo';
+import Breadcrumbs from '@/Components/Breadcrumbs';
 import ErrorBoundary from '@/Components/ErrorBoundary';
 import ThemeToggle from '@/Components/ThemeToggle';
 import TranslationToggle from '@/Components/TranslationToggle';
@@ -14,6 +15,7 @@ export default function AuthenticatedLayout({
     subtitle,
     action,
     actionRight,
+    breadcrumbs = null,
 }) {
     const { auth } = usePage().props;
     const { t } = useTranslation();
@@ -216,7 +218,8 @@ export default function AuthenticatedLayout({
             <div className="bg-base-200 sticky top-16 z-20 flex items-center justify-between gap-4 px-4 py-4 text-lg font-semibold shadow-xl md:px-12 md:py-6 md:text-xl lg:px-24 lg:text-2xl">
                 {action && action}
 
-                <div className="items-left flex grow flex-col">
+                <div className="items-left flex min-w-0 grow flex-col">
+                    {breadcrumbs && <Breadcrumbs items={breadcrumbs} />}
                     <div className="text-2xl font-bold">{title}</div>
                     <div className="text-lg font-semibold">{subtitle}</div>
                 </div>

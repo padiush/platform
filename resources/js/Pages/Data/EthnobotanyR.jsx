@@ -21,6 +21,10 @@ export default function EthnobotanyR({ project, forms }) {
     return (
         <AuthenticatedLayout
             title={t('data.generate_ethnobotanyr')}
+            breadcrumbs={[
+                { label: t('navigation.data'), href: route('data.index') },
+                { label: project.name },
+            ]}
             subtitle={project.name}
             action={
                 <Link className="btn btn-ghost" href={route('data.index')}>

@@ -28,6 +28,13 @@ export default function InterviewInstances({ project, form, instances }) {
     return (
         <AuthenticatedLayout
             title={t('interviews.title')}
+            breadcrumbs={[
+                {
+                    label: t('navigation.interview'),
+                    href: route('interviews.index'),
+                },
+                { label: form.name },
+            ]}
             subtitle={t('interviews.form_on_project', {
                 form: form.name,
                 project: project.name,
