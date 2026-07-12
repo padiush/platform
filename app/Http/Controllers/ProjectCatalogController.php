@@ -48,13 +48,6 @@ class ProjectCatalogController extends Controller
             }
         }
 
-        if ($projects->isEmpty()) {
-            return redirect()
-                ->route('projects.index')
-                ->with('message', 'catalogs.no_projects')
-                ->with('message_type', 'error');
-        }
-
         return Inertia::render('Catalog/Index', [
             'projects' => $projects,
         ]);

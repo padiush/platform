@@ -1,4 +1,5 @@
 import Card from '@/Components/Card';
+import EmptyState from '@/Components/EmptyState';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Link } from '@inertiajs/react';
 import { useTranslation } from 'react-i18next';
@@ -10,6 +11,14 @@ export default function DataProcessing({ projects }) {
         <AuthenticatedLayout title={t('data.data_processing')}>
             <div className="p-4 md:pt-8 lg:pt-12">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
+                    {projects.length === 0 && (
+                        <EmptyState
+                            title={t('hubs.empty.title_data')}
+                            hint={t('hubs.empty.hint_data')}
+                            ctaHref={route('projects.index')}
+                            ctaLabel={t('hubs.empty.cta')}
+                        />
+                    )}
                     {projects.length > 0 && (
                         <div className="grid w-full grid-cols-1 gap-4">
                             {projects.map((project) => {

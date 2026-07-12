@@ -399,5 +399,18 @@
     "theme": {
         "switch_to_light": "Switch to light theme",
         "switch_to_dark": "Switch to dark theme"
+    },
+    "hubs": {
+        "empty": {
+            "title_designer": "No projects to design forms for",
+            "hint_designer": "You need an active project where you can manage forms. Create a project or ask its manager for form access.",
+            "title_interviews": "No projects ready for interviews",
+            "hint_interviews": "You need an active project where you can record data, with at least one enabled form.",
+            "title_catalogs": "No catalogs available",
+            "hint_catalogs": "You need a project where you can view the species catalog.",
+            "title_data": "No data to process yet",
+            "hint_data": "You need a project where you can manage data or generate reports.",
+            "cta": "Go to my projects"
+        }
     }
 }
