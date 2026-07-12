@@ -167,6 +167,7 @@
             "add_option": "Agregar opción",
             "required": "Campo requerido",
             "link_to_species": "Las respuestas de este campo se vincularán a un nombre científico dentro del catálogo.",
+            "use_category": "Las respuestas de este campo son una categoría de uso (p. ej. alimento, medicina).",
             "move_up": "Mover hacia arriba",
             "move_down": "Mover hacia abajo"
         },
@@ -203,6 +204,7 @@
             "answers_one": "{{count}} respuesta registrada",
             "answers_other": "{{count}} respuestas registradas",
             "linked": "Vinculado a especies",
+            "use_category": "Categoría de uso",
             "fields_one": "{{count}} campo",
             "fields_other": "{{count}} campos"
         },

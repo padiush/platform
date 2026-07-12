@@ -141,6 +141,7 @@
             "label": "Label",
             "label_description": "It will appear on the interview form when the interview is in progress.",
             "link_to_species": "The answers in this field will be linked to a scientific name within the catalog.",
+            "use_category": "The answers in this field are a use category (e.g. food, medicine).",
             "max": "Maximum value",
             "min": "Minimum value",
             "move_down": "Move down",
@@ -203,6 +204,7 @@
             "answers_one": "{{count}} recorded answer",
             "answers_other": "{{count}} recorded answers",
             "linked": "Linked to species",
+            "use_category": "Use category",
             "fields_one": "{{count}} field",
             "fields_other": "{{count}} fields"
         },

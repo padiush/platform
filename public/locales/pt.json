@@ -141,6 +141,7 @@
             "label": "Etiqueta",
             "label_description": "Aparecerá no formulário de entrevista quando a entrevista estiver a decorrer.",
             "link_to_species": "As respostas neste campo serão associadas a um nome científico no catálogo.",
+            "use_category": "As respostas neste campo são uma categoria de uso (p. ex. alimento, medicina).",
             "max": "Valor máximo",
             "min": "Valor mínimo",
             "move_down": "Deslocar-se para baixo",
@@ -203,6 +204,7 @@
             "answers_one": "{{count}} resposta registrada",
             "answers_other": "{{count}} respostas registradas",
             "linked": "Vinculado a espécies",
+            "use_category": "Categoria de uso",
             "fields_one": "{{count}} campo",
             "fields_other": "{{count}} campos"
         },

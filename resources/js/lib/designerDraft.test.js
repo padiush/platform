@@ -115,6 +115,20 @@ describe('prepareForSave', () => {
         expect(payload[0].id).toBeUndefined();
     });
 
+    it('carries the use-category role through', () => {
+        const item = {
+            ...createItem('select'),
+            label: 'Use',
+            is_use_category: true,
+            options: ['Food'],
+        };
+        const payload = prepareForSave([
+            { ...createSection(), name: 'Uso', items: [item] },
+        ]);
+
+        expect(payload[0].items[0].is_use_category).toBe(true);
+    });
+
     it('keeps ids for stored rows and nulls blank number bounds', () => {
         const payload = prepareForSave(toDraft(structure));
 
@@ -176,5 +190,16 @@ describe('itemSummary', () => {
             'designer.summary.options:2',
             'designer.summary.answers:3',
         ]);
+    });
+
+    it('lists the use-category role', () => {
+        const t = (key) => key;
+        const item = {
+            ...createItem('text'),
+            label: 'Use',
+            is_use_category: true,
+        };
+
+        expect(itemSummary(item, t)).toContain('designer.summary.use_category');
     });
 });
