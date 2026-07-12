@@ -5,9 +5,10 @@ import { useTranslation } from 'react-i18next';
 
 /**
  * Controlled native-<dialog> shell for create/edit forms. `open` drives
- * showModal()/close() (which gives focus-trapping + Escape for free); the
- * dialog's native close event (Escape, backdrop) reports back through
- * `onClose`. The form itself is passed as children.
+ * showModal()/close() (which gives focus-trapping for free). Every dismissal —
+ * the close button, the backdrop, and Escape — routes through `onClose` so the
+ * caller can strip its deep-link query param; we don't rely on the dialog's
+ * native close event, which some webviews never emit. The form is the children.
  */
 export default function FormModal({ open, onClose, title, children }) {
     const { t } = useTranslation();
@@ -25,7 +26,16 @@ export default function FormModal({ open, onClose, title, children }) {
     }, [open]);
 
     return (
-        <dialog ref={ref} className="modal" onClose={onClose}>
+        <dialog
+            ref={ref}
+            className="modal"
+            onCancel={(e) => {
+                // Escape: close through onClose (strips the param) rather than
+                // letting the dialog quietly close itself.
+                e.preventDefault();
+                onClose();
+            }}
+        >
             <div className="modal-box">
                 <div className="mb-4 flex items-center justify-between gap-4">
                     <h3 className="text-lg font-bold">{title}</h3>
@@ -40,9 +50,12 @@ export default function FormModal({ open, onClose, title, children }) {
                 </div>
                 {open && children}
             </div>
-            <form method="dialog" className="modal-backdrop">
-                <button>{t('actions.close')}</button>
-            </form>
+            <button
+                type="button"
+                className="modal-backdrop"
+                aria-label={t('actions.close')}
+                onClick={onClose}
+            />
         </dialog>
     );
 }
