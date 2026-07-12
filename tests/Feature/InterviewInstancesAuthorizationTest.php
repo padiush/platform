@@ -79,7 +79,11 @@ class InterviewInstancesAuthorizationTest extends TestCase
 
         $response->assertOk();
         $response->assertInertia(
-            fn (Assert $page) => $page->component('Interviews/Instance')
+            fn (Assert $page) => $page
+                ->component('Interviews/Instance')
+                // The header shows recorder + timestamp, not the raw id.
+                ->has('instance.user.name')
+                ->has('instance.created_at')
         );
     }
 

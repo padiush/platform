@@ -212,12 +212,12 @@ export default function Wizard({ project, form, structure, instancesCount }) {
 
                     <div className="mx-auto flex w-full max-w-4xl flex-col gap-4 pb-24">
                         {saveError && (
-                            <div className="alert alert-error">
+                            <div className="alert alert-soft alert-error">
                                 <span>{t(saveError)}</span>
                             </div>
                         )}
                         {blockedMoves && (
-                            <div className="alert alert-error">
+                            <div className="alert alert-soft alert-error">
                                 <div>
                                     <p>{t('designer.move_has_answers')}</p>
                                     <ul className="list-inside list-disc text-sm">

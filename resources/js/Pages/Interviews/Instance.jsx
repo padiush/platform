@@ -1,4 +1,5 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import { formatDateTime } from '@/utils/datetime';
 import { faArrowLeft } from '@fortawesome/pro-regular-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link } from '@inertiajs/react';
@@ -6,11 +7,18 @@ import { useTranslation } from 'react-i18next';
 import SectionRender from './Partials/SectionRender';
 
 export default function Instance({ project, form, instance, answers }) {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
+
+    // Humanized identity: when it was recorded and by whom — never the
+    // raw instance id.
+    const recordedAt = formatDateTime(instance.created_at, i18n.language);
+    const title = [t('interviews.instance_label'), recordedAt]
+        .filter(Boolean)
+        .join(' · ');
 
     return (
         <AuthenticatedLayout
-            title={t('interviews.instance.title', { id: instance.id })}
+            title={title}
             breadcrumbs={[
                 {
                     label: t('navigation.interview'),
@@ -22,10 +30,15 @@ export default function Instance({ project, form, instance, answers }) {
                 },
                 { label: t('interviews.instance_label') },
             ]}
-            subtitle={t('interviews.form_on_project', {
-                form: form.name,
-                project: project.name,
-            })}
+            subtitle={[
+                t('interviews.form_on_project', {
+                    form: form.name,
+                    project: project.name,
+                }),
+                instance.user?.name,
+            ]
+                .filter(Boolean)
+                .join(' · ')}
             action={
                 <Link
                     href={route('interviews.instances', { form: form.id })}

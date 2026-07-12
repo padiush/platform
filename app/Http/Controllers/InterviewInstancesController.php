@@ -182,6 +182,10 @@ class InterviewInstancesController extends Controller
                 ];
             });
 
+        // The page header shows who recorded the interview and when,
+        // instead of the raw instance id.
+        $instance->load('user');
+
         return Inertia::render('Interviews/Instance', [
             'project' => $project,
             'form' => $form,
