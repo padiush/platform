@@ -1,5 +1,6 @@
 import Alert from '@/Components/Alert';
 import Card from '@/Components/Card';
+import ConfirmModal from '@/Components/ConfirmModal';
 import FormModal from '@/Components/FormModal';
 import useQueryModal from '@/Hooks/useQueryModal';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
@@ -10,6 +11,7 @@ import {
 } from '@fortawesome/pro-regular-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link, router } from '@inertiajs/react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import InviteForm from './Partials/InviteForm';
 
@@ -23,6 +25,20 @@ export default function Accesses({
     const { t } = useTranslation();
 
     const [inviteParam, setInvite] = useQueryModal('invite');
+    const [revoking, setRevoking] = useState(null);
+
+    const confirmRevoke = () => {
+        router.delete(
+            route('projects.accesses.revoke', {
+                project: project.id,
+                user: revoking.id,
+            }),
+            {
+                preserveScroll: true,
+                onSuccess: () => setRevoking(null),
+            },
+        );
+    };
 
     return (
         <AuthenticatedLayout
@@ -51,10 +67,7 @@ export default function Accesses({
                         {/* Invitation section */}
                         <div className="grid grid-cols-1 gap-4">
                             {invites.length > 0 && (
-                                <div className="indicator w-full">
-                                    <span className="indicator-item badge badge-secondary">
-                                        {invites.length}
-                                    </span>
+                                <div>
                                     <a
                                         href={route(
                                             'projects.accesses.invites',
@@ -62,9 +75,12 @@ export default function Accesses({
                                                 project: project.id,
                                             },
                                         )}
-                                        className="btn btn-primary self-start"
+                                        className="btn btn-primary"
                                     >
                                         {t('projects.view_pending_invites')}
+                                        <span className="badge badge-secondary badge-sm">
+                                            {invites.length}
+                                        </span>
                                     </a>
                                 </div>
                             )}
@@ -95,24 +111,24 @@ export default function Accesses({
                                 <table className="table-compact table w-full">
                                     <thead>
                                         <tr>
-                                            <td>
+                                            <th>
                                                 {t('projects.access_form.name')}
-                                            </td>
-                                            <td className="hidden lg:table-cell">
+                                            </th>
+                                            <th className="hidden lg:table-cell">
                                                 {t(
                                                     'projects.access_form.email',
                                                 )}
-                                            </td>
-                                            <td>
+                                            </th>
+                                            <th>
                                                 {t(
                                                     'projects.access_form.permission',
                                                 )}
-                                            </td>
-                                            <td>
+                                            </th>
+                                            <th>
                                                 {t(
                                                     'projects.access_form.actions',
                                                 )}
-                                            </td>
+                                            </th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -137,47 +153,36 @@ export default function Accesses({
                                                         }
                                                     </td>
                                                     <td>
-                                                        <button
-                                                            type="button"
-                                                            className="btn btn-ghost btn-sm text-error"
-                                                            disabled={
-                                                                user.id ===
-                                                                auth.user.id
-                                                            }
-                                                            onClick={() => {
-                                                                if (
-                                                                    confirm(
-                                                                        t(
-                                                                            'projects.access_form.revoke_confirmation',
-                                                                        ),
-                                                                    )
-                                                                ) {
-                                                                    router.delete(
-                                                                        route(
-                                                                            'projects.accesses.revoke',
-                                                                            {
-                                                                                project:
-                                                                                    project.id,
-                                                                                user: user.id,
-                                                                            },
-                                                                        ),
-                                                                        {
-                                                                            preserveScroll: true,
-                                                                        },
-                                                                    );
-                                                                }
-                                                            }}
-                                                        >
-                                                            <FontAwesomeIcon
-                                                                icon={faTrash}
-                                                                className="lg:mr-2"
-                                                            />
-                                                            <span className="hidden lg:inline">
+                                                        {user.id ===
+                                                        auth.user.id ? (
+                                                            <span className="badge badge-ghost badge-sm">
                                                                 {t(
-                                                                    'actions.revoke',
+                                                                    'projects.you',
                                                                 )}
                                                             </span>
-                                                        </button>
+                                                        ) : (
+                                                            <button
+                                                                type="button"
+                                                                className="btn btn-ghost btn-sm text-error"
+                                                                onClick={() =>
+                                                                    setRevoking(
+                                                                        user,
+                                                                    )
+                                                                }
+                                                            >
+                                                                <FontAwesomeIcon
+                                                                    icon={
+                                                                        faTrash
+                                                                    }
+                                                                    className="lg:mr-2"
+                                                                />
+                                                                <span className="hidden lg:inline">
+                                                                    {t(
+                                                                        'actions.revoke',
+                                                                    )}
+                                                                </span>
+                                                            </button>
+                                                        )}
                                                     </td>
                                                 </tr>
                                             );
@@ -206,6 +211,21 @@ export default function Accesses({
                     onClose={() => setInvite(null)}
                 />
             </FormModal>
+
+            <ConfirmModal
+                open={revoking != null}
+                title={t('projects.revoke_access_title')}
+                message={
+                    revoking
+                        ? t('projects.access_form.revoke_confirmation_named', {
+                              name: revoking.name,
+                          })
+                        : ''
+                }
+                confirmLabel={t('actions.revoke')}
+                onConfirm={confirmRevoke}
+                onClose={() => setRevoking(null)}
+            />
         </AuthenticatedLayout>
     );
 }

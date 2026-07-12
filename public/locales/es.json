@@ -54,6 +54,8 @@
         "users_with_access": "Usuarios con acceso al proyecto",
         "view_pending_invites": "Ver invitaciones pendientes",
         "no_other_users": "No hay más usuarios con acceso a este proyecto.",
+        "you": "Tú",
+        "revoke_access_title": "Revocar acceso",
         "no_matching_invites": "No se encontraron invitaciones con ese criterio de búsqueda.",
         "access_form": {
             "name": "Nombre",
@@ -61,7 +63,8 @@
             "permission": "Permisos",
             "select_permission": "Selecciona un permiso",
             "actions": "Acciones",
-            "revoke_confirmation": "¿Estás seguro de que deseas revocar el acceso de este usuario?"
+            "revoke_confirmation": "¿Estás seguro de que deseas revocar el acceso de este usuario?",
+            "revoke_confirmation_named": "¿Revocar el acceso de {{name}} a este proyecto?"
         },
         "no_edit_permission": "No cuentas con los permisos necesarios para editar este proyecto.",
         "no_revoke_own_access": "No puedes revocar tu propio acceso a este proyecto.",

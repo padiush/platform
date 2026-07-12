@@ -54,13 +54,16 @@
         "users_with_access": "Users with Access to the Project",
         "view_pending_invites": "View Pending Invitations",
         "no_other_users": "There are no other users with access to this project.",
+        "you": "You",
+        "revoke_access_title": "Revoke access",
         "access_form": {
             "name": "Name",
             "email": "Email",
             "permission": "Permissions",
             "select_permission": "Select a permission",
             "actions": "Actions",
-            "revoke_confirmation": "Are you sure you want to revoke this user's access?"
+            "revoke_confirmation": "Are you sure you want to revoke this user's access?",
+            "revoke_confirmation_named": "Revoke {{name}}'s access to this project?"
         },
         "no_matching_invites": "No invitations were found with this search criteria.",
         "no_edit_permission": "You do not have the permissions required to edit this project.",
