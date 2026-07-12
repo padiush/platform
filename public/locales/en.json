@@ -454,6 +454,9 @@
             "download": "Download",
             "format_xlsx": "Excel (.xlsx)",
             "format_csv": "CSV (.csv)",
+            "references": "References",
+            "references_intro": "Cite the source paper for each index you report.",
+            "ethnobotanyr_note": "an R package (Whitney, C.) that implements these indices — the definitions come from the primary sources above.",
             "empty": {
                 "title": "No indices yet",
                 "hint": "Link interview citations to catalog species and mark a use-category field in the form designer."

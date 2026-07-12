@@ -10,6 +10,38 @@ import { useTranslation } from 'react-i18next';
 const ratio = (value) => Number(value).toFixed(2);
 const percent = (value) => `${Number(value).toFixed(1)}%`;
 
+const ETHNOBOTANYR_URL = 'https://CRAN.R-project.org/package=ethnobotanyR';
+
+// The primary paper that defines each index — language-independent citations, so
+// they live here rather than in the locale files (the framing prose is i18n'd).
+const CITATIONS = [
+    {
+        abbr: 'RFC',
+        nameKey: 'data.reports.rfc_full',
+        source: 'Tardío, J. & Pardo-de-Santayana, M. (2008). Cultural importance indices: a comparative analysis. Economic Botany 62(1), 24–39.',
+    },
+    {
+        abbr: 'UV',
+        nameKey: 'data.reports.uv_full',
+        source: 'Phillips, O. & Gentry, A. H. (1993). The useful plants of Tambopata, Peru. Economic Botany 47(1), 15–32.',
+    },
+    {
+        abbr: 'CI',
+        nameKey: 'data.reports.ci_full',
+        source: 'Tardío, J. & Pardo-de-Santayana, M. (2008). Cultural importance indices: a comparative analysis. Economic Botany 62(1), 24–39.',
+    },
+    {
+        abbr: 'ICF',
+        nameKey: 'data.reports.icf_full',
+        source: 'Trotter, R. T. & Logan, M. H. (1986). Informant consensus. In: Plants in Indigenous Medicine and Diet. Redgrave.',
+    },
+    {
+        abbr: 'FL',
+        nameKey: 'data.reports.fl_full',
+        source: 'Friedman, J., Yaniv, Z., Dafni, A. & Palewitch, D. (1986). A preliminary classification of the healing potential of medicinal plants. Journal of Ethnopharmacology 16, 275–287.',
+    },
+];
+
 /** Italic binomial + plain authority. */
 function ScientificName({ species }) {
     return (
@@ -303,6 +335,40 @@ export default function Reports({ project, indices }) {
                                     </div>
                                 </Card>
                             )}
+
+                            <Card title={t('data.reports.references')}>
+                                <p className="text-sm opacity-80">
+                                    {t('data.reports.references_intro')}
+                                </p>
+                                <ul className="mt-3 space-y-3 text-sm">
+                                    {CITATIONS.map((citation) => (
+                                        <li key={citation.abbr}>
+                                            <span className="font-semibold">
+                                                {citation.abbr}
+                                            </span>
+                                            <span className="opacity-70">
+                                                {' '}
+                                                — {t(citation.nameKey)}
+                                            </span>
+                                            <div className="opacity-80">
+                                                {citation.source}
+                                            </div>
+                                        </li>
+                                    ))}
+                                </ul>
+                                <p className="mt-4 text-sm opacity-80">
+                                    <a
+                                        href={ETHNOBOTANYR_URL}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="link font-medium"
+                                    >
+                                        ethnobotanyR
+                                    </a>
+                                    {' — '}
+                                    {t('data.reports.ethnobotanyr_note')}
+                                </p>
+                            </Card>
                         </>
                     )}
                 </div>

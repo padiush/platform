@@ -219,3 +219,12 @@ from memory):
   classification of the healing potential of medicinal plants…* J. Ethnopharmacology 16.
 - Tardío, J., & Pardo-de-Santayana, M. (2008). *Cultural importance indices: a
   comparative analysis…* Economic Botany 62(1), 24–39.
+
+**Tooling inspiration** (implements these same literature indices — not their
+origin; the primary sources above define them):
+
+- Whitney, C. *ethnobotanyR: Calculate Quantitative Ethnobotany Indices.* R
+  package, CRAN. <https://CRAN.R-project.org/package=ethnobotanyR>
+
+The report page surfaces these per-index citations plus the ethnobotanyR
+attribution, so researchers can cite the right source for each index.
