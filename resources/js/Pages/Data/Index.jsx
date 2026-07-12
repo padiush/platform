@@ -82,6 +82,27 @@ export default function DataProcessing({ projects }) {
 
                                             {canGenerateReports ? (
                                                 <Link
+                                                    href={route(
+                                                        'data.reports',
+                                                        {
+                                                            project: project.id,
+                                                        },
+                                                    )}
+                                                    className="btn btn-outline btn-primary btn-sm"
+                                                >
+                                                    {t('data.reports.title')}
+                                                </Link>
+                                            ) : (
+                                                <span
+                                                    className="btn btn-outline btn-sm btn-disabled"
+                                                    aria-disabled="true"
+                                                >
+                                                    {t('data.reports.title')}
+                                                </span>
+                                            )}
+
+                                            {canGenerateReports ? (
+                                                <Link
                                                     href={route('data.export', {
                                                         project: project.id,
                                                     })}

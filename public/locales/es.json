@@ -429,6 +429,35 @@
             "previewing": "Generando vista previa…",
             "custom_counts": "{{interviews}} entrevistas · {{records}} registros",
             "species_counts": "{{count}} registros de especies"
+        },
+        "reports": {
+            "title": "Índices",
+            "subtitle": "Índices cuantitativos de etnobiología",
+            "informants": "Informantes",
+            "unlinked": "Citas sin vincular",
+            "species_indices": "Índices por especie",
+            "use_categories": "Categorías de uso",
+            "fidelity": "Nivel de fidelidad",
+            "species": "Especie",
+            "family": "Familia",
+            "use_category": "Categoría de uso",
+            "n_taxa": "Taxones",
+            "fc": "Citas",
+            "fc_full": "Frecuencia de citación (número de informantes)",
+            "rfc_full": "Frecuencia relativa de citación",
+            "uv_full": "Valor de uso",
+            "ci_full": "Índice de importancia cultural",
+            "n_ur": "Reportes de uso",
+            "n_ur_full": "Número de reportes de uso",
+            "icf_full": "Factor de consenso de informantes",
+            "fl_full": "Nivel de fidelidad",
+            "download": "Descargar",
+            "format_xlsx": "Excel (.xlsx)",
+            "format_csv": "CSV (.csv)",
+            "empty": {
+                "title": "Aún no hay índices",
+                "hint": "Vincula las citas de las entrevistas con especies del catálogo y marca un campo de categoría de uso en el diseñador de formularios."
+            }
         }
     },
     "public": {
