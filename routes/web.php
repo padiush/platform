@@ -100,6 +100,10 @@ Route::middleware(['auth'])->group(function () {
                         '/{project}/form/{form}/preview',
                         'preview'
                     )->name('form.preview');
+                    Route::put(
+                        '/{project}/form/{form}/structure',
+                        'updateStructure'
+                    )->name('form.structure.update');
                     Route::get(
                         '/{project}/form/{form}/sections',
                         'fetchSections'

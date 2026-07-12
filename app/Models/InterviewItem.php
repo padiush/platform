@@ -36,4 +36,9 @@ class InterviewItem extends Model
             'interview_section_id'
         );
     }
+
+    public function answers()
+    {
+        return $this->hasMany(InstanceAnswer::class, 'interview_item_id');
+    }
 }
