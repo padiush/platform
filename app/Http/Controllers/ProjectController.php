@@ -48,9 +48,10 @@ class ProjectController extends Controller
         ]);
     }
 
-    public function create(): Response
+    public function create(): RedirectResponse
     {
-        return Inertia::render('Projects/Form');
+        // The form is a modal on the project list; deep-link opens it there.
+        return redirect()->route('projects.index', ['create' => 1]);
     }
 
     public function store(Request $request): RedirectResponse
@@ -90,7 +91,7 @@ class ProjectController extends Controller
             ->with('message_type', 'success');
     }
 
-    public function edit(Project $project): Response|RedirectResponse
+    public function edit(Project $project): RedirectResponse
     {
         if (! Auth::user()->can('view', $project)) {
             return $this->denyNoAccess();
@@ -100,9 +101,7 @@ class ProjectController extends Controller
             return $this->denyNoPermission();
         }
 
-        return Inertia::render('Projects/Form', [
-            'project' => $project,
-        ]);
+        return redirect()->route('projects.index', ['edit' => $project->id]);
     }
 
     public function update(Request $request, Project $project)

@@ -62,13 +62,13 @@ class ProjectTest extends TestCase
         $response->assertDontSee($project->name);
     }
 
-    public function test_projects_create_can_be_rendered()
+    public function test_projects_create_redirects_to_the_list_modal()
     {
         $user = User::factory()->create();
 
         $response = $this->actingAs($user)->get(route('projects.create'));
 
-        $response->assertStatus(200);
+        $response->assertRedirect(route('projects.index', ['create' => 1]));
     }
 
     public function test_projects_can_be_created()
@@ -104,7 +104,7 @@ class ProjectTest extends TestCase
         ]);
     }
 
-    public function test_projects_edit_can_be_rendered_for_projects_with_manage_capability()
+    public function test_projects_edit_redirects_to_the_list_modal_for_projects_with_manage_capability()
     {
         $user = User::factory()->create();
 
@@ -118,8 +118,7 @@ class ProjectTest extends TestCase
 
         $response = $this->actingAs($user)->get(route('projects.edit', $project));
 
-        $response->assertStatus(200);
-        $response->assertSee($project->name);
+        $response->assertRedirect(route('projects.index', ['edit' => $project->id]));
     }
 
     public function test_projects_edit_cannot_be_rendered_for_projects_without_access()
