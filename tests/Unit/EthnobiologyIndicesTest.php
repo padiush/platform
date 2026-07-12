@@ -111,6 +111,12 @@ class EthnobiologyIndicesTest extends TestCase
         $this->assertEqualsWithDelta(0.9375, $speciesA['cv'], 1e-9); // 1·0.75·1.25
         $this->assertEqualsWithDelta(1.0, $speciesB['cv'], 1e-9); // 1·1·1
 
+        // Per-category use-report counts (drive the charts).
+        $this->assertSame(3, $this->reports($speciesA, 'food'));
+        $this->assertSame(2, $this->reports($speciesA, 'medicine'));
+        $this->assertSame(2, $this->reports($speciesB, 'food'));
+        $this->assertSame(2, $this->reports($speciesB, 'medicine'));
+
         // Fidelity Level
         $this->assertEqualsWithDelta(100.0, $this->fl($speciesA, 'food'), 1e-9);
         $this->assertEqualsWithDelta(50.0, $this->fl($speciesB, 'medicine'), 1e-9);
@@ -262,5 +268,11 @@ class EthnobiologyIndicesTest extends TestCase
     {
         return (new Collection($species['fidelity']))
             ->firstWhere('use_category', $useCategory)['value'];
+    }
+
+    private function reports(array $species, string $useCategory): int
+    {
+        return (new Collection($species['uses']))
+            ->firstWhere('use_category', $useCategory)['reports'];
     }
 }
