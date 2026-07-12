@@ -11,11 +11,14 @@ use App\Models\InterviewItem;
 use App\Models\InterviewSection;
 use App\Models\Project;
 use App\Models\User;
+use App\Services\CatalogSpeciesSearch;
+use App\Services\SpeciesLinkingList;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
 use Maatwebsite\Excel\Facades\Excel;
@@ -61,13 +64,16 @@ class InterviewDataController extends Controller
         ]);
     }
 
-    public function linkSpecies(Project $project): Response|RedirectResponse
-    {
+    public function linkSpecies(
+        Project $project,
+        Request $request,
+        SpeciesLinkingList $linkingList
+    ): Response|RedirectResponse {
         $this->checkPermission($project);
 
-        $linkable_answers = $project->speciesAnswers()->get();
-
-        if ($linkable_answers->count() === 0) {
+        // Only bounce when the project has no linkable answers at all. An empty
+        // search/filter result stays on the page and shows an empty state.
+        if ($project->speciesAnswers()->count() === 0) {
             return redirect()
                 ->route('data.index')
                 ->with(
@@ -76,89 +82,62 @@ class InterviewDataController extends Controller
                 );
         }
 
-        $answered_sections = collect();
+        $filters = [
+            'q' => trim((string) $request->query('q', '')),
+            'status' => in_array($request->query('status'), SpeciesLinkingList::STATUSES, true)
+                ? $request->query('status')
+                : 'all',
+            'group' => $request->boolean('group', true),
+        ];
 
-        foreach ($linkable_answers as $answer) {
-            $this_section = new \stdClass;
+        $rows = $linkingList->paginate(
+            $project,
+            $filters,
+            (int) $request->integer('page', 1)
+        );
 
-            if ($answer->section->repeatable) {
-                $section_answers = InstanceAnswer::where(
-                    'interview_instance_id',
-                    $answer->interview_instance_id
-                )
-                    ->where('interview_section_id', $answer->section->id)
-                    ->where('repeatable_index', $answer->repeatable_index)
-                    ->get();
-            } else {
-                $section_answers = InstanceAnswer::where(
-                    'interview_instance_id',
-                    $answer->interview_instance_id
-                )
-                    ->where('interview_section_id', $answer->section->id)
-                    ->get();
-            }
-
-            $this_section->section = [
-                'id' => $answer->section->id,
-                'name' => $answer->section->name,
-                'repeatable' => $answer->section->repeatable,
-            ];
-            $this_section->repeatable = $answer->section->repeatable;
-            $this_section->interview_instance_id =
-                $answer->interview_instance_id;
-            $this_section->repeatable_index = $answer->section->repeatable
-                ? $answer->repeatable_index
-                : null;
-            $this_section->items = $answer->section->items->map(function (
-                $item
-            ) {
-                return [
-                    'id' => $item->id,
-                    'label' => $item->label,
-                ];
-            });
-            $this_section->catalog_species_id = $answer->catalog_species_id;
-            $this_section->answers = $section_answers->map(function ($ans) {
-                return [
-                    'id' => $ans->id,
-                    'interview_item_id' => $ans->interview_item_id,
-                    'answer' => $ans->answer,
-                ];
-            });
-
-            $answered_sections->push($this_section);
-        }
-
-        $species = CatalogSpecies::where('project_id', $project->id)
-            ->orderBy('family', 'asc')
-            ->orderBy('genus', 'asc')
-            ->orderBy('name', 'asc')
-            ->get()
-            ->map(function ($s) {
-                return [
-                    'id' => $s->id,
-                    'family' => $s->family,
-                    'genus' => $s->genus,
-                    'name' => $s->name,
-                    'authority' => $s->authority,
-                ];
-            });
-
-        // Order by genus and then by name
-        $species = $species
-            ->sortBy(function ($s) {
-                return [$s['genus'], $s['name']];
-            })
-            ->values();
+        $linked = $project->linkedAnswers()->count();
+        $unlinked = $project->unlinkedAnswers()->count();
 
         return Inertia::render('Data/LinkSpecies', [
             'project' => [
                 'id' => $project->id,
                 'name' => $project->name,
             ],
-            'answered_sections' => $answered_sections,
-            'species' => $species,
+            'rows' => $rows,
+            'filters' => $filters,
+            'totals' => [
+                'linked' => $linked,
+                'unlinked' => $unlinked,
+                'total' => $linked + $unlinked,
+            ],
             'csrf_token' => csrf_token(),
+        ]);
+    }
+
+    public function searchSpecies(
+        Project $project,
+        Request $request,
+        CatalogSpeciesSearch $search
+    ): JsonResponse {
+        $this->checkPermission($project, true);
+
+        $paginator = $search->paginate(
+            $project,
+            ['q' => trim((string) $request->query('q', ''))],
+            (int) $request->integer('page', 1)
+        );
+
+        return response()->json([
+            'data' => collect($paginator->items())->map(fn ($sp) => [
+                'id' => $sp->id,
+                'family' => $sp->family,
+                'genus' => $sp->genus,
+                'name' => $sp->name,
+                'authority' => $sp->authority,
+            ])->all(),
+            'current_page' => $paginator->currentPage(),
+            'has_more' => $paginator->hasMorePages(),
         ]);
     }
 
@@ -168,54 +147,130 @@ class InterviewDataController extends Controller
     ): JsonResponse {
         $this->checkPermission($project, true);
 
-        $request->validate([
+        $validated = $request->validate([
             'interview_instance_id' => 'required|exists:interview_instances,id',
-            'catalog_species_id' => 'required|exists:catalog_species,id',
+            'catalog_species_id' => 'nullable|exists:catalog_species,id',
             'interview_section_id' => 'required|exists:interview_sections,id',
             'repeatable_index' => 'nullable|integer',
         ]);
 
-        // Every referenced resource must belong to this project, otherwise an
-        // authorized user could link across projects by mixing ids.
-        $projectFormIds = $project->interviewForms()->pluck('id');
-        $species = CatalogSpecies::findOrFail($request->catalog_species_id);
-        $instance = InterviewInstance::findOrFail(
-            $request->interview_instance_id
-        );
-        $section = InterviewSection::findOrFail(
-            $request->interview_section_id
+        $speciesId = $validated['catalog_species_id'] ?? null;
+
+        $this->assertTargetBelongsToProject(
+            $project,
+            $validated['interview_instance_id'],
+            $validated['interview_section_id'],
+            $speciesId
         );
 
-        if (
-            $species->project_id !== $project->id ||
-            ! $projectFormIds->contains($instance->interview_form_id) ||
-            ! $projectFormIds->contains($section->interview_form_id)
-        ) {
-            $this->deny('Recurso no válido para este proyecto.', true);
-        }
+        $this->linkGroup(
+            $validated['interview_instance_id'],
+            $validated['interview_section_id'],
+            $request->filled('repeatable_index')
+                ? (int) $validated['repeatable_index']
+                : null,
+            $speciesId
+        );
 
-        $answers = InstanceAnswer::where(
-            'interview_instance_id',
-            $request->interview_instance_id
-        )
-            ->where('interview_section_id', $request->interview_section_id)
+        return response()->json(['success' => true]);
+    }
+
+    public function handleBulkLinkRequest(
+        Project $project,
+        Request $request
+    ): JsonResponse {
+        $this->checkPermission($project, true);
+
+        $validated = $request->validate([
+            'catalog_species_id' => 'nullable|exists:catalog_species,id',
+            'targets' => 'required|array|min:1',
+            'targets.*.interview_instance_id' => 'required|exists:interview_instances,id',
+            'targets.*.interview_section_id' => 'required|exists:interview_sections,id',
+            'targets.*.repeatable_index' => 'nullable|integer',
+        ]);
+
+        $speciesId = $validated['catalog_species_id'] ?? null;
+
+        DB::transaction(function () use ($project, $validated, $speciesId) {
+            foreach ($validated['targets'] as $target) {
+                $repeatableIndex = ($target['repeatable_index'] ?? null) !== null
+                    ? (int) $target['repeatable_index']
+                    : null;
+
+                $this->assertTargetBelongsToProject(
+                    $project,
+                    $target['interview_instance_id'],
+                    $target['interview_section_id'],
+                    $speciesId
+                );
+
+                $this->linkGroup(
+                    $target['interview_instance_id'],
+                    $target['interview_section_id'],
+                    $repeatableIndex,
+                    $speciesId
+                );
+            }
+        });
+
+        return response()->json([
+            'success' => true,
+            'count' => count($validated['targets']),
+        ]);
+    }
+
+    /**
+     * Links (or, when $speciesId is null, unlinks) every species-linkable
+     * answer in one (instance, section, repeatable_index) group.
+     */
+    private function linkGroup(
+        string $instanceId,
+        int $sectionId,
+        ?int $repeatableIndex,
+        ?int $speciesId
+    ): void {
+        $answers = InstanceAnswer::where('interview_instance_id', $instanceId)
+            ->where('interview_section_id', $sectionId)
+            ->when(
+                $repeatableIndex !== null,
+                fn ($query) => $query->where('repeatable_index', $repeatableIndex)
+            )
             ->get();
-
-        if ($request->filled('repeatable_index')) {
-            $answers = $answers->where(
-                'repeatable_index',
-                $request->repeatable_index
-            );
-        }
 
         foreach ($answers as $answer) {
             if ($answer->item->link_to_species) {
-                $answer->catalog_species_id = $request->catalog_species_id;
+                $answer->catalog_species_id = $speciesId;
                 $answer->save();
             }
         }
+    }
 
-        return response()->json(['success' => true]);
+    /**
+     * Guards against cross-project linking: every referenced resource must
+     * belong to this project, otherwise an authorized user could link across
+     * projects by mixing ids.
+     */
+    private function assertTargetBelongsToProject(
+        Project $project,
+        string $instanceId,
+        int $sectionId,
+        ?int $speciesId
+    ): void {
+        $projectFormIds = $project->interviewForms()->pluck('id');
+        $instance = InterviewInstance::findOrFail($instanceId);
+        $section = InterviewSection::findOrFail($sectionId);
+
+        $valid = $projectFormIds->contains($instance->interview_form_id) &&
+            $projectFormIds->contains($section->interview_form_id);
+
+        if ($speciesId !== null) {
+            $species = CatalogSpecies::findOrFail($speciesId);
+            $valid = $valid && $species->project_id === $project->id;
+        }
+
+        if (! $valid) {
+            $this->deny('Recurso no válido para este proyecto.', true);
+        }
     }
 
     public function prepareEthnobotanyR(Project $project)

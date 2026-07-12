@@ -153,8 +153,15 @@ Route::middleware(['auth'])->group(function () {
     Route::controller(InterviewDataController::class)->group(function () {
         Route::get('/data', 'index')->name('data.index');
         Route::get('/data/link/{project}', 'linkSpecies')->name('data.link');
+        Route::get(
+            '/data/link/{project}/species-search',
+            'searchSpecies'
+        )->name('data.link.species-search');
         Route::post('/data/link/{project}/handle', 'handleLinkRequest')->name(
             'data.link.handle'
+        );
+        Route::post('/data/link/{project}/bulk', 'handleBulkLinkRequest')->name(
+            'data.link.bulk'
         );
 
         Route::get('/data/{project}/ethnobotanyR', 'prepareEthnobotanyR')->name(
