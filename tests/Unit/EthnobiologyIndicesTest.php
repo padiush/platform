@@ -162,6 +162,47 @@ class EthnobiologyIndicesTest extends TestCase
         $this->assertNull($food['icf']);
     }
 
+    public function test_instances_of_non_use_forms_do_not_dilute_the_denominator()
+    {
+        $a = $this->species('edulis');
+
+        // The main instrument (setUp) carries a species field: two informants,
+        // both citing A for food.
+        $this->useReport($this->interview(), 0, $a, 'food');
+        $this->useReport($this->interview(), 0, $a, 'food');
+
+        // A second, unrelated instrument in the same project with no species/use
+        // fields — e.g. a demographics survey with three respondents.
+        $other = InterviewForm::factory()->create(['project_id' => $this->project->id]);
+        $otherSection = InterviewSection::factory()->create([
+            'interview_form_id' => $other->id,
+        ]);
+        $otherItem = InterviewItem::factory()->create([
+            'interview_section_id' => $otherSection->id,
+            'type' => 'text',
+        ]);
+        foreach (range(1, 3) as $ignored) {
+            $instance = InterviewInstance::factory()->create([
+                'interview_form_id' => $other->id,
+            ]);
+            InstanceAnswer::create([
+                'interview_instance_id' => $instance->id,
+                'interview_section_id' => $otherSection->id,
+                'interview_item_id' => $otherItem->id,
+                'answer' => 'a demographic value',
+            ]);
+        }
+
+        $result = $this->indices->compute($this->project);
+
+        // N counts only the two species-instrument interviews, not the three
+        // demographic ones — otherwise RFC(A) would be 2/5 instead of 2/2.
+        $this->assertSame(2, $result['informants']);
+        $speciesA = collect($result['species'])->firstWhere('species.id', $a->id);
+        $this->assertSame(2, $speciesA['fc']);
+        $this->assertEqualsWithDelta(1.0, $speciesA['rfc'], 1e-9);
+    }
+
     private function species(string $name): CatalogSpecies
     {
         return CatalogSpecies::factory()->create([
