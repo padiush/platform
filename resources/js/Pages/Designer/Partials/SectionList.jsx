@@ -1,17 +1,16 @@
+import DragHandle from '@/Components/DragHandle';
 import IconButton from '@/Components/IconButton';
-import {
-    faArrowDown,
-    faArrowUp,
-    faPlus,
-    faTrashCan,
-} from '@fortawesome/pro-regular-svg-icons';
+import PositionSelect from '@/Components/PositionSelect';
+import { faPlus, faTrashCan } from '@fortawesome/pro-regular-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 /**
  * The outline sidebar: one row per section, keyboard-selectable, with item
- * counts and boundary-disabled reordering. Renaming happens in the main
- * panel, so rows stay plain buttons.
+ * counts. Reordering: drag from the grip, or use the position select
+ * (keyboard/touch). Renaming happens in the main panel, so rows stay plain
+ * buttons.
  */
 export default function SectionList({
     sections,
@@ -22,6 +21,9 @@ export default function SectionList({
     onRemove,
 }) {
     const { t } = useTranslation();
+    // Rows are draggable only while their grip is pressed.
+    const [dragArmedId, setDragArmedId] = useState(null);
+    const [draggedIndex, setDraggedIndex] = useState(null);
 
     return (
         <nav aria-label={t('designer.title')} className="flex flex-col gap-2">
@@ -48,43 +50,66 @@ export default function SectionList({
                             selected
                                 ? 'border-primary bg-base-300'
                                 : 'hover:bg-base-300 border-transparent'
-                        }`}
+                        } ${draggedIndex === index ? 'opacity-60' : ''}`}
+                        draggable={dragArmedId === section.clientId}
+                        onDragStart={() => setDraggedIndex(index)}
+                        onDragOver={(e) => {
+                            if (draggedIndex !== null) {
+                                e.preventDefault();
+                            }
+                        }}
+                        onDrop={() => {
+                            if (
+                                draggedIndex !== null &&
+                                draggedIndex !== index
+                            ) {
+                                onMove(draggedIndex, index);
+                            }
+                            setDraggedIndex(null);
+                            setDragArmedId(null);
+                        }}
+                        onDragEnd={() => {
+                            setDraggedIndex(null);
+                            setDragArmedId(null);
+                        }}
                     >
-                        <button
-                            type="button"
-                            aria-label={t('designer.select_section_aria', {
-                                name,
-                            })}
-                            aria-current={selected ? 'true' : undefined}
-                            onClick={() => onSelect(index)}
-                            className="w-full rounded-md px-2 py-1.5 text-left"
-                        >
-                            <span className="block truncate font-semibold">
-                                {name}
-                            </span>
-                            <span className="text-base-content/60 block text-xs">
-                                {t('designer.summary.fields', {
-                                    count: section.items.length,
+                        <div className="flex items-start gap-1">
+                            {sections.length > 1 && (
+                                <DragHandle
+                                    title={t('designer.drag_handle')}
+                                    onArm={() =>
+                                        setDragArmedId(section.clientId)
+                                    }
+                                    onDisarm={() => setDragArmedId(null)}
+                                />
+                            )}
+                            <button
+                                type="button"
+                                aria-label={t('designer.select_section_aria', {
+                                    name,
                                 })}
-                                {section.repeatable
-                                    ? ` · ${t('designer.repeatable')}`
-                                    : ''}
-                            </span>
-                        </button>
-                        <div className="flex justify-end gap-1 px-1 pb-1">
-                            <IconButton
-                                icon={faArrowUp}
-                                label={t('designer.fields.move_up')}
-                                disabled={index === 0}
-                                onClick={() => onMove(index, index - 1)}
-                                className="btn-xs"
-                            />
-                            <IconButton
-                                icon={faArrowDown}
-                                label={t('designer.fields.move_down')}
-                                disabled={index === sections.length - 1}
-                                onClick={() => onMove(index, index + 1)}
-                                className="btn-xs"
+                                aria-current={selected ? 'true' : undefined}
+                                onClick={() => onSelect(index)}
+                                className="min-w-0 grow rounded-md px-2 py-1.5 text-left"
+                            >
+                                <span className="block truncate font-semibold">
+                                    {name}
+                                </span>
+                                <span className="text-base-content/60 block text-xs">
+                                    {t('designer.summary.fields', {
+                                        count: section.items.length,
+                                    })}
+                                    {section.repeatable
+                                        ? ` · ${t('designer.repeatable')}`
+                                        : ''}
+                                </span>
+                            </button>
+                        </div>
+                        <div className="flex items-center justify-end gap-1 px-1 pb-1">
+                            <PositionSelect
+                                index={index}
+                                count={sections.length}
+                                onMove={(to) => onMove(index, to)}
                             />
                             <IconButton
                                 icon={faTrashCan}

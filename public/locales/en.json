@@ -233,7 +233,8 @@
         },
         "move_has_answers": "These fields already have recorded answers and cannot move to another section:",
         "name_auto_hint": "Derived from the label — edit to override.",
-        "name_label": "Export column name"
+        "name_label": "Export column name",
+        "drag_handle": "Drag to reorder"
     },
     "interviews": {
         "new_interview": "New interview",
