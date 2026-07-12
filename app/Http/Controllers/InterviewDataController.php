@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Exports\CustomExport;
 use App\Exports\EthnobotanyRExport;
 use App\Models\CatalogSpecies;
+use App\Models\ChartPreference;
 use App\Models\InstanceAnswer;
 use App\Models\InterviewInstance;
 use App\Models\InterviewItem;
@@ -153,11 +154,70 @@ class InterviewDataController extends Controller
             'summary' => $section === null
                 ? null
                 : ($filters['tab'] === 'summary'
-                    ? fn () => $table->summary($form, $section)
-                    : Inertia::optional(fn () => $table->summary($form, $section))),
+                    ? fn () => $this->withChartPreferences($table->summary($form, $section))
+                    : Inertia::optional(
+                        fn () => $this->withChartPreferences($table->summary($form, $section))
+                    )),
             // For the native-form "export this section" download.
             'csrf_token' => csrf_token(),
         ]);
+    }
+
+    /**
+     * Overlays the current user's saved chart type onto each summary field,
+     * ignoring a stale choice that is no longer valid for the field's kind.
+     */
+    private function withChartPreferences(array $summary): array
+    {
+        $preferences = ChartPreference::query()
+            ->where('user_id', Auth::id())
+            ->whereIn('interview_item_id', collect($summary)->pluck('item_id'))
+            ->pluck('chart_type', 'interview_item_id');
+
+        return collect($summary)->map(function (array $field) use ($preferences) {
+            $saved = $preferences[$field['item_id']] ?? null;
+
+            if ($saved !== null && in_array($saved, $field['available'], true)) {
+                $field['chart_type'] = $saved;
+            }
+
+            return $field;
+        })->all();
+    }
+
+    public function saveChartPreference(
+        Project $project,
+        Request $request
+    ): JsonResponse {
+        $this->checkPermission($project, true);
+
+        $validated = $request->validate([
+            'interview_item_id' => 'required|exists:interview_items,id',
+            'chart_type' => 'required|string',
+        ]);
+
+        $item = InterviewItem::findOrFail($validated['interview_item_id']);
+        $section = InterviewSection::findOrFail($item->interview_section_id);
+
+        if (! $project->interviewForms()->pluck('id')->contains($section->interview_form_id)) {
+            $this->deny('Recurso no válido para este proyecto.', true);
+        }
+
+        $kind = InterviewDataTable::kindFor($item);
+
+        if (! in_array($validated['chart_type'], InterviewDataTable::chartTypesFor($kind), true)) {
+            return response()->json(
+                ['error' => 'Tipo de gráfico no válido para este campo.'],
+                422
+            );
+        }
+
+        ChartPreference::updateOrCreate(
+            ['user_id' => Auth::id(), 'interview_item_id' => $item->id],
+            ['chart_type' => $validated['chart_type']],
+        );
+
+        return response()->json(['success' => true]);
     }
 
     public function linkSpecies(

@@ -29,11 +29,52 @@ class InterviewDataTable
 {
     public const PER_PAGE = 20;
 
-    /** Categories shown per categorical chart (by descending count). */
-    private const TOP_N = 12;
+    /**
+     * Distinct values returned per categorical/species field. The table view
+     * lists these; bar/pie slice further on the client. Bounded by distinct
+     * cardinality, and total_distinct reports how many were dropped.
+     */
+    private const DISPLAY_MAX = 50;
+
+    /** Above this month span, dates bucket by year instead of month. */
+    private const MONTH_SPAN_LIMIT = 24;
 
     /** Histogram buckets for numeric fields. */
     private const BINS = 8;
+
+    /**
+     * The chart "kind" a field maps to — drives both the aggregation and the
+     * chart types offered for it.
+     */
+    public static function kindFor(InterviewItem $item): string
+    {
+        if ($item->link_to_species) {
+            return 'species';
+        }
+
+        return match ($item->type) {
+            'number' => 'number',
+            'date' => 'date',
+            default => 'categorical',
+        };
+    }
+
+    /**
+     * @return list<string>
+     */
+    public static function chartTypesFor(string $kind): array
+    {
+        return match ($kind) {
+            'number' => ['bar', 'table'],
+            'date' => ['bar', 'line', 'table'],
+            default => ['bar', 'pie', 'table'],
+        };
+    }
+
+    public static function defaultChartType(string $kind): string
+    {
+        return 'bar';
+    }
 
     /**
      * @param  array{interviewer?: ?int, from?: ?string, to?: ?string}  $filters
@@ -216,10 +257,18 @@ class InterviewDataTable
 
     private function fieldSummary(InterviewItem $item): array
     {
-        $base = ['item_id' => $item->id, 'label' => $item->label];
+        $kind = self::kindFor($item);
 
-        if ($item->link_to_species) {
-            return $base + ['kind' => 'species', 'data' => $this->speciesSummary($item)];
+        $base = [
+            'item_id' => $item->id,
+            'label' => $item->label,
+            'kind' => $kind,
+            'available' => self::chartTypesFor($kind),
+            'chart_type' => self::defaultChartType($kind),
+        ];
+
+        if ($kind === 'species') {
+            return $base + $this->speciesSummary($item);
         }
 
         $values = InstanceAnswer::query()
@@ -230,10 +279,10 @@ class InterviewDataTable
             ->values();
 
         return match ($item->type) {
-            'number' => $base + ['kind' => 'number'] + $this->numericSummary($values),
-            'date' => $base + ['kind' => 'date', 'data' => $this->dateSummary($values)],
-            'multi' => $base + ['kind' => 'categorical', 'data' => $this->multiSummary($values)],
-            default => $base + ['kind' => 'categorical', 'data' => $this->categoricalSummary($values)],
+            'number' => $base + $this->numericSummary($values),
+            'date' => $base + $this->dateSummary($values),
+            'multi' => $base + $this->multiSummary($values),
+            default => $base + $this->categoricalSummary($values),
         };
     }
 
@@ -253,17 +302,21 @@ class InterviewDataTable
             ->get()
             ->mapWithKeys(fn ($s) => [$s->id => trim("{$s->genus} {$s->name}")]);
 
-        return $counts
+        $sorted = $counts
             ->map(fn ($total, $id) => ['label' => $names[$id] ?? '—', 'count' => $total])
             ->sortByDesc('count')
-            ->take(self::TOP_N)
-            ->values()
-            ->all();
+            ->values();
+
+        return [
+            'data' => $sorted->take(self::DISPLAY_MAX)->all(),
+            'total_distinct' => $sorted->count(),
+            'total_count' => $sorted->sum('count'),
+        ];
     }
 
     private function categoricalSummary(Collection $values): array
     {
-        return $this->topN($values->countBy(fn ($v) => (string) $v));
+        return $this->distribution($values->countBy(fn ($v) => (string) $v));
     }
 
     private function multiSummary(Collection $values): array
@@ -280,17 +333,25 @@ class InterviewDataTable
             }
         }
 
-        return $this->topN($counts);
+        return $this->distribution($counts);
     }
 
-    private function topN(Collection $counts): array
+    /**
+     * Sorted top-DISPLAY_MAX distribution plus how much was truncated, so the
+     * client can show "top N of M" and an "Other" bucket.
+     */
+    private function distribution(Collection $counts): array
     {
-        return $counts
-            ->sortDesc()
-            ->take(self::TOP_N)
-            ->map(fn ($count, $label) => ['label' => (string) $label, 'count' => $count])
-            ->values()
-            ->all();
+        $sorted = $counts->sortDesc();
+
+        return [
+            'data' => $sorted->take(self::DISPLAY_MAX)
+                ->map(fn ($count, $label) => ['label' => (string) $label, 'count' => $count])
+                ->values()
+                ->all(),
+            'total_distinct' => $sorted->count(),
+            'total_count' => $sorted->sum(),
+        ];
     }
 
     private function numericSummary(Collection $values): array
@@ -350,22 +411,38 @@ class InterviewDataTable
 
     private function dateSummary(Collection $values): array
     {
-        $counts = collect();
+        $dates = collect();
 
         foreach ($values as $raw) {
             try {
-                $month = Carbon::parse($raw)->format('Y-m');
+                $dates->push(Carbon::parse($raw));
             } catch (\Throwable) {
                 continue;
             }
-
-            $counts[$month] = ($counts[$month] ?? 0) + 1;
         }
 
-        return $counts
-            ->sortKeys()
-            ->map(fn ($count, $month) => ['label' => $month, 'count' => $count])
-            ->values()
-            ->all();
+        if ($dates->isEmpty()) {
+            return ['data' => [], 'bucket' => 'month'];
+        }
+
+        // Bucket by year once the span gets long, so a multi-year dataset
+        // doesn't produce dozens of unreadable monthly bars.
+        $byYear = $dates->min()->diffInMonths($dates->max()) > self::MONTH_SPAN_LIMIT;
+        $format = $byYear ? 'Y' : 'Y-m';
+
+        $counts = collect();
+        foreach ($dates as $date) {
+            $key = $date->format($format);
+            $counts[$key] = ($counts[$key] ?? 0) + 1;
+        }
+
+        return [
+            'data' => $counts
+                ->sortKeys()
+                ->map(fn ($count, $label) => ['label' => (string) $label, 'count' => $count])
+                ->values()
+                ->all(),
+            'bucket' => $byYear ? 'year' : 'month',
+        ];
     }
 }

@@ -234,6 +234,69 @@ class InterviewDataTableTest extends TestCase
         $this->assertEquals(4, $summary['stats']['median']);
     }
 
+    public function test_summary_exposes_available_types_and_default_per_kind()
+    {
+        $section = $this->section();
+        $select = $this->item($section, 'select');
+        $number = $this->item($section, 'number');
+        $date = $this->item($section, 'date');
+        $this->answer($this->interview(), $section, $select, 'A');
+        $this->answer($this->interview(), $section, $number, '5');
+        $this->answer($this->interview(), $section, $date, '2026-01-01');
+
+        $byId = collect($this->table->summary($this->form, $section))->keyBy('item_id');
+
+        $this->assertSame(['bar', 'pie', 'table'], $byId[$select->id]['available']);
+        $this->assertSame(['bar', 'table'], $byId[$number->id]['available']);
+        $this->assertSame(['bar', 'line', 'table'], $byId[$date->id]['available']);
+        $this->assertSame('bar', $byId[$select->id]['chart_type']);
+    }
+
+    public function test_summary_reports_truncation_totals()
+    {
+        $section = $this->section();
+        $item = $this->item($section, 'select');
+        foreach (['A', 'A', 'B'] as $value) {
+            $this->answer($this->interview(), $section, $item, $value);
+        }
+
+        $summary = collect($this->table->summary($this->form, $section))
+            ->firstWhere('item_id', $item->id);
+
+        $this->assertSame(2, $summary['total_distinct']);
+        $this->assertSame(3, $summary['total_count']);
+    }
+
+    public function test_date_summary_buckets_by_month_or_year_by_span()
+    {
+        $section = $this->section();
+
+        $monthly = $this->item($section, 'date');
+        $this->answer($this->interview(), $section, $monthly, '2026-01-15');
+        $this->answer($this->interview(), $section, $monthly, '2026-02-20');
+
+        $yearly = $this->item($section, 'date');
+        $this->answer($this->interview(), $section, $yearly, '2020-01-01');
+        $this->answer($this->interview(), $section, $yearly, '2026-01-01');
+
+        $byId = collect($this->table->summary($this->form, $section))->keyBy('item_id');
+
+        $this->assertSame('month', $byId[$monthly->id]['bucket']);
+        $this->assertSame('year', $byId[$yearly->id]['bucket']);
+    }
+
+    public function test_kind_for_maps_item_types()
+    {
+        $section = $this->section();
+
+        $this->assertSame('number', InterviewDataTable::kindFor($this->item($section, 'number')));
+        $this->assertSame('date', InterviewDataTable::kindFor($this->item($section, 'date')));
+        $this->assertSame('categorical', InterviewDataTable::kindFor($this->item($section, 'multi')));
+        $this->assertSame('species', InterviewDataTable::kindFor(
+            $this->item($section, 'text', ['link_to_species' => true])
+        ));
+    }
+
     public function test_summary_counts_species_citations()
     {
         $section = $this->section();
