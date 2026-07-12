@@ -104,50 +104,6 @@ Route::middleware(['auth'])->group(function () {
                         '/{project}/form/{form}/structure',
                         'updateStructure'
                     )->name('form.structure.update');
-                    Route::get(
-                        '/{project}/form/{form}/sections',
-                        'fetchSections'
-                    )->name('form.sections');
-                    Route::post(
-                        '/{project}/form/{form}/section/create',
-                        'createSection'
-                    )->name('form.sections.create');
-                    Route::put(
-                        '/{project}/form/{form}/section/{section}/rename',
-                        'renameSection'
-                    )->name('form.sections.rename');
-                    Route::put(
-                        '/{project}/form/{form}/section/{section}/reorder',
-                        'reorderSection'
-                    )->name('form.sections.reorder');
-                    Route::put(
-                        '/projects/{project}/designer/{form}/section/{section}/repeatable',
-                        'toggleRepeatable'
-                    )->name('form.sections.repeatable');
-                    Route::delete(
-                        '/{project}/form/{form}/sections/{section}/delete',
-                        'deleteSection'
-                    )->name('form.sections.delete');
-                    Route::get(
-                        '/{project}/form/{form}/section/{section}/items',
-                        'fetchItems'
-                    )->name('form.section.items');
-                    Route::post(
-                        '/{project}/form/{form}/section/{section}/items/create',
-                        'createItem'
-                    )->name('form.section.items.create');
-                    Route::put(
-                        '/{project}/form/{form}/section/{section}/items/{item}',
-                        'updateItem'
-                    )->name('form.section.items.update');
-                    Route::delete(
-                        '/{project}/form/{form}/section/{section}/items/{item}/delete',
-                        'deleteItem'
-                    )->name('form.section.items.delete');
-                    Route::put(
-                        '/{project}/form/{form}/section/{section}/items/{item}/reorder',
-                        'reorderItem'
-                    )->name('form.section.items.reorder');
                 }
             );
         });
