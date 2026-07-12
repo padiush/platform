@@ -34,13 +34,33 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+        $user = $request->user();
+        // Accesses (not owned projects): membership is what unlocks the app's
+        // sections, and the nav gates each item by the matching capability.
+        $accesses = $user
+            ? $user->projectAccesses()->with('capability')->get()
+            : collect();
+
         return [
             ...parent::share($request),
             'auth' => [
-                'user' => $request->user(),
-                'projects' => $request->user()
-                    ? $request->user()->projects->count()
-                    : [],
+                'user' => $user,
+                'projects' => $accesses->count(),
+                'capabilities' => [
+                    'manage_forms' => $accesses->contains(
+                        fn ($access) => (bool) $access->capability?->manage_forms
+                    ),
+                    'record_data' => $accesses->contains(
+                        fn ($access) => (bool) $access->capability?->record_data
+                    ),
+                    'data' => $accesses->contains(
+                        fn ($access) => $access->capability?->manage_data ||
+                            $access->capability?->generate_reports
+                    ),
+                    'view_catalog' => $accesses->contains(
+                        fn ($access) => (bool) $access->capability?->view_catalog
+                    ),
+                ],
             ],
             'honeypot' => new Honeypot(config('honeypot')),
             'ziggy' => fn () => [

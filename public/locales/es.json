@@ -399,5 +399,18 @@
     "theme": {
         "switch_to_light": "Cambiar a tema claro",
         "switch_to_dark": "Cambiar a tema oscuro"
+    },
+    "hubs": {
+        "empty": {
+            "title_designer": "No hay proyectos para diseñar formularios",
+            "hint_designer": "Necesitas un proyecto activo donde puedas administrar formularios. Crea un proyecto o pide acceso a quien lo administra.",
+            "title_interviews": "No hay proyectos listos para entrevistas",
+            "hint_interviews": "Necesitas un proyecto activo donde puedas registrar datos, con al menos un formulario habilitado.",
+            "title_catalogs": "No hay catálogos disponibles",
+            "hint_catalogs": "Necesitas un proyecto donde puedas ver el catálogo de especies.",
+            "title_data": "Aún no hay datos para procesar",
+            "hint_data": "Necesitas un proyecto donde puedas administrar datos o generar reportes.",
+            "cta": "Ir a mis proyectos"
+        }
     }
 }

@@ -82,13 +82,6 @@ class InterviewInstancesController extends Controller
             }
         }
 
-        if ($projects->count() == 0) {
-            return redirect()
-                ->route('projects.index')
-                ->with('message', 'interviews.no_projects_available')
-                ->with('message_type', 'error');
-        }
-
         return Inertia::render('Interviews/Index', [
             'projects' => $projects,
             'user' => Auth::user(),
