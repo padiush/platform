@@ -88,11 +88,11 @@ absorb them without a rewrite.
   expensive to retrofit. Drives which taxonomic authority the catalog validates
   against and the analysis/vocabulary defaults. See
   [decisions/0006-multi-subfield-architecture.md](decisions/0006-multi-subfield-architecture.md).
-- **A "use" semantic on items** — the indices need to know which answers are
-  *uses* and in which *use category*. Today only `link_to_species` is semantic;
-  there is no use-category role. This is the key open modeling decision for the
-  indices milestone — see the OPEN QUESTION in
-  [analysis/ethnobotany-indices.md](analysis/ethnobotany-indices.md).
+- **A use-category role on items** — the indices need to know which answers are
+  *uses* and in which *use category*. Decided: a use-category role on
+  `InterviewItem`, mirroring `link_to_species`
+  ([decisions/0007-use-category-as-item-role.md](decisions/0007-use-category-as-item-role.md));
+  to be built as a prerequisite of the indices milestone.
 - **`InstanceAnswer` client UUID** — instances are already UUID-keyed; answers
   are integer-PK. Offline capture creates answers on-device, so they will need a
   client-generated identifier. See

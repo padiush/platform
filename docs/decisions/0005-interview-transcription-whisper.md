@@ -1,6 +1,6 @@
 # 0005 — Transcribe interview audio with self-hosted Whisper
 
-- **Status:** Proposed
+- **Status:** Accepted
 - **Deciders:** Project owner
 
 ## Context

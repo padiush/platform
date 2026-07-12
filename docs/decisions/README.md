@@ -15,11 +15,12 @@ is accurate, and the open questions are surfaced in
 | # | Decision | Status |
 |---|---|---|
 | [0001](0001-complete-ethnobotany-before-generalizing.md) | Complete the ethnobotany vertical before generalizing to other subfields | Accepted |
-| [0002](0002-mobile-companion-stack.md) | Build companion apps on Expo / React Native | Proposed |
+| [0002](0002-mobile-companion-stack.md) | Build companion apps on Expo / React Native | Accepted |
 | [0003](0003-capture-only-companion-scope.md) | Scope the companion apps to field capture only | Proposed |
 | [0004](0004-offline-sync-model.md) | Offline sync: client-owned records, UUIDs, last-writer-wins | Proposed |
-| [0005](0005-interview-transcription-whisper.md) | Transcribe interview audio with self-hosted Whisper | Proposed |
+| [0005](0005-interview-transcription-whisper.md) | Transcribe interview audio with self-hosted Whisper | Accepted |
 | [0006](0006-multi-subfield-architecture.md) | Generalize to ethnobiology via subfield configuration | Accepted (impl. deferred) |
+| [0007](0007-use-category-as-item-role.md) | Model use-category as a form-item role | Accepted |
 
 ## Template
 
