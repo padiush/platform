@@ -393,6 +393,17 @@
                 "max": "max",
                 "mean": "mean",
                 "median": "median"
+            },
+            "chart": {
+                "bar": "Bars",
+                "pie": "Pie",
+                "line": "Line",
+                "table": "Table",
+                "other": "Other",
+                "top_n_of_m": "Showing {{shown}} of {{total}}",
+                "value": "Value",
+                "count": "Count",
+                "percent": "%"
             }
         }
     },
