@@ -1,6 +1,8 @@
 import Card from '@/Components/Card';
+import DragHandle from '@/Components/DragHandle';
 import IconButton from '@/Components/IconButton';
 import Input from '@/Components/Input';
+import PositionSelect from '@/Components/PositionSelect';
 import Select from '@/Components/Select';
 import {
     effectiveName,
@@ -8,8 +10,6 @@ import {
     itemSummary,
 } from '@/lib/designerDraft';
 import {
-    faArrowDown,
-    faArrowUp,
     faChevronDown,
     faChevronRight,
     faPlus,
@@ -21,7 +21,8 @@ import { useTranslation } from 'react-i18next';
 /**
  * One field of the draft. Collapsed it reads as an outline row (title +
  * facts); expanded it shows the full editor. All edits go through onChange —
- * nothing talks to the server here.
+ * nothing talks to the server here. Reordering: drag from the grip, or use
+ * the position select (keyboard/touch).
  */
 export default function FieldCard({
     item,
@@ -35,6 +36,8 @@ export default function FieldCard({
     onMove,
     onMoveToSection,
     onRemove,
+    onDragArm,
+    onDragDisarm,
 }) {
     const { t } = useTranslation();
 
@@ -50,6 +53,13 @@ export default function FieldCard({
     return (
         <Card className="w-full">
             <div className="flex flex-wrap items-center gap-2">
+                {count > 1 && (
+                    <DragHandle
+                        title={t('designer.drag_handle')}
+                        onArm={onDragArm}
+                        onDisarm={onDragDisarm}
+                    />
+                )}
                 <button
                     type="button"
                     aria-expanded={expanded}
@@ -71,37 +81,10 @@ export default function FieldCard({
                 </button>
 
                 <div className="flex flex-wrap items-center gap-1">
-                    {count > 1 && (
-                        <select
-                            className="select select-bordered select-sm hidden w-auto sm:block"
-                            aria-label={t('designer.position_label', {
-                                position: index + 1,
-                                count,
-                            })}
-                            value={index}
-                            onChange={(e) => onMove(Number(e.target.value))}
-                        >
-                            {Array.from({ length: count }, (_, i) => (
-                                <option key={i} value={i}>
-                                    {t('designer.position_label', {
-                                        position: i + 1,
-                                        count,
-                                    })}
-                                </option>
-                            ))}
-                        </select>
-                    )}
-                    <IconButton
-                        icon={faArrowUp}
-                        label={t('designer.fields.move_up')}
-                        disabled={index === 0}
-                        onClick={() => onMove(index - 1)}
-                    />
-                    <IconButton
-                        icon={faArrowDown}
-                        label={t('designer.fields.move_down')}
-                        disabled={index === count - 1}
-                        onClick={() => onMove(index + 1)}
+                    <PositionSelect
+                        index={index}
+                        count={count}
+                        onMove={onMove}
                     />
                     <IconButton
                         icon={faTrashCan}

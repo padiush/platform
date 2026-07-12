@@ -41,6 +41,10 @@ export default function Wizard({ project, form, structure, instancesCount }) {
     const [expandedFieldId, setExpandedFieldId] = useState(null);
     const [drawerOpen, setDrawerOpen] = useState(false);
     const pendingFocus = useRef(null); // {selector} to focus after render
+    // Cards are draggable only while their grip is pressed, so selecting
+    // text inside a card's inputs never starts a drag.
+    const [dragArmedId, setDragArmedId] = useState(null);
+    const [draggedIndex, setDraggedIndex] = useState(null);
 
     const selectedSection =
         selectedIndex !== null ? (sections[selectedIndex] ?? null) : null;
@@ -311,6 +315,42 @@ export default function Wizard({ project, form, structure, instancesCount }) {
                                         <div
                                             key={item.clientId}
                                             data-client-id={item.clientId}
+                                            className={
+                                                draggedIndex === itemIndex
+                                                    ? 'opacity-60'
+                                                    : ''
+                                            }
+                                            draggable={
+                                                dragArmedId === item.clientId
+                                            }
+                                            onDragStart={() =>
+                                                setDraggedIndex(itemIndex)
+                                            }
+                                            onDragOver={(e) => {
+                                                if (draggedIndex !== null) {
+                                                    e.preventDefault();
+                                                }
+                                            }}
+                                            onDrop={() => {
+                                                if (
+                                                    draggedIndex !== null &&
+                                                    draggedIndex !== itemIndex
+                                                ) {
+                                                    patchItems(
+                                                        moveItem(
+                                                            selectedSection.items,
+                                                            draggedIndex,
+                                                            itemIndex,
+                                                        ),
+                                                    );
+                                                }
+                                                setDraggedIndex(null);
+                                                setDragArmedId(null);
+                                            }}
+                                            onDragEnd={() => {
+                                                setDraggedIndex(null);
+                                                setDragArmedId(null);
+                                            }}
                                         >
                                             <FieldCard
                                                 item={item}
@@ -364,6 +404,14 @@ export default function Wizard({ project, form, structure, instancesCount }) {
                                                                 i !== itemIndex,
                                                         ),
                                                     )
+                                                }
+                                                onDragArm={() =>
+                                                    setDragArmedId(
+                                                        item.clientId,
+                                                    )
+                                                }
+                                                onDragDisarm={() =>
+                                                    setDragArmedId(null)
                                                 }
                                             />
                                         </div>

@@ -233,7 +233,8 @@
         },
         "move_has_answers": "Estos campos ya tienen respuestas registradas y no pueden moverse a otra sección:",
         "name_auto_hint": "Derivado de la etiqueta; edítalo para personalizarlo.",
-        "name_label": "Nombre de columna al exportar"
+        "name_label": "Nombre de columna al exportar",
+        "drag_handle": "Arrastra para reordenar"
     },
     "interviews": {
         "title": "Entrevistas",

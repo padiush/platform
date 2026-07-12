@@ -233,7 +233,8 @@
         },
         "move_has_answers": "Estes campos já têm respostas registradas e não podem ser movidos para outra seção:",
         "name_auto_hint": "Derivado do rótulo — edite para personalizar.",
-        "name_label": "Nome da coluna na exportação"
+        "name_label": "Nome da coluna na exportação",
+        "drag_handle": "Arraste para reordenar"
     },
     "interviews": {
         "new_interview": "Nova entrevista",
