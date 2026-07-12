@@ -34,8 +34,9 @@ Mapping to the data model ([../data-model.md](../data-model.md)):
 > same repeatable set as the linked species, supplies *u*. See
 > [../decisions/0007-use-category-as-item-role.md](../decisions/0007-use-category-as-item-role.md).
 >
-> With the role in place, the remaining work for the (all-five) milestone is the
-> index **computation** itself — ICF, FL, and CI read *u* from this flag.
+> ✅ The computation is now built in `app/Services/EthnobiologyIndices.php`
+> (verified against the worked example below). The remaining milestone work is
+> **surfacing** it — a report UI and an export.
 
 **N (the denominator)** is *all informants surveyed*, not just those who cited a
 given species. A species no informant mentioned contributes 0 to UV/RFC/CI, which
@@ -178,10 +179,11 @@ from memory):
 ## Implementation notes
 
 - **Answers are encrypted** (`InstanceAnswer.answer` cast `encrypted`), so indices
-  cannot be computed in SQL — decrypt and aggregate in PHP, following the existing
-  in-memory pattern in `app/Services/InterviewDataTable.php` /
-  `InterviewDataExport.php`. Expect an `EthnobiologyIndices` service in the same
-  family.
+  cannot be computed in SQL — they are decrypted and aggregated in PHP, following
+  the in-memory pattern of `InterviewDataTable` / `InterviewDataExport`.
+  Implemented in `app/Services/EthnobiologyIndices.php`; species citations
+  (FC/RFC/I_u) come from links directly, use reports (UV/CI/ICF/FL) additionally
+  require a use-category.
 - **Scope** is a project (optionally a single form). `N` is the count of
   in-scope instances.
 - **Unlinked answers** (null `catalog_species_id`) are excluded from species-level
@@ -196,9 +198,10 @@ from memory):
   ([ADR 0007](../decisions/0007-use-category-as-item-role.md)).
 - ✅ **v1 scope** — all five indices (RFC, UV, CI, ICF, FL) ship together; the
   use-category role is a prerequisite of the milestone.
-- ⏳ **UV variant** — still to confirm at implementation: the "mean use-reports per
-  informant" reading (used here) vs. a Phillips & Gentry uses-based count. Low
-  stakes; lock it when the fixture is encoded.
+- ✅ **UV variant** — implemented as "mean use-reports per informant"
+  (`UV(s) = ΣUR(s) / N`), matching the worked-example fixture. (In the fixture
+  each informant gives at most one report per species-use, so this coincides with
+  the Phillips & Gentry uses-based reading.)
 
 ## Sources
 
