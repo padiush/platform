@@ -404,7 +404,22 @@
                 "value": "Valor",
                 "count": "Contagem",
                 "percent": "%"
-            }
+            },
+            "customize_export": "Personalizar exportação…"
+        },
+        "export": {
+            "title": "Exportar",
+            "mode_custom": "Campos personalizados",
+            "mode_ethnobotanyr": "Matriz EthnobotanyR",
+            "select_all": "Selecionar tudo",
+            "repeatable_locked": "Não pode misturar secções repetíveis e não repetíveis numa exportação.",
+            "ethnobotanyr_help": "Cria uma matriz de informante × espécie com uma coluna 0/1 por categoria de uso, pronta para o pacote ethnobotanyR do R.",
+            "category_field": "Campo de categoria de uso",
+            "format": "Formato",
+            "generate": "Descarregar",
+            "previewing": "A gerar pré-visualização…",
+            "custom_counts": "{{interviews}} entrevistas · {{records}} registos",
+            "species_counts": "{{count}} registos de espécies"
         }
     },
     "public": {

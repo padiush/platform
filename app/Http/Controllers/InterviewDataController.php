@@ -7,23 +7,28 @@ use App\Exports\EthnobotanyRExport;
 use App\Models\CatalogSpecies;
 use App\Models\ChartPreference;
 use App\Models\InstanceAnswer;
+use App\Models\InterviewForm;
 use App\Models\InterviewInstance;
 use App\Models\InterviewItem;
 use App\Models\InterviewSection;
 use App\Models\Project;
 use App\Models\User;
 use App\Services\CatalogSpeciesSearch;
+use App\Services\InterviewDataExport;
 use App\Services\InterviewDataTable;
 use App\Services\SpeciesLinkingList;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
 use Maatwebsite\Excel\Facades\Excel;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class InterviewDataController extends Controller
 {
@@ -429,235 +434,199 @@ class InterviewDataController extends Controller
         }
     }
 
-    public function prepareEthnobotanyR(Project $project)
+    public function prepareExport(Project $project, Request $request): Response|RedirectResponse
     {
         $this->checkPermission($project);
 
-        // Get all the forms on the project
-        $forms = $project->interviewForms;
-
-        foreach ($forms as $form) {
-            $form->load('sections.items');
-        }
-
-        return Inertia::render('Data/EthnobotanyR', [
-            'project' => [
-                'id' => $project->id,
-                'name' => $project->name,
-            ],
-            'forms' => $forms->map(function ($form) {
-                return [
-                    'id' => $form->id,
-                    'name' => $form->name,
-                    'sections' => $form->sections->map(function ($section) {
-                        return [
-                            'id' => $section->id,
-                            'name' => $section->name,
-                            'items' => $section->items->map(function ($item) {
-                                return [
-                                    'id' => $item->id,
-                                    'label' => $item->label,
-                                ];
-                            }),
-                        ];
-                    }),
-                ];
-            }),
-            'csrf_token' => csrf_token(),
-        ]);
-    }
-
-    public function handleEthnobotanyRRequest(
-        Project $project,
-        Request $request
-    ) {
-        $this->checkPermission($project, true);
-
-        $request->validate([
-            'form_id' => 'required|exists:interview_forms,id',
-            'field_id' => 'required|exists:interview_items,id',
-        ]);
-
-        $form = $project->interviewForms
-            ->where('id', $request->form_id)
-            ->first();
-
-        $item = InterviewItem::find($request->field_id);
-
-        // The selected form and field must belong to this project.
-        if (
-            ! $form ||
-            ! $item ||
-            $item->section->interview_form_id !== $form->id
-        ) {
-            $this->deny('El campo no pertenece a este proyecto.', false);
-        }
-
-        $categories = InstanceAnswer::where(
-            'interview_item_id',
-            $item->id
-        )->get();
-
-        // Leave only unique answers
-        $categories = $categories->unique('answer');
-
-        // Get all the answers from $item->section where the answer's catalog_species_id is not null
-        $answers = InstanceAnswer::where(
-            'interview_section_id',
-            $item->section->id
-        )
-            ->where('catalog_species_id', '!=', null)
+        $forms = $project->interviewForms()
+            ->with([
+                'sections' => fn ($query) => $query->orderBy('order'),
+                'sections.items' => fn ($query) => $query->orderBy('order'),
+            ])
             ->get();
 
-        foreach ($answers as $answer) {
-            $answer->load('species');
-            // May be null when this instance has no category answer for the
-            // selected field; the export treats a null category as no match.
-            $answer->category = InstanceAnswer::where(
-                'interview_item_id',
-                $request->field_id
-            )
-                ->where('interview_instance_id', $answer->interview_instance_id)
-                ->where('repeatable_index', $answer->repeatable_index)
-                ->first()?->answer;
-        }
-
-        return Excel::download(
-            new EthnobotanyRExport($answers, $categories),
-            'ethnobotanyr.xlsx'
-        );
-    }
-
-    public function prepareCustom(Project $project)
-    {
-        $this->checkPermission($project);
-
-        // Get all the forms on the project
-        $forms = $project->interviewForms;
-
-        foreach ($forms as $form) {
-            $form->load('sections', 'sections.items');
-        }
-
-        return Inertia::render('Data/Custom', [
+        return Inertia::render('Data/Export', [
             'project' => [
                 'id' => $project->id,
                 'name' => $project->name,
             ],
-            'forms' => $forms->map(function ($form) {
-                return [
-                    'id' => $form->id,
-                    'name' => $form->name,
-                    'sections' => $form->sections->map(function ($section) {
-                        return [
-                            'id' => $section->id,
-                            'name' => $section->name,
-                            'repeatable' => $section->repeatable,
-                            'items' => $section->items->map(function ($item) {
-                                return [
-                                    'id' => $item->id,
-                                    'label' => $item->label,
-                                ];
-                            }),
-                        ];
-                    }),
-                ];
-            }),
+            // Deep-link prefill (e.g. from the View page's "Customize export").
+            'initial' => [
+                'mode' => in_array($request->query('mode'), ['custom', 'ethnobotanyr'], true)
+                    ? $request->query('mode')
+                    : 'custom',
+                'form' => $request->integer('form') ?: null,
+                'section' => $request->integer('section') ?: null,
+            ],
+            'forms' => $forms->map(fn ($form) => [
+                'id' => $form->id,
+                'name' => $form->name,
+                'sections' => $form->sections->map(fn ($section) => [
+                    'id' => $section->id,
+                    'name' => $section->name,
+                    'repeatable' => $section->repeatable,
+                    'items' => $section->items->map(fn ($item) => [
+                        'id' => $item->id,
+                        'label' => $item->label,
+                        'type' => $item->type,
+                        'link_to_species' => $item->link_to_species,
+                    ])->values(),
+                ])->values(),
+            ])->values(),
             'csrf_token' => csrf_token(),
         ]);
     }
 
-    public function handleCustomRequest(Project $project, Request $request)
-    {
-        $this->checkPermission($project);
+    public function exportPreview(
+        Project $project,
+        Request $request,
+        InterviewDataExport $export
+    ): JsonResponse {
+        $this->checkPermission($project, true);
 
-        $request->validate([
+        $validated = $request->validate([
+            'mode' => 'required|in:custom,ethnobotanyr',
             'form_id' => 'required|exists:interview_forms,id',
-            'selected_fields' => 'required|json',
         ]);
 
-        $form = $project->interviewForms
-            ->where('id', $request->form_id)
-            ->first();
+        $form = $project->interviewForms->firstWhere('id', (int) $validated['form_id']);
+
+        if (! $form) {
+            $this->deny('El formulario no pertenece a este proyecto.', true);
+        }
+
+        if ($validated['mode'] === 'custom') {
+            $ids = array_filter((array) json_decode($request->query('selected_fields', '[]'), true));
+
+            if ($ids === []) {
+                return response()->json([
+                    'columns' => [],
+                    'instance_count' => 0,
+                    'record_count' => 0,
+                    'rows' => [],
+                ]);
+            }
+
+            $items = $this->customExportItems($form, $ids);
+            $repeatable = $this->exportRepeatable($items);
+
+            if ($repeatable === null) {
+                return response()->json(['error' => 'mixed_repeatable'], 422);
+            }
+
+            return response()->json($export->customPreview($form, $items, $repeatable));
+        }
+
+        $field = $this->ethnobotanyField($form, (int) $request->query('field_id'));
+
+        return response()->json($export->ethnobotanyPreview($field));
+    }
+
+    public function downloadExport(
+        Project $project,
+        Request $request,
+        InterviewDataExport $export
+    ): BinaryFileResponse|RedirectResponse {
+        $this->checkPermission($project);
+
+        $validated = $request->validate([
+            'mode' => 'required|in:custom,ethnobotanyr',
+            'form_id' => 'required|exists:interview_forms,id',
+            'format' => 'nullable|in:xlsx,csv',
+        ]);
+
+        $format = $validated['format'] ?? 'xlsx';
+        $form = $project->interviewForms->firstWhere('id', (int) $validated['form_id']);
 
         if (! $form) {
             $this->deny('El formulario no pertenece a este proyecto.', false);
         }
 
-        $selected_fields = json_decode($request->selected_fields);
+        if ($validated['mode'] === 'custom') {
+            $request->validate(['selected_fields' => 'required|json']);
 
-        $items = InterviewItem::whereIn('id', $selected_fields)->get();
+            $items = $this->customExportItems(
+                $form,
+                (array) json_decode($request->selected_fields, true)
+            );
+            $repeatable = $this->exportRepeatable($items);
 
-        // Every selected field must belong to a section of the selected form.
-        $formSectionIds = $form->sections()->pluck('id');
-
-        foreach ($items as $item) {
-            if (! $formSectionIds->contains($item->interview_section_id)) {
-                $this->deny(
-                    'Los campos seleccionados no pertenecen a este proyecto.',
-                    false
-                );
-            }
-        }
-
-        // Check if all items belong to a section with the same repeatable value
-        $repeatable = collect();
-
-        foreach ($items as $item) {
-            $item->load('section');
-            $repeatable->push($item->section->repeatable);
-        }
-
-        if ($repeatable->unique()->count() > 1) {
-            return redirect()
-                ->back()
-                ->with(
+            if ($repeatable === null) {
+                return redirect()->back()->with(
                     'error',
                     'No puedes seleccionar campos de secciones repetibles y no repetibles al mismo tiempo.'
                 );
-        }
-
-        $repeatable = $repeatable->first();
-
-        $instances = collect();
-
-        foreach ($items as $item) {
-            $answers = InstanceAnswer::where(
-                'interview_item_id',
-                $item->id
-            )->get();
-
-            foreach ($answers as $answer) {
-                $instances->push($answer->interview_instance_id);
             }
+
+            $matrix = $export->customMatrix($form, $items, $repeatable);
+
+            return Excel::download(
+                new CustomExport($matrix['headers'], $matrix['rows']),
+                $this->exportFilename($project, 'custom', $format),
+                $this->exportWriter($format),
+            );
         }
 
-        $instances = $instances->unique();
-        $instances = InterviewInstance::whereIn('id', $instances)->get();
-
-        if ($repeatable) {
-            foreach ($instances as $instance) {
-                // Get the highest repeatable index for this instance
-                $max_repeatable_index = InstanceAnswer::where(
-                    'interview_instance_id',
-                    $instance->id
-                )->max('repeatable_index');
-                $instance->max_repeatable_index = $max_repeatable_index;
-            }
-        }
-
-        foreach ($items as $item) {
-            $answers = InstanceAnswer::where(
-                'interview_item_id',
-                $item->id
-            )->get();
-            $item->answers = $answers;
-        }
+        $field = $this->ethnobotanyField($form, (int) $request->input('field_id'));
+        $matrix = $export->ethnobotanyMatrix($field);
 
         return Excel::download(
-            new CustomExport($items, $instances, $repeatable),
-            'custom.xlsx'
+            new EthnobotanyRExport($matrix['headers'], $matrix['rows']),
+            $this->exportFilename($project, 'ethnobotanyr', $format),
+            $this->exportWriter($format),
         );
+    }
+
+    /**
+     * Selected custom-export fields, guarded to belong to the form, ordered by
+     * section then field order.
+     */
+    private function customExportItems(InterviewForm $form, array $ids): Collection
+    {
+        $items = InterviewItem::whereIn('id', $ids)->with('section')->get();
+        $sectionIds = $form->sections()->pluck('id');
+
+        foreach ($items as $item) {
+            if (! $sectionIds->contains($item->interview_section_id)) {
+                $this->deny(
+                    'Los campos seleccionados no pertenecen a este proyecto.',
+                    request()->expectsJson()
+                );
+            }
+        }
+
+        return $items
+            ->sortBy(fn ($item) => [$item->section->order ?? 0, $item->order ?? 0])
+            ->values();
+    }
+
+    /** Shared repeatable flag of the selected fields, or null when mixed. */
+    private function exportRepeatable(Collection $items): ?bool
+    {
+        $values = $items->map(fn ($item) => (bool) $item->section->repeatable)->unique();
+
+        return $values->count() === 1 ? (bool) $values->first() : null;
+    }
+
+    private function ethnobotanyField(InterviewForm $form, int $fieldId): InterviewItem
+    {
+        $item = InterviewItem::with('section')->find($fieldId);
+
+        if (! $item || $item->section->interview_form_id !== $form->id) {
+            $this->deny('El campo no pertenece a este proyecto.', request()->expectsJson());
+        }
+
+        return $item;
+    }
+
+    private function exportFilename(Project $project, string $kind, string $format): string
+    {
+        return Str::slug($project->name)."-{$kind}-".now()->format('Y-m-d').".{$format}";
+    }
+
+    private function exportWriter(string $format): ?string
+    {
+        return $format === 'csv' ? \Maatwebsite\Excel\Excel::CSV : null;
     }
 
     /**

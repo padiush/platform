@@ -188,8 +188,9 @@ class ResourceScopingTest extends TestCase
         $foreignItem = InterviewItem::factory()->create();
 
         $response = $this->actingAs($user)->post(
-            route('data.custom', ['project' => $mine]),
+            route('data.export.download', ['project' => $mine]),
             [
+                'mode' => 'custom',
                 'form_id' => $myForm->id,
                 'selected_fields' => json_encode([$foreignItem->id]),
             ]

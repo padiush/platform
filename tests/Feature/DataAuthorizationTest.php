@@ -78,10 +78,10 @@ class DataAuthorizationTest extends TestCase
         $response->assertForbidden();
     }
 
-    public function test_outsider_cannot_open_the_custom_export_page()
+    public function test_outsider_cannot_open_the_export_page()
     {
         $response = $this->actingAs($this->outsider())->get(
-            route('data.custom', ['project' => $this->project])
+            route('data.export', ['project' => $this->project])
         );
 
         $response->assertRedirect(route('projects.index'));
@@ -90,8 +90,9 @@ class DataAuthorizationTest extends TestCase
     public function test_outsider_cannot_run_the_custom_export()
     {
         $response = $this->actingAs($this->outsider())->post(
-            route('data.custom', ['project' => $this->project]),
+            route('data.export.download', ['project' => $this->project]),
             [
+                'mode' => 'custom',
                 'form_id' => $this->form->id,
                 'selected_fields' => json_encode([$this->item->id]),
             ]
@@ -103,27 +104,28 @@ class DataAuthorizationTest extends TestCase
     public function test_outsider_cannot_run_the_ethnobotanyr_export()
     {
         $response = $this->actingAs($this->outsider())->post(
-            route('data.ethnobotanyR', ['project' => $this->project]),
+            route('data.export.download', ['project' => $this->project]),
             [
+                'mode' => 'ethnobotanyr',
                 'form_id' => $this->form->id,
                 'field_id' => $this->item->id,
             ]
         );
 
-        $response->assertForbidden();
+        $response->assertRedirect(route('projects.index'));
     }
 
-    public function test_member_can_open_the_custom_export_page()
+    public function test_member_can_open_the_export_page()
     {
         $user = $this->userWithCapability($this->project, 'generate_reports');
 
         $response = $this->actingAs($user)->get(
-            route('data.custom', ['project' => $this->project])
+            route('data.export', ['project' => $this->project])
         );
 
         $response->assertOk();
         $response->assertInertia(
-            fn (Assert $page) => $page->component('Data/Custom')
+            fn (Assert $page) => $page->component('Data/Export', false)
         );
     }
 }

@@ -404,7 +404,22 @@
                 "value": "Value",
                 "count": "Count",
                 "percent": "%"
-            }
+            },
+            "customize_export": "Customize export…"
+        },
+        "export": {
+            "title": "Export",
+            "mode_custom": "Custom fields",
+            "mode_ethnobotanyr": "EthnobotanyR matrix",
+            "select_all": "Select all",
+            "repeatable_locked": "You can't mix repeatable and non-repeatable sections in one export.",
+            "ethnobotanyr_help": "Builds an informant × species matrix with a 0/1 column per use category, ready for R's ethnobotanyR package.",
+            "category_field": "Use-category field",
+            "format": "Format",
+            "generate": "Download",
+            "previewing": "Building preview…",
+            "custom_counts": "{{interviews}} interviews · {{records}} records",
+            "species_counts": "{{count}} species records"
         }
     },
     "public": {

@@ -2,21 +2,27 @@
 
 namespace App\Exports;
 
-use Illuminate\Contracts\View\View;
-use Maatwebsite\Excel\Concerns\FromView;
+use Maatwebsite\Excel\Concerns\FromArray;
+use Maatwebsite\Excel\Concerns\WithHeadings;
 
-class EthnobotanyRExport implements FromView
+class EthnobotanyRExport implements FromArray, WithHeadings
 {
+    /**
+     * @param  list<string>  $headings
+     * @param  list<list<string>>  $rows
+     */
     public function __construct(
-        private $answers,
-        private $categories
+        private array $headings,
+        private array $rows
     ) {}
 
-    public function view(): View
+    public function headings(): array
     {
-        return view('exports.ethnobotanyr', [
-            'answers' => $this->answers,
-            'categories' => $this->categories,
-        ]);
+        return $this->headings;
+    }
+
+    public function array(): array
+    {
+        return $this->rows;
     }
 }
