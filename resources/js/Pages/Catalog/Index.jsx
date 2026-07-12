@@ -1,5 +1,6 @@
 import Card from '@/Components/Card';
 import EmptyState from '@/Components/EmptyState';
+import MetricCard from '@/Components/MetricCard';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Link } from '@inertiajs/react';
 import { useTranslation } from 'react-i18next';
@@ -23,33 +24,28 @@ export default function CatalogOverview({ projects }) {
                         <div className="grid w-full grid-cols-1 gap-4">
                             {projects.map((project) => (
                                 <Card key={project.id} title={project.name}>
-                                    <div className="stats stats-vertical lg:stats-horizontal bg-base-300">
-                                        <div className="stat">
-                                            <div className="stat-value">
-                                                {project.catalog_species_count}
-                                            </div>
-                                            <div className="stat-title">
-                                                {t('catalogs.total_species')}
-                                            </div>
-                                        </div>
-                                        <div className="stat">
-                                            <div className="stat-value">
-                                                {project.linked_species_count}
-                                            </div>
-                                            <div className="stat-title">
-                                                {t('catalogs.reported_species')}
-                                            </div>
-                                        </div>
-                                        <div className="stat">
-                                            <div className="stat-value">
-                                                {project.linked_families_count}
-                                            </div>
-                                            <div className="stat-title">
-                                                {t(
-                                                    'catalogs.reported_families',
-                                                )}
-                                            </div>
-                                        </div>
+                                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                                        <MetricCard
+                                            label={t('catalogs.total_species')}
+                                            value={
+                                                project.catalog_species_count
+                                            }
+                                            tone="primary"
+                                        />
+                                        <MetricCard
+                                            label={t(
+                                                'catalogs.reported_species',
+                                            )}
+                                            value={project.linked_species_count}
+                                        />
+                                        <MetricCard
+                                            label={t(
+                                                'catalogs.reported_families',
+                                            )}
+                                            value={
+                                                project.linked_families_count
+                                            }
+                                        />
                                     </div>
 
                                     <div className="mt-4 flex flex-wrap justify-end gap-2">

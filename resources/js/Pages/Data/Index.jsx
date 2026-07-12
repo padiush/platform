@@ -1,5 +1,6 @@
 import Card from '@/Components/Card';
 import EmptyState from '@/Components/EmptyState';
+import MetricCard from '@/Components/MetricCard';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Link } from '@inertiajs/react';
 import { useTranslation } from 'react-i18next';
@@ -32,23 +33,23 @@ export default function DataProcessing({ projects }) {
 
                                 return (
                                     <Card key={project.id} title={project.name}>
-                                        <div className="stats stats-vertical lg:stats-horizontal bg-base-300">
-                                            <div className="stat">
-                                                <div className="stat-value">
-                                                    {unlinkedCount}
-                                                </div>
-                                                <div className="stat-title">
-                                                    {t('data.unlinked_reports')}
-                                                </div>
-                                            </div>
-                                            <div className="stat">
-                                                <div className="stat-value">
-                                                    {linkedCount}
-                                                </div>
-                                                <div className="stat-title">
-                                                    {t('data.linked_reports')}
-                                                </div>
-                                            </div>
+                                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                                            <MetricCard
+                                                label={t(
+                                                    'data.unlinked_reports',
+                                                )}
+                                                value={unlinkedCount}
+                                                tone={
+                                                    unlinkedCount > 0
+                                                        ? 'warning'
+                                                        : 'default'
+                                                }
+                                            />
+                                            <MetricCard
+                                                label={t('data.linked_reports')}
+                                                value={linkedCount}
+                                                tone="primary"
+                                            />
                                         </div>
 
                                         <div className="mt-4 flex flex-wrap justify-end gap-2">
