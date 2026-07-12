@@ -463,7 +463,9 @@
             "charts": {
                 "download": "Download PNG",
                 "index": "Index",
-                "by_index": "Top species by index"
+                "by_index": "Top species by index",
+                "heatmap": "Species × use categories",
+                "heatmap_note": "Cell shade and number show the use reports for each species and use category."
             },
             "empty": {
                 "title": "No indices yet",

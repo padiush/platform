@@ -8,6 +8,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link } from '@inertiajs/react';
 import { useTranslation } from 'react-i18next';
 import IndexBarChart from './Partials/IndexBarChart';
+import UseHeatmap from './Partials/UseHeatmap';
 
 const ratio = (value) => Number(value).toFixed(2);
 const percent = (value) => `${Number(value).toFixed(1)}%`;
@@ -391,6 +392,16 @@ export default function Reports({ project, indices }) {
                                 filename="species-by-index.png"
                             >
                                 <IndexBarChart species={species} />
+                            </ChartCard>
+
+                            <ChartCard
+                                title={t('data.reports.charts.heatmap')}
+                                filename="species-use-heatmap.png"
+                            >
+                                <UseHeatmap
+                                    species={species}
+                                    useCategories={useCategories}
+                                />
                             </ChartCard>
 
                             <Card title={t('data.reports.references')}>
