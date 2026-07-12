@@ -366,7 +366,35 @@
             "error": "Ocorreu um erro ao pesquisar espécies.",
             "unlink": "Remover ligação"
         },
-        "search_label": "Pesquisar"
+        "search_label": "Pesquisar",
+        "view": {
+            "title": "Ver dados",
+            "form": "Formulário",
+            "section": "Secção",
+            "tab_table": "Tabela",
+            "tab_summary": "Resumo",
+            "export": "Exportar secção",
+            "interviewer": "Entrevistador",
+            "all_interviewers": "Todos os entrevistadores",
+            "from": "De",
+            "to": "Até",
+            "col_date": "Data",
+            "col_recorder": "Registado por",
+            "col_record": "Registo",
+            "loading": "A carregar resumo…",
+            "no_chart_data": "Sem dados para o gráfico",
+            "no_rows_title": "Sem resultados",
+            "no_rows_hint": "Ajuste os filtros para ver mais registos.",
+            "no_sections_title": "Este formulário não tem secções",
+            "no_sections_hint": "Adicione secções e campos no designer de formulários.",
+            "stats": {
+                "count": "n",
+                "min": "mín",
+                "max": "máx",
+                "mean": "média",
+                "median": "mediana"
+            }
+        }
     },
     "public": {
         "home": "Início",

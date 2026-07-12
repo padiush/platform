@@ -366,7 +366,35 @@
             "error": "Ocurrió un error al buscar especies.",
             "unlink": "Quitar vínculo"
         },
-        "search_label": "Buscar"
+        "search_label": "Buscar",
+        "view": {
+            "title": "Ver datos",
+            "form": "Formulario",
+            "section": "Sección",
+            "tab_table": "Tabla",
+            "tab_summary": "Resumen",
+            "export": "Exportar sección",
+            "interviewer": "Entrevistador",
+            "all_interviewers": "Todos los entrevistadores",
+            "from": "Desde",
+            "to": "Hasta",
+            "col_date": "Fecha",
+            "col_recorder": "Registrado por",
+            "col_record": "Registro",
+            "loading": "Cargando resumen…",
+            "no_chart_data": "Sin datos para graficar",
+            "no_rows_title": "Sin resultados",
+            "no_rows_hint": "Ajusta los filtros para ver más registros.",
+            "no_sections_title": "El formulario no tiene secciones",
+            "no_sections_hint": "Agrega secciones y campos en el diseñador de formularios.",
+            "stats": {
+                "count": "n",
+                "min": "mín",
+                "max": "máx",
+                "mean": "media",
+                "median": "mediana"
+            }
+        }
     },
     "public": {
         "home": "Inicio",

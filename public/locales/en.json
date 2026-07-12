@@ -366,7 +366,35 @@
             "error": "An error occurred while searching species.",
             "unlink": "Remove link"
         },
-        "search_label": "Search"
+        "search_label": "Search",
+        "view": {
+            "title": "View data",
+            "form": "Form",
+            "section": "Section",
+            "tab_table": "Table",
+            "tab_summary": "Summary",
+            "export": "Export section",
+            "interviewer": "Interviewer",
+            "all_interviewers": "All interviewers",
+            "from": "From",
+            "to": "To",
+            "col_date": "Date",
+            "col_recorder": "Recorded by",
+            "col_record": "Record",
+            "loading": "Loading summary…",
+            "no_chart_data": "No data to chart",
+            "no_rows_title": "No results",
+            "no_rows_hint": "Adjust the filters to see more records.",
+            "no_sections_title": "This form has no sections",
+            "no_sections_hint": "Add sections and fields in the form designer.",
+            "stats": {
+                "count": "n",
+                "min": "min",
+                "max": "max",
+                "mean": "mean",
+                "median": "median"
+            }
+        }
     },
     "public": {
         "home": "Home",

@@ -94,6 +94,18 @@ class InterviewDataViewTest extends TestCase
         );
     }
 
+    public function test_summary_tab_includes_the_summary()
+    {
+        $this->recordAnswer('guarumo');
+
+        $response = $this->actingAs($this->manager())->get(
+            route('data.view', ['project' => $this->project, 'tab' => 'summary'])
+        );
+
+        $response->assertOk();
+        $response->assertInertia(fn (Assert $page) => $page->has('summary'));
+    }
+
     public function test_member_without_data_capability_is_denied()
     {
         $this->recordAnswer('guarumo');
