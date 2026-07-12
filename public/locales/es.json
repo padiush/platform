@@ -365,7 +365,8 @@
             "no_matches": "No se encontraron especies.",
             "error": "Ocurrió un error al buscar especies.",
             "unlink": "Quitar vínculo"
-        }
+        },
+        "search_label": "Buscar"
     },
     "public": {
         "home": "Inicio",

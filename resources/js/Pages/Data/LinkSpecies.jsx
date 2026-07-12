@@ -10,7 +10,9 @@ import {
     faArrowLeft,
     faChevronDown,
     faChevronRight,
+    faLink,
     faMagnifyingGlass,
+    faPen,
 } from '@fortawesome/pro-regular-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link, router, usePage } from '@inertiajs/react';
@@ -22,9 +24,10 @@ import { useTranslation } from 'react-i18next';
 // flat rows — lines up on the same boundaries. Fixed tracks (not fractions)
 // keep columns aligned across rows, which each render as their own grid.
 // Columns: gutter/chevron · reported name · status · species · action.
-// The species column is dropped below `sm`, where the action track narrows.
+// Below `sm` the species column is dropped and the action collapses to an
+// icon button, giving the reported name the most room on narrow screens.
 const ROW_GRID =
-    'grid grid-cols-[1.5rem_minmax(0,1fr)_3rem_7rem] items-center gap-3 sm:grid-cols-[1.5rem_minmax(0,1fr)_3rem_14rem_8rem]';
+    'grid grid-cols-[1.5rem_minmax(0,1fr)_3rem_3rem] items-center gap-3 sm:grid-cols-[1.5rem_minmax(0,1fr)_3rem_14rem_8rem]';
 
 function StatusBadge({ linked, total, className = '' }) {
     // Group badge shows linked/total; a single row shows a linked/unlinked pill.
@@ -197,6 +200,9 @@ export default function LinkSpecies({ project, rows, filters, totals }) {
             <button
                 type="button"
                 className="btn btn-ghost btn-xs w-full"
+                aria-label={
+                    member.linked ? t('data.change') : t('data.link_action')
+                }
                 onClick={() =>
                     openPicker({
                         type: 'row',
@@ -205,7 +211,12 @@ export default function LinkSpecies({ project, rows, filters, totals }) {
                     })
                 }
             >
-                {member.linked ? t('data.change') : t('data.link_action')}
+                <span className="sm:hidden">
+                    <FontAwesomeIcon icon={member.linked ? faPen : faLink} />
+                </span>
+                <span className="hidden sm:inline">
+                    {member.linked ? t('data.change') : t('data.link_action')}
+                </span>
             </button>
         </div>
     );
@@ -265,6 +276,11 @@ export default function LinkSpecies({ project, rows, filters, totals }) {
                     <button
                         type="button"
                         className="btn btn-primary btn-sm w-full"
+                        aria-label={
+                            expandable
+                                ? t('data.link_all')
+                                : t('data.link_action')
+                        }
                         onClick={() =>
                             openPicker({
                                 type: 'group',
@@ -273,9 +289,14 @@ export default function LinkSpecies({ project, rows, filters, totals }) {
                             })
                         }
                     >
-                        {expandable
-                            ? t('data.link_all')
-                            : t('data.link_action')}
+                        <span className="sm:hidden">
+                            <FontAwesomeIcon icon={faLink} />
+                        </span>
+                        <span className="hidden sm:inline">
+                            {expandable
+                                ? t('data.link_all')
+                                : t('data.link_action')}
+                        </span>
                     </button>
                 </div>
 
@@ -310,6 +331,9 @@ export default function LinkSpecies({ project, rows, filters, totals }) {
                 <button
                     type="button"
                     className="btn btn-primary btn-sm w-full"
+                    aria-label={
+                        row.linked ? t('data.change') : t('data.link_action')
+                    }
                     onClick={() =>
                         openPicker({
                             type: 'row',
@@ -318,7 +342,12 @@ export default function LinkSpecies({ project, rows, filters, totals }) {
                         })
                     }
                 >
-                    {row.linked ? t('data.change') : t('data.link_action')}
+                    <span className="sm:hidden">
+                        <FontAwesomeIcon icon={row.linked ? faPen : faLink} />
+                    </span>
+                    <span className="hidden sm:inline">
+                        {row.linked ? t('data.change') : t('data.link_action')}
+                    </span>
                 </button>
             </div>
         </li>
@@ -362,9 +391,9 @@ export default function LinkSpecies({ project, rows, filters, totals }) {
                             <div className="sm:col-span-2">
                                 <Input
                                     name="q"
+                                    label={t('data.search_label')}
                                     value={q}
                                     placeholder={t('data.search_placeholder')}
-                                    aria-label={t('data.search_placeholder')}
                                     leftAddon={
                                         <span className="bg-base-200 border-base-300 join-item flex items-center border px-3">
                                             <FontAwesomeIcon
@@ -400,19 +429,30 @@ export default function LinkSpecies({ project, rows, filters, totals }) {
                                 </option>
                             </Select>
 
-                            <div className="flex items-end pb-1">
-                                <Input
-                                    type="checkbox"
-                                    label={t('data.group_by_name')}
-                                    checked={grouped}
-                                    onChange={(e) =>
-                                        visit({
-                                            q,
-                                            status,
-                                            group: e.target.checked,
-                                        })
-                                    }
-                                />
+                            <div className="fieldset w-full">
+                                {/* Spacer legend aligns the box with the
+                                    labeled controls on one row; only needed
+                                    when they sit side by side (sm+). */}
+                                <span className="fieldset-legend hidden sm:block">
+                                    &nbsp;
+                                </span>
+                                <label className="input input-bordered flex cursor-pointer items-center gap-2">
+                                    <input
+                                        type="checkbox"
+                                        className="checkbox checkbox-sm"
+                                        checked={grouped}
+                                        onChange={(e) =>
+                                            visit({
+                                                q,
+                                                status,
+                                                group: e.target.checked,
+                                            })
+                                        }
+                                    />
+                                    <span className="truncate">
+                                        {t('data.group_by_name')}
+                                    </span>
+                                </label>
                             </div>
                         </div>
 
