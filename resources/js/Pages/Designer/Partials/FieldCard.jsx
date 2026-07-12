@@ -246,10 +246,34 @@ export default function FieldCard({
                             className="checkbox"
                             checked={item.link_to_species}
                             onChange={(e) =>
-                                patch({ link_to_species: e.target.checked })
+                                patch({
+                                    link_to_species: e.target.checked,
+                                    // A field is a taxon link or a use category,
+                                    // never both — selecting one clears the other.
+                                    ...(e.target.checked
+                                        ? { is_use_category: false }
+                                        : {}),
+                                })
                             }
                         />
                         <span>{t('designer.fields.link_to_species')}</span>
+                    </label>
+
+                    <label className="flex items-center gap-2 lg:col-span-3">
+                        <input
+                            type="checkbox"
+                            className="checkbox"
+                            checked={item.is_use_category}
+                            onChange={(e) =>
+                                patch({
+                                    is_use_category: e.target.checked,
+                                    ...(e.target.checked
+                                        ? { link_to_species: false }
+                                        : {}),
+                                })
+                            }
+                        />
+                        <span>{t('designer.fields.use_category')}</span>
                     </label>
 
                     {sections.length > 1 && (

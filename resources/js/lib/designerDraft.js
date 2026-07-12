@@ -30,6 +30,7 @@ export function toDraftItem(item) {
         type: item.type ?? 'text',
         required: Boolean(item.required),
         link_to_species: Boolean(item.link_to_species),
+        is_use_category: Boolean(item.is_use_category),
         min: item.min ?? '',
         max: item.max ?? '',
         step: item.step ?? '',
@@ -72,6 +73,7 @@ export function createItem(type = 'text') {
         type,
         required: false,
         link_to_species: false,
+        is_use_category: false,
         min: '',
         max: '',
         step: '',
@@ -100,6 +102,7 @@ function signatureItem(item) {
         type: item.type,
         required: item.required,
         link_to_species: item.link_to_species,
+        is_use_category: item.is_use_category,
         min: String(item.min ?? ''),
         max: String(item.max ?? ''),
         step: String(item.step ?? ''),
@@ -130,6 +133,7 @@ export function prepareForSave(sections) {
             type: item.type,
             required: item.required,
             link_to_species: item.link_to_species,
+            is_use_category: item.is_use_category,
             min: item.min === '' ? null : item.min,
             max: item.max === '' ? null : item.max,
             step: item.step === '' ? null : item.step,
@@ -207,6 +211,10 @@ export function itemSummary(item, t) {
 
     if (item.link_to_species) {
         facts.push(t('designer.summary.linked'));
+    }
+
+    if (item.is_use_category) {
+        facts.push(t('designer.summary.use_category'));
     }
 
     if (item.answers_count > 0) {
