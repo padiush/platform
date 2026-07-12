@@ -38,4 +38,20 @@ describe('FormModal', () => {
 
         expect(onClose).toHaveBeenCalled();
     });
+
+    it('reports a close when the backdrop is clicked', () => {
+        const onClose = vi.fn();
+        render(
+            <FormModal open title="T" onClose={onClose}>
+                <p>Body</p>
+            </FormModal>,
+        );
+
+        // The backdrop is the second control carrying the close label.
+        fireEvent.click(
+            screen.getAllByRole('button', { name: 'actions.close' })[1],
+        );
+
+        expect(onClose).toHaveBeenCalled();
+    });
 });
