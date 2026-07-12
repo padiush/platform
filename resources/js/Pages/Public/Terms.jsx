@@ -12,8 +12,8 @@ export default function Terms() {
                     {t('public.terms')}
                 </h1>
             </div>
-            <div
-                className="bg-white px-12 py-4 text-black"
+            <article
+                className="text-base-content mx-auto max-w-3xl px-6 py-10 leading-relaxed md:px-8"
                 dangerouslySetInnerHTML={{ __html: pageContent }}
             />
         </PublicLayout>

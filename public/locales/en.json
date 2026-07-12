@@ -1,7 +1,15 @@
 {
     "dashboard": {
         "welcome_message": "Welcome to {{appName}}, {{name}}!",
-        "title": "Dashboard"
+        "title": "Dashboard",
+        "greeting": "Hello, {{name}}!",
+        "subtitle": "Where do you want to continue today?",
+        "projects_desc": "Create and manage your research projects and their collaborators.",
+        "design_desc": "Design the interview forms your team uses in the field.",
+        "interview_desc": "Record new interviews for your active projects.",
+        "catalogs_desc": "Keep your species catalogs identified and up to date.",
+        "data_desc": "Link answers to species and export publishable datasets.",
+        "no_projects_hint": "Start by creating your first project — everything else builds on it."
     },
     "app": {
         "name": "Padiush"
@@ -12,8 +20,12 @@
         "catalogs": "Catalogs",
         "data": "Data",
         "design": "Form Designer",
-        "interview": "Pass Interviews",
-        "system_dashboard": "System Dashboard"
+        "interview": "Conduct interviews",
+        "system_dashboard": "System Dashboard",
+        "breadcrumb": "Breadcrumb",
+        "back": "Back",
+        "home": "Home",
+        "logout": "Log out"
     },
     "titles": {
         "my_projects": "My Projects"
@@ -140,7 +152,12 @@
             "date_field": "Date field",
             "number_field": "Numeric field",
             "single_choice": "Unique selection",
-            "text_field": "Text field"
+            "text_field": "Text field",
+            "text": "Text",
+            "number": "Number",
+            "date": "Date",
+            "multi": "Multiple choice",
+            "select": "Single choice"
         },
         "new_section": "New section",
         "no_items": "There are no items in this section",
@@ -172,7 +189,56 @@
         "section_reordered": "The section has been reordered.",
         "section_not_found": "The section was not found.",
         "required": "Required field",
-        "save_error": "An error occurred while saving the answer."
+        "save_error": "An error occurred while saving the answer.",
+        "summary": {
+            "options_one": "{{count}} option",
+            "options_other": "{{count}} options",
+            "answers_one": "{{count}} recorded answer",
+            "answers_other": "{{count}} recorded answers",
+            "linked": "Linked to species",
+            "fields_one": "{{count}} field",
+            "fields_other": "{{count}} fields"
+        },
+        "issues": {
+            "section_name": "A section is missing its name",
+            "item_label": "A field is missing its label",
+            "item_options": "A choice field has no options"
+        },
+        "save": "Save",
+        "saving": "Saving…",
+        "saved_badge": "Saved",
+        "unsaved_badge": "Unsaved changes",
+        "structure_saved": "Structure saved.",
+        "issues_before_save_one": "{{count}} issue to fix before saving",
+        "issues_before_save_other": "{{count}} issues to fix before saving",
+        "draft_counts": "{{sections}} sections · {{fields}} fields",
+        "unsaved_guard": "You have unsaved changes. Leave the designer?",
+        "interviews_recorded_one": "{{count}} interview recorded",
+        "interviews_recorded_other": "{{count}} interviews recorded",
+        "add_field": "Add field",
+        "field_n": "Field {{n}}",
+        "delete_section": "Delete section",
+        "delete_field": "Delete field",
+        "expand_field": "Edit field",
+        "collapse_field": "Collapse field",
+        "position_label": "Position {{position}} of {{count}}",
+        "move_to_section": "Move to section…",
+        "select_section_aria": "Edit section {{name}}",
+        "empty": {
+            "no_sections_title": "Start with a section",
+            "no_sections_hint": "Sections group the questions of your interview. Create the first one to begin.",
+            "no_fields": "This section has no fields yet — add the first one below.",
+            "pick_section": "Select a section on the left to edit its fields."
+        },
+        "detach": {
+            "title": "Delete fields with recorded answers?",
+            "body": "Saving will permanently delete these fields together with their recorded answers:",
+            "confirm": "Delete and save"
+        },
+        "move_has_answers": "These fields already have recorded answers and cannot move to another section:",
+        "name_auto_hint": "Derived from the label — edit to override.",
+        "name_label": "Export column name",
+        "drag_handle": "Drag to reorder"
     },
     "interviews": {
         "new_interview": "New interview",
@@ -196,7 +262,10 @@
         "no_access": "You do not have permission to record interviews in this project.",
         "form_not_found": "The form was not found in this project.",
         "instance_not_found": "The interview was not found.",
-        "item_not_found": "The field was not found in this interview."
+        "item_not_found": "The field was not found in this interview.",
+        "instance_label": "Interview",
+        "saving": "Saving…",
+        "saved": "Saved"
     },
     "common": {
         "actions": {
@@ -293,7 +362,11 @@
         "email": "Email",
         "message": "Message",
         "send": "Send",
-        "contact_success": "Your message has been sent. Thank you for contacting us!"
+        "contact_success": "Your message has been sent. Thank you for contacting us!",
+        "features_title": "What can you do with Padiush?",
+        "features_subtitle": "From interview design to publishable datasets — everything your ethnobotanical research needs, in one place.",
+        "cta_title": "Start systematizing your research today",
+        "learn_more": "Learn more"
     },
     "auth": {
         "login": "Log in",
@@ -329,5 +402,22 @@
     "errors": {
         "unexpected_title": "An unexpected error occurred",
         "unexpected_body": "Please reload the page; if the error persists, contact technical support and provide the information shown above."
+    },
+    "theme": {
+        "switch_to_light": "Switch to light theme",
+        "switch_to_dark": "Switch to dark theme"
+    },
+    "hubs": {
+        "empty": {
+            "title_designer": "No projects to design forms for",
+            "hint_designer": "You need an active project where you can manage forms. Create a project or ask its manager for form access.",
+            "title_interviews": "No projects ready for interviews",
+            "hint_interviews": "You need an active project where you can record data, with at least one enabled form.",
+            "title_catalogs": "No catalogs available",
+            "hint_catalogs": "You need a project where you can view the species catalog.",
+            "title_data": "No data to process yet",
+            "hint_data": "You need a project where you can manage data or generate reports.",
+            "cta": "Go to my projects"
+        }
     }
 }

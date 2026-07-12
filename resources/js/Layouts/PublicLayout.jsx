@@ -1,4 +1,5 @@
 import ApplicationFullLogo from '@/Components/ApplicationFullLogo';
+import ThemeToggle from '@/Components/ThemeToggle';
 import TranslationToggle from '@/Components/TranslationToggle';
 import { useFlashMessage } from '@/Hooks/useFlashMessage';
 import { faLinkedin } from '@fortawesome/free-brands-svg-icons';
@@ -77,6 +78,8 @@ export default function PublicLayout({ children, title }) {
                     </Link>
                 </div>
                 <div className="navbar-end hidden lg:flex">
+                    <ThemeToggle />
+                    <TranslationToggle />
                     <ul className="menu menu-horizontal px-1">
                         {!route().current('public.index') && (
                             <li>
@@ -111,6 +114,7 @@ export default function PublicLayout({ children, title }) {
                     </ul>
                 </div>
                 <div className="navbar-end lg:hidden">
+                    <ThemeToggle />
                     <TranslationToggle />
                 </div>
             </div>
@@ -119,6 +123,12 @@ export default function PublicLayout({ children, title }) {
                 <div id="content">{children}</div>
             </main>
             <footer className="footer sm:footer-horizontal bg-base-300 text-base-content p-10">
+                <aside>
+                    <ApplicationFullLogo className="text-primary h-12 w-auto fill-current" />
+                    <p className="text-base-content/70 max-w-xs">
+                        {t('public.hero_subtitle')}
+                    </p>
+                </aside>
                 <div>
                     <span className="footer-title">{t('public.about')}</span>
                     <Link

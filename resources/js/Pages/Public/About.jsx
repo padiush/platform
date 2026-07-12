@@ -25,21 +25,21 @@ export default function About() {
                         className="h-full w-full object-cover"
                     />
                 </div>
-                <div className="bg-white p-12 text-black">
-                    <div className="text-primary flex justify-center pb-12">
-                        <ApplicationFullLogo className="h-auto w-[80vw] md:w-[50vw] lg:w-[25vw]" />
+                <div className="bg-base-100 text-base-content flex flex-col justify-center p-8 md:p-12">
+                    <div className="text-primary flex justify-center pb-10">
+                        <ApplicationFullLogo className="h-auto w-full max-w-xs fill-current md:max-w-sm" />
                     </div>
-                    <div className="text-center text-2xl font-bold">
+                    <div className="pb-4 text-center text-2xl font-bold">
                         <p>{t('public.welcome')}</p>
                     </div>
-                    <div className="text-justify lg:text-xl">
+                    <div className="text-base-content/80 mx-auto max-w-prose text-justify lg:text-lg">
                         <p>{t('public.about_paragraph1')}</p>
                     </div>
                 </div>
             </div>
             <div className="bg-primary text-primary-content p-12">
                 <div className="text-center">
-                    <span className="text-2xl md:text-3xl">
+                    <span className="text-2xl font-bold md:text-3xl">
                         {t('public.team')}
                     </span>
                 </div>

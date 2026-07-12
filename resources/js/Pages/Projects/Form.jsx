@@ -36,7 +36,11 @@ export default function ProjectForm({ project = null, auth }) {
                     : t('projects.create_project')
             }
             action={
-                <Link href={route('projects.index')} className="btn btn-ghost">
+                <Link
+                    href={route('projects.index')}
+                    className="btn btn-ghost"
+                    aria-label={t('navigation.back')}
+                >
                     <FontAwesomeIcon icon={faArrowLeft} />
                 </Link>
             }

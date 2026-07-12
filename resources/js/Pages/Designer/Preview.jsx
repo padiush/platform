@@ -48,6 +48,20 @@ export default function Preview({ project, form }) {
     return (
         <AuthenticatedLayout
             title={t('designer.preview_title')}
+            breadcrumbs={[
+                {
+                    label: t('navigation.design'),
+                    href: route('designer.index'),
+                },
+                {
+                    label: form.name,
+                    href: route('designer.form.wizard', {
+                        project: project.id,
+                        form: form.id,
+                    }),
+                },
+                { label: t('designer.preview') },
+            ]}
             subtitle={form.name}
             action={
                 <Link
@@ -56,6 +70,7 @@ export default function Preview({ project, form }) {
                         form: form.id,
                     })}
                     className="btn btn-ghost"
+                    aria-label={t('navigation.back')}
                 >
                     <FontAwesomeIcon icon={faArrowLeft} />
                 </Link>

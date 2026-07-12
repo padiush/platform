@@ -1,7 +1,15 @@
 {
     "dashboard": {
         "welcome_message": "Bem-vindo ao {{appName}}, {{name}}!",
-        "title": "Painel"
+        "title": "Painel",
+        "greeting": "Olá, {{name}}!",
+        "subtitle": "Onde você quer continuar hoje?",
+        "projects_desc": "Crie e gerencie seus projetos de pesquisa e seus colaboradores.",
+        "design_desc": "Desenhe os formulários de entrevista que sua equipe usa em campo.",
+        "interview_desc": "Registre novas entrevistas para seus projetos ativos.",
+        "catalogs_desc": "Mantenha seus catálogos de espécies identificados e atualizados.",
+        "data_desc": "Vincule respostas a espécies e exporte dados prontos para publicar.",
+        "no_projects_hint": "Comece criando seu primeiro projeto — todo o resto parte daí."
     },
     "app": {
         "name": "Padiush"
@@ -12,8 +20,12 @@
         "catalogs": "Catálogos",
         "data": "Dados",
         "design": "Conceção de formulários",
-        "interview": "Passar nas entrevistas",
-        "system_dashboard": "Painel do sistema"
+        "interview": "Realizar entrevistas",
+        "system_dashboard": "Painel do sistema",
+        "breadcrumb": "Trilha de navegação",
+        "back": "Voltar",
+        "home": "Início",
+        "logout": "Sair"
     },
     "titles": {
         "my_projects": "Meus Projetos"
@@ -140,7 +152,12 @@
             "date_field": "Campo de data",
             "number_field": "Campo numérico",
             "single_choice": "Seleção única",
-            "text_field": "Campo de texto"
+            "text_field": "Campo de texto",
+            "text": "Texto",
+            "number": "Número",
+            "date": "Data",
+            "multi": "Seleção múltipla",
+            "select": "Seleção única"
         },
         "new_section": "Nova secção",
         "no_items": "Não existem itens nesta secção",
@@ -172,7 +189,56 @@
         "section_reordered": "A seção foi reordenada.",
         "section_not_found": "A seção não foi encontrada.",
         "required": "Campo obrigatório",
-        "save_error": "Ocorreu um erro ao salvar a resposta."
+        "save_error": "Ocorreu um erro ao salvar a resposta.",
+        "summary": {
+            "options_one": "{{count}} opção",
+            "options_other": "{{count}} opções",
+            "answers_one": "{{count}} resposta registrada",
+            "answers_other": "{{count}} respostas registradas",
+            "linked": "Vinculado a espécies",
+            "fields_one": "{{count}} campo",
+            "fields_other": "{{count}} campos"
+        },
+        "issues": {
+            "section_name": "Uma seção está sem nome",
+            "item_label": "Um campo está sem rótulo",
+            "item_options": "Um campo de seleção não tem opções"
+        },
+        "save": "Salvar",
+        "saving": "Salvando…",
+        "saved_badge": "Salvo",
+        "unsaved_badge": "Alterações não salvas",
+        "structure_saved": "Estrutura salva.",
+        "issues_before_save_one": "{{count}} problema a corrigir antes de salvar",
+        "issues_before_save_other": "{{count}} problemas a corrigir antes de salvar",
+        "draft_counts": "{{sections}} seções · {{fields}} campos",
+        "unsaved_guard": "Você tem alterações não salvas. Sair do designer?",
+        "interviews_recorded_one": "{{count}} entrevista registrada",
+        "interviews_recorded_other": "{{count}} entrevistas registradas",
+        "add_field": "Adicionar campo",
+        "field_n": "Campo {{n}}",
+        "delete_section": "Excluir seção",
+        "delete_field": "Excluir campo",
+        "expand_field": "Editar campo",
+        "collapse_field": "Recolher campo",
+        "position_label": "Posição {{position}} de {{count}}",
+        "move_to_section": "Mover para a seção…",
+        "select_section_aria": "Editar seção {{name}}",
+        "empty": {
+            "no_sections_title": "Comece com uma seção",
+            "no_sections_hint": "As seções agrupam as perguntas da sua entrevista. Crie a primeira para começar.",
+            "no_fields": "Esta seção ainda não tem campos — adicione o primeiro abaixo.",
+            "pick_section": "Selecione uma seção à esquerda para editar seus campos."
+        },
+        "detach": {
+            "title": "Excluir campos com respostas registradas?",
+            "body": "Ao salvar, estes campos serão excluídos permanentemente junto com suas respostas registradas:",
+            "confirm": "Excluir e salvar"
+        },
+        "move_has_answers": "Estes campos já têm respostas registradas e não podem ser movidos para outra seção:",
+        "name_auto_hint": "Derivado do rótulo — edite para personalizar.",
+        "name_label": "Nome da coluna na exportação",
+        "drag_handle": "Arraste para reordenar"
     },
     "interviews": {
         "new_interview": "Nova entrevista",
@@ -196,7 +262,10 @@
         "no_access": "Você não tem permissão para registrar entrevistas neste projeto.",
         "form_not_found": "O formulário não foi encontrado neste projeto.",
         "instance_not_found": "A entrevista não foi encontrada.",
-        "item_not_found": "O campo não foi encontrado nesta entrevista."
+        "item_not_found": "O campo não foi encontrado nesta entrevista.",
+        "instance_label": "Entrevista",
+        "saving": "Salvando…",
+        "saved": "Salvo"
     },
     "common": {
         "actions": {
@@ -293,7 +362,11 @@
         "email": "Email",
         "message": "Mensagem",
         "send": "Enviar",
-        "contact_success": "Sua mensagem foi enviada. Obrigado por entrar em contato!"
+        "contact_success": "Sua mensagem foi enviada. Obrigado por entrar em contato!",
+        "features_title": "O que você pode fazer com o Padiush?",
+        "features_subtitle": "Do desenho de entrevistas a dados prontos para publicar: tudo o que a sua pesquisa etnobotânica precisa, em um só lugar.",
+        "cta_title": "Comece a sistematizar sua pesquisa hoje",
+        "learn_more": "Saiba mais"
     },
     "auth": {
         "login": "Entrar",
@@ -329,5 +402,22 @@
     "errors": {
         "unexpected_title": "Ocorreu um erro inesperado",
         "unexpected_body": "Por favor, recarregue a página; se o erro persistir, entre em contato com o suporte técnico e forneça as informações mostradas acima."
+    },
+    "theme": {
+        "switch_to_light": "Mudar para tema claro",
+        "switch_to_dark": "Mudar para tema escuro"
+    },
+    "hubs": {
+        "empty": {
+            "title_designer": "Nenhum projeto para desenhar formulários",
+            "hint_designer": "Você precisa de um projeto ativo onde possa administrar formulários. Crie um projeto ou peça acesso a quem o administra.",
+            "title_interviews": "Nenhum projeto pronto para entrevistas",
+            "hint_interviews": "Você precisa de um projeto ativo onde possa registrar dados, com pelo menos um formulário habilitado.",
+            "title_catalogs": "Nenhum catálogo disponível",
+            "hint_catalogs": "Você precisa de um projeto onde possa ver o catálogo de espécies.",
+            "title_data": "Ainda não há dados para processar",
+            "hint_data": "Você precisa de um projeto onde possa administrar dados ou gerar relatórios.",
+            "cta": "Ir para meus projetos"
+        }
     }
 }

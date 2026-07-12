@@ -81,11 +81,16 @@ export default function LinkSpecies({ project, answered_sections, species }) {
     return (
         <AuthenticatedLayout
             title={t('data.title')}
+            breadcrumbs={[
+                { label: t('navigation.data'), href: route('data.index') },
+                { label: project.name },
+            ]}
             subtitle={project.name}
             action={
                 <Link
                     className="btn btn-ghost btn-circle"
                     href={route('data.index')}
+                    aria-label={t('navigation.back')}
                 >
                     <FontAwesomeIcon icon={faArrowLeft} />
                 </Link>

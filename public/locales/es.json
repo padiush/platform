@@ -1,7 +1,15 @@
 {
     "dashboard": {
         "welcome_message": "¡Te damos la bienvenida a {{appName}}, {{name}}!",
-        "title": "Dashboard"
+        "title": "Dashboard",
+        "greeting": "¡Hola, {{name}}!",
+        "subtitle": "¿Dónde quieres continuar hoy?",
+        "projects_desc": "Crea y administra tus proyectos de investigación y sus colaboradores.",
+        "design_desc": "Diseña los formularios de entrevista que tu equipo usa en campo.",
+        "interview_desc": "Registra nuevas entrevistas para tus proyectos activos.",
+        "catalogs_desc": "Mantén tus catálogos de especies identificados y al día.",
+        "data_desc": "Vincula respuestas con especies y exporta datos listos para publicar.",
+        "no_projects_hint": "Empieza creando tu primer proyecto: todo lo demás parte de ahí."
     },
     "app": {
         "name": "Padiush"
@@ -10,10 +18,14 @@
         "projects": "Proyectos",
         "interviews": "Entrevistas",
         "design": "Diseñar formularios",
-        "interview": "Pasar entrevistas",
+        "interview": "Realizar entrevistas",
         "catalogs": "Catálogos",
         "data": "Datos",
-        "system_dashboard": "Panel del sistema"
+        "system_dashboard": "Panel del sistema",
+        "breadcrumb": "Ruta de navegación",
+        "back": "Volver",
+        "home": "Inicio",
+        "logout": "Cerrar sesión"
     },
     "titles": {
         "my_projects": "Mis proyectos"
@@ -128,7 +140,12 @@
             "number_field": "Campo numérico",
             "checkbox": "Selección múltiple",
             "single_choice": "Selección única",
-            "date_field": "Campo de fecha"
+            "date_field": "Campo de fecha",
+            "text": "Texto",
+            "number": "Número",
+            "date": "Fecha",
+            "multi": "Selección múltiple",
+            "select": "Selección única"
         },
         "fields": {
             "label": "Etiqueta",
@@ -172,7 +189,56 @@
         "section_reordered": "Se ha reordenado la sección.",
         "section_not_found": "No se ha encontrado la sección.",
         "required": "Campo requerido",
-        "save_error": "Ha ocurrido un error al guardar la respuesta."
+        "save_error": "Ha ocurrido un error al guardar la respuesta.",
+        "summary": {
+            "options_one": "{{count}} opción",
+            "options_other": "{{count}} opciones",
+            "answers_one": "{{count}} respuesta registrada",
+            "answers_other": "{{count}} respuestas registradas",
+            "linked": "Vinculado a especies",
+            "fields_one": "{{count}} campo",
+            "fields_other": "{{count}} campos"
+        },
+        "issues": {
+            "section_name": "Una sección no tiene nombre",
+            "item_label": "Un campo no tiene etiqueta",
+            "item_options": "Un campo de selección no tiene opciones"
+        },
+        "save": "Guardar",
+        "saving": "Guardando…",
+        "saved_badge": "Guardado",
+        "unsaved_badge": "Cambios sin guardar",
+        "structure_saved": "Estructura guardada.",
+        "issues_before_save_one": "{{count}} problema por corregir antes de guardar",
+        "issues_before_save_other": "{{count}} problemas por corregir antes de guardar",
+        "draft_counts": "{{sections}} secciones · {{fields}} campos",
+        "unsaved_guard": "Tienes cambios sin guardar. ¿Salir del diseñador?",
+        "interviews_recorded_one": "{{count}} entrevista registrada",
+        "interviews_recorded_other": "{{count}} entrevistas registradas",
+        "add_field": "Agregar campo",
+        "field_n": "Campo {{n}}",
+        "delete_section": "Eliminar sección",
+        "delete_field": "Eliminar campo",
+        "expand_field": "Editar campo",
+        "collapse_field": "Contraer campo",
+        "position_label": "Posición {{position}} de {{count}}",
+        "move_to_section": "Mover a sección…",
+        "select_section_aria": "Editar sección {{name}}",
+        "empty": {
+            "no_sections_title": "Comienza con una sección",
+            "no_sections_hint": "Las secciones agrupan las preguntas de tu entrevista. Crea la primera para empezar.",
+            "no_fields": "Esta sección aún no tiene campos: agrega el primero abajo.",
+            "pick_section": "Selecciona una sección a la izquierda para editar sus campos."
+        },
+        "detach": {
+            "title": "¿Eliminar campos con respuestas registradas?",
+            "body": "Al guardar se eliminarán permanentemente estos campos junto con sus respuestas registradas:",
+            "confirm": "Eliminar y guardar"
+        },
+        "move_has_answers": "Estos campos ya tienen respuestas registradas y no pueden moverse a otra sección:",
+        "name_auto_hint": "Derivado de la etiqueta; edítalo para personalizarlo.",
+        "name_label": "Nombre de columna al exportar",
+        "drag_handle": "Arrastra para reordenar"
     },
     "interviews": {
         "title": "Entrevistas",
@@ -196,7 +262,10 @@
         "no_access": "No tienes permisos para tomar entrevistas en este proyecto.",
         "form_not_found": "No se ha encontrado el formulario en este proyecto.",
         "instance_not_found": "No se ha encontrado la entrevista.",
-        "item_not_found": "No se ha encontrado el campo en esta entrevista."
+        "item_not_found": "No se ha encontrado el campo en esta entrevista.",
+        "instance_label": "Entrevista",
+        "saving": "Guardando…",
+        "saved": "Guardado"
     },
     "common": {
         "actions": {
@@ -293,7 +362,11 @@
         "email": "Correo electrónico",
         "message": "Mensaje",
         "send": "Enviar",
-        "contact_success": "Tu mensaje ha sido enviado. ¡Gracias por contactarnos!"
+        "contact_success": "Tu mensaje ha sido enviado. ¡Gracias por contactarnos!",
+        "features_title": "¿Qué puedes hacer con Padiush?",
+        "features_subtitle": "Del diseño de entrevistas a datos listos para publicar: todo lo que tu investigación etnobotánica necesita, en un solo lugar.",
+        "cta_title": "Empieza a sistematizar tu investigación hoy",
+        "learn_more": "Conoce más"
     },
     "auth": {
         "login": "Iniciar sesión",
@@ -329,5 +402,22 @@
     "errors": {
         "unexpected_title": "Ha ocurrido un error inesperado",
         "unexpected_body": "Por favor, recarga la página; si el error persiste, contacta a soporte técnico y proporciona la información mostrada arriba."
+    },
+    "theme": {
+        "switch_to_light": "Cambiar a tema claro",
+        "switch_to_dark": "Cambiar a tema oscuro"
+    },
+    "hubs": {
+        "empty": {
+            "title_designer": "No hay proyectos para diseñar formularios",
+            "hint_designer": "Necesitas un proyecto activo donde puedas administrar formularios. Crea un proyecto o pide acceso a quien lo administra.",
+            "title_interviews": "No hay proyectos listos para entrevistas",
+            "hint_interviews": "Necesitas un proyecto activo donde puedas registrar datos, con al menos un formulario habilitado.",
+            "title_catalogs": "No hay catálogos disponibles",
+            "hint_catalogs": "Necesitas un proyecto donde puedas ver el catálogo de especies.",
+            "title_data": "Aún no hay datos para procesar",
+            "hint_data": "Necesitas un proyecto donde puedas administrar datos o generar reportes.",
+            "cta": "Ir a mis proyectos"
+        }
     }
 }

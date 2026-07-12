@@ -50,11 +50,23 @@ export default function PendingInvites({ project, invites, filters }) {
     return (
         <AuthenticatedLayout
             title={t('projects.pending_invites')}
+            breadcrumbs={[
+                {
+                    label: t('navigation.projects'),
+                    href: route('projects.index'),
+                },
+                {
+                    label: project.name,
+                    href: route('projects.accesses', { project: project.id }),
+                },
+                { label: t('projects.pending_invites') },
+            ]}
             subtitle={project.name}
             action={
                 <Link
                     className="btn btn-ghost btn-circle"
                     href={route('projects.accesses', { project: project.id })}
+                    aria-label={t('navigation.back')}
                 >
                     <FontAwesomeIcon icon={faArrowLeft} />
                 </Link>
@@ -127,7 +139,7 @@ export default function PendingInvites({ project, invites, filters }) {
                                                     </td>
                                                     <td>
                                                         <button
-                                                            className="btn btn-error btn-xs"
+                                                            className="btn btn-ghost btn-sm text-error"
                                                             onClick={() =>
                                                                 handleRevoke(
                                                                     invite.id,

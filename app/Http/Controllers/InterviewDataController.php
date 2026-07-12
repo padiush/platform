@@ -56,13 +56,6 @@ class InterviewDataController extends Controller
             }
         }
 
-        if ($projects->isEmpty()) {
-            return redirect()
-                ->route('projects.index')
-                ->with('message', 'data.no_projects')
-                ->with('message_type', 'error');
-        }
-
         return Inertia::render('Data/Index', [
             'projects' => $projects,
         ]);
