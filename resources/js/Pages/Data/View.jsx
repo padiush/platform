@@ -1,4 +1,5 @@
 import Card from '@/Components/Card';
+import ChartTypeChooser from '@/Components/ChartTypeChooser';
 import EmptyState from '@/Components/EmptyState';
 import FieldSummaryChart from '@/Components/FieldSummaryChart';
 import Input from '@/Components/Input';
@@ -9,6 +10,8 @@ import { formatDateTime } from '@/utils/datetime';
 import { faArrowLeft, faDownload } from '@fortawesome/pro-regular-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link, router, usePage } from '@inertiajs/react';
+import axios from 'axios';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 function Cell({ cell }) {
@@ -48,6 +51,21 @@ export default function DataView({
     const { csrf_token } = usePage().props;
 
     const tab = filters.tab || 'table';
+
+    // Per-field chart type: optimistic local override, persisted server-side.
+    const [chartTypes, setChartTypes] = useState({});
+    const chooseChart = (field, type) => {
+        setChartTypes((prev) => ({ ...prev, [field.item_id]: type }));
+        axios
+            .post(
+                route('data.chart-preference', { project: project.id }),
+                { interview_item_id: field.item_id, chart_type: type },
+                { headers: { 'X-CSRF-TOKEN': csrf_token } },
+            )
+            .catch((err) =>
+                console.error('Error saving chart preference:', err),
+            );
+    };
 
     const visit = (overrides = {}) => {
         const next = {
@@ -366,14 +384,32 @@ export default function DataView({
                             </div>
                         ) : (
                             <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-                                {summary.map((field) => (
-                                    <Card
-                                        key={field.item_id}
-                                        title={field.label}
-                                    >
-                                        <FieldSummaryChart field={field} />
-                                    </Card>
-                                ))}
+                                {summary.map((field) => {
+                                    const chartType =
+                                        chartTypes[field.item_id] ??
+                                        field.chart_type;
+
+                                    return (
+                                        <Card
+                                            key={field.item_id}
+                                            title={field.label}
+                                            actions={
+                                                <ChartTypeChooser
+                                                    available={field.available}
+                                                    value={chartType}
+                                                    onChange={(type) =>
+                                                        chooseChart(field, type)
+                                                    }
+                                                />
+                                            }
+                                        >
+                                            <FieldSummaryChart
+                                                field={field}
+                                                chartType={chartType}
+                                            />
+                                        </Card>
+                                    );
+                                })}
                             </div>
                         )}
                     </Card>

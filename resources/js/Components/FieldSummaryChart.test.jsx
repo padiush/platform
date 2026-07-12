@@ -11,11 +11,17 @@ vi.mock('recharts', () => {
         ResponsiveContainer: Pass,
         BarChart: Pass,
         Bar: Pass,
+        PieChart: Pass,
+        Pie: Pass,
+        LineChart: Pass,
+        Line: Nil,
         XAxis: Nil,
         YAxis: Nil,
         CartesianGrid: Nil,
         Tooltip: Nil,
         LabelList: Nil,
+        Legend: Nil,
+        Cell: Nil,
     };
 });
 
@@ -65,5 +71,58 @@ describe('FieldSummaryChart', () => {
         );
 
         expect(screen.getByText('data.view.no_chart_data')).toBeInTheDocument();
+    });
+
+    it('renders a pie when chosen', () => {
+        render(
+            <FieldSummaryChart
+                field={{
+                    kind: 'categorical',
+                    data: [{ label: 'Alimento', count: 3 }],
+                    total_distinct: 1,
+                    total_count: 3,
+                }}
+                chartType="pie"
+            />,
+        );
+
+        expect(
+            screen.queryByText('data.view.no_chart_data'),
+        ).not.toBeInTheDocument();
+    });
+
+    it('renders a table with counts and percentages when chosen', () => {
+        render(
+            <FieldSummaryChart
+                field={{
+                    kind: 'categorical',
+                    data: [{ label: 'Alimento', count: 3 }],
+                    total_distinct: 1,
+                    total_count: 3,
+                }}
+                chartType="table"
+            />,
+        );
+
+        expect(screen.getByText('data.view.chart.value')).toBeInTheDocument();
+        expect(screen.getByText('Alimento')).toBeInTheDocument();
+        expect(screen.getByText('100%')).toBeInTheDocument();
+    });
+
+    it('renders a line for a date field when chosen', () => {
+        render(
+            <FieldSummaryChart
+                field={{
+                    kind: 'date',
+                    data: [{ label: '2026-01', count: 2 }],
+                    bucket: 'month',
+                }}
+                chartType="line"
+            />,
+        );
+
+        expect(
+            screen.queryByText('data.view.no_chart_data'),
+        ).not.toBeInTheDocument();
     });
 });
