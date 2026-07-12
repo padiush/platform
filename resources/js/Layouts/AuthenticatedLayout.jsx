@@ -148,19 +148,25 @@ export default function AuthenticatedLayout({
                 </div>
             </div>
 
-            <div className="bg-base-200 sticky top-16 z-20 flex items-center justify-between gap-4 px-4 py-4 text-lg font-semibold shadow-xl md:px-12 md:py-6 md:text-xl lg:px-24 lg:text-2xl">
+            <div className="bg-base-100/95 border-base-300 sticky top-16 z-20 flex items-center justify-between gap-4 border-b px-4 py-3 backdrop-blur md:px-12 lg:px-24">
                 {action && action}
 
-                <div className="items-left flex min-w-0 grow flex-col">
+                <div className="items-left flex min-w-0 grow flex-col gap-0.5">
                     {breadcrumbs && <Breadcrumbs items={breadcrumbs} />}
-                    <div className="text-2xl font-bold">{title}</div>
-                    <div className="text-lg font-semibold">{subtitle}</div>
+                    <div className="truncate text-xl font-bold md:text-2xl">
+                        {title}
+                    </div>
+                    {subtitle && (
+                        <div className="text-base-content/60 truncate text-sm font-medium">
+                            {subtitle}
+                        </div>
+                    )}
                 </div>
 
                 {actionRight && actionRight}
             </div>
 
-            <div className="bg-base-100 flex-1 overflow-y-auto">
+            <div className="bg-base-200/50 flex-1 overflow-y-auto">
                 {flashShown && <FlashAlert />}
 
                 <ErrorBoundary>{children}</ErrorBoundary>
