@@ -315,6 +315,16 @@ class ProjectController extends Controller
             return $this->denyNoPermission();
         }
 
+        // The invite is route-bound independently of the project, so a manager
+        // of one project could otherwise revoke another project's invite by
+        // mixing ids in the URL. Keep it scoped to the authorized project.
+        if ($invite->project_id !== $project->id) {
+            return redirect()
+                ->route('projects.accesses', ['project' => $project])
+                ->with('message', 'projects.invite_not_found')
+                ->with('message_type', 'error');
+        }
+
         $invite->delete();
 
         $remaining_invites = $project->invites->count();

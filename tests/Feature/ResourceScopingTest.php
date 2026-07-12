@@ -9,6 +9,8 @@ use App\Models\InterviewInstance;
 use App\Models\InterviewItem;
 use App\Models\InterviewSection;
 use App\Models\Project;
+use App\Models\ProjectCapability;
+use App\Models\ProjectInvite;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Concerns\InteractsWithProjects;
 use Tests\TestCase;
@@ -70,6 +72,34 @@ class ResourceScopingTest extends TestCase
         $response->assertSessionHas('message', 'designer.form_not_found');
         $this->assertDatabaseHas('interview_forms', [
             'id' => $foreignForm->id,
+        ]);
+    }
+
+    public function test_invite_of_another_project_cannot_be_revoked()
+    {
+        $mine = Project::factory()->create();
+        $user = $this->userWithCapability($mine, 'manage_users');
+
+        $other = Project::factory()->create();
+        $foreignInvite = ProjectInvite::factory()->create([
+            'project_id' => $other->id,
+            'inviting_user_id' => $user->id,
+            'invited_email' => 'outsider@example.com',
+            'project_capability_id' => ProjectCapability::first()->id,
+            'expires_at' => now()->addDays(7),
+        ]);
+
+        $response = $this->actingAs($user)->delete(
+            route('projects.accesses.invites.revoke', [
+                'project' => $mine,
+                'invite' => $foreignInvite,
+            ])
+        );
+
+        $response->assertRedirect(route('projects.accesses', ['project' => $mine]));
+        $response->assertSessionHas('message', 'projects.invite_not_found');
+        $this->assertDatabaseHas('project_invites', [
+            'id' => $foreignInvite->id,
         ]);
     }
 
