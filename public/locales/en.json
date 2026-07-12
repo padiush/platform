@@ -148,7 +148,12 @@
             "date_field": "Date field",
             "number_field": "Numeric field",
             "single_choice": "Unique selection",
-            "text_field": "Text field"
+            "text_field": "Text field",
+            "text": "Text",
+            "number": "Number",
+            "date": "Date",
+            "multi": "Multiple choice",
+            "select": "Single choice"
         },
         "new_section": "New section",
         "no_items": "There are no items in this section",
@@ -180,7 +185,55 @@
         "section_reordered": "The section has been reordered.",
         "section_not_found": "The section was not found.",
         "required": "Required field",
-        "save_error": "An error occurred while saving the answer."
+        "save_error": "An error occurred while saving the answer.",
+        "summary": {
+            "options_one": "{{count}} option",
+            "options_other": "{{count}} options",
+            "answers_one": "{{count}} recorded answer",
+            "answers_other": "{{count}} recorded answers",
+            "linked": "Linked to species",
+            "fields_one": "{{count}} field",
+            "fields_other": "{{count}} fields"
+        },
+        "issues": {
+            "section_name": "A section is missing its name",
+            "item_label": "A field is missing its label",
+            "item_options": "A choice field has no options"
+        },
+        "save": "Save",
+        "saving": "Saving…",
+        "saved_badge": "Saved",
+        "unsaved_badge": "Unsaved changes",
+        "structure_saved": "Structure saved.",
+        "issues_before_save_one": "{{count}} issue to fix before saving",
+        "issues_before_save_other": "{{count}} issues to fix before saving",
+        "draft_counts": "{{sections}} sections · {{fields}} fields",
+        "unsaved_guard": "You have unsaved changes. Leave the designer?",
+        "interviews_recorded_one": "{{count}} interview recorded",
+        "interviews_recorded_other": "{{count}} interviews recorded",
+        "add_field": "Add field",
+        "field_n": "Field {{n}}",
+        "delete_section": "Delete section",
+        "delete_field": "Delete field",
+        "expand_field": "Edit field",
+        "collapse_field": "Collapse field",
+        "position_label": "Position {{position}} of {{count}}",
+        "move_to_section": "Move to section…",
+        "select_section_aria": "Edit section {{name}}",
+        "empty": {
+            "no_sections_title": "Start with a section",
+            "no_sections_hint": "Sections group the questions of your interview. Create the first one to begin.",
+            "no_fields": "This section has no fields yet — add the first one below.",
+            "pick_section": "Select a section on the left to edit its fields."
+        },
+        "detach": {
+            "title": "Delete fields with recorded answers?",
+            "body": "Saving will permanently delete these fields together with their recorded answers:",
+            "confirm": "Delete and save"
+        },
+        "move_has_answers": "These fields already have recorded answers and cannot move to another section:",
+        "name_auto_hint": "Derived from the label — edit to override.",
+        "name_label": "Export column name"
     },
     "interviews": {
         "new_interview": "New interview",

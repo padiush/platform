@@ -148,7 +148,12 @@
             "date_field": "Campo de data",
             "number_field": "Campo numérico",
             "single_choice": "Seleção única",
-            "text_field": "Campo de texto"
+            "text_field": "Campo de texto",
+            "text": "Texto",
+            "number": "Número",
+            "date": "Data",
+            "multi": "Seleção múltipla",
+            "select": "Seleção única"
         },
         "new_section": "Nova secção",
         "no_items": "Não existem itens nesta secção",
@@ -180,7 +185,55 @@
         "section_reordered": "A seção foi reordenada.",
         "section_not_found": "A seção não foi encontrada.",
         "required": "Campo obrigatório",
-        "save_error": "Ocorreu um erro ao salvar a resposta."
+        "save_error": "Ocorreu um erro ao salvar a resposta.",
+        "summary": {
+            "options_one": "{{count}} opção",
+            "options_other": "{{count}} opções",
+            "answers_one": "{{count}} resposta registrada",
+            "answers_other": "{{count}} respostas registradas",
+            "linked": "Vinculado a espécies",
+            "fields_one": "{{count}} campo",
+            "fields_other": "{{count}} campos"
+        },
+        "issues": {
+            "section_name": "Uma seção está sem nome",
+            "item_label": "Um campo está sem rótulo",
+            "item_options": "Um campo de seleção não tem opções"
+        },
+        "save": "Salvar",
+        "saving": "Salvando…",
+        "saved_badge": "Salvo",
+        "unsaved_badge": "Alterações não salvas",
+        "structure_saved": "Estrutura salva.",
+        "issues_before_save_one": "{{count}} problema a corrigir antes de salvar",
+        "issues_before_save_other": "{{count}} problemas a corrigir antes de salvar",
+        "draft_counts": "{{sections}} seções · {{fields}} campos",
+        "unsaved_guard": "Você tem alterações não salvas. Sair do designer?",
+        "interviews_recorded_one": "{{count}} entrevista registrada",
+        "interviews_recorded_other": "{{count}} entrevistas registradas",
+        "add_field": "Adicionar campo",
+        "field_n": "Campo {{n}}",
+        "delete_section": "Excluir seção",
+        "delete_field": "Excluir campo",
+        "expand_field": "Editar campo",
+        "collapse_field": "Recolher campo",
+        "position_label": "Posição {{position}} de {{count}}",
+        "move_to_section": "Mover para a seção…",
+        "select_section_aria": "Editar seção {{name}}",
+        "empty": {
+            "no_sections_title": "Comece com uma seção",
+            "no_sections_hint": "As seções agrupam as perguntas da sua entrevista. Crie a primeira para começar.",
+            "no_fields": "Esta seção ainda não tem campos — adicione o primeiro abaixo.",
+            "pick_section": "Selecione uma seção à esquerda para editar seus campos."
+        },
+        "detach": {
+            "title": "Excluir campos com respostas registradas?",
+            "body": "Ao salvar, estes campos serão excluídos permanentemente junto com suas respostas registradas:",
+            "confirm": "Excluir e salvar"
+        },
+        "move_has_answers": "Estes campos já têm respostas registradas e não podem ser movidos para outra seção:",
+        "name_auto_hint": "Derivado do rótulo — edite para personalizar.",
+        "name_label": "Nome da coluna na exportação"
     },
     "interviews": {
         "new_interview": "Nova entrevista",

@@ -136,7 +136,12 @@
             "number_field": "Campo numérico",
             "checkbox": "Selección múltiple",
             "single_choice": "Selección única",
-            "date_field": "Campo de fecha"
+            "date_field": "Campo de fecha",
+            "text": "Texto",
+            "number": "Número",
+            "date": "Fecha",
+            "multi": "Selección múltiple",
+            "select": "Selección única"
         },
         "fields": {
             "label": "Etiqueta",
@@ -180,7 +185,55 @@
         "section_reordered": "Se ha reordenado la sección.",
         "section_not_found": "No se ha encontrado la sección.",
         "required": "Campo requerido",
-        "save_error": "Ha ocurrido un error al guardar la respuesta."
+        "save_error": "Ha ocurrido un error al guardar la respuesta.",
+        "summary": {
+            "options_one": "{{count}} opción",
+            "options_other": "{{count}} opciones",
+            "answers_one": "{{count}} respuesta registrada",
+            "answers_other": "{{count}} respuestas registradas",
+            "linked": "Vinculado a especies",
+            "fields_one": "{{count}} campo",
+            "fields_other": "{{count}} campos"
+        },
+        "issues": {
+            "section_name": "Una sección no tiene nombre",
+            "item_label": "Un campo no tiene etiqueta",
+            "item_options": "Un campo de selección no tiene opciones"
+        },
+        "save": "Guardar",
+        "saving": "Guardando…",
+        "saved_badge": "Guardado",
+        "unsaved_badge": "Cambios sin guardar",
+        "structure_saved": "Estructura guardada.",
+        "issues_before_save_one": "{{count}} problema por corregir antes de guardar",
+        "issues_before_save_other": "{{count}} problemas por corregir antes de guardar",
+        "draft_counts": "{{sections}} secciones · {{fields}} campos",
+        "unsaved_guard": "Tienes cambios sin guardar. ¿Salir del diseñador?",
+        "interviews_recorded_one": "{{count}} entrevista registrada",
+        "interviews_recorded_other": "{{count}} entrevistas registradas",
+        "add_field": "Agregar campo",
+        "field_n": "Campo {{n}}",
+        "delete_section": "Eliminar sección",
+        "delete_field": "Eliminar campo",
+        "expand_field": "Editar campo",
+        "collapse_field": "Contraer campo",
+        "position_label": "Posición {{position}} de {{count}}",
+        "move_to_section": "Mover a sección…",
+        "select_section_aria": "Editar sección {{name}}",
+        "empty": {
+            "no_sections_title": "Comienza con una sección",
+            "no_sections_hint": "Las secciones agrupan las preguntas de tu entrevista. Crea la primera para empezar.",
+            "no_fields": "Esta sección aún no tiene campos: agrega el primero abajo.",
+            "pick_section": "Selecciona una sección a la izquierda para editar sus campos."
+        },
+        "detach": {
+            "title": "¿Eliminar campos con respuestas registradas?",
+            "body": "Al guardar se eliminarán permanentemente estos campos junto con sus respuestas registradas:",
+            "confirm": "Eliminar y guardar"
+        },
+        "move_has_answers": "Estos campos ya tienen respuestas registradas y no pueden moverse a otra sección:",
+        "name_auto_hint": "Derivado de la etiqueta; edítalo para personalizarlo.",
+        "name_label": "Nombre de columna al exportar"
     },
     "interviews": {
         "title": "Entrevistas",
