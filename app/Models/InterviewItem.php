@@ -21,11 +21,13 @@ class InterviewItem extends Model
         'step',
         'options',
         'link_to_species',
+        'is_use_category',
     ];
 
     protected $casts = [
         'required' => 'boolean',
         'link_to_species' => 'boolean',
+        'is_use_category' => 'boolean',
         'options' => 'array',
     ];
 

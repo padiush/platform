@@ -189,6 +189,7 @@
         "item_deleted": "O campo foi excluído.",
         "item_reordered": "O campo foi reordenado.",
         "item_not_found": "O campo não foi encontrado.",
+        "item_role_conflict": "Um campo pode vincular uma espécie ou ser uma categoria de uso, mas não ambos.",
         "section_created": "A seção foi criada.",
         "section_renamed": "A seção foi renomeada.",
         "section_deleted": "A seção foi excluída.",

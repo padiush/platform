@@ -189,6 +189,7 @@
         "item_deleted": "Se ha eliminado el campo.",
         "item_reordered": "Se ha reordenado el campo.",
         "item_not_found": "No se ha encontrado el campo.",
+        "item_role_conflict": "Un campo puede vincular una especie o ser una categoría de uso, pero no ambas.",
         "section_created": "Se ha creado la sección.",
         "section_renamed": "Se ha renombrado la sección.",
         "section_deleted": "Se ha eliminado la sección.",
