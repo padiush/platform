@@ -54,13 +54,16 @@
         "users_with_access": "Usuários com acesso ao projeto",
         "view_pending_invites": "Ver convites pendentes",
         "no_other_users": "Não há outros usuários com acesso a este projeto.",
+        "you": "Você",
+        "revoke_access_title": "Revogar acesso",
         "access_form": {
             "name": "Nome",
             "email": "Email",
             "permission": "Permissões",
             "select_permission": "Selecione uma permissão",
             "actions": "Ações",
-            "revoke_confirmation": "Tem certeza de que deseja revogar o acesso deste usuário?"
+            "revoke_confirmation": "Tem certeza de que deseja revogar o acesso deste usuário?",
+            "revoke_confirmation_named": "Revogar o acesso de {{name}} a este projeto?"
         },
         "no_matching_invites": "Não foram encontrados convites com este critério de pesquisa.",
         "no_edit_permission": "Você não tem as permissões necessárias para editar este projeto.",
