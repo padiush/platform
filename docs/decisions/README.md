@@ -1,0 +1,49 @@
+# Architecture Decision Records
+
+Short records of the significant, hard-to-reverse choices behind Padiush's
+direction — the *why* that git history and code can't preserve. Read these before
+re-litigating a decision; if you do change one, add a new ADR that supersedes it
+rather than editing the old one.
+
+These capture reasoning from the product/architecture discussions that shaped the
+current roadmap. Several are **Proposed**, not settled — the status line on each
+is accurate, and the open questions are surfaced in
+[../README.md#open-decisions](../README.md).
+
+## Index
+
+| # | Decision | Status |
+|---|---|---|
+| [0001](0001-complete-ethnobotany-before-generalizing.md) | Complete the ethnobotany vertical before generalizing to other subfields | Accepted |
+| [0002](0002-mobile-companion-stack.md) | Build companion apps on Expo / React Native | Proposed |
+| [0003](0003-capture-only-companion-scope.md) | Scope the companion apps to field capture only | Proposed |
+| [0004](0004-offline-sync-model.md) | Offline sync: client-owned records, UUIDs, last-writer-wins | Proposed |
+| [0005](0005-interview-transcription-whisper.md) | Transcribe interview audio with self-hosted Whisper | Proposed |
+| [0006](0006-multi-subfield-architecture.md) | Generalize to ethnobiology via subfield configuration | Accepted (impl. deferred) |
+
+## Template
+
+```markdown
+# NNNN — <short imperative title>
+
+- **Status:** Proposed | Accepted | Superseded by NNNN | Deprecated
+- **Date:** YYYY-MM-DD
+- **Deciders:** <who>
+
+## Context
+What forces are at play — technical, product, domain — that make a decision
+necessary. State constraints and the problem, not the answer.
+
+## Decision
+The choice, in one or two sentences, plus the essential specifics.
+
+## Consequences
+What becomes easier and what becomes harder. Include the costs, not just the wins.
+
+## Alternatives considered
+The options rejected and the one-line reason each lost.
+```
+
+> ADR dates are intentionally omitted from the seed records below (they capture
+> decisions made across a discussion, not on a single stampable day). Add a date
+> when a decision moves to **Accepted** and is acted on.

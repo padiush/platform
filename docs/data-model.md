@@ -1,0 +1,102 @@
+# Data model
+
+The domain map for Padiush as it stands today. This is a *living* document:
+when the schema changes in a way that matters to the pipeline (a new entity, a
+new link, a semantic role on a field), update this file in the same change.
+
+It exists because the code is the source of truth for *fields*, but not for
+*relationships and intent* — that's what's expensive to reconstruct later.
+
+## The pipeline in one line
+
+A **project** scopes a **team** and an **interview instrument** (form). Field
+workers record **interviews** (instances) of that form; each **answer** captures
+what an informant said. Answers on a designated field are **linked** to a
+**catalog species** (folk name → scientific taxon). Linked answers are the
+"use reports" that feed analysis and export.
+
+```
+Project ─┬─ ProjectAccess ── ProjectCapability      (who can do what)
+         ├─ ProjectInvite                            (pending access grants)
+         ├─ InterviewForm ── InterviewSection ── InterviewItem
+         │        └─ InterviewInstance ── InstanceAnswer ──┐
+         └─ CatalogSpecies ───────────────────────────────┘  (the link)
+                    └─ CatalogSpeciesPhoto
+```
+
+## Entity reference
+
+| Entity | Purpose | Key fields | PK |
+|---|---|---|---|
+| `User` | Account | `name`, `email`, `system_admin` | int |
+| `Project` | Study container | `name`, `author`, `institution`, `author_email`, `country`, `finished`, `published`, `shared`, `user_id` (owner) | int |
+| `ProjectCapability` | A role = a set of permission flags | `name` + 8 booleans (below) | int |
+| `ProjectAccess` | A user's role on a project | `user_id`, `project_id`, `project_capability_id` — **unique** `(user_id, project_id)` | int |
+| `ProjectInvite` | Pending access grant, by email | `project_id`, `inviting_user_id`, `invited_user_id?`, `invited_name`, `invited_email`, `project_capability_id`, `expires_at` | int |
+| `InterviewForm` | An interview instrument | `project_id`, `name`, `description`, `is_active` | int |
+| `InterviewSection` | A group of items; may repeat | `interview_form_id`, `name`, `order`, `repeatable` | int |
+| `InterviewItem` | A question | `interview_section_id`, `label`, `name`, `type`, `required`, `options[]`, `link_to_species`, `order` | int |
+| `InterviewInstance` | **One completed interview** | `interview_form_id`, `user_id` (recorder) | **uuid** |
+| `InstanceAnswer` | One informant response to one item | `interview_instance_id` (uuid), `interview_section_id`, `interview_item_id`, `repeatable_index`, `answer` (**encrypted**), `catalog_species_id?` | int |
+| `CatalogSpecies` | A scientific taxon in the project catalog | `project_id`, `family`, `genus`, `name`, `authority` | int |
+| `CatalogSpeciesPhoto` | Reference image for a taxon | `catalog_species_id`, … | int |
+| `ChartPreference` | Persisted per-field chart choice (data viewer) | field key, chart type | int |
+
+### Item types
+
+`InterviewItem.type` ∈ `text` · `number` · `date` · `multi` · `select`.
+`multi`/`select` carry `options[]`. `link_to_species = true` marks the item
+whose answer is a **folk/vernacular name** to be linked to a `CatalogSpecies`.
+
+### The link (the heart of the platform)
+
+`InstanceAnswer.catalog_species_id` is the folk-name → taxon reconciliation. It
+is set by the species-linking flow (`app/Services/SpeciesLinkingList.php` +
+`InterviewDataController::handleLinkRequest` / `handleBulkLinkRequest`), never at
+capture time. An answer with a non-null `catalog_species_id` is a **linked use
+record**; the triple `(instance, answer, species)` is the unit that analysis
+counts. See [analysis/ethnobotany-indices.md](analysis/ethnobotany-indices.md).
+
+### Repeatable sections
+
+A `repeatable` section yields many answer sets per instance, distinguished by
+`InstanceAnswer.repeatable_index`. This is how one interview produces many
+plant-use records — the natural data shape for ethnobiology.
+
+## Authorization
+
+Per-project RBAC. A user's `ProjectAccess` points at a `ProjectCapability` whose
+boolean flags are checked in `app/Policies/ProjectPolicy.php` via `can()`:
+
+`manage_project` · `manage_users` · `manage_forms` · `record_data` ·
+`manage_data` · `generate_reports` · `view_catalog` · `edit_catalog`
+
+Seeded roles: **Administrador del proyecto** (all), **Usuario técnico**
+(`record_data`, `generate_reports`, `view_catalog`, `edit_catalog`), **Usuario
+de consulta** (`generate_reports`, `view_catalog`). Because the policy is the
+single authorization surface, it applies identically to web (Inertia) and to any
+future token-authenticated API — see
+[decisions/0002-mobile-companion-stack.md](decisions/0002-mobile-companion-stack.md).
+
+## Where the roadmap touches the model
+
+These are **not built yet**; they are the pencilled-in slots so the model can
+absorb them without a rewrite.
+
+- **`Project.subfield`** — a first-class attribute selecting the ethnobiology
+  subfield (ethnobotany, ethnomycology, ethno-ornithology, …). Cheap to add now,
+  expensive to retrofit. Drives which taxonomic authority the catalog validates
+  against and the analysis/vocabulary defaults. See
+  [decisions/0006-multi-subfield-architecture.md](decisions/0006-multi-subfield-architecture.md).
+- **A "use" semantic on items** — the indices need to know which answers are
+  *uses* and in which *use category*. Today only `link_to_species` is semantic;
+  there is no use-category role. This is the key open modeling decision for the
+  indices milestone — see the OPEN QUESTION in
+  [analysis/ethnobotany-indices.md](analysis/ethnobotany-indices.md).
+- **`InstanceAnswer` client UUID** — instances are already UUID-keyed; answers
+  are integer-PK. Offline capture creates answers on-device, so they will need a
+  client-generated identifier. See
+  [contracts/sync-protocol.md](contracts/sync-protocol.md).
+- **Capture artifacts** — GPS, audio (+ transcript), voucher/specimen metadata,
+  and (for zoology subfields) conservation status. Introduced by the companion
+  apps; see [contracts/companion-api.md](contracts/companion-api.md).
