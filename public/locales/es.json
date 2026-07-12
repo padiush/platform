@@ -308,7 +308,23 @@
         "error_fetching_data": "Hubo un error al obtener los datos",
         "references": "Referencias en línea",
         "wfo_query_info": "Se muestran los resultados al consultar por {{name}} ante los registros de WFO.",
-        "species_not_found": "La especie no pertenece a este proyecto."
+        "species_not_found": "La especie no pertenece a este proyecto.",
+        "search_placeholder": "Buscar por nombre científico o local…",
+        "all_families": "Todas las familias",
+        "all_genera": "Todos los géneros",
+        "no_matches_title": "Sin coincidencias",
+        "no_matches_hint": "Ajusta la búsqueda o los filtros para ver más especies.",
+        "link_status": {
+            "label": "Vínculo con entrevistas",
+            "all": "Todas",
+            "linked": "Con nombres vinculados",
+            "unlinked": "Sin vincular"
+        },
+        "sort": {
+            "label": "Ordenar por",
+            "family": "Familia (taxonómico)",
+            "linked": "Más vinculadas"
+        }
     },
     "data": {
         "data_processing": "Procesamiento de datos",

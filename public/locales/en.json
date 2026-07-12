@@ -308,7 +308,23 @@
         "subtitle": "Ethnobotanical catalog of",
         "taxonomic_cross_reference": "Taxonomic cross-reference",
         "wfo_query_info": "Results are displayed when querying for {{name}} against WFO records.",
-        "species_not_found": "The species does not belong to this project."
+        "species_not_found": "The species does not belong to this project.",
+        "search_placeholder": "Search by scientific or local name…",
+        "all_families": "All families",
+        "all_genera": "All genera",
+        "no_matches_title": "No matches",
+        "no_matches_hint": "Adjust the search or filters to see more species.",
+        "link_status": {
+            "label": "Interview links",
+            "all": "All",
+            "linked": "With linked names",
+            "unlinked": "Unlinked"
+        },
+        "sort": {
+            "label": "Sort by",
+            "family": "Family (taxonomic)",
+            "linked": "Most linked"
+        }
     },
     "data": {
         "custom_export": "Customized export",

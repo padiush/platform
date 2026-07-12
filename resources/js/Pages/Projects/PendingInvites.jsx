@@ -1,6 +1,7 @@
 import Alert from '@/Components/Alert';
 import Card from '@/Components/Card';
 import Input from '@/Components/Input';
+import Pagination from '@/Components/Pagination';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { formatRelativeTime } from '@/utils/datetime';
 import { faArrowLeft, faTrash } from '@fortawesome/pro-regular-svg-icons';
@@ -162,26 +163,10 @@ export default function PendingInvites({ project, invites, filters }) {
                                         </tbody>
                                     </table>
 
-                                    <div className="mt-4 flex flex-wrap justify-between">
-                                        {invites.total > invites.per_page && (
-                                            <div className="join">
-                                                {invites.links.map((link) => (
-                                                    <Link
-                                                        key={link.label}
-                                                        className={`join-item btn btn-sm ${
-                                                            link.active
-                                                                ? 'btn-primary'
-                                                                : 'btn-ghost'
-                                                        }`}
-                                                        href={link.url || '#'}
-                                                        dangerouslySetInnerHTML={{
-                                                            __html: link.label,
-                                                        }}
-                                                    />
-                                                ))}
-                                            </div>
-                                        )}
-                                    </div>
+                                    <Pagination
+                                        links={invites.links}
+                                        className="mt-4"
+                                    />
                                 </>
                             ) : (
                                 <Alert

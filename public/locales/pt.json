@@ -308,7 +308,23 @@
         "query": "Pesquisa efectuada",
         "references": "Referências online",
         "taxonomic_cross_reference": "Referência cruzada taxonómica",
-        "species_not_found": "A espécie não pertence a este projeto."
+        "species_not_found": "A espécie não pertence a este projeto.",
+        "search_placeholder": "Pesquisar por nome científico ou local…",
+        "all_families": "Todas as famílias",
+        "all_genera": "Todos os géneros",
+        "no_matches_title": "Sem correspondências",
+        "no_matches_hint": "Ajuste a pesquisa ou os filtros para ver mais espécies.",
+        "link_status": {
+            "label": "Ligação a entrevistas",
+            "all": "Todas",
+            "linked": "Com nomes ligados",
+            "unlinked": "Sem ligação"
+        },
+        "sort": {
+            "label": "Ordenar por",
+            "family": "Família (taxonómico)",
+            "linked": "Mais ligadas"
+        }
     },
     "data": {
         "custom_export": "Exportação personalizada",
