@@ -1,32 +1,15 @@
 import Card from '@/Components/Card';
-import DeletionModal from '@/Components/DeletionModal';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { faArrowLeft, faEye } from '@fortawesome/pro-regular-svg-icons';
+import {
+    faArrowLeft,
+    faChevronRight,
+} from '@fortawesome/pro-regular-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link } from '@inertiajs/react';
-import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export default function CatalogSpeciesIndex({ project, species }) {
     const { t } = useTranslation();
-    const deletionModalRef = useRef();
-    const [deletionModalOptions, setDeletionModalOptions] = useState({
-        url: '',
-        name: '',
-    });
-
-    const handleDelete = (sp) => {
-        setDeletionModalOptions({
-            name: `${sp.genus} ${sp.name}`,
-            url: route('catalogs.species.delete', {
-                project: project.id,
-                species: sp.id,
-            }),
-        });
-
-        deletionModalRef.current.showModal();
-    };
-
     return (
         <AuthenticatedLayout
             title={t('catalogs.ethnobotanical_catalog')}
@@ -51,70 +34,48 @@ export default function CatalogSpeciesIndex({ project, species }) {
             <div className="p-4 md:pt-8 lg:pt-12">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
                     <Card title={t('catalogs.species_list')}>
-                        <table className="table-compact table w-full table-fixed">
-                            <thead>
-                                <tr>
-                                    <th className="lg:w-1/6">
-                                        {t('catalogs.family')}
-                                    </th>
-                                    <th className="lg:w-2/3">
-                                        {t('catalogs.species')}
-                                    </th>
-                                    <th className="lg:w-1/6">
-                                        {t('catalogs.reports')}
-                                    </th>
-                                    <th className="lg:w-1/6">
-                                        {t('projects.actions')}
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {species.data.map((sp) => (
-                                    <tr key={sp.id}>
-                                        <td className="text-wrap">
-                                            {sp.family}
-                                        </td>
-                                        <td className="text-wrap">
-                                            <span className="italic">
-                                                {sp.genus} {sp.name}
-                                            </span>{' '}
-                                            {sp.authority}
-                                        </td>
-                                        <td className="text-wrap">
-                                            {sp.answers.length}
-                                        </td>
-                                        <td>
-                                            <div className="join join-vertical lg:join-horizontal">
-                                                <Link
-                                                    href={route(
-                                                        'catalogs.species.show',
+                        <ul className="border-base-300 divide-base-300 rounded-box divide-y border">
+                            {species.data.map((sp) => (
+                                <li key={sp.id}>
+                                    <Link
+                                        href={route('catalogs.species.show', {
+                                            project: project.id,
+                                            species: sp.id,
+                                        })}
+                                        className="hover:bg-base-200 group flex items-center gap-3 px-4 py-3 transition"
+                                    >
+                                        <span className="min-w-0 grow">
+                                            <span className="block truncate font-medium">
+                                                <span className="italic">
+                                                    {sp.genus} {sp.name}
+                                                </span>{' '}
+                                                <span className="text-base-content/60 font-normal">
+                                                    {sp.authority}
+                                                </span>
+                                            </span>
+                                            <span className="text-base-content/60 mt-0.5 block truncate text-xs">
+                                                {[
+                                                    sp.family,
+                                                    t(
+                                                        'designer.summary.answers',
                                                         {
-                                                            project: project.id,
-                                                            species: sp.id,
+                                                            count: sp.answers
+                                                                .length,
                                                         },
-                                                    )}
-                                                    className="btn btn-primary btn-xs join-item"
-                                                >
-                                                    <FontAwesomeIcon
-                                                        icon={faEye}
-                                                        className="mr-2"
-                                                    />
-                                                    {t('common.actions.view')}
-                                                </Link>
-                                                <div
-                                                    className="btn btn-error btn-xs join-item"
-                                                    onClick={() =>
-                                                        handleDelete(sp)
-                                                    }
-                                                >
-                                                    {t('actions.delete')}
-                                                </div>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                                                    ),
+                                                ]
+                                                    .filter(Boolean)
+                                                    .join(' · ')}
+                                            </span>
+                                        </span>
+                                        <FontAwesomeIcon
+                                            icon={faChevronRight}
+                                            className="text-base-content/30 group-hover:text-base-content/60 shrink-0 transition"
+                                        />
+                                    </Link>
+                                </li>
+                            ))}
+                        </ul>
 
                         {/* Pagination */}
                         <div className="mt-4 flex justify-center">
@@ -140,11 +101,6 @@ export default function CatalogSpeciesIndex({ project, species }) {
                     </Card>
                 </div>
             </div>
-            <DeletionModal
-                modalRef={deletionModalRef}
-                name={deletionModalOptions.name}
-                url={deletionModalOptions.url}
-            />
         </AuthenticatedLayout>
     );
 }

@@ -16,6 +16,8 @@ export default function AuthenticatedLayout({
     action,
     actionRight,
     breadcrumbs = null,
+    // Plain-text document title for when `title` is JSX.
+    headTitle = null,
 }) {
     const { auth } = usePage().props;
     const { t } = useTranslation();
@@ -68,7 +70,9 @@ export default function AuthenticatedLayout({
 
     return (
         <div className="z-10 flex h-screen w-full flex-col overflow-hidden">
-            <Head title={title} />
+            <Head
+                title={headTitle ?? (typeof title === 'string' ? title : '')}
+            />
             <div className="navbar bg-primary text-primary-content sticky top-0 z-30 h-16 shadow-xl">
                 <div className="navbar-start">
                     <div className="dropdown">
