@@ -241,6 +241,12 @@ from memory):
   linked") so a researcher knows the denominator of *linked* knowledge.
 - **Gate** these behind `generate_reports` (all roles have it today) — see the
   access-control note in [../data-model.md](../data-model.md).
+- **Charts.** The report page also offers three downloadable (PNG) charts, each
+  from the same result: a species-by-index bar chart (selectable index), a
+  species × use-category heatmap, and a species→use Sankey. These cover
+  ethnobotanyR's `Radial_plot` / `ethnoChord` / `ethno_alluvial` (the chord is
+  rendered as the more legible heatmap). Service exposes a per-species `uses`
+  list ([{use_category, reports}]) to drive the heatmap and Sankey.
 
 ## Decisions & open points
 
