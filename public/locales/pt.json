@@ -465,7 +465,8 @@
                 "index": "Índice",
                 "by_index": "Espécies principais por índice",
                 "heatmap": "Espécies × categorias de uso",
-                "heatmap_note": "O tom e o número de cada célula indicam os relatos de uso por espécie e categoria."
+                "heatmap_note": "O tom e o número de cada célula indicam os relatos de uso por espécie e categoria.",
+                "sankey": "Fluxos de relatos de uso"
             },
             "empty": {
                 "title": "Ainda não há índices",
