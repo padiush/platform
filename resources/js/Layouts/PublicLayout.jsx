@@ -35,7 +35,7 @@ export default function PublicLayout({ children, title }) {
                         </label>
                         <ul
                             tabIndex={0}
-                            className="menu menu-compact dropdown-content bg-base-200 rounded-box mt-3 w-52 p-2 shadow-sm"
+                            className="menu menu-compact dropdown-content bg-base-200 text-base-content rounded-box mt-3 w-52 p-2 shadow-sm"
                         >
                             {!route().current('public.index') && (
                                 <li>
