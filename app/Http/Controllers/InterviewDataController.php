@@ -464,16 +464,19 @@ class InterviewDataController extends Controller
         $data = $indices->compute($project);
 
         // Literature-standard abbreviations — language-independent.
-        $headings = ['Family', 'Genus', 'Species', 'Authority', 'FC', 'RFC', 'UV', 'CI'];
+        $headings = ['Family', 'Genus', 'Species', 'Authority', 'FC', 'NU', 'RFC', 'UV', 'CI', 'RI', 'CV'];
         $rows = array_map(fn ($species) => [
             $species['species']['family'],
             $species['species']['genus'],
             $species['species']['name'],
             $species['species']['authority'],
             $species['fc'],
+            $species['nu'],
             round($species['rfc'], 4),
             round($species['uv'], 4),
             round($species['ci'], 4),
+            round($species['ri'], 4),
+            round($species['cv'], 4),
         ], $data['species']);
 
         $indicesSheet = new IndicesExport($headings, $rows);
@@ -504,8 +507,11 @@ class InterviewDataController extends Controller
     {
         return [
             ['RFC', 'Relative frequency of citation', 'Tardío, J. & Pardo-de-Santayana, M. (2008). Cultural importance indices: a comparative analysis. Economic Botany 62(1), 24–39.'],
+            ['NU', 'Number of uses', 'Prance, G. T., Balée, W., Boom, B. M. & Carneiro, R. L. (1987). Quantitative ethnobotany and the case for conservation in Amazonia. Conservation Biology 1(4), 296–310.'],
             ['UV', 'Use value', 'Phillips, O. & Gentry, A. H. (1993). The useful plants of Tambopata, Peru. Economic Botany 47(1), 15–32.'],
             ['CI', 'Cultural importance index', 'Tardío, J. & Pardo-de-Santayana, M. (2008). Cultural importance indices: a comparative analysis. Economic Botany 62(1), 24–39.'],
+            ['RI', 'Relative importance', 'Tardío, J. & Pardo-de-Santayana, M. (2008). Cultural importance indices: a comparative analysis. Economic Botany 62(1), 24–39.'],
+            ['CV', 'Cultural value', 'Reyes-García, V., Huanca, T., Vadez, V. & Leonard, W. (2006). Cultural, practical and economic value of wild plants: a quantitative study in the Bolivian Amazon. Economic Botany 60(1), 62–74.'],
             ['ICF', 'Informant consensus factor', 'Trotter, R. T. & Logan, M. H. (1986). Informant consensus. In: Plants in Indigenous Medicine and Diet. Redgrave.'],
             ['FL', 'Fidelity level', 'Friedman, J., Yaniv, Z., Dafni, A. & Palewitch, D. (1986). A preliminary classification of the healing potential of medicinal plants. Journal of Ethnopharmacology 16, 275–287.'],
             ['ethnobotanyR', 'Implementation (Whitney, C.)', 'https://CRAN.R-project.org/package=ethnobotanyR — implements these indices; definitions from the primary sources above.'],

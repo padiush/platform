@@ -55,7 +55,7 @@ class EthnobiologyIndicesTest extends TestCase
         $this->indices = new EthnobiologyIndices;
     }
 
-    public function test_computes_all_five_indices_for_the_worked_example()
+    public function test_computes_the_indices_for_the_worked_example()
     {
         $a = $this->species('edulis');       // Inga edulis
         $b = $this->species('peltata');      // Cecropia peltata
@@ -98,6 +98,18 @@ class EthnobiologyIndicesTest extends TestCase
         $this->assertEqualsWithDelta(1.0, $speciesB['uv'], 1e-9);
         $this->assertEqualsWithDelta(1.25, $speciesA['ci'], 1e-9);
         $this->assertEqualsWithDelta(1.0, $speciesB['ci'], 1e-9);
+
+        // Number of Uses — both used in food and medicine.
+        $this->assertSame(2, $speciesA['nu']);
+        $this->assertSame(2, $speciesB['nu']);
+
+        // Relative Importance: ½(RFC/RFCmax + NU/NUmax); RFCmax = 1, NUmax = 2.
+        $this->assertEqualsWithDelta(0.875, $speciesA['ri'], 1e-9); // (0.75 + 1)/2
+        $this->assertEqualsWithDelta(1.0, $speciesB['ri'], 1e-9); // (1 + 1)/2
+
+        // Cultural Value: (NU/NC)·RFC·CI; NC = 2 use-categories.
+        $this->assertEqualsWithDelta(0.9375, $speciesA['cv'], 1e-9); // 1·0.75·1.25
+        $this->assertEqualsWithDelta(1.0, $speciesB['cv'], 1e-9); // 1·1·1
 
         // Fidelity Level
         $this->assertEqualsWithDelta(100.0, $this->fl($speciesA, 'food'), 1e-9);

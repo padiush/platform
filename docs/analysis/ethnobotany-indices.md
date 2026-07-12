@@ -85,6 +85,17 @@ UV(s) = ( Σ_i U(i,s) ) / N
   as a species).
 - Source: Phillips & Gentry (1993).
 
+### Number of Uses — NU
+
+*How many use-categories a species is put to.*
+
+```
+NU(s) = |{ u : species s is cited in use-category u }|
+```
+- An integer count, `≥ 0`.
+- **Edge cases:** a species cited without any use-category answer has `NU = 0`.
+- Source: Prance et al. (1987).
+
 ### Cultural Importance Index — CI
 
 *UV that respects use-categories.*
@@ -99,6 +110,31 @@ CI(s) = Σ_u ( UR(u,s) / N )
   across categories.
 - **Requires use-categories** (blocked by the open decision above).
 - Source: Tardío & Pardo-de-Santayana (2008).
+
+### Relative Importance — RI
+
+*A species' importance relative to the most-cited and most-versatile.*
+
+```
+RI(s) = ½ · ( RFC(s)/RFC_max + NU(s)/NU_max )
+```
+- `RFC_max`, `NU_max` = the maxima across all species in scope.
+- Range `0–1`; the most-cited species reaches the RFC term = 1, the most-versatile
+  reaches the NU term = 1.
+- **Edge cases:** if `RFC_max` or `NU_max` = 0, that term contributes 0 (no
+  division by zero).
+- Source: Tardío & Pardo-de-Santayana (2008), after Pardo-de-Santayana (2003).
+
+### Cultural Value — CV
+
+*Breadth of use × how widely the species is known × how many uses reported.*
+
+```
+CV(s) = ( NU(s)/NC ) · RFC(s) · CI(s)
+```
+- `NC` = total number of use-categories considered in the study.
+- **Edge cases:** `NC = 0` → `CV = 0`.
+- Source: Reyes-García et al. (2006).
 
 ### Informant Consensus Factor — ICF (a.k.a. FIC)
 
@@ -159,6 +195,8 @@ from memory):
 - Use-reports per category: `N_ur(food) = 3+2 = 5`, `N_ur(medicine) = 2+2 = 4`;
   distinct taxa per category = {A,B} = 2 in both.
 - Informants citing A for any use `I_u(A) = 3`; for B, `I_u(B) = 4`.
+- Use breadth: `NU(A) = NU(B) = 2` (each used in food and medicine); total
+  categories `NC = 2`. Maxima: `RFC_max = 1` (B), `NU_max = 2`.
 
 **Expected values** (the exact assertions a test must reproduce):
 
@@ -166,10 +204,16 @@ from memory):
 |---|---|---|---|
 | RFC | A | **0.75** | FC/N = 3/4 |
 | RFC | B | **1.00** | 4/4 |
+| NU | A | **2** | food, medicine |
+| NU | B | **2** | food, medicine |
 | UV | A | **1.25** | ΣUR/N = (3+2)/4 |
 | UV | B | **1.00** | (2+2)/4 |
 | CI | A | **1.25** | (3/4)+(2/4) |
 | CI | B | **1.00** | (2/4)+(2/4) |
+| RI | A | **0.875** | ½(0.75/1 + 2/2) |
+| RI | B | **1.00** | ½(1/1 + 2/2) |
+| CV | A | **0.9375** | (2/2)·0.75·1.25 |
+| CV | B | **1.00** | (2/2)·1·1 |
 | ICF | food | **0.75** | (N_ur−N_t)/(N_ur−1) = (5−2)/(5−1) |
 | ICF | medicine | **0.6667** | (4−2)/(4−1) |
 | FL | A, food | **100 %** | I_p/I_u = 3/3 |
@@ -187,8 +231,8 @@ from memory):
   cannot be computed in SQL — they are decrypted and aggregated in PHP, following
   the in-memory pattern of `InterviewDataTable` / `InterviewDataExport`.
   Implemented in `app/Services/EthnobiologyIndices.php`; species citations
-  (FC/RFC/I_u) come from links directly, use reports (UV/CI/ICF/FL) additionally
-  require a use-category.
+  (FC/RFC/I_u) come from links directly; the use-report indices (NU, UV, CI, RI,
+  CV, ICF, FL) additionally require a use-category.
 - **Scope** is a project, restricted to its forms that carry a `link_to_species`
   field. `N` is the count of interviews of those forms — unrelated instruments in
   the same project are excluded so they can't dilute the denominator.
@@ -202,8 +246,8 @@ from memory):
 
 - ✅ **Use-category modeling** — built as `InterviewItem.is_use_category`
   ([ADR 0007](../decisions/0007-use-category-as-item-role.md)).
-- ✅ **v1 scope** — all five indices (RFC, UV, CI, ICF, FL) ship together; the
-  use-category role is a prerequisite of the milestone.
+- ✅ **Scope** — the ethnobotanyR species-level set (FC, NU, RFC, UV, CI, RI, CV)
+  plus FL and ICF; the use-category role is a prerequisite of the milestone.
 - ✅ **UV variant** — implemented as "mean use-reports per informant"
   (`UV(s) = ΣUR(s) / N`), matching the worked-example fixture. (In the fixture
   each informant gives at most one report per species-use, so this coincides with
@@ -211,14 +255,19 @@ from memory):
 
 ## Sources
 
+- Prance, G. T., Balée, W., Boom, B. M., & Carneiro, R. L. (1987). *Quantitative
+  ethnobotany and the case for conservation in Amazonia.* Conservation Biology
+  1(4), 296–310. — NU
 - Phillips, O., & Gentry, A. H. (1993). *The useful plants of Tambopata, Peru.*
-  Economic Botany 47(1).
+  Economic Botany 47(1), 15–32. — UV
 - Trotter, R. T., & Logan, M. H. (1986). *Informant consensus.* In *Plants in
-  Indigenous Medicine and Diet.* Redgrave.
+  Indigenous Medicine and Diet.* Redgrave. — ICF
 - Friedman, J., Yaniv, Z., Dafni, A., & Palewitch, D. (1986). *A preliminary
-  classification of the healing potential of medicinal plants…* J. Ethnopharmacology 16.
+  classification of the healing potential of medicinal plants…* J. Ethnopharmacology 16. — FL
 - Tardío, J., & Pardo-de-Santayana, M. (2008). *Cultural importance indices: a
-  comparative analysis…* Economic Botany 62(1), 24–39.
+  comparative analysis…* Economic Botany 62(1), 24–39. — RFC, CI, RI
+- Reyes-García, V., Huanca, T., Vadez, V., & Leonard, W. (2006). *Cultural,
+  practical and economic value of wild plants…* Economic Botany 60(1), 62–74. — CV
 
 **Tooling inspiration** (implements these same literature indices — not their
 origin; the primary sources above define them):

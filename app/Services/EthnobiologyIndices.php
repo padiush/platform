@@ -168,7 +168,8 @@ class EthnobiologyIndices
     }
 
     /**
-     * RFC, UV, CI, and per-use Fidelity Level for every cited species.
+     * FC, NU, RFC, UV, CI, RI, CV, and per-use Fidelity Level for every cited
+     * species — the ethnobotanyR species-level set (plus FL).
      */
     private function speciesIndices(array $speciesByInstance, array $useReports, int $n): array
     {
@@ -184,28 +185,55 @@ class EthnobiologyIndices
         $urBySpecies = [];
         $urBySpeciesUse = [];
         $informantsBySpeciesUse = [];
+        $useCategories = [];
         foreach ($useReports as $report) {
             $s = $report['species'];
             $u = $report['use'];
             $urBySpecies[$s] = ($urBySpecies[$s] ?? 0) + 1;
             $urBySpeciesUse[$s][$u] = ($urBySpeciesUse[$s][$u] ?? 0) + 1;
             $informantsBySpeciesUse[$s][$u][$report['instance']] = true;
+            $useCategories[$u] = true;
         }
+
+        // NC: total use-categories considered in the study (Cultural Value).
+        $nc = count($useCategories);
+
+        // Base metrics per species, before the maxima-dependent Relative
+        // Importance can be computed.
+        $metrics = [];
+        foreach ($fc as $speciesId => $citations) {
+            $useCounts = $urBySpeciesUse[$speciesId] ?? [];
+            $metrics[$speciesId] = [
+                'fc' => $citations,
+                'rfc' => $citations / $n,
+                'nu' => count($useCounts),   // distinct use-categories
+                'uv' => ($urBySpecies[$speciesId] ?? 0) / $n,
+                'ci' => array_sum($useCounts) / $n,
+            ];
+        }
+
+        // Relative Importance relativizes each species to the most-cited and
+        // most-versatile in the study.
+        $rfcMax = $metrics === [] ? 0 : max(array_column($metrics, 'rfc'));
+        $nuMax = $metrics === [] ? 0 : max(array_column($metrics, 'nu'));
 
         $catalog = CatalogSpecies::whereIn('id', array_keys($fc))
             ->get()
             ->keyBy('id');
 
         $species = [];
-        foreach ($fc as $speciesId => $citations) {
+        foreach ($metrics as $speciesId => $metric) {
             $fidelity = [];
             foreach ($urBySpeciesUse[$speciesId] ?? [] as $use => $count) {
                 $ip = count($informantsBySpeciesUse[$speciesId][$use]);
                 $fidelity[] = [
                     'use_category' => $use,
-                    'value' => ($ip / $citations) * 100,
+                    'value' => ($ip / $metric['fc']) * 100,
                 ];
             }
+
+            $rfcRel = $rfcMax > 0 ? $metric['rfc'] / $rfcMax : 0;
+            $nuRel = $nuMax > 0 ? $metric['nu'] / $nuMax : 0;
 
             $model = $catalog->get($speciesId);
 
@@ -217,10 +245,15 @@ class EthnobiologyIndices
                     'name' => $model?->name,
                     'authority' => $model?->authority,
                 ],
-                'fc' => $citations,
-                'rfc' => $citations / $n,
-                'uv' => ($urBySpecies[$speciesId] ?? 0) / $n,
-                'ci' => array_sum($urBySpeciesUse[$speciesId] ?? []) / $n,
+                'fc' => $metric['fc'],
+                'nu' => $metric['nu'],
+                'rfc' => $metric['rfc'],
+                'uv' => $metric['uv'],
+                'ci' => $metric['ci'],
+                'ri' => ($rfcRel + $nuRel) / 2,
+                'cv' => $nc > 0
+                    ? ($metric['nu'] / $nc) * $metric['rfc'] * $metric['ci']
+                    : 0,
                 'fidelity' => $fidelity,
             ];
         }
