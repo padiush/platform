@@ -340,7 +340,32 @@
         "custom_instructions": "Select the fields you want to include in the report. You cannot mix fields from repeatable and unique sections.",
         "repeatable": "repeatable section",
         "unique": "unique section",
-        "no_projects": "You have no available projects."
+        "no_projects": "You have no available projects.",
+        "search_placeholder": "Search by reported name…",
+        "status": {
+            "label": "Status",
+            "all": "All",
+            "unlinked": "Unlinked",
+            "linked": "Linked"
+        },
+        "group_by_name": "Group by name",
+        "linked_of_total": "linked",
+        "mixed": "Multiple species",
+        "change": "Change",
+        "link_action": "Link",
+        "link_all": "Link all",
+        "link_error": "An error occurred while linking the species.",
+        "interview_count": "{{count}} interviews",
+        "toggle_members": "Show interviews",
+        "no_matches_title": "No matches",
+        "no_matches_hint": "Adjust the search or filters to see more answers.",
+        "picker": {
+            "title": "Link to a species",
+            "search_placeholder": "Search species…",
+            "no_matches": "No species found.",
+            "error": "An error occurred while searching species.",
+            "unlink": "Remove link"
+        }
     },
     "public": {
         "home": "Home",

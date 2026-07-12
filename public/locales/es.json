@@ -340,7 +340,32 @@
         "select_usage_field": "Selecciona el campo que contiene el uso",
         "custom_instructions": "Selecciona los campos que deseas incluir en el reporte. No puedes mezclar campos de secciones repetibles con campos de secciones únicas.",
         "repeatable": "sección repetible",
-        "unique": "sección única"
+        "unique": "sección única",
+        "search_placeholder": "Buscar por nombre reportado…",
+        "status": {
+            "label": "Estado",
+            "all": "Todos",
+            "unlinked": "Sin vincular",
+            "linked": "Vinculados"
+        },
+        "group_by_name": "Agrupar por nombre",
+        "linked_of_total": "vinculados",
+        "mixed": "Varias especies",
+        "change": "Cambiar",
+        "link_action": "Vincular",
+        "link_all": "Vincular todo",
+        "link_error": "Ocurrió un error al vincular la especie.",
+        "interview_count": "{{count}} entrevistas",
+        "toggle_members": "Mostrar entrevistas",
+        "no_matches_title": "Sin coincidencias",
+        "no_matches_hint": "Ajusta la búsqueda o los filtros para ver más respuestas.",
+        "picker": {
+            "title": "Vincular a una especie",
+            "search_placeholder": "Buscar especie…",
+            "no_matches": "No se encontraron especies.",
+            "error": "Ocurrió un error al buscar especies.",
+            "unlink": "Quitar vínculo"
+        }
     },
     "public": {
         "home": "Inicio",
