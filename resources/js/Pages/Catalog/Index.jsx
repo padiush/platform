@@ -1,12 +1,20 @@
 import Card from '@/Components/Card';
 import EmptyState from '@/Components/EmptyState';
+import FormModal from '@/Components/FormModal';
 import MetricCard from '@/Components/MetricCard';
+import useQueryModal from '@/Hooks/useQueryModal';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Link } from '@inertiajs/react';
 import { useTranslation } from 'react-i18next';
+import SpeciesForm from './Partials/SpeciesForm';
 
 export default function CatalogOverview({ projects }) {
     const { t } = useTranslation();
+
+    const [createParam, setCreate] = useQueryModal('create');
+    const registering = createParam
+        ? projects.find((p) => p.id === Number(createParam))
+        : null;
 
     return (
         <AuthenticatedLayout title={t('catalogs.title')}>
@@ -50,15 +58,15 @@ export default function CatalogOverview({ projects }) {
 
                                     <div className="mt-4 flex flex-wrap justify-end gap-2">
                                         {project.can_edit_catalog ? (
-                                            <Link
-                                                href={route(
-                                                    'catalogs.species.register',
-                                                    { project: project.id },
-                                                )}
+                                            <button
+                                                type="button"
+                                                onClick={() =>
+                                                    setCreate(project.id)
+                                                }
                                                 className="btn btn-outline btn-primary btn-sm"
                                             >
                                                 {t('catalogs.register_species')}
-                                            </Link>
+                                            </button>
                                         ) : (
                                             <span
                                                 className="btn btn-outline btn-sm btn-disabled"
@@ -93,6 +101,24 @@ export default function CatalogOverview({ projects }) {
                     )}
                 </div>
             </div>
+
+            <FormModal
+                open={!!registering}
+                onClose={() => setCreate(null)}
+                title={
+                    registering
+                        ? `${t('catalogs.register_species')} — ${registering.name}`
+                        : t('catalogs.register_species')
+                }
+            >
+                {registering && (
+                    <SpeciesForm
+                        key={createParam}
+                        project={registering}
+                        onClose={() => setCreate(null)}
+                    />
+                )}
+            </FormModal>
         </AuthenticatedLayout>
     );
 }

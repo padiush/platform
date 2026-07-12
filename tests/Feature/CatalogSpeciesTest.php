@@ -23,7 +23,7 @@ class CatalogSpeciesTest extends TestCase
         $this->project = Project::factory()->create();
     }
 
-    public function test_editor_can_open_the_register_page()
+    public function test_editor_register_link_redirects_to_the_hub_modal()
     {
         $user = $this->userWithCapability($this->project, 'edit_catalog');
 
@@ -31,9 +31,8 @@ class CatalogSpeciesTest extends TestCase
             route('catalogs.species.register', $this->project)
         );
 
-        $response->assertOk();
-        $response->assertInertia(
-            fn (Assert $page) => $page->component('Catalog/Form')
+        $response->assertRedirect(
+            route('catalogs.index', ['create' => $this->project->id])
         );
     }
 

@@ -54,7 +54,7 @@ class ProjectCatalogController extends Controller
         ]);
     }
 
-    public function registerSpecies(Project $project): Response|RedirectResponse
+    public function registerSpecies(Project $project): RedirectResponse
     {
         if (! Auth::user()->can('editCatalog', $project)) {
             return redirect()
@@ -63,9 +63,9 @@ class ProjectCatalogController extends Controller
                 ->with('message_type', 'error');
         }
 
-        return Inertia::render('Catalog/Form', [
-            'project' => $project,
-        ]);
+        // The register form is a modal on the catalog hub; deep-link opens it
+        // there, carrying which project it belongs to.
+        return redirect()->route('catalogs.index', ['create' => $project->id]);
     }
 
     public function storeSpecies(
