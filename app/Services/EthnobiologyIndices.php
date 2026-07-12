@@ -224,11 +224,17 @@ class EthnobiologyIndices
         $species = [];
         foreach ($metrics as $speciesId => $metric) {
             $fidelity = [];
+            $uses = [];
             foreach ($urBySpeciesUse[$speciesId] ?? [] as $use => $count) {
                 $ip = count($informantsBySpeciesUse[$speciesId][$use]);
                 $fidelity[] = [
                     'use_category' => $use,
                     'value' => ($ip / $metric['fc']) * 100,
+                ];
+                // Raw use-report counts per category — drives the charts.
+                $uses[] = [
+                    'use_category' => $use,
+                    'reports' => $count,
                 ];
             }
 
@@ -255,6 +261,7 @@ class EthnobiologyIndices
                     ? ($metric['nu'] / $nc) * $metric['rfc'] * $metric['ci']
                     : 0,
                 'fidelity' => $fidelity,
+                'uses' => $uses,
             ];
         }
 
