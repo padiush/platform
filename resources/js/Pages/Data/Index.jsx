@@ -51,19 +51,19 @@ export default function DataProcessing({ projects }) {
                                             </div>
                                         </div>
 
-                                        <div className="mt-4 grid w-full grid-cols-1 gap-4 lg:grid-cols-3">
+                                        <div className="mt-4 flex flex-wrap justify-end gap-2">
                                             {canManageData ? (
                                                 <Link
                                                     href={route('data.link', {
                                                         project: project.id,
                                                     })}
-                                                    className="btn btn-primary w-full"
+                                                    className="btn btn-primary btn-sm"
                                                 >
                                                     {t('data.link_species')}
                                                 </Link>
                                             ) : (
                                                 <span
-                                                    className="btn btn-primary btn-disabled w-full"
+                                                    className="btn btn-sm btn-disabled"
                                                     aria-disabled="true"
                                                 >
                                                     {t('data.link_species')}
@@ -78,7 +78,7 @@ export default function DataProcessing({ projects }) {
                                                             project: project.id,
                                                         },
                                                     )}
-                                                    className="btn btn-primary w-full"
+                                                    className="btn btn-outline btn-primary btn-sm"
                                                 >
                                                     {t(
                                                         'data.generate_ethnobotanyr',
@@ -86,7 +86,7 @@ export default function DataProcessing({ projects }) {
                                                 </Link>
                                             ) : (
                                                 <span
-                                                    className="btn btn-primary btn-disabled w-full"
+                                                    className="btn btn-outline btn-sm btn-disabled"
                                                     aria-disabled="true"
                                                 >
                                                     {t(
@@ -100,13 +100,13 @@ export default function DataProcessing({ projects }) {
                                                     href={route('data.custom', {
                                                         project: project.id,
                                                     })}
-                                                    className="btn btn-primary w-full"
+                                                    className="btn btn-outline btn-primary btn-sm"
                                                 >
                                                     {t('data.custom_export')}
                                                 </Link>
                                             ) : (
                                                 <span
-                                                    className="btn btn-primary btn-disabled w-full"
+                                                    className="btn btn-outline btn-sm btn-disabled"
                                                     aria-disabled="true"
                                                 >
                                                     {t('data.custom_export')}

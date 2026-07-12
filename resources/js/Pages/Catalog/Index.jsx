@@ -52,20 +52,20 @@ export default function CatalogOverview({ projects }) {
                                         </div>
                                     </div>
 
-                                    <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
+                                    <div className="mt-4 flex flex-wrap justify-end gap-2">
                                         {project.can_edit_catalog ? (
                                             <Link
                                                 href={route(
                                                     'catalogs.species.register',
                                                     { project: project.id },
                                                 )}
-                                                className="btn btn-primary w-full"
+                                                className="btn btn-outline btn-primary btn-sm"
                                             >
                                                 {t('catalogs.register_species')}
                                             </Link>
                                         ) : (
                                             <span
-                                                className="btn btn-primary btn-disabled w-full"
+                                                className="btn btn-outline btn-sm btn-disabled"
                                                 aria-disabled="true"
                                             >
                                                 {t('catalogs.register_species')}
@@ -78,13 +78,13 @@ export default function CatalogOverview({ projects }) {
                                                 href={route('catalogs.show', {
                                                     project: project.id,
                                                 })}
-                                                className="btn btn-primary w-full"
+                                                className="btn btn-primary btn-sm"
                                             >
                                                 {t('catalogs.view_catalog')}
                                             </Link>
                                         ) : (
                                             <span
-                                                className="btn btn-primary btn-disabled w-full"
+                                                className="btn btn-sm btn-disabled"
                                                 aria-disabled="true"
                                             >
                                                 {t('catalogs.view_catalog')}

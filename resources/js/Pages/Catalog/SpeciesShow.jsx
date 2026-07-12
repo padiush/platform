@@ -170,7 +170,7 @@ export default function SpeciesShow({ species, project }) {
                                 )}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="btn btn-primary"
+                                className="btn btn-outline btn-sm justify-start"
                             >
                                 <FontAwesomeIcon
                                     icon={faArrowUpRightFromSquare}
@@ -184,7 +184,7 @@ export default function SpeciesShow({ species, project }) {
                                 )}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="btn btn-primary"
+                                className="btn btn-outline btn-sm justify-start"
                             >
                                 <FontAwesomeIcon
                                     icon={faArrowUpRightFromSquare}
@@ -198,7 +198,7 @@ export default function SpeciesShow({ species, project }) {
                                 )}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="btn btn-primary"
+                                className="btn btn-outline btn-sm justify-start"
                             >
                                 <FontAwesomeIcon
                                     icon={faArrowUpRightFromSquare}

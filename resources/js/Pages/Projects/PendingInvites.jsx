@@ -139,7 +139,7 @@ export default function PendingInvites({ project, invites, filters }) {
                                                     </td>
                                                     <td>
                                                         <button
-                                                            className="btn btn-error btn-xs"
+                                                            className="btn btn-ghost btn-sm text-error"
                                                             onClick={() =>
                                                                 handleRevoke(
                                                                     invite.id,

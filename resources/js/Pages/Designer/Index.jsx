@@ -2,8 +2,16 @@ import Alert from '@/Components/Alert';
 import Card from '@/Components/Card';
 import DeletionModal from '@/Components/DeletionModal';
 import EmptyState from '@/Components/EmptyState';
+import IconButton from '@/Components/IconButton';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { faCheck, faTimes } from '@fortawesome/pro-regular-svg-icons';
+import {
+    faCheck,
+    faPenToSquare,
+    faPlus,
+    faPowerOff,
+    faTimes,
+    faTrashCan,
+} from '@fortawesome/pro-regular-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link } from '@inertiajs/react';
 import { useRef, useState } from 'react';
@@ -129,10 +137,10 @@ export default function DesignerIndex({ projects }) {
                                                                         .length
                                                                 )}
                                                             </td>
-                                                            <td className="text-center">
-                                                                <div className="mb-2">
+                                                            <td>
+                                                                <div className="flex flex-wrap items-center justify-end gap-1">
                                                                     <Link
-                                                                        className="btn btn-secondary btn-xs join-item"
+                                                                        className="btn btn-primary btn-sm"
                                                                         href={route(
                                                                             'designer.form.wizard',
                                                                             {
@@ -146,11 +154,8 @@ export default function DesignerIndex({ projects }) {
                                                                             'designer.index.wizard',
                                                                         )}
                                                                     </Link>
-                                                                </div>
-
-                                                                <div className="join join-vertical lg:join-horizontal">
                                                                     <Link
-                                                                        className="btn btn-primary btn-xs join-item"
+                                                                        className="btn btn-ghost btn-sm"
                                                                         href={route(
                                                                             'designer.form.edit',
                                                                             {
@@ -160,12 +165,17 @@ export default function DesignerIndex({ projects }) {
                                                                             },
                                                                         )}
                                                                     >
+                                                                        <FontAwesomeIcon
+                                                                            icon={
+                                                                                faPenToSquare
+                                                                            }
+                                                                        />
                                                                         {t(
                                                                             'designer.index.edit_details',
                                                                         )}
                                                                     </Link>
                                                                     <Link
-                                                                        className="btn btn-primary btn-xs join-item"
+                                                                        className="btn btn-ghost btn-sm"
                                                                         href={route(
                                                                             'designer.form.toggle',
                                                                             {
@@ -176,6 +186,11 @@ export default function DesignerIndex({ projects }) {
                                                                         )}
                                                                         method="put"
                                                                     >
+                                                                        <FontAwesomeIcon
+                                                                            icon={
+                                                                                faPowerOff
+                                                                            }
+                                                                        />
                                                                         {form.is_active
                                                                             ? t(
                                                                                   'designer.index.disable',
@@ -184,19 +199,21 @@ export default function DesignerIndex({ projects }) {
                                                                                   'designer.index.enable',
                                                                               )}
                                                                     </Link>
-                                                                    <div
-                                                                        className="btn btn-error btn-xs join-item"
+                                                                    <IconButton
+                                                                        icon={
+                                                                            faTrashCan
+                                                                        }
+                                                                        label={t(
+                                                                            'designer.index.delete',
+                                                                        )}
+                                                                        className="text-error"
                                                                         onClick={() =>
                                                                             handleDelete(
                                                                                 project.id,
                                                                                 form,
                                                                             )
                                                                         }
-                                                                    >
-                                                                        {t(
-                                                                            'designer.index.delete',
-                                                                        )}
-                                                                    </div>
+                                                                    />
                                                                 </div>
                                                             </td>
                                                         </tr>
@@ -212,15 +229,18 @@ export default function DesignerIndex({ projects }) {
                                             )}
                                         />
                                     )}
-                                    <Link
-                                        href={route(
-                                            'designer.create',
-                                            project.id,
-                                        )}
-                                        className="btn btn-primary mt-4 w-full"
-                                    >
-                                        {t('designer.index.create')}
-                                    </Link>
+                                    <div className="mt-2 flex justify-end">
+                                        <Link
+                                            href={route(
+                                                'designer.create',
+                                                project.id,
+                                            )}
+                                            className="btn btn-outline btn-primary btn-sm"
+                                        >
+                                            <FontAwesomeIcon icon={faPlus} />
+                                            {t('designer.index.create')}
+                                        </Link>
+                                    </div>
                                 </Card>
                             ))}
                         </div>
