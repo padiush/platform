@@ -2,6 +2,8 @@
 
 namespace Tests\Feature;
 
+use App\Exports\IndicesReportExport;
+use App\Exports\ReferencesSheet;
 use App\Models\CatalogSpecies;
 use App\Models\InstanceAnswer;
 use App\Models\InterviewForm;
@@ -10,7 +12,9 @@ use App\Models\InterviewItem;
 use App\Models\InterviewSection;
 use App\Models\Project;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Str;
 use Inertia\Testing\AssertableInertia as Assert;
+use Maatwebsite\Excel\Facades\Excel;
 use Tests\Concerns\InteractsWithProjects;
 use Tests\TestCase;
 
@@ -104,6 +108,34 @@ class DataReportsTest extends TestCase
         $this->assertStringContainsString(
             'attachment',
             (string) $response->headers->get('content-disposition')
+        );
+    }
+
+    public function test_xlsx_report_includes_a_references_sheet()
+    {
+        Excel::fake();
+        $this->freezeTime();
+
+        $user = $this->userWithCapability($this->project, 'generate_reports');
+        $species = CatalogSpecies::factory()->create([
+            'project_id' => $this->project->id,
+        ]);
+        $this->cite($this->interview(), 0, $species, 'food');
+
+        $this->actingAs($user)->get(
+            route('data.reports.download', [
+                'project' => $this->project,
+                'format' => 'xlsx',
+            ])
+        )->assertOk();
+
+        $filename = Str::slug($this->project->name)
+            .'-indices-'.now()->format('Y-m-d').'.xlsx';
+
+        Excel::assertDownloaded(
+            $filename,
+            fn (IndicesReportExport $export) => count($export->sheets()) === 2
+                && $export->sheets()[1] instanceof ReferencesSheet
         );
     }
 

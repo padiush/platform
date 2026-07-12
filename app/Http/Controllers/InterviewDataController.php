@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Exports\CustomExport;
 use App\Exports\EthnobotanyRExport;
 use App\Exports\IndicesExport;
+use App\Exports\IndicesReportExport;
+use App\Exports\ReferencesSheet;
 use App\Models\CatalogSpecies;
 use App\Models\ChartPreference;
 use App\Models\InstanceAnswer;
@@ -474,11 +476,40 @@ class InterviewDataController extends Controller
             round($species['ci'], 4),
         ], $data['species']);
 
+        $indicesSheet = new IndicesExport($headings, $rows);
+        $filename = $this->exportFilename($project, 'indices', $format);
+
+        // CSV is a single flat table; xlsx also carries a References sheet.
+        if ($format === 'csv') {
+            return Excel::download($indicesSheet, $filename, $this->exportWriter('csv'));
+        }
+
         return Excel::download(
-            new IndicesExport($headings, $rows),
-            $this->exportFilename($project, 'indices', $format),
-            $this->exportWriter($format),
+            new IndicesReportExport(
+                $indicesSheet,
+                new ReferencesSheet($this->indexReferences())
+            ),
+            $filename,
         );
+    }
+
+    /**
+     * The source paper for each index plus the ethnobotanyR attribution, for the
+     * xlsx References sheet. Mirrors the citations shown on the report page
+     * (resources/js/Pages/Data/Reports.jsx); keep the two in sync.
+     *
+     * @return list<list<string>>
+     */
+    private function indexReferences(): array
+    {
+        return [
+            ['RFC', 'Relative frequency of citation', 'Tardío, J. & Pardo-de-Santayana, M. (2008). Cultural importance indices: a comparative analysis. Economic Botany 62(1), 24–39.'],
+            ['UV', 'Use value', 'Phillips, O. & Gentry, A. H. (1993). The useful plants of Tambopata, Peru. Economic Botany 47(1), 15–32.'],
+            ['CI', 'Cultural importance index', 'Tardío, J. & Pardo-de-Santayana, M. (2008). Cultural importance indices: a comparative analysis. Economic Botany 62(1), 24–39.'],
+            ['ICF', 'Informant consensus factor', 'Trotter, R. T. & Logan, M. H. (1986). Informant consensus. In: Plants in Indigenous Medicine and Diet. Redgrave.'],
+            ['FL', 'Fidelity level', 'Friedman, J., Yaniv, Z., Dafni, A. & Palewitch, D. (1986). A preliminary classification of the healing potential of medicinal plants. Journal of Ethnopharmacology 16, 275–287.'],
+            ['ethnobotanyR', 'Implementation (Whitney, C.)', 'https://CRAN.R-project.org/package=ethnobotanyR — implements these indices; definitions from the primary sources above.'],
+        ];
     }
 
     public function prepareExport(Project $project, Request $request): Response|RedirectResponse
