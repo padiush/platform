@@ -263,7 +263,9 @@
         "form_not_found": "The form was not found in this project.",
         "instance_not_found": "The interview was not found.",
         "item_not_found": "The field was not found in this interview.",
-        "instance_label": "Interview"
+        "instance_label": "Interview",
+        "saving": "Saving…",
+        "saved": "Saved"
     },
     "common": {
         "actions": {

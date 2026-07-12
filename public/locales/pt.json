@@ -263,7 +263,9 @@
         "form_not_found": "O formulário não foi encontrado neste projeto.",
         "instance_not_found": "A entrevista não foi encontrada.",
         "item_not_found": "O campo não foi encontrado nesta entrevista.",
-        "instance_label": "Entrevista"
+        "instance_label": "Entrevista",
+        "saving": "Salvando…",
+        "saved": "Salvo"
     },
     "common": {
         "actions": {

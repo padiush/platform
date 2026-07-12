@@ -6,7 +6,29 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import ItemRender from './ItemRender';
 
-export default function SectionRender({ section, instance, answers = [] }) {
+function ProgressBadge({ answered, total }) {
+    if (total === 0) {
+        return null;
+    }
+
+    return (
+        <span
+            className={`badge tabular-nums ${
+                answered === total ? 'badge-success' : 'badge-ghost'
+            }`}
+        >
+            {answered}/{total}
+        </span>
+    );
+}
+
+export default function SectionRender({
+    section,
+    instance,
+    answers = [],
+    answeredKeys = new Set(),
+    onAnswered = () => {},
+}) {
     const { t } = useTranslation();
 
     const initialRepeatCount = section.repeatable
@@ -23,6 +45,11 @@ export default function SectionRender({ section, instance, answers = [] }) {
     useEffect(() => {
         setRepeatCount(initialRepeatCount);
     }, [initialRepeatCount]);
+
+    const answeredIn = (repeatableIndex) =>
+        section.items.filter((item) =>
+            answeredKeys.has(`${item.id}:${repeatableIndex ?? 'base'}`),
+        ).length;
 
     const handleRemove = (index) => {
         router.delete(
@@ -50,28 +77,37 @@ export default function SectionRender({ section, instance, answers = [] }) {
             <>
                 {Array.from({ length: repeatCount }).map((_, i) => (
                     <details
-                        className="bg-base-200 border-base-300 collapse border"
+                        className="bg-base-100 border-base-300 collapse border"
                         key={i}
                     >
-                        <summary className="collapse-title font-semibold">
-                            {section.name} #{i + 1}
+                        <summary className="collapse-title flex items-center justify-between gap-2 py-4 font-semibold">
+                            <span>
+                                {section.name} #{i + 1}
+                            </span>
+                            <ProgressBadge
+                                answered={answeredIn(i)}
+                                total={section.items.length}
+                            />
                         </summary>
                         <div className="collapse-content text-sm">
                             {section.description && (
-                                <p className="mb-2 text-sm text-gray-500">
+                                <p className="text-base-content/60 mb-2 text-sm">
                                     {t(section.description)}
                                 </p>
                             )}
 
-                            {section.items.map((item) => (
-                                <ItemRender
-                                    key={item.id}
-                                    item={item}
-                                    instance={instance}
-                                    answers={answers}
-                                    repeatableIndex={i}
-                                />
-                            ))}
+                            <div className="grid grid-cols-1 gap-3">
+                                {section.items.map((item) => (
+                                    <ItemRender
+                                        key={item.id}
+                                        item={item}
+                                        instance={instance}
+                                        answers={answers}
+                                        repeatableIndex={i}
+                                        onAnswered={onAnswered}
+                                    />
+                                ))}
+                            </div>
 
                             <div className="mt-4 flex justify-end">
                                 <button
@@ -92,7 +128,7 @@ export default function SectionRender({ section, instance, answers = [] }) {
 
                 <button
                     type="button"
-                    className="btn btn-primary mt-2 self-start"
+                    className="btn btn-primary mt-2 justify-self-start"
                     onClick={() => setRepeatCount(repeatCount + 1)}
                 >
                     <FontAwesomeIcon icon={faPlus} className="mr-2" />
@@ -103,21 +139,33 @@ export default function SectionRender({ section, instance, answers = [] }) {
     }
 
     return (
-        <Card title={section.name} className="mb-4">
+        <Card
+            title={section.name}
+            className="mb-4"
+            actions={
+                <ProgressBadge
+                    answered={answeredIn(null)}
+                    total={section.items.length}
+                />
+            }
+        >
             {section.description && (
-                <p className="mb-2 text-sm text-gray-500">
+                <p className="text-base-content/60 mb-2 text-sm">
                     {t(section.description)}
                 </p>
             )}
 
-            {section.items.map((item) => (
-                <ItemRender
-                    key={item.id}
-                    item={item}
-                    instance={instance}
-                    answers={answers}
-                />
-            ))}
+            <div className="grid grid-cols-1 gap-3">
+                {section.items.map((item) => (
+                    <ItemRender
+                        key={item.id}
+                        item={item}
+                        instance={instance}
+                        answers={answers}
+                        onAnswered={onAnswered}
+                    />
+                ))}
+            </div>
         </Card>
     );
 }
