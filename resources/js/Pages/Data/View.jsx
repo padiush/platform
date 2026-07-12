@@ -199,42 +199,66 @@ export default function DataView({
                                 </button>
                             </div>
 
-                            <form
-                                method="post"
-                                action={route('data.custom', {
-                                    project: project.id,
-                                })}
-                            >
-                                <input
-                                    type="hidden"
-                                    name="_token"
-                                    value={csrf_token}
-                                />
-                                <input
-                                    type="hidden"
-                                    name="form_id"
-                                    value={structure.form_id}
-                                />
-                                <input
-                                    type="hidden"
-                                    name="selected_fields"
-                                    value={JSON.stringify(
-                                        section.items.map((item) => item.id),
-                                    )}
-                                />
-                                <button
-                                    type="submit"
-                                    className="btn btn-outline btn-sm"
+                            <div className="flex items-center gap-2">
+                                <form
+                                    method="post"
+                                    action={route('data.export.download', {
+                                        project: project.id,
+                                    })}
                                 >
-                                    <FontAwesomeIcon
-                                        icon={faDownload}
-                                        className="sm:mr-2"
+                                    <input
+                                        type="hidden"
+                                        name="_token"
+                                        value={csrf_token}
                                     />
-                                    <span className="hidden sm:inline">
-                                        {t('data.view.export')}
-                                    </span>
-                                </button>
-                            </form>
+                                    <input
+                                        type="hidden"
+                                        name="mode"
+                                        value="custom"
+                                    />
+                                    <input
+                                        type="hidden"
+                                        name="format"
+                                        value="xlsx"
+                                    />
+                                    <input
+                                        type="hidden"
+                                        name="form_id"
+                                        value={structure.form_id}
+                                    />
+                                    <input
+                                        type="hidden"
+                                        name="selected_fields"
+                                        value={JSON.stringify(
+                                            section.items.map(
+                                                (item) => item.id,
+                                            ),
+                                        )}
+                                    />
+                                    <button
+                                        type="submit"
+                                        className="btn btn-outline btn-sm"
+                                    >
+                                        <FontAwesomeIcon
+                                            icon={faDownload}
+                                            className="sm:mr-2"
+                                        />
+                                        <span className="hidden sm:inline">
+                                            {t('data.view.export')}
+                                        </span>
+                                    </button>
+                                </form>
+                                <Link
+                                    href={route('data.export', {
+                                        project: project.id,
+                                        form: structure.form_id,
+                                        section: section.id,
+                                    })}
+                                    className="btn btn-ghost btn-sm"
+                                >
+                                    {t('data.view.customize_export')}
+                                </Link>
+                            </div>
                         </div>
 
                         {tab === 'table' ? (

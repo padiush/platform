@@ -2,24 +2,27 @@
 
 namespace App\Exports;
 
-use Illuminate\Contracts\View\View;
-use Illuminate\Database\Eloquent\Collection;
-use Maatwebsite\Excel\Concerns\FromView;
+use Maatwebsite\Excel\Concerns\FromArray;
+use Maatwebsite\Excel\Concerns\WithHeadings;
 
-class CustomExport implements FromView
+class CustomExport implements FromArray, WithHeadings
 {
+    /**
+     * @param  list<string>  $headings
+     * @param  list<list<string>>  $rows
+     */
     public function __construct(
-        private Collection $items,
-        private Collection $instances,
-        private bool $repeatable
+        private array $headings,
+        private array $rows
     ) {}
 
-    public function view(): View
+    public function headings(): array
     {
-        return view('exports.custom', [
-            'items' => $this->items,
-            'instances' => $this->instances,
-            'repeatable' => $this->repeatable,
-        ]);
+        return $this->headings;
+    }
+
+    public function array(): array
+    {
+        return $this->rows;
     }
 }

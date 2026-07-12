@@ -169,17 +169,15 @@ Route::middleware(['auth'])->group(function () {
             'data.link.bulk'
         );
 
-        Route::get('/data/{project}/ethnobotanyR', 'prepareEthnobotanyR')->name(
-            'data.ethnobotanyR'
+        Route::get('/data/{project}/export', 'prepareExport')->name(
+            'data.export'
         );
-        Route::post(
-            '/data/{project}/ethnobotanyR',
-            'handleEthnobotanyRRequest'
+        Route::get('/data/{project}/export/preview', 'exportPreview')->name(
+            'data.export.preview'
         );
-        Route::get('/data/{project}/custom', 'prepareCustom')->name(
-            'data.custom'
+        Route::post('/data/{project}/export/download', 'downloadExport')->name(
+            'data.export.download'
         );
-        Route::post('/data/{project}/custom', 'handleCustomRequest');
     });
 });
 

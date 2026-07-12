@@ -82,44 +82,19 @@ export default function DataProcessing({ projects }) {
 
                                             {canGenerateReports ? (
                                                 <Link
-                                                    href={route(
-                                                        'data.ethnobotanyR',
-                                                        {
-                                                            project: project.id,
-                                                        },
-                                                    )}
-                                                    className="btn btn-outline btn-primary btn-sm"
-                                                >
-                                                    {t(
-                                                        'data.generate_ethnobotanyr',
-                                                    )}
-                                                </Link>
-                                            ) : (
-                                                <span
-                                                    className="btn btn-outline btn-sm btn-disabled"
-                                                    aria-disabled="true"
-                                                >
-                                                    {t(
-                                                        'data.generate_ethnobotanyr',
-                                                    )}
-                                                </span>
-                                            )}
-
-                                            {canGenerateReports ? (
-                                                <Link
-                                                    href={route('data.custom', {
+                                                    href={route('data.export', {
                                                         project: project.id,
                                                     })}
                                                     className="btn btn-outline btn-primary btn-sm"
                                                 >
-                                                    {t('data.custom_export')}
+                                                    {t('data.export.title')}
                                                 </Link>
                                             ) : (
                                                 <span
                                                     className="btn btn-outline btn-sm btn-disabled"
                                                     aria-disabled="true"
                                                 >
-                                                    {t('data.custom_export')}
+                                                    {t('data.export.title')}
                                                 </span>
                                             )}
                                         </div>
