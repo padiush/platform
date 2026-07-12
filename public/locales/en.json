@@ -465,7 +465,8 @@
                 "index": "Index",
                 "by_index": "Top species by index",
                 "heatmap": "Species × use categories",
-                "heatmap_note": "Cell shade and number show the use reports for each species and use category."
+                "heatmap_note": "Cell shade and number show the use reports for each species and use category.",
+                "sankey": "Use-report flows"
             },
             "empty": {
                 "title": "No indices yet",

@@ -9,6 +9,7 @@ import { Link } from '@inertiajs/react';
 import { useTranslation } from 'react-i18next';
 import IndexBarChart from './Partials/IndexBarChart';
 import UseHeatmap from './Partials/UseHeatmap';
+import UsesSankey from './Partials/UsesSankey';
 
 const ratio = (value) => Number(value).toFixed(2);
 const percent = (value) => `${Number(value).toFixed(1)}%`;
@@ -399,6 +400,16 @@ export default function Reports({ project, indices }) {
                                 filename="species-use-heatmap.png"
                             >
                                 <UseHeatmap
+                                    species={species}
+                                    useCategories={useCategories}
+                                />
+                            </ChartCard>
+
+                            <ChartCard
+                                title={t('data.reports.charts.sankey')}
+                                filename="species-use-flows.png"
+                            >
+                                <UsesSankey
                                     species={species}
                                     useCategories={useCategories}
                                 />
