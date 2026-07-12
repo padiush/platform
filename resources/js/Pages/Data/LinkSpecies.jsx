@@ -18,14 +18,22 @@ import axios from 'axios';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-function StatusBadge({ linked, total }) {
+// Shared column template so every row type — groups, expanded members and
+// flat rows — lines up on the same boundaries. Fixed tracks (not fractions)
+// keep columns aligned across rows, which each render as their own grid.
+// Columns: gutter/chevron · reported name · status · species · action.
+// The species column is dropped below `sm`, where the action track narrows.
+const ROW_GRID =
+    'grid grid-cols-[1.5rem_minmax(0,1fr)_3rem_7rem] items-center gap-3 sm:grid-cols-[1.5rem_minmax(0,1fr)_3rem_14rem_8rem]';
+
+function StatusBadge({ linked, total, className = '' }) {
     // Group badge shows linked/total; a single row shows a linked/unlinked pill.
     if (total !== undefined) {
         return (
             <span
                 className={`badge tabular-nums ${
                     linked >= total ? 'badge-success' : 'badge-ghost'
-                }`}
+                } ${className}`}
             >
                 {linked}/{total}
             </span>
@@ -33,7 +41,9 @@ function StatusBadge({ linked, total }) {
     }
 
     return (
-        <span className={`badge ${linked ? 'badge-success' : 'badge-ghost'}`}>
+        <span
+            className={`badge ${linked ? 'badge-success' : 'badge-ghost'} ${className}`}
+        >
             {linked ? '✓' : '—'}
         </span>
     );
@@ -63,7 +73,10 @@ export default function LinkSpecies({ project, rows, filters, totals }) {
 
     const [q, setQ] = useState(filters.q || '');
     const [status, setStatus] = useState(filters.status || 'all');
-    const [group, setGroup] = useState(filters.group ?? true);
+    // `group` drives the row shape, so it reads from filters (which arrives
+    // with the matching `rows` payload) rather than optimistic local state —
+    // otherwise a toggle re-renders the new mode against the old data shape.
+    const grouped = filters.group ?? true;
     const [expanded, setExpanded] = useState(() => new Set());
 
     const modalRef = useRef(null);
@@ -93,13 +106,13 @@ export default function LinkSpecies({ project, rows, filters, totals }) {
         const timeout = setTimeout(() => {
             if (debouncedQ !== q) {
                 setDebouncedQ(q);
-                visit({ q, status, group });
+                visit({ q, status, group: grouped });
             }
         }, 400);
 
         return () => clearTimeout(timeout);
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [q, debouncedQ, status, group]);
+    }, [q, debouncedQ, status, grouped]);
 
     const toggleExpanded = (key) => {
         setExpanded((prev) => {
@@ -168,18 +181,22 @@ export default function LinkSpecies({ project, rows, filters, totals }) {
     const renderMemberRow = (member) => (
         <div
             key={member.key}
-            className="border-base-300 flex items-center gap-3 border-t px-4 py-2 pl-10"
+            className={`border-base-300 border-t px-4 py-2 ${ROW_GRID}`}
         >
-            <StatusBadge linked={member.linked} />
-            <span className="text-base-content/70 min-w-0 grow truncate text-sm">
+            <span aria-hidden="true" />
+            <span className="text-base-content/70 min-w-0 truncate text-sm">
                 {interviewLabel(member.interview)}
             </span>
-            <span className="hidden min-w-0 basis-1/3 truncate text-sm sm:block">
+            <StatusBadge
+                linked={member.linked}
+                className="justify-self-center"
+            />
+            <span className="hidden min-w-0 truncate text-sm sm:block">
                 <SpeciesLabel species={member.species} t={t} />
             </span>
             <button
                 type="button"
-                className="btn btn-ghost btn-xs"
+                className="btn btn-ghost btn-xs w-full"
                 onClick={() =>
                     openPicker({
                         type: 'row',
@@ -199,11 +216,11 @@ export default function LinkSpecies({ project, rows, filters, totals }) {
 
         return (
             <li key={item.key}>
-                <div className="flex items-center gap-3 px-4 py-3">
+                <div className={`px-4 py-3 ${ROW_GRID}`}>
                     {expandable ? (
                         <button
                             type="button"
-                            className="btn btn-ghost btn-xs btn-circle"
+                            className="btn btn-ghost btn-xs btn-circle justify-self-center"
                             aria-label={t('data.toggle_members')}
                             aria-expanded={isExpanded}
                             onClick={() => toggleExpanded(item.key)}
@@ -215,10 +232,10 @@ export default function LinkSpecies({ project, rows, filters, totals }) {
                             />
                         </button>
                     ) : (
-                        <span className="w-6" />
+                        <span aria-hidden="true" />
                     )}
 
-                    <span className="min-w-0 grow">
+                    <span className="min-w-0">
                         <span className="block truncate font-medium">
                             {item.name}
                         </span>
@@ -234,9 +251,10 @@ export default function LinkSpecies({ project, rows, filters, totals }) {
                     <StatusBadge
                         linked={item.linked_count}
                         total={item.total}
+                        className="justify-self-center"
                     />
 
-                    <span className="hidden min-w-0 basis-1/3 truncate sm:block">
+                    <span className="hidden min-w-0 truncate sm:block">
                         <SpeciesLabel
                             species={item.species}
                             mixed={item.mixed}
@@ -246,7 +264,7 @@ export default function LinkSpecies({ project, rows, filters, totals }) {
 
                     <button
                         type="button"
-                        className="btn btn-primary btn-sm"
+                        className="btn btn-primary btn-sm w-full"
                         onClick={() =>
                             openPicker({
                                 type: 'group',
@@ -272,9 +290,9 @@ export default function LinkSpecies({ project, rows, filters, totals }) {
 
     const renderFlatRow = (row) => (
         <li key={row.key}>
-            <div className="flex items-center gap-3 px-4 py-3">
-                <StatusBadge linked={row.linked} />
-                <span className="min-w-0 grow">
+            <div className={`px-4 py-3 ${ROW_GRID}`}>
+                <span aria-hidden="true" />
+                <span className="min-w-0">
                     <span className="block truncate font-medium">
                         {row.reported_name}
                     </span>
@@ -282,12 +300,16 @@ export default function LinkSpecies({ project, rows, filters, totals }) {
                         {interviewLabel(row.interview)}
                     </span>
                 </span>
-                <span className="hidden min-w-0 basis-1/3 truncate sm:block">
+                <StatusBadge
+                    linked={row.linked}
+                    className="justify-self-center"
+                />
+                <span className="hidden min-w-0 truncate sm:block">
                     <SpeciesLabel species={row.species} t={t} />
                 </span>
                 <button
                     type="button"
-                    className="btn btn-primary btn-sm"
+                    className="btn btn-primary btn-sm w-full"
                     onClick={() =>
                         openPicker({
                             type: 'row',
@@ -360,7 +382,11 @@ export default function LinkSpecies({ project, rows, filters, totals }) {
                                 value={status}
                                 onChange={(e) => {
                                     setStatus(e.target.value);
-                                    visit({ q, status: e.target.value, group });
+                                    visit({
+                                        q,
+                                        status: e.target.value,
+                                        group: grouped,
+                                    });
                                 }}
                             >
                                 <option value="all">
@@ -378,15 +404,14 @@ export default function LinkSpecies({ project, rows, filters, totals }) {
                                 <Input
                                     type="checkbox"
                                     label={t('data.group_by_name')}
-                                    checked={group}
-                                    onChange={(e) => {
-                                        setGroup(e.target.checked);
+                                    checked={grouped}
+                                    onChange={(e) =>
                                         visit({
                                             q,
                                             status,
                                             group: e.target.checked,
-                                        });
-                                    }}
+                                        })
+                                    }
                                 />
                             </div>
                         </div>
@@ -394,7 +419,7 @@ export default function LinkSpecies({ project, rows, filters, totals }) {
                         {rows.data.length > 0 ? (
                             <>
                                 <ul className="border-base-300 divide-base-300 rounded-box divide-y border">
-                                    {group
+                                    {grouped
                                         ? rows.data.map(renderGroup)
                                         : rows.data.map(renderFlatRow)}
                                 </ul>
