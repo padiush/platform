@@ -44,7 +44,7 @@ export default function Reports({ project, indices }) {
     );
 
     const download = (
-        <div className="dropdown">
+        <div className="dropdown dropdown-end">
             <div tabIndex={0} role="button" className="btn btn-primary btn-sm">
                 <FontAwesomeIcon icon={faDownload} />
                 {t('data.reports.download')}
@@ -86,17 +86,15 @@ export default function Reports({ project, indices }) {
             ]}
             subtitle={t('data.reports.subtitle')}
             action={
-                <div className="flex items-center gap-2">
-                    {hasData && download}
-                    <Link
-                        href={route('data.index')}
-                        className="btn btn-ghost btn-circle"
-                        aria-label={t('navigation.back')}
-                    >
-                        <FontAwesomeIcon icon={faArrowLeft} />
-                    </Link>
-                </div>
+                <Link
+                    href={route('data.index')}
+                    className="btn btn-ghost btn-circle"
+                    aria-label={t('navigation.back')}
+                >
+                    <FontAwesomeIcon icon={faArrowLeft} />
+                </Link>
             }
+            actionRight={hasData && download}
         >
             <div className="p-4 md:pt-8 lg:pt-12">
                 <div className="mx-auto max-w-7xl space-y-4 sm:px-6 lg:px-8">
