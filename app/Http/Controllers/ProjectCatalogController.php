@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\CatalogSpecies;
 use App\Models\Project;
+use App\Services\CatalogSpeciesSearch;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -99,28 +100,42 @@ class ProjectCatalogController extends Controller
             ->with('message_type', 'success');
     }
 
-    public function show(Project $project): Response|RedirectResponse
-    {
+    public function show(
+        Request $request,
+        Project $project,
+        CatalogSpeciesSearch $search
+    ): Response|RedirectResponse {
         if (! Auth::user()->can('viewCatalog', $project)) {
             return redirect()
                 ->route('catalogs.index')
                 ->with('error', 'No tienes permisos para ver este catálogo.');
         }
 
-        $speciesQuery = CatalogSpecies::withCount('answers')
-            ->where('project_id', $project->id)
-            ->orderBy('family', 'asc')
-            ->orderBy('genus', 'asc')
-            ->orderBy('name', 'asc');
+        // Only bounce when the catalog is genuinely empty. An empty search or
+        // filter result stays on the page and shows an in-place empty state.
+        $catalogIsEmpty = ! CatalogSpecies::where('project_id', $project->id)->exists();
 
-        if ($speciesQuery->count() === 0) {
+        if ($catalogIsEmpty) {
             return redirect()
                 ->route('catalogs.index')
                 ->with('error', 'Este catálogo no tiene especies registradas.');
         }
 
-        $species = $speciesQuery->paginate(20)->through(
-            fn ($sp) => [
+        $filters = [
+            'q' => trim((string) $request->query('q', '')),
+            'family' => (string) $request->query('family', ''),
+            'genus' => (string) $request->query('genus', ''),
+            'link' => in_array($request->query('link'), CatalogSpeciesSearch::LINK_STATUSES, true)
+                ? $request->query('link')
+                : 'all',
+            'sort' => in_array($request->query('sort'), CatalogSpeciesSearch::SORTS, true)
+                ? $request->query('sort')
+                : 'family',
+        ];
+
+        $species = $search
+            ->paginate($project, $filters, (int) $request->integer('page', 1))
+            ->through(fn ($sp) => [
                 'id' => $sp->id,
                 'family' => $sp->family,
                 'genus' => $sp->genus,
@@ -129,8 +144,7 @@ class ProjectCatalogController extends Controller
                 'answers' => [
                     'length' => $sp->answers_count,
                 ],
-            ]
-        );
+            ]);
 
         return Inertia::render('Catalog/SpeciesIndex', [
             'project' => [
@@ -138,7 +152,49 @@ class ProjectCatalogController extends Controller
                 'name' => $project->name,
             ],
             'species' => $species,
+            'filters' => $filters,
+            // Dropdown data doesn't change with the filters, so skip it on the
+            // partial reloads that search/filter changes trigger.
+            'families' => fn () => $this->projectFamilies($project),
+            'genera' => fn () => $this->projectGenera($project),
         ]);
+    }
+
+    /**
+     * Distinct, sorted family names for the project's family filter dropdown.
+     */
+    private function projectFamilies(Project $project): array
+    {
+        return CatalogSpecies::where('project_id', $project->id)
+            ->whereNotNull('family')
+            ->where('family', '!=', '')
+            ->distinct()
+            ->orderBy('family')
+            ->pluck('family')
+            ->values()
+            ->all();
+    }
+
+    /**
+     * Distinct {family, genus} pairs so the genus dropdown can depend on the
+     * selected family on the client.
+     *
+     * @return array<int, array{family: ?string, genus: string}>
+     */
+    private function projectGenera(Project $project): array
+    {
+        return CatalogSpecies::where('project_id', $project->id)
+            ->whereNotNull('genus')
+            ->where('genus', '!=', '')
+            ->select('family', 'genus')
+            ->distinct()
+            ->orderBy('genus')
+            ->get()
+            ->map(fn ($row) => [
+                'family' => $row->family,
+                'genus' => $row->genus,
+            ])
+            ->all();
     }
 
     public function showSpecies(
