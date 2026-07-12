@@ -1,17 +1,20 @@
 import Card from '@/Components/Card';
+import DeletionModal from '@/Components/DeletionModal';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import {
     faArrowLeft,
     faArrowUpRightFromSquare,
+    faTrashCan,
 } from '@fortawesome/pro-regular-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link } from '@inertiajs/react';
 import axios from 'axios';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export default function SpeciesShow({ species, project }) {
     const { t } = useTranslation();
+    const deletionModalRef = useRef();
     const [wfoData, setWfoData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -50,6 +53,7 @@ export default function SpeciesShow({ species, project }) {
 
     return (
         <AuthenticatedLayout
+            headTitle={`${scientificName} ${species.authority ?? ''}`.trim()}
             title={
                 <>
                     <span className="italic">
@@ -78,6 +82,16 @@ export default function SpeciesShow({ species, project }) {
                 >
                     <FontAwesomeIcon icon={faArrowLeft} />
                 </Link>
+            }
+            actionRight={
+                <button
+                    type="button"
+                    className="btn btn-ghost text-error"
+                    onClick={() => deletionModalRef.current.showModal()}
+                >
+                    <FontAwesomeIcon icon={faTrashCan} />
+                    {t('actions.delete')}
+                </button>
             }
         >
             <div className="p-4 md:pt-8 lg:pt-12">
@@ -210,6 +224,14 @@ export default function SpeciesShow({ species, project }) {
                     </Card>
                 </div>
             </div>
+            <DeletionModal
+                modalRef={deletionModalRef}
+                name={scientificName}
+                url={route('catalogs.species.delete', {
+                    project: project.id,
+                    species: species.id,
+                })}
+            />
         </AuthenticatedLayout>
     );
 }
