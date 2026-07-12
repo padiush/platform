@@ -630,6 +630,63 @@ class ProjectTest extends TestCase
         ]);
     }
 
+    public function test_expired_invitations_cannot_be_accepted()
+    {
+        $user = User::factory()->create();
+        $anotherUser = User::factory()->create();
+
+        $project = Project::factory()->create();
+
+        $invite = ProjectInvite::factory()->create([
+            'project_id' => $project->id,
+            'inviting_user_id' => $user->id,
+            'invited_user_id' => $anotherUser->id,
+            'invited_email' => $anotherUser->email,
+            'project_capability_id' => ProjectCapability::where('manage_project', false)->first()->id,
+            'expires_at' => now()->subDay(),
+        ]);
+
+        $response = $this->actingAs($anotherUser)->get(route('projects.invites.accept', $invite));
+
+        $response->assertRedirect(route('projects.index'));
+        $response->assertSessionHas('message', 'projects.invite_expired');
+        $response->assertSessionHas('message_type', 'error');
+        // No access is granted and the stale invite is cleared.
+        $this->assertDatabaseMissing('project_accesses', [
+            'project_id' => $project->id,
+            'user_id' => $anotherUser->id,
+        ]);
+        $this->assertDatabaseMissing('project_invites', [
+            'id' => $invite->id,
+        ]);
+    }
+
+    public function test_expired_invitations_are_cleared_on_decline()
+    {
+        $user = User::factory()->create();
+        $anotherUser = User::factory()->create();
+
+        $project = Project::factory()->create();
+
+        $invite = ProjectInvite::factory()->create([
+            'project_id' => $project->id,
+            'inviting_user_id' => $user->id,
+            'invited_user_id' => $anotherUser->id,
+            'invited_email' => $anotherUser->email,
+            'project_capability_id' => ProjectCapability::where('manage_project', false)->first()->id,
+            'expires_at' => now()->subDay(),
+        ]);
+
+        $response = $this->actingAs($anotherUser)->get(route('projects.invites.decline', $invite));
+
+        $response->assertRedirect(route('projects.index'));
+        $response->assertSessionHas('message', 'projects.invite_expired');
+        $response->assertSessionHas('message_type', 'error');
+        $this->assertDatabaseMissing('project_invites', [
+            'id' => $invite->id,
+        ]);
+    }
+
     public function test_invitations_cannot_be_accepted_by_other_users()
     {
         $user = User::factory()->create();

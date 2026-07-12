@@ -75,6 +75,7 @@
         "no_invites": "No hay invitaciones pendientes para este proyecto.",
         "already_in_project": "Ya tienes acceso a este proyecto.",
         "cannot_accept_another_user_invite": "No puedes aceptar esta invitación.",
+        "invite_expired": "Esta invitación ha expirado.",
         "cannot_decline_another_user_invite": "No puedes declinar esta invitación."
     },
     "actions": {
