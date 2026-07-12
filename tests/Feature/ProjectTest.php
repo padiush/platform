@@ -7,6 +7,7 @@ use App\Models\ProjectAccess;
 use App\Models\ProjectCapability;
 use App\Models\ProjectInvite;
 use App\Models\User;
+use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia as Assert;
 use Tests\TestCase;
@@ -289,6 +290,27 @@ class ProjectTest extends TestCase
             'project_id' => $project->id,
             'user_id' => $otherUser->id,
             'project_capability_id' => ProjectCapability::where('manage_project', false)->first()->id,
+        ]);
+    }
+
+    public function test_a_user_cannot_have_duplicate_access_rows_on_a_project()
+    {
+        $user = User::factory()->create();
+        $project = Project::factory()->create();
+        $capabilityId = ProjectCapability::where('manage_project', true)->first()->id;
+
+        ProjectAccess::factory()->create([
+            'user_id' => $user->id,
+            'project_id' => $project->id,
+            'project_capability_id' => $capabilityId,
+        ]);
+
+        $this->expectException(QueryException::class);
+
+        ProjectAccess::factory()->create([
+            'user_id' => $user->id,
+            'project_id' => $project->id,
+            'project_capability_id' => $capabilityId,
         ]);
     }
 
