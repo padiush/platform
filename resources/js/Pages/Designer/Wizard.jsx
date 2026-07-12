@@ -154,7 +154,7 @@ export default function Wizard({ project, form, structure, instancesCount }) {
             actionRight={
                 <div className="flex flex-wrap items-center justify-end gap-2">
                     {instancesCount > 0 && (
-                        <span className="badge badge-warning badge-outline whitespace-nowrap">
+                        <span className="badge badge-warning badge-outline hidden whitespace-nowrap md:inline-flex">
                             {t('designer.interviews_recorded', {
                                 count: instancesCount,
                             })}
