@@ -81,6 +81,10 @@ export default function LinkSpecies({ project, answered_sections, species }) {
     return (
         <AuthenticatedLayout
             title={t('data.title')}
+            breadcrumbs={[
+                { label: t('navigation.data'), href: route('data.index') },
+                { label: project.name },
+            ]}
             subtitle={project.name}
             action={
                 <Link

@@ -24,6 +24,14 @@ export default function CatalogSpeciesForm({ project }) {
     return (
         <AuthenticatedLayout
             title={t('catalogs.register_species')}
+            breadcrumbs={[
+                {
+                    label: t('navigation.catalogs'),
+                    href: route('catalogs.index'),
+                },
+                { label: project.name },
+                { label: t('catalogs.register_species') },
+            ]}
             subtitle={`${t('catalogs.catalog_for_project')} "${project.name}"`}
             action={
                 <Link

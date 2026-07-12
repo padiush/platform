@@ -34,6 +34,10 @@ export default function CustomExport({ project, forms }) {
     return (
         <AuthenticatedLayout
             title={t('data.custom_export')}
+            breadcrumbs={[
+                { label: t('navigation.data'), href: route('data.index') },
+                { label: project.name },
+            ]}
             subtitle={project.name}
             action={
                 <Link className="btn btn-ghost" href={route('data.index')}>

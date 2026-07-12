@@ -11,13 +11,24 @@ export default function Instance({ project, form, instance, answers }) {
     return (
         <AuthenticatedLayout
             title={t('interviews.instance.title', { id: instance.id })}
+            breadcrumbs={[
+                {
+                    label: t('navigation.interview'),
+                    href: route('interviews.index'),
+                },
+                {
+                    label: form.name,
+                    href: route('interviews.instances', { form: form.id }),
+                },
+                { label: t('interviews.instance_label') },
+            ]}
             subtitle={t('interviews.form_on_project', {
                 form: form.name,
                 project: project.name,
             })}
             action={
                 <Link
-                    href={route('interviews.index')}
+                    href={route('interviews.instances', { form: form.id })}
                     className="btn btn-ghost"
                 >
                     <FontAwesomeIcon icon={faArrowLeft} />

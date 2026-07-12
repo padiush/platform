@@ -30,6 +30,13 @@ export default function CatalogSpeciesIndex({ project, species }) {
     return (
         <AuthenticatedLayout
             title={t('catalogs.ethnobotanical_catalog')}
+            breadcrumbs={[
+                {
+                    label: t('navigation.catalogs'),
+                    href: route('catalogs.index'),
+                },
+                { label: project.name },
+            ]}
             subtitle={project.name}
             action={
                 <Link

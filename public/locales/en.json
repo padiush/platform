@@ -21,7 +21,8 @@
         "data": "Data",
         "design": "Form Designer",
         "interview": "Pass Interviews",
-        "system_dashboard": "System Dashboard"
+        "system_dashboard": "System Dashboard",
+        "breadcrumb": "Breadcrumb"
     },
     "titles": {
         "my_projects": "My Projects"
@@ -258,7 +259,8 @@
         "no_access": "You do not have permission to record interviews in this project.",
         "form_not_found": "The form was not found in this project.",
         "instance_not_found": "The interview was not found.",
-        "item_not_found": "The field was not found in this interview."
+        "item_not_found": "The field was not found in this interview.",
+        "instance_label": "Interview"
     },
     "common": {
         "actions": {

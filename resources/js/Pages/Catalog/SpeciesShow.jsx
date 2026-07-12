@@ -59,9 +59,20 @@ export default function SpeciesShow({ species, project }) {
                 </>
             }
             subtitle={`${t('catalogs.subtitle')} ${project.name}`}
+            breadcrumbs={[
+                {
+                    label: t('navigation.catalogs'),
+                    href: route('catalogs.index'),
+                },
+                {
+                    label: project.name,
+                    href: route('catalogs.show', { project: project.id }),
+                },
+                { label: `${species.genus} ${species.name}` },
+            ]}
             action={
                 <Link
-                    href={route('catalogs.index')}
+                    href={route('catalogs.show', { project: project.id })}
                     className="btn btn-ghost btn-circle"
                 >
                     <FontAwesomeIcon icon={faArrowLeft} />
