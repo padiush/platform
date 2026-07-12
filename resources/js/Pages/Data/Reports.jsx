@@ -21,6 +21,11 @@ const CITATIONS = [
         source: 'Tardío, J. & Pardo-de-Santayana, M. (2008). Cultural importance indices: a comparative analysis. Economic Botany 62(1), 24–39.',
     },
     {
+        abbr: 'NU',
+        nameKey: 'data.reports.nu_full',
+        source: 'Prance, G. T., Balée, W., Boom, B. M. & Carneiro, R. L. (1987). Quantitative ethnobotany and the case for conservation in Amazonia. Conservation Biology 1(4), 296–310.',
+    },
+    {
         abbr: 'UV',
         nameKey: 'data.reports.uv_full',
         source: 'Phillips, O. & Gentry, A. H. (1993). The useful plants of Tambopata, Peru. Economic Botany 47(1), 15–32.',
@@ -29,6 +34,16 @@ const CITATIONS = [
         abbr: 'CI',
         nameKey: 'data.reports.ci_full',
         source: 'Tardío, J. & Pardo-de-Santayana, M. (2008). Cultural importance indices: a comparative analysis. Economic Botany 62(1), 24–39.',
+    },
+    {
+        abbr: 'RI',
+        nameKey: 'data.reports.ri_full',
+        source: 'Tardío, J. & Pardo-de-Santayana, M. (2008). Cultural importance indices: a comparative analysis. Economic Botany 62(1), 24–39.',
+    },
+    {
+        abbr: 'CV',
+        nameKey: 'data.reports.cv_full',
+        source: 'Reyes-García, V., Huanca, T., Vadez, V. & Leonard, W. (2006). Cultural, practical and economic value of wild plants: a quantitative study in the Bolivian Amazon. Economic Botany 60(1), 62–74.',
     },
     {
         abbr: 'ICF',
@@ -174,6 +189,14 @@ export default function Reports({ project, indices }) {
                                                 <th
                                                     className="text-right"
                                                     title={t(
+                                                        'data.reports.nu_full',
+                                                    )}
+                                                >
+                                                    NU
+                                                </th>
+                                                <th
+                                                    className="text-right"
+                                                    title={t(
                                                         'data.reports.rfc_full',
                                                     )}
                                                 >
@@ -195,6 +218,22 @@ export default function Reports({ project, indices }) {
                                                 >
                                                     CI
                                                 </th>
+                                                <th
+                                                    className="text-right"
+                                                    title={t(
+                                                        'data.reports.ri_full',
+                                                    )}
+                                                >
+                                                    RI
+                                                </th>
+                                                <th
+                                                    className="text-right"
+                                                    title={t(
+                                                        'data.reports.cv_full',
+                                                    )}
+                                                >
+                                                    CV
+                                                </th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -214,6 +253,9 @@ export default function Reports({ project, indices }) {
                                                         {entry.fc}
                                                     </td>
                                                     <td className="text-right tabular-nums">
+                                                        {entry.nu}
+                                                    </td>
+                                                    <td className="text-right tabular-nums">
                                                         {ratio(entry.rfc)}
                                                     </td>
                                                     <td className="text-right tabular-nums">
@@ -221,6 +263,12 @@ export default function Reports({ project, indices }) {
                                                     </td>
                                                     <td className="text-right tabular-nums">
                                                         {ratio(entry.ci)}
+                                                    </td>
+                                                    <td className="text-right tabular-nums">
+                                                        {ratio(entry.ri)}
+                                                    </td>
+                                                    <td className="text-right tabular-nums">
+                                                        {ratio(entry.cv)}
                                                     </td>
                                                 </tr>
                                             ))}
