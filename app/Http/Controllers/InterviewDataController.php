@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Exports\CustomExport;
 use App\Exports\EthnobotanyRExport;
+use App\Exports\IndicesExport;
 use App\Models\CatalogSpecies;
 use App\Models\ChartPreference;
 use App\Models\InstanceAnswer;
@@ -14,6 +15,7 @@ use App\Models\InterviewSection;
 use App\Models\Project;
 use App\Models\User;
 use App\Services\CatalogSpeciesSearch;
+use App\Services\EthnobiologyIndices;
 use App\Services\InterviewDataExport;
 use App\Services\InterviewDataTable;
 use App\Services\SpeciesLinkingList;
@@ -432,6 +434,51 @@ class InterviewDataController extends Controller
         if (! $valid) {
             $this->deny('Recurso no válido para este proyecto.', true);
         }
+    }
+
+    public function reports(
+        Project $project,
+        EthnobiologyIndices $indices
+    ): Response|RedirectResponse {
+        $this->checkPermission($project);
+
+        return Inertia::render('Data/Reports', [
+            'project' => [
+                'id' => $project->id,
+                'name' => $project->name,
+            ],
+            'indices' => $indices->compute($project),
+        ]);
+    }
+
+    public function downloadReport(
+        Project $project,
+        Request $request,
+        EthnobiologyIndices $indices
+    ): BinaryFileResponse {
+        $this->checkPermission($project);
+
+        $format = $request->query('format') === 'csv' ? 'csv' : 'xlsx';
+        $data = $indices->compute($project);
+
+        // Literature-standard abbreviations — language-independent.
+        $headings = ['Family', 'Genus', 'Species', 'Authority', 'FC', 'RFC', 'UV', 'CI'];
+        $rows = array_map(fn ($species) => [
+            $species['species']['family'],
+            $species['species']['genus'],
+            $species['species']['name'],
+            $species['species']['authority'],
+            $species['fc'],
+            round($species['rfc'], 4),
+            round($species['uv'], 4),
+            round($species['ci'], 4),
+        ], $data['species']);
+
+        return Excel::download(
+            new IndicesExport($headings, $rows),
+            $this->exportFilename($project, 'indices', $format),
+            $this->exportWriter($format),
+        );
     }
 
     public function prepareExport(Project $project, Request $request): Response|RedirectResponse

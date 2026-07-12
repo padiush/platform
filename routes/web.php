@@ -169,6 +169,13 @@ Route::middleware(['auth'])->group(function () {
             'data.link.bulk'
         );
 
+        Route::get('/data/{project}/reports', 'reports')->name(
+            'data.reports'
+        );
+        Route::get('/data/{project}/reports/download', 'downloadReport')->name(
+            'data.reports.download'
+        );
+
         Route::get('/data/{project}/export', 'prepareExport')->name(
             'data.export'
         );
