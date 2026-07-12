@@ -34,9 +34,10 @@ Mapping to the data model ([../data-model.md](../data-model.md)):
 > same repeatable set as the linked species, supplies *u*. See
 > [../decisions/0007-use-category-as-item-role.md](../decisions/0007-use-category-as-item-role.md).
 >
-> ✅ The computation is now built in `app/Services/EthnobiologyIndices.php`
-> (verified against the worked example below). The remaining milestone work is
-> **surfacing** it — a report UI and an export.
+> ✅ Built end to end: the computation in `app/Services/EthnobiologyIndices.php`
+> (verified against the worked example below), surfaced as a report page
+> (`data.reports` → `Data/Reports`) and an xlsx/csv export
+> (`data.reports.download`), both gated on `generate_reports`.
 
 **N (the denominator)** is *all informants surveyed with a species instrument* —
 interviews of forms that carry a `link_to_species` field — not just those who
