@@ -429,6 +429,35 @@
             "previewing": "Building preview…",
             "custom_counts": "{{interviews}} interviews · {{records}} records",
             "species_counts": "{{count}} species records"
+        },
+        "reports": {
+            "title": "Indices",
+            "subtitle": "Quantitative ethnobiology indices",
+            "informants": "Informants",
+            "unlinked": "Unlinked citations",
+            "species_indices": "Species indices",
+            "use_categories": "Use categories",
+            "fidelity": "Fidelity level",
+            "species": "Species",
+            "family": "Family",
+            "use_category": "Use category",
+            "n_taxa": "Taxa",
+            "fc": "Citations",
+            "fc_full": "Frequency of citation (number of informants)",
+            "rfc_full": "Relative frequency of citation",
+            "uv_full": "Use value",
+            "ci_full": "Cultural importance index",
+            "n_ur": "Use reports",
+            "n_ur_full": "Number of use reports",
+            "icf_full": "Informant consensus factor",
+            "fl_full": "Fidelity level",
+            "download": "Download",
+            "format_xlsx": "Excel (.xlsx)",
+            "format_csv": "CSV (.csv)",
+            "empty": {
+                "title": "No indices yet",
+                "hint": "Link interview citations to catalog species and mark a use-category field in the form designer."
+            }
         }
     },
     "public": {
