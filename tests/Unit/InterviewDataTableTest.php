@@ -1,0 +1,259 @@
+<?php
+
+namespace Tests\Unit;
+
+use App\Models\CatalogSpecies;
+use App\Models\InstanceAnswer;
+use App\Models\InterviewForm;
+use App\Models\InterviewInstance;
+use App\Models\InterviewItem;
+use App\Models\InterviewSection;
+use App\Models\Project;
+use App\Models\User;
+use App\Services\InterviewDataTable;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
+
+class InterviewDataTableTest extends TestCase
+{
+    use RefreshDatabase;
+
+    private Project $project;
+
+    private InterviewForm $form;
+
+    private InterviewDataTable $table;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->project = Project::factory()->create();
+        $this->form = InterviewForm::factory()->create(['project_id' => $this->project->id]);
+        $this->table = new InterviewDataTable;
+    }
+
+    private function section(bool $repeatable = false): InterviewSection
+    {
+        return InterviewSection::factory()->create([
+            'interview_form_id' => $this->form->id,
+            'repeatable' => $repeatable,
+        ]);
+    }
+
+    private function item(InterviewSection $section, string $type = 'text', array $extra = []): InterviewItem
+    {
+        return InterviewItem::factory()->create(array_merge([
+            'interview_section_id' => $section->id,
+            'type' => $type,
+        ], $extra));
+    }
+
+    private function interview(?User $user = null): InterviewInstance
+    {
+        return InterviewInstance::factory()->create([
+            'interview_form_id' => $this->form->id,
+            'user_id' => ($user ?? User::factory()->create())->id,
+        ]);
+    }
+
+    private function answer(
+        InterviewInstance $instance,
+        InterviewSection $section,
+        InterviewItem $item,
+        ?string $value,
+        ?int $index = null,
+        ?int $speciesId = null
+    ): InstanceAnswer {
+        return InstanceAnswer::create([
+            'interview_instance_id' => $instance->id,
+            'interview_section_id' => $section->id,
+            'interview_item_id' => $item->id,
+            'repeatable_index' => $index,
+            'answer' => $value,
+            'catalog_species_id' => $speciesId,
+        ]);
+    }
+
+    private function rows(InterviewSection $section, array $filters = [])
+    {
+        return $this->table->rows($this->form, $section, $filters, 1);
+    }
+
+    public function test_non_repeatable_section_has_one_row_per_interview()
+    {
+        $section = $this->section();
+        $item = $this->item($section);
+
+        $a = $this->interview();
+        $this->answer($a, $section, $item, 'guarumo');
+        $b = $this->interview();
+        $this->answer($b, $section, $item, 'ceiba');
+
+        $result = $this->rows($section);
+
+        $this->assertSame(2, $result->total());
+        $values = collect($result->items())->map(fn ($r) => $r['cells'][$item->id]['value']);
+        $this->assertEqualsCanonicalizing(['guarumo', 'ceiba'], $values->all());
+    }
+
+    public function test_repeatable_section_has_one_row_per_record()
+    {
+        $section = $this->section(true);
+        $item = $this->item($section);
+
+        $instance = $this->interview();
+        $this->answer($instance, $section, $item, 'first', 0);
+        $this->answer($instance, $section, $item, 'second', 1);
+
+        $result = $this->rows($section);
+
+        $this->assertSame(2, $result->total());
+        $this->assertEqualsCanonicalizing(
+            [0, 1],
+            collect($result->items())->pluck('record_index')->all(),
+        );
+    }
+
+    public function test_multi_cell_is_parsed_to_an_array()
+    {
+        $section = $this->section();
+        $item = $this->item($section, 'multi');
+
+        $instance = $this->interview();
+        $this->answer($instance, $section, $item, json_encode(['Alimento', 'Medicina']));
+
+        $cell = $this->rows($section)->items()[0]['cells'][$item->id];
+
+        $this->assertSame('multi', $cell['kind']);
+        $this->assertSame(['Alimento', 'Medicina'], $cell['values']);
+    }
+
+    public function test_unanswered_cell_is_null()
+    {
+        $section = $this->section();
+        $answered = $this->item($section);
+        $blank = $this->item($section);
+
+        $instance = $this->interview();
+        $this->answer($instance, $section, $answered, 'value');
+
+        $cells = $this->rows($section)->items()[0]['cells'];
+
+        $this->assertNotNull($cells[$answered->id]);
+        $this->assertNull($cells[$blank->id]);
+    }
+
+    public function test_species_cell_shows_the_linked_binomial()
+    {
+        $section = $this->section();
+        $item = $this->item($section, 'text', ['link_to_species' => true]);
+        $species = CatalogSpecies::factory()->create([
+            'project_id' => $this->project->id,
+            'genus' => 'Cecropia',
+            'name' => 'obtusifolia',
+        ]);
+
+        $instance = $this->interview();
+        $this->answer($instance, $section, $item, 'guarumo', null, $species->id);
+
+        $cell = $this->rows($section)->items()[0]['cells'][$item->id];
+
+        $this->assertSame('species', $cell['kind']);
+        $this->assertSame('Cecropia obtusifolia', $cell['value']);
+    }
+
+    public function test_interviewer_filter_narrows_rows()
+    {
+        $section = $this->section();
+        $item = $this->item($section);
+
+        $alice = User::factory()->create();
+        $this->answer($this->interview($alice), $section, $item, 'a');
+        $this->answer($this->interview(), $section, $item, 'b');
+
+        $result = $this->rows($section, ['interviewer' => $alice->id]);
+
+        $this->assertSame(1, $result->total());
+        $this->assertSame('a', $result->items()[0]['cells'][$item->id]['value']);
+    }
+
+    public function test_summary_counts_categorical_values()
+    {
+        $section = $this->section();
+        $item = $this->item($section, 'select');
+
+        foreach (['Alimento', 'Alimento', 'Medicina'] as $value) {
+            $this->answer($this->interview(), $section, $item, $value);
+        }
+
+        $summary = collect($this->table->summary($this->form, $section))
+            ->firstWhere('item_id', $item->id);
+
+        $this->assertSame('categorical', $summary['kind']);
+        $this->assertSame(
+            ['Alimento' => 2, 'Medicina' => 1],
+            collect($summary['data'])->pluck('count', 'label')->all(),
+        );
+    }
+
+    public function test_summary_explodes_multi_values()
+    {
+        $section = $this->section();
+        $item = $this->item($section, 'multi');
+
+        $this->answer($this->interview(), $section, $item, json_encode(['Hoja', 'Corteza']));
+        $this->answer($this->interview(), $section, $item, json_encode(['Hoja']));
+
+        $summary = collect($this->table->summary($this->form, $section))
+            ->firstWhere('item_id', $item->id);
+
+        $this->assertSame(
+            ['Hoja' => 2, 'Corteza' => 1],
+            collect($summary['data'])->pluck('count', 'label')->all(),
+        );
+    }
+
+    public function test_summary_computes_numeric_stats()
+    {
+        $section = $this->section();
+        $item = $this->item($section, 'number');
+
+        foreach ([2, 4, 6] as $value) {
+            $this->answer($this->interview(), $section, $item, (string) $value);
+        }
+
+        $summary = collect($this->table->summary($this->form, $section))
+            ->firstWhere('item_id', $item->id);
+
+        $this->assertSame('number', $summary['kind']);
+        $this->assertSame(3, $summary['stats']['count']);
+        $this->assertEquals(2, $summary['stats']['min']);
+        $this->assertEquals(6, $summary['stats']['max']);
+        $this->assertEquals(4, $summary['stats']['mean']);
+        $this->assertEquals(4, $summary['stats']['median']);
+    }
+
+    public function test_summary_counts_species_citations()
+    {
+        $section = $this->section();
+        $item = $this->item($section, 'text', ['link_to_species' => true]);
+        $species = CatalogSpecies::factory()->create([
+            'project_id' => $this->project->id,
+            'genus' => 'Inga',
+            'name' => 'edulis',
+        ]);
+
+        $this->answer($this->interview(), $section, $item, 'guaba', null, $species->id);
+        $this->answer($this->interview(), $section, $item, 'guama', null, $species->id);
+
+        $summary = collect($this->table->summary($this->form, $section))
+            ->firstWhere('item_id', $item->id);
+
+        $this->assertSame('species', $summary['kind']);
+        $this->assertSame(
+            ['Inga edulis' => 2],
+            collect($summary['data'])->pluck('count', 'label')->all(),
+        );
+    }
+}

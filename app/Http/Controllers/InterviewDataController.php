@@ -12,6 +12,7 @@ use App\Models\InterviewSection;
 use App\Models\Project;
 use App\Models\User;
 use App\Services\CatalogSpeciesSearch;
+use App\Services\InterviewDataTable;
 use App\Services\SpeciesLinkingList;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\JsonResponse;
@@ -61,6 +62,95 @@ class InterviewDataController extends Controller
 
         return Inertia::render('Data/Index', [
             'projects' => $projects,
+        ]);
+    }
+
+    public function viewData(
+        Project $project,
+        Request $request,
+        InterviewDataTable $table
+    ): Response|RedirectResponse {
+        $this->checkPermission($project);
+
+        // Only forms that actually have interviews are worth viewing.
+        $forms = $project->interviewForms()
+            ->withCount('instances')
+            ->orderBy('name')
+            ->get()
+            ->filter(fn ($form) => $form->instances_count > 0)
+            ->values();
+
+        if ($forms->isEmpty()) {
+            return redirect()
+                ->route('data.index')
+                ->with('error', 'Este proyecto no tiene formularios con datos.');
+        }
+
+        $form = $forms->firstWhere('id', (int) $request->query('form')) ?? $forms->first();
+        $form->load([
+            'sections' => fn ($query) => $query->orderBy('order'),
+            'sections.items' => fn ($query) => $query->orderBy('order'),
+        ]);
+
+        $section = $form->sections->firstWhere('id', (int) $request->query('section'))
+            ?? $form->sections->first();
+
+        $filters = [
+            'form' => $form->id,
+            'section' => $section?->id,
+            'interviewer' => $request->integer('interviewer') ?: null,
+            'from' => $request->query('from') ?: null,
+            'to' => $request->query('to') ?: null,
+            'tab' => in_array($request->query('tab'), ['table', 'summary'], true)
+                ? $request->query('tab')
+                : 'table',
+        ];
+
+        $interviewers = User::query()
+            ->whereIn('id', $form->instances()->select('user_id')->distinct())
+            ->orderBy('name')
+            ->get(['id', 'name'])
+            ->map(fn ($user) => ['id' => $user->id, 'name' => $user->name])
+            ->values();
+
+        return Inertia::render('Data/View', [
+            'project' => [
+                'id' => $project->id,
+                'name' => $project->name,
+            ],
+            'forms' => $forms->map(fn ($f) => [
+                'id' => $f->id,
+                'name' => $f->name,
+            ])->values(),
+            'structure' => $section === null ? null : [
+                'form_id' => $form->id,
+                'sections' => $form->sections->map(fn ($s) => [
+                    'id' => $s->id,
+                    'name' => $s->name,
+                    'repeatable' => $s->repeatable,
+                ])->values(),
+                'section' => [
+                    'id' => $section->id,
+                    'name' => $section->name,
+                    'repeatable' => $section->repeatable,
+                    'items' => $section->items->map(fn ($item) => [
+                        'id' => $item->id,
+                        'label' => $item->label,
+                        'type' => $item->type,
+                        'link_to_species' => $item->link_to_species,
+                    ])->values(),
+                ],
+            ],
+            'rows' => $section === null
+                ? null
+                : $table->rows($form, $section, $filters, (int) $request->integer('page', 1)),
+            'filters' => $filters,
+            'interviewers' => $interviewers,
+            // Decrypting a whole section to aggregate is only worth it when the
+            // Summary tab asks for it, so keep it an optional (partial-reload) prop.
+            'summary' => $section === null
+                ? null
+                : Inertia::optional(fn () => $table->summary($form, $section)),
         ]);
     }
 

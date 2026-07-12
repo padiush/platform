@@ -152,6 +152,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::controller(InterviewDataController::class)->group(function () {
         Route::get('/data', 'index')->name('data.index');
+        Route::get('/data/{project}/view', 'viewData')->name('data.view');
         Route::get('/data/link/{project}', 'linkSpecies')->name('data.link');
         Route::get(
             '/data/link/{project}/species-search',
