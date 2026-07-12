@@ -343,6 +343,17 @@ class ProjectController extends Controller
                 ->with('message_type', 'error');
         }
 
+        // An expired invite is already void; deleting it is the same outcome as
+        // a decline, but tell the user why it wasn't a live invitation.
+        if ($invite->expires_at->isPast()) {
+            $invite->delete();
+
+            return redirect()
+                ->route('projects.index')
+                ->with('message', 'projects.invite_expired')
+                ->with('message_type', 'error');
+        }
+
         $invite->delete();
 
         return redirect()
@@ -359,6 +370,18 @@ class ProjectController extends Controller
             return redirect()
                 ->route('projects.index')
                 ->with('message', 'projects.cannot_accept_another_user_invite')
+                ->with('message_type', 'error');
+        }
+
+        // The 7-day window is only meaningful if it's enforced at the grant
+        // point too — the accept link lives in an email and would otherwise
+        // work forever. Drop the stale invite instead of granting access.
+        if ($invite->expires_at->isPast()) {
+            $invite->delete();
+
+            return redirect()
+                ->route('projects.index')
+                ->with('message', 'projects.invite_expired')
                 ->with('message_type', 'error');
         }
 
