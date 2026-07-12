@@ -365,7 +365,8 @@
             "no_matches": "No species found.",
             "error": "An error occurred while searching species.",
             "unlink": "Remove link"
-        }
+        },
+        "search_label": "Search"
     },
     "public": {
         "home": "Home",
