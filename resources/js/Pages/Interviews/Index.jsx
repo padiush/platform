@@ -68,7 +68,7 @@ export default function InterviewOverview({ projects }) {
                                                                         'interviews.create',
                                                                         form.id,
                                                                     )}
-                                                                    className="btn btn-xs btn-primary"
+                                                                    className="btn btn-sm btn-primary"
                                                                 >
                                                                     {t(
                                                                         'interviews.new_interview',
@@ -79,7 +79,7 @@ export default function InterviewOverview({ projects }) {
                                                                         'interviews.instances',
                                                                         form.id,
                                                                     )}
-                                                                    className="btn btn-xs btn-primary"
+                                                                    className="btn btn-sm btn-ghost"
                                                                 >
                                                                     {t(
                                                                         'interviews.view_existing',

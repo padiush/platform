@@ -125,7 +125,7 @@ export default function SystemIndex({ users, user_count, project_count }) {
                                         </td>
                                         <td>
                                             <div
-                                                className="btn btn-error btn-xs"
+                                                className="btn btn-ghost btn-sm text-error"
                                                 onClick={() =>
                                                     handleDelete(user)
                                                 }

@@ -76,7 +76,7 @@ export default function SectionRender({ section, instance, answers = [] }) {
                             <div className="mt-4 flex justify-end">
                                 <button
                                     type="button"
-                                    className="btn btn-sm btn-error"
+                                    className="btn btn-ghost btn-sm text-error"
                                     onClick={() => handleRemove(i)}
                                 >
                                     <FontAwesomeIcon
@@ -92,7 +92,7 @@ export default function SectionRender({ section, instance, answers = [] }) {
 
                 <button
                     type="button"
-                    className="btn btn-primary mt-2 w-full"
+                    className="btn btn-primary mt-2 self-start"
                     onClick={() => setRepeatCount(repeatCount + 1)}
                 >
                     <FontAwesomeIcon icon={faPlus} className="mr-2" />

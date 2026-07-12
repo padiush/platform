@@ -65,7 +65,7 @@ export default function Accesses({
                                                 project: project.id,
                                             },
                                         )}
-                                        className="btn btn-primary w-full"
+                                        className="btn btn-primary self-start"
                                     >
                                         {t('projects.view_pending_invites')}
                                     </a>
@@ -133,7 +133,7 @@ export default function Accesses({
                                     <div className="mt-4 w-full">
                                         <button
                                             type="submit"
-                                            className="btn btn-primary w-full"
+                                            className="btn btn-primary self-start"
                                             disabled={processing}
                                         >
                                             {t('actions.invite')}
@@ -196,7 +196,7 @@ export default function Accesses({
                                                     <td>
                                                         <button
                                                             type="button"
-                                                            className="btn btn-error btn-xs"
+                                                            className="btn btn-ghost btn-sm text-error"
                                                             disabled={
                                                                 user.id ===
                                                                 auth.user.id
