@@ -227,4 +227,6 @@ origin; the primary sources above define them):
   package, CRAN. <https://CRAN.R-project.org/package=ethnobotanyR>
 
 The report page surfaces these per-index citations plus the ethnobotanyR
-attribution, so researchers can cite the right source for each index.
+attribution, so researchers can cite the right source for each index. The xlsx
+export carries them too, on a second **References** sheet (CSV, a single flat
+table, keeps just the indices).

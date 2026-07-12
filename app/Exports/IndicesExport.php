@@ -4,12 +4,14 @@ namespace App\Exports;
 
 use Maatwebsite\Excel\Concerns\FromArray;
 use Maatwebsite\Excel\Concerns\WithHeadings;
+use Maatwebsite\Excel\Concerns\WithTitle;
 
 /**
- * A quantitative-indices table (species with FC/RFC/UV/CI) as xlsx/csv. Headers
- * use the literature-standard abbreviations, which are language-independent.
+ * The species-indices table (FC/RFC/UV/CI) as one sheet. Headers use the
+ * literature-standard abbreviations, which are language-independent. Also the
+ * lone sheet of a CSV download; the sheet title is ignored there.
  */
-class IndicesExport implements FromArray, WithHeadings
+class IndicesExport implements FromArray, WithHeadings, WithTitle
 {
     /**
      * @param  list<string>  $headings
@@ -28,5 +30,10 @@ class IndicesExport implements FromArray, WithHeadings
     public function array(): array
     {
         return $this->rows;
+    }
+
+    public function title(): string
+    {
+        return 'Indices';
     }
 }
