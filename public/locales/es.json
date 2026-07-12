@@ -50,6 +50,7 @@
         "country": "País",
         "access": "Acceso al proyecto",
         "invite_user": "Invitar usuario al proyecto",
+        "invite_user_hint": "Envía una invitación por correo para dar acceso a este proyecto.",
         "users_with_access": "Usuarios con acceso al proyecto",
         "view_pending_invites": "Ver invitaciones pendientes",
         "no_other_users": "No hay más usuarios con acceso a este proyecto.",

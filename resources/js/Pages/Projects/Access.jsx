@@ -1,11 +1,17 @@
 import Alert from '@/Components/Alert';
 import Card from '@/Components/Card';
-import Input from '@/Components/Input';
+import FormModal from '@/Components/FormModal';
+import useQueryModal from '@/Hooks/useQueryModal';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { faArrowLeft, faTrash } from '@fortawesome/pro-regular-svg-icons';
+import {
+    faArrowLeft,
+    faTrash,
+    faUserPlus,
+} from '@fortawesome/pro-regular-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Link, router, useForm } from '@inertiajs/react';
+import { Link, router } from '@inertiajs/react';
 import { useTranslation } from 'react-i18next';
+import InviteForm from './Partials/InviteForm';
 
 export default function Accesses({
     project,
@@ -16,16 +22,7 @@ export default function Accesses({
 }) {
     const { t } = useTranslation();
 
-    const { data, setData, post, processing } = useForm({
-        name: '',
-        email: '',
-        capability_id: '',
-    });
-
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        post(route('projects.accesses.invite', { project: project.id }));
-    };
+    const [inviteParam, setInvite] = useQueryModal('invite');
 
     return (
         <AuthenticatedLayout
@@ -73,73 +70,19 @@ export default function Accesses({
                             )}
 
                             <Card title={t('projects.invite_user')}>
-                                <form onSubmit={handleSubmit}>
-                                    <Input
-                                        name="name"
-                                        label={t('projects.access_form.name')}
-                                        value={data.name}
-                                        onChange={(e) =>
-                                            setData('name', e.target.value)
-                                        }
-                                    />
-                                    <Input
-                                        name="email"
-                                        type="email"
-                                        label={t('projects.access_form.email')}
-                                        value={data.email}
-                                        onChange={(e) =>
-                                            setData('email', e.target.value)
-                                        }
-                                    />
-                                    <div className="form-control w-full">
-                                        <fieldset className="fieldset w-full">
-                                            <legend className="fieldset-legend">
-                                                {t(
-                                                    'projects.access_form.permission',
-                                                )}
-                                            </legend>
-                                            <select
-                                                name="capability_id"
-                                                value={data.capability_id}
-                                                onChange={(e) =>
-                                                    setData(
-                                                        'capability_id',
-                                                        e.target.value,
-                                                    )
-                                                }
-                                                className="select select-bordered w-full"
-                                                required
-                                            >
-                                                <option value="" disabled>
-                                                    {t(
-                                                        'projects.access_form.select_permission',
-                                                    )}
-                                                </option>
-                                                {capabilities.map(
-                                                    (capability) => (
-                                                        <option
-                                                            key={capability.id}
-                                                            value={
-                                                                capability.id
-                                                            }
-                                                        >
-                                                            {capability.name}
-                                                        </option>
-                                                    ),
-                                                )}
-                                            </select>
-                                        </fieldset>
-                                    </div>
-                                    <div className="mt-4 w-full">
-                                        <button
-                                            type="submit"
-                                            className="btn btn-primary self-start"
-                                            disabled={processing}
-                                        >
-                                            {t('actions.invite')}
-                                        </button>
-                                    </div>
-                                </form>
+                                <p className="text-sm opacity-80">
+                                    {t('projects.invite_user_hint')}
+                                </p>
+                                <div className="mt-4">
+                                    <button
+                                        type="button"
+                                        className="btn btn-primary self-start"
+                                        onClick={() => setInvite('1')}
+                                    >
+                                        <FontAwesomeIcon icon={faUserPlus} />
+                                        {t('actions.invite')}
+                                    </button>
+                                </div>
                             </Card>
                         </div>
 
@@ -251,6 +194,18 @@ export default function Accesses({
                     </div>
                 </div>
             </div>
+
+            <FormModal
+                open={inviteParam != null}
+                onClose={() => setInvite(null)}
+                title={t('projects.invite_user')}
+            >
+                <InviteForm
+                    project={project}
+                    capabilities={capabilities}
+                    onClose={() => setInvite(null)}
+                />
+            </FormModal>
         </AuthenticatedLayout>
     );
 }
