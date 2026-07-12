@@ -120,6 +120,63 @@ class DesignerStructureTest extends TestCase
         ]);
     }
 
+    public function test_use_category_role_is_persisted()
+    {
+        $user = $this->userWithCapability($this->project, 'manage_forms');
+
+        $response = $this->actingAs($user)->putJson($this->structureUrl(), [
+            'sections' => [
+                [
+                    'name' => 'Plant use',
+                    'repeatable' => true,
+                    'items' => [
+                        $this->itemPayload([
+                            'label' => 'Use',
+                            'name' => 'use',
+                            'type' => 'select',
+                            'options' => ['Medicinal', 'Food'],
+                            'is_use_category' => true,
+                        ]),
+                    ],
+                ],
+            ],
+        ]);
+
+        $response->assertOk();
+        $response->assertJsonPath('structure.0.items.0.is_use_category', true);
+        $this->assertDatabaseHas('interview_items', [
+            'name' => 'use',
+            'is_use_category' => true,
+            'link_to_species' => false,
+        ]);
+    }
+
+    public function test_item_cannot_be_both_taxon_and_use_category()
+    {
+        $user = $this->userWithCapability($this->project, 'manage_forms');
+
+        $response = $this->actingAs($user)->putJson($this->structureUrl(), [
+            'sections' => [
+                [
+                    'name' => 'Plant use',
+                    'repeatable' => true,
+                    'items' => [
+                        $this->itemPayload([
+                            'label' => 'Confused field',
+                            'name' => 'confused',
+                            'link_to_species' => true,
+                            'is_use_category' => true,
+                        ]),
+                    ],
+                ],
+            ],
+        ]);
+
+        $response->assertUnprocessable();
+        $response->assertJsonPath('message', 'designer.item_role_conflict');
+        $this->assertDatabaseMissing('interview_items', ['name' => 'confused']);
+    }
+
     public function test_structure_updates_reorders_and_deletes()
     {
         $user = $this->userWithCapability($this->project, 'manage_forms');

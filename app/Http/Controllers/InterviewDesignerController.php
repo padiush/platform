@@ -89,12 +89,32 @@ class InterviewDesignerController extends Controller
             'sections.*.items.*.type' => 'required|string|in:text,number,date,multi,select',
             'sections.*.items.*.required' => 'boolean',
             'sections.*.items.*.link_to_species' => 'boolean',
+            'sections.*.items.*.is_use_category' => 'boolean',
             'sections.*.items.*.min' => 'nullable|numeric',
             'sections.*.items.*.max' => 'nullable|numeric',
             'sections.*.items.*.step' => 'nullable|numeric',
             'sections.*.items.*.options' => 'nullable|array',
             'sections.*.items.*.options.*' => 'nullable|string|max:255',
         ]);
+
+        // An item's answer is either a folk name to link to a taxon or a use
+        // category — never both. The indices rely on that distinction.
+        foreach ($validated['sections'] as $section) {
+            foreach ($section['items'] ?? [] as $item) {
+                if (
+                    ($item['link_to_species'] ?? false) &&
+                    ($item['is_use_category'] ?? false)
+                ) {
+                    return response()->json(
+                        [
+                            'message' => 'designer.item_role_conflict',
+                            'message_type' => 'error',
+                        ],
+                        422
+                    );
+                }
+            }
+        }
 
         $result = $structureService->apply(
             $form,
@@ -158,6 +178,7 @@ class InterviewDesignerController extends Controller
                     'type' => $item->type,
                     'required' => (bool) $item->required,
                     'link_to_species' => (bool) $item->link_to_species,
+                    'is_use_category' => (bool) $item->is_use_category,
                     'min' => $item->min,
                     'max' => $item->max,
                     'step' => $item->step,

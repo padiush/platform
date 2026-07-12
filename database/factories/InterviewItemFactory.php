@@ -26,6 +26,7 @@ class InterviewItemFactory extends Factory
             'required' => false,
             'order' => 1,
             'link_to_species' => false,
+            'is_use_category' => false,
         ];
     }
 }

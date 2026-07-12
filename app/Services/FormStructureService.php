@@ -169,6 +169,7 @@ class FormStructureService
             'type' => $type,
             'required' => (bool) ($itemPayload['required'] ?? false),
             'link_to_species' => (bool) ($itemPayload['link_to_species'] ?? false),
+            'is_use_category' => (bool) ($itemPayload['is_use_category'] ?? false),
             'min' => $isNumber ? ($itemPayload['min'] ?? null) : null,
             'max' => $isNumber ? ($itemPayload['max'] ?? null) : null,
             'step' => $isNumber ? ($itemPayload['step'] ?? null) : null,

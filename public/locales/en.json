@@ -189,6 +189,7 @@
         "item_deleted": "The field has been deleted.",
         "item_reordered": "The field has been reordered.",
         "item_not_found": "The field was not found.",
+        "item_role_conflict": "A field can be a species link or a use category, but not both.",
         "section_created": "The section has been created.",
         "section_renamed": "The section has been renamed.",
         "section_deleted": "The section has been deleted.",
