@@ -460,6 +460,11 @@
             "references": "Referências",
             "references_intro": "Cite o artigo original de cada índice que você reportar.",
             "ethnobotanyr_note": "um pacote R (Whitney, C.) que implementa estes índices; as definições vêm das fontes primárias acima.",
+            "charts": {
+                "download": "Baixar PNG",
+                "index": "Índice",
+                "by_index": "Espécies principais por índice"
+            },
             "empty": {
                 "title": "Ainda não há índices",
                 "hint": "Vincule as citações das entrevistas a espécies do catálogo e marque um campo de categoria de uso no designer de formulários."
