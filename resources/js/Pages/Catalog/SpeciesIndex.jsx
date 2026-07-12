@@ -42,6 +42,7 @@ export default function CatalogSpeciesIndex({ project, species }) {
                 <Link
                     href={route('catalogs.index')}
                     className="btn btn-ghost btn-circle"
+                    aria-label={t('navigation.back')}
                 >
                     <FontAwesomeIcon icon={faArrowLeft} />
                 </Link>

@@ -155,11 +155,12 @@ export default function Wizard({ project, form, structure, instancesCount }) {
                 { label: form.name },
             ]}
             action={
-                <Link href={route('designer.index')} className="btn btn-ghost">
-                    <FontAwesomeIcon
-                        icon={faArrowLeft}
-                        aria-label={t('pagination.previous')}
-                    />
+                <Link
+                    href={route('designer.index')}
+                    className="btn btn-ghost"
+                    aria-label={t('navigation.back')}
+                >
+                    <FontAwesomeIcon icon={faArrowLeft} />
                 </Link>
             }
             actionRight={

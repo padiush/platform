@@ -30,6 +30,7 @@ export default function Instance({ project, form, instance, answers }) {
                 <Link
                     href={route('interviews.instances', { form: form.id })}
                     className="btn btn-ghost"
+                    aria-label={t('navigation.back')}
                 >
                     <FontAwesomeIcon icon={faArrowLeft} />
                 </Link>

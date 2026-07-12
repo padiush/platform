@@ -43,6 +43,7 @@ export default function InterviewInstances({ project, form, instances }) {
                 <Link
                     href={route('interviews.index')}
                     className="btn btn-ghost"
+                    aria-label={t('navigation.back')}
                 >
                     <FontAwesomeIcon icon={faArrowLeft} />
                 </Link>

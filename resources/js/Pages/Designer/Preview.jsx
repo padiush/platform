@@ -70,6 +70,7 @@ export default function Preview({ project, form }) {
                         form: form.id,
                     })}
                     className="btn btn-ghost"
+                    aria-label={t('navigation.back')}
                 >
                     <FontAwesomeIcon icon={faArrowLeft} />
                 </Link>

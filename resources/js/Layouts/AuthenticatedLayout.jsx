@@ -24,6 +24,48 @@ export default function AuthenticatedLayout({
     const activeWhen = (pattern) =>
         route().current(pattern) ? 'menu-active' : '';
 
+    // One flat, capability-gated list feeding both menus: the navbar only
+    // promises sections the user's project roles actually unlock.
+    const capabilities = auth.capabilities ?? {};
+    const navItems = [
+        {
+            label: t('navigation.projects'),
+            href: route('projects.index'),
+            pattern: 'projects.*',
+            show: true,
+        },
+        {
+            label: t('navigation.system_dashboard'),
+            href: route('system.index'),
+            pattern: 'system.*',
+            show: Boolean(auth.user.system_admin),
+        },
+        {
+            label: t('navigation.design'),
+            href: route('designer.index'),
+            pattern: 'designer.*',
+            show: Boolean(capabilities.manage_forms),
+        },
+        {
+            label: t('navigation.interview'),
+            href: route('interviews.index'),
+            pattern: 'interviews.*',
+            show: Boolean(capabilities.record_data),
+        },
+        {
+            label: t('navigation.catalogs'),
+            href: route('catalogs.index'),
+            pattern: 'catalogs.*',
+            show: Boolean(capabilities.view_catalog),
+        },
+        {
+            label: t('navigation.data'),
+            href: route('data.index'),
+            pattern: 'data.*',
+            show: Boolean(capabilities.data),
+        },
+    ].filter((item) => item.show);
+
     return (
         <div className="z-10 flex h-screen w-full flex-col overflow-hidden">
             <Head title={title} />
@@ -55,149 +97,38 @@ export default function AuthenticatedLayout({
                             tabIndex={0}
                             className="menu menu-sm dropdown-content bg-base-100 text-base-content rounded-box z-1 mt-3 w-52 p-2 shadow"
                         >
-                            <li>
-                                <Link
-                                    href={route('projects.index')}
-                                    className={activeWhen('projects.*')}
-                                >
-                                    {t('navigation.projects')}
-                                </Link>
-                            </li>
-                            {auth.user.system_admin && (
-                                <li>
+                            {navItems.map((item) => (
+                                <li key={item.pattern}>
                                     <Link
-                                        href={route('system.index')}
-                                        className={activeWhen('system.*')}
+                                        href={item.href}
+                                        className={activeWhen(item.pattern)}
                                     >
-                                        {t('navigation.system_dashboard')}
+                                        {item.label}
                                     </Link>
                                 </li>
-                            )}
-                            {auth.projects > 0 && (
-                                <>
-                                    <li>
-                                        <details>
-                                            <summary>
-                                                {t('navigation.interviews')}
-                                            </summary>
-                                            <ul className="bg-base-200 z-20 p-2 shadow-xl">
-                                                <li>
-                                                    <Link
-                                                        href={route(
-                                                            'designer.index',
-                                                        )}
-                                                    >
-                                                        {t('navigation.design')}
-                                                    </Link>
-                                                </li>
-                                                <li>
-                                                    <Link
-                                                        href={route(
-                                                            'interviews.index',
-                                                        )}
-                                                    >
-                                                        {t(
-                                                            'navigation.interview',
-                                                        )}
-                                                    </Link>
-                                                </li>
-                                            </ul>
-                                        </details>
-                                    </li>
-                                    <li>
-                                        <Link
-                                            href={route('catalogs.index')}
-                                            className={activeWhen('catalogs.*')}
-                                        >
-                                            {t('navigation.catalogs')}
-                                        </Link>
-                                    </li>
-                                    <li>
-                                        <Link
-                                            href={route('data.index')}
-                                            className={activeWhen('data.*')}
-                                        >
-                                            {t('navigation.data')}
-                                        </Link>
-                                    </li>
-                                </>
-                            )}
+                            ))}
                         </ul>
                     </div>
                     <Link
                         className="btn btn-ghost text-xl"
                         href={route('dashboard')}
+                        aria-label={t('navigation.home')}
                     >
                         <ApplicationLogo className="h-10 w-auto fill-current" />
                     </Link>
                 </div>
                 <div className="navbar-center hidden lg:flex">
                     <ul className="menu menu-horizontal px-1">
-                        <li>
-                            <Link
-                                href={route('projects.index')}
-                                className={activeWhen('projects.*')}
-                            >
-                                {t('navigation.projects')}
-                            </Link>
-                        </li>
-                        {auth.user.system_admin && (
-                            <li>
+                        {navItems.map((item) => (
+                            <li key={item.pattern}>
                                 <Link
-                                    href={route('system.index')}
-                                    className={activeWhen('system.*')}
+                                    href={item.href}
+                                    className={activeWhen(item.pattern)}
                                 >
-                                    {t('navigation.system_dashboard')}
+                                    {item.label}
                                 </Link>
                             </li>
-                        )}
-                        {auth.projects > 0 && (
-                            <>
-                                <li>
-                                    <details>
-                                        <summary>
-                                            {t('navigation.interviews')}
-                                        </summary>
-                                        <ul className="bg-base-200 z-20 p-2 shadow-xl">
-                                            <li>
-                                                <Link
-                                                    href={route(
-                                                        'designer.index',
-                                                    )}
-                                                >
-                                                    {t('navigation.design')}
-                                                </Link>
-                                            </li>
-                                            <li>
-                                                <Link
-                                                    href={route(
-                                                        'interviews.index',
-                                                    )}
-                                                >
-                                                    {t('navigation.interview')}
-                                                </Link>
-                                            </li>
-                                        </ul>
-                                    </details>
-                                </li>
-                                <li>
-                                    <Link
-                                        href={route('catalogs.index')}
-                                        className={activeWhen('catalogs.*')}
-                                    >
-                                        {t('navigation.catalogs')}
-                                    </Link>
-                                </li>
-                                <li>
-                                    <Link
-                                        href={route('data.index')}
-                                        className={activeWhen('data.*')}
-                                    >
-                                        {t('navigation.data')}
-                                    </Link>
-                                </li>
-                            </>
-                        )}
+                        ))}
                     </ul>
                 </div>
                 <div className="navbar-end">
@@ -209,6 +140,8 @@ export default function AuthenticatedLayout({
                         href="/logout"
                         method="post"
                         as="button"
+                        aria-label={t('navigation.logout')}
+                        title={t('navigation.logout')}
                     >
                         <FontAwesomeIcon icon={faRightFromBracket} />
                     </Link>

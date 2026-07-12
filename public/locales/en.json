@@ -20,9 +20,12 @@
         "catalogs": "Catalogs",
         "data": "Data",
         "design": "Form Designer",
-        "interview": "Pass Interviews",
+        "interview": "Conduct interviews",
         "system_dashboard": "System Dashboard",
-        "breadcrumb": "Breadcrumb"
+        "breadcrumb": "Breadcrumb",
+        "back": "Back",
+        "home": "Home",
+        "logout": "Log out"
     },
     "titles": {
         "my_projects": "My Projects"

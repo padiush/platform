@@ -105,11 +105,29 @@ export default function DesignerIndex({ projects }) {
                                                                 />
                                                             </td>
                                                             <td className="hidden text-center lg:table-cell">
-                                                                {
+                                                                {form.instances
+                                                                    .length >
+                                                                0 ? (
+                                                                    <Link
+                                                                        className="link link-hover"
+                                                                        href={route(
+                                                                            'interviews.instances',
+                                                                            {
+                                                                                form: form.id,
+                                                                            },
+                                                                        )}
+                                                                    >
+                                                                        {
+                                                                            form
+                                                                                .instances
+                                                                                .length
+                                                                        }
+                                                                    </Link>
+                                                                ) : (
                                                                     form
                                                                         .instances
                                                                         .length
-                                                                }
+                                                                )}
                                                             </td>
                                                             <td className="text-center">
                                                                 <div className="mb-2">

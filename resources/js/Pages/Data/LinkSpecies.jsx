@@ -90,6 +90,7 @@ export default function LinkSpecies({ project, answered_sections, species }) {
                 <Link
                     className="btn btn-ghost btn-circle"
                     href={route('data.index')}
+                    aria-label={t('navigation.back')}
                 >
                     <FontAwesomeIcon icon={faArrowLeft} />
                 </Link>

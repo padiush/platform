@@ -66,6 +66,7 @@ export default function PendingInvites({ project, invites, filters }) {
                 <Link
                     className="btn btn-ghost btn-circle"
                     href={route('projects.accesses', { project: project.id })}
+                    aria-label={t('navigation.back')}
                 >
                     <FontAwesomeIcon icon={faArrowLeft} />
                 </Link>

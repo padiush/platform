@@ -42,6 +42,7 @@ export default function Accesses({
                 <Link
                     href={route('projects.index')}
                     className="btn btn-ghost btn-circle"
+                    aria-label={t('navigation.back')}
                 >
                     <FontAwesomeIcon icon={faArrowLeft} />
                 </Link>

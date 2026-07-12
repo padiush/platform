@@ -27,7 +27,11 @@ export default function EthnobotanyR({ project, forms }) {
             ]}
             subtitle={project.name}
             action={
-                <Link className="btn btn-ghost" href={route('data.index')}>
+                <Link
+                    className="btn btn-ghost"
+                    href={route('data.index')}
+                    aria-label={t('navigation.back')}
+                >
                     <FontAwesomeIcon icon={faArrowLeft} />
                 </Link>
             }
