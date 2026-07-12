@@ -76,6 +76,7 @@
         "already_in_project": "Você já tem acesso a este projeto.",
         "cannot_accept_another_user_invite": "Você não pode aceitar este convite.",
         "invite_expired": "Este convite expirou.",
+        "invite_not_found": "Esse convite não pertence a este projeto.",
         "cannot_decline_another_user_invite": "Você não pode recusar este convite."
     },
     "actions": {

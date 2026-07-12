@@ -76,7 +76,8 @@
         "already_in_project": "You already have access to this project.",
         "cannot_accept_another_user_invite": "You cannot accept this invitation.",
         "cannot_decline_another_user_invite": "You cannot decline this invitation.",
-        "invite_expired": "This invitation has expired."
+        "invite_expired": "This invitation has expired.",
+        "invite_not_found": "That invitation doesn't belong to this project."
     },
     "actions": {
         "accept": "Accept",
