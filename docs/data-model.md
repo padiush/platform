@@ -35,7 +35,7 @@ Project ─┬─ ProjectAccess ── ProjectCapability      (who can do what)
 | `ProjectInvite` | Pending access grant, by email | `project_id`, `inviting_user_id`, `invited_user_id?`, `invited_name`, `invited_email`, `project_capability_id`, `expires_at` | int |
 | `InterviewForm` | An interview instrument | `project_id`, `name`, `description`, `is_active` | int |
 | `InterviewSection` | A group of items; may repeat | `interview_form_id`, `name`, `order`, `repeatable` | int |
-| `InterviewItem` | A question | `interview_section_id`, `label`, `name`, `type`, `required`, `options[]`, `link_to_species`, `order` | int |
+| `InterviewItem` | A question | `interview_section_id`, `label`, `name`, `type`, `required`, `options[]`, `link_to_species`, `is_use_category`, `order` | int |
 | `InterviewInstance` | **One completed interview** | `interview_form_id`, `user_id` (recorder) | **uuid** |
 | `InstanceAnswer` | One informant response to one item | `interview_instance_id` (uuid), `interview_section_id`, `interview_item_id`, `repeatable_index`, `answer` (**encrypted**), `catalog_species_id?` | int |
 | `CatalogSpecies` | A scientific taxon in the project catalog | `project_id`, `family`, `genus`, `name`, `authority` | int |
@@ -88,11 +88,11 @@ absorb them without a rewrite.
   expensive to retrofit. Drives which taxonomic authority the catalog validates
   against and the analysis/vocabulary defaults. See
   [decisions/0006-multi-subfield-architecture.md](decisions/0006-multi-subfield-architecture.md).
-- **A use-category role on items** — the indices need to know which answers are
-  *uses* and in which *use category*. Decided: a use-category role on
-  `InterviewItem`, mirroring `link_to_species`
-  ([decisions/0007-use-category-as-item-role.md](decisions/0007-use-category-as-item-role.md));
-  to be built as a prerequisite of the indices milestone.
+- **A use-category role on items** — ✅ **built.** `InterviewItem.is_use_category`
+  marks the field whose answer is a use category, mirroring `link_to_species`
+  (mutually exclusive with it). This supplies the *u* the indices need
+  ([decisions/0007-use-category-as-item-role.md](decisions/0007-use-category-as-item-role.md)).
+  Remaining for the indices milestone: the computation itself.
 - **`InstanceAnswer` client UUID** — instances are already UUID-keyed; answers
   are integer-PK. Offline capture creates answers on-device, so they will need a
   client-generated identifier. See

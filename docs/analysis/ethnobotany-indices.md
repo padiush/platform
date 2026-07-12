@@ -23,21 +23,19 @@ Mapping to the data model ([../data-model.md](../data-model.md)):
 |---|---|---|
 | Informant *i* | one `InterviewInstance` (one interview = one informant's responses) | ✅ exists |
 | Species *s* | `InstanceAnswer.catalog_species_id` (the folk-name → taxon link) | ✅ exists |
-| Use-category *u* | a **use-category item role** ([ADR 0007](../decisions/0007-use-category-as-item-role.md)) | ✅ decided · ⏳ to build |
+| Use-category *u* | `InterviewItem.is_use_category` ([ADR 0007](../decisions/0007-use-category-as-item-role.md)) | ✅ built |
 | Informant count *N* | number of `InterviewInstance` rows for the form(s) in scope | ✅ exists |
 
-> ### ✅ DECIDED — how a "use" is identified
+> ### ✅ BUILT — how a "use" is identified
 >
-> Every index below needs to know, for a linked answer, **which use-category it
-> belongs to**. This is now a **use-category role on `InterviewItem`**, mirroring
-> `link_to_species` — set at instrument-design time so categorization is
-> structured and consistent. The answer to a use-category item, within the same
-> repeatable set as the linked species, supplies *u*. See
+> A linked answer's **use-category** comes from `InterviewItem.is_use_category`
+> — the field flagged as a use category at instrument-design time, mutually
+> exclusive with `link_to_species`. The answer to a use-category item, within the
+> same repeatable set as the linked species, supplies *u*. See
 > [../decisions/0007-use-category-as-item-role.md](../decisions/0007-use-category-as-item-role.md).
 >
-> **Milestone dependency:** the first analysis milestone ships **all five indices
-> together**, so this item role must land **before or with** the index
-> computation — ICF, FL, and CI cannot be computed without it.
+> With the role in place, the remaining work for the (all-five) milestone is the
+> index **computation** itself — ICF, FL, and CI read *u* from this flag.
 
 **N (the denominator)** is *all informants surveyed*, not just those who cited a
 given species. A species no informant mentioned contributes 0 to UV/RFC/CI, which
@@ -194,7 +192,7 @@ from memory):
 
 ## Decisions & open points
 
-- ✅ **Use-category modeling** — a use-category role on `InterviewItem`
+- ✅ **Use-category modeling** — built as `InterviewItem.is_use_category`
   ([ADR 0007](../decisions/0007-use-category-as-item-role.md)).
 - ✅ **v1 scope** — all five indices (RFC, UV, CI, ICF, FL) ship together; the
   use-category role is a prerequisite of the milestone.
