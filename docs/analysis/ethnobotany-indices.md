@@ -24,7 +24,7 @@ Mapping to the data model ([../data-model.md](../data-model.md)):
 | Informant *i* | one `InterviewInstance` (one interview = one informant's responses) | ✅ exists |
 | Species *s* | `InstanceAnswer.catalog_species_id` (the folk-name → taxon link) | ✅ exists |
 | Use-category *u* | `InterviewItem.is_use_category` ([ADR 0007](../decisions/0007-use-category-as-item-role.md)) | ✅ built |
-| Informant count *N* | number of `InterviewInstance` rows for the form(s) in scope | ✅ exists |
+| Informant count *N* | interviews of forms that carry a species field (`link_to_species`) | ✅ built |
 
 > ### ✅ BUILT — how a "use" is identified
 >
@@ -38,9 +38,13 @@ Mapping to the data model ([../data-model.md](../data-model.md)):
 > (verified against the worked example below). The remaining milestone work is
 > **surfacing** it — a report UI and an export.
 
-**N (the denominator)** is *all informants surveyed*, not just those who cited a
-given species. A species no informant mentioned contributes 0 to UV/RFC/CI, which
-is correct — rarity should lower the score.
+**N (the denominator)** is *all informants surveyed with a species instrument* —
+interviews of forms that carry a `link_to_species` field — not just those who
+cited a given species. A species no informant mentioned contributes 0 to
+UV/RFC/CI, which is correct — rarity should lower the score. A project may also
+hold unrelated instruments (an interview can be recorded with no species/use
+linking — e.g. a demographics form); those interviews are **excluded from N**, so
+mixing instruments in one project does not dilute the indices.
 
 ---
 
@@ -184,8 +188,9 @@ from memory):
   Implemented in `app/Services/EthnobiologyIndices.php`; species citations
   (FC/RFC/I_u) come from links directly, use reports (UV/CI/ICF/FL) additionally
   require a use-category.
-- **Scope** is a project (optionally a single form). `N` is the count of
-  in-scope instances.
+- **Scope** is a project, restricted to its forms that carry a `link_to_species`
+  field. `N` is the count of interviews of those forms — unrelated instruments in
+  the same project are excluded so they can't dilute the denominator.
 - **Unlinked answers** (null `catalog_species_id`) are excluded from species-level
   indices and should be surfaced as a data-quality figure ("X citations not yet
   linked") so a researcher knows the denominator of *linked* knowledge.

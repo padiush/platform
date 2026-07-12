@@ -33,7 +33,29 @@ class EthnobiologyIndices
 {
     public function compute(Project $project): array
     {
-        $formIds = InterviewForm::where('project_id', $project->id)->pluck('id');
+        // Forms carrying a species field define the survey universe. A project
+        // can also hold unrelated instruments — an interview may be recorded
+        // with no species/use linking (e.g. a demographics form) — and those
+        // interviews must not dilute the denominator N.
+        $formIds = InterviewForm::where('project_id', $project->id)
+            ->whereHas(
+                'sections.items',
+                fn ($query) => $query->where('link_to_species', true)
+            )
+            ->pluck('id');
+
+        $n = InterviewInstance::whereIn('interview_form_id', $formIds)->count();
+
+        $empty = [
+            'informants' => $n,
+            'species' => [],
+            'use_categories' => [],
+            'unlinked_citations' => 0,
+        ];
+
+        if ($n === 0) {
+            return $empty;
+        }
 
         $items = InterviewItem::whereHas(
             'section',
@@ -50,20 +72,6 @@ class EthnobiologyIndices
         $useItems = array_flip(
             $items->where('is_use_category', true)->pluck('id')->all()
         );
-
-        $n = InterviewInstance::whereIn('interview_form_id', $formIds)->count();
-
-        $empty = [
-            'informants' => $n,
-            'species' => [],
-            'use_categories' => [],
-            'unlinked_citations' => 0,
-        ];
-
-        // Nothing to report without informants or a taxon field to cite.
-        if ($n === 0 || $taxonItems === []) {
-            return $empty;
-        }
 
         $answers = InstanceAnswer::whereIn(
             'interview_item_id',
