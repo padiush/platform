@@ -90,7 +90,7 @@ class ResourceScopingTest extends TestCase
             ]
         );
 
-        $response->assertRedirect();
+        $response->assertRedirect(route('designer.index'));
         $this->assertDatabaseHas('interview_forms', [
             'name' => 'My form',
             'project_id' => $mine->id,

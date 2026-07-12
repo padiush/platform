@@ -59,15 +59,15 @@ class InterviewFormController extends Controller
         ]);
     }
 
-    public function create(Project $project): RedirectResponse|Response
+    public function create(Project $project): RedirectResponse
     {
         if (! Auth::user()->can('manageForms', $project)) {
             return $this->denyNoAccess();
         }
 
-        return Inertia::render('Designer/Form', [
-            'project' => $project,
-        ]);
+        // The form-details form is a modal on the designer list; deep-link
+        // opens it there, carrying which project it belongs to.
+        return redirect()->route('designer.index', ['create' => $project->id]);
     }
 
     public function store(Request $request, Project $project): RedirectResponse
@@ -89,11 +89,10 @@ class InterviewFormController extends Controller
             'description' => $request->description,
         ]);
 
+        // The details are captured in the modal; land back on the list, where
+        // the new form is ready to open in the Wizard.
         return redirect()
-            ->route('designer.form.edit', [
-                'project' => $project,
-                'form' => $form,
-            ])
+            ->route('designer.index')
             ->with('message', 'designer.form_create_success')
             ->with('message_type', 'success');
     }
@@ -181,17 +180,14 @@ class InterviewFormController extends Controller
     public function edit(
         Project $project,
         InterviewForm $form
-    ): RedirectResponse|Response {
+    ): RedirectResponse {
         if (! Auth::user()->can('manageForms', $project)) {
             return $this->denyNoAccess();
         }
 
         self::ensureFormBelongsToProject($project, $form);
 
-        return Inertia::render('Designer/Form', [
-            'project' => $project,
-            'form' => $form,
-        ]);
+        return redirect()->route('designer.index', ['edit' => $form->id]);
     }
 
     private function denyNoAccess(): RedirectResponse

@@ -2,7 +2,9 @@ import Alert from '@/Components/Alert';
 import Card from '@/Components/Card';
 import DeletionModal from '@/Components/DeletionModal';
 import EmptyState from '@/Components/EmptyState';
+import FormModal from '@/Components/FormModal';
 import IconButton from '@/Components/IconButton';
+import useQueryModal from '@/Hooks/useQueryModal';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import {
     faCheck,
@@ -16,6 +18,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link } from '@inertiajs/react';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import FormDetailsForm from './Partials/FormDetailsForm';
 
 export default function DesignerIndex({ projects }) {
     const { t } = useTranslation();
@@ -24,6 +27,21 @@ export default function DesignerIndex({ projects }) {
         url: '',
         name: '',
     });
+
+    const [createParam, setCreate] = useQueryModal('create');
+    const [editParam, setEdit] = useQueryModal('edit');
+
+    const creatingProject = createParam
+        ? projects.find((p) => p.id === Number(createParam))
+        : null;
+
+    const editingForm = editParam
+        ? projects
+              .flatMap((p) =>
+                  p.interview_forms.map((f) => ({ ...f, project: p })),
+              )
+              .find((f) => f.id === Number(editParam))
+        : null;
 
     const handleDelete = (projectId, form) => {
         setDeletionModalOptions({
@@ -154,16 +172,14 @@ export default function DesignerIndex({ projects }) {
                                                                             'designer.index.wizard',
                                                                         )}
                                                                     </Link>
-                                                                    <Link
+                                                                    <button
+                                                                        type="button"
                                                                         className="btn btn-ghost btn-sm"
-                                                                        href={route(
-                                                                            'designer.form.edit',
-                                                                            {
-                                                                                project:
-                                                                                    project.id,
-                                                                                form: form.id,
-                                                                            },
-                                                                        )}
+                                                                        onClick={() =>
+                                                                            setEdit(
+                                                                                form.id,
+                                                                            )
+                                                                        }
                                                                     >
                                                                         <FontAwesomeIcon
                                                                             icon={
@@ -173,7 +189,7 @@ export default function DesignerIndex({ projects }) {
                                                                         {t(
                                                                             'designer.index.edit_details',
                                                                         )}
-                                                                    </Link>
+                                                                    </button>
                                                                     <Link
                                                                         className="btn btn-ghost btn-sm"
                                                                         href={route(
@@ -230,16 +246,16 @@ export default function DesignerIndex({ projects }) {
                                         />
                                     )}
                                     <div className="mt-2 flex justify-end">
-                                        <Link
-                                            href={route(
-                                                'designer.create',
-                                                project.id,
-                                            )}
+                                        <button
+                                            type="button"
+                                            onClick={() =>
+                                                setCreate(project.id)
+                                            }
                                             className="btn btn-outline btn-primary btn-sm"
                                         >
                                             <FontAwesomeIcon icon={faPlus} />
                                             {t('designer.index.create')}
-                                        </Link>
+                                        </button>
                                     </div>
                                 </Card>
                             ))}
@@ -253,6 +269,43 @@ export default function DesignerIndex({ projects }) {
                 name={deletionModalOptions.name}
                 url={deletionModalOptions.url}
             />
+
+            <FormModal
+                open={!!creatingProject}
+                onClose={() => setCreate(null)}
+                title={
+                    creatingProject
+                        ? `${t('designer.create_form.title')} — ${creatingProject.name}`
+                        : t('designer.create_form.title')
+                }
+            >
+                {creatingProject && (
+                    <FormDetailsForm
+                        key={`create-${createParam}`}
+                        project={creatingProject}
+                        onClose={() => setCreate(null)}
+                    />
+                )}
+            </FormModal>
+
+            <FormModal
+                open={!!editingForm}
+                onClose={() => setEdit(null)}
+                title={
+                    editingForm
+                        ? `${t('designer.create_form.edit_title')} — ${editingForm.name}`
+                        : t('designer.create_form.edit_title')
+                }
+            >
+                {editingForm && (
+                    <FormDetailsForm
+                        key={`edit-${editParam}`}
+                        project={editingForm.project}
+                        form={editingForm}
+                        onClose={() => setEdit(null)}
+                    />
+                )}
+            </FormModal>
         </AuthenticatedLayout>
     );
 }
