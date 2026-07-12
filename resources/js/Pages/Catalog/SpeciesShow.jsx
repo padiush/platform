@@ -74,6 +74,7 @@ export default function SpeciesShow({ species, project }) {
                 <Link
                     href={route('catalogs.show', { project: project.id })}
                     className="btn btn-ghost btn-circle"
+                    aria-label={t('navigation.back')}
                 >
                     <FontAwesomeIcon icon={faArrowLeft} />
                 </Link>

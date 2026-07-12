@@ -20,9 +20,12 @@
         "catalogs": "Catálogos",
         "data": "Dados",
         "design": "Conceção de formulários",
-        "interview": "Passar nas entrevistas",
+        "interview": "Realizar entrevistas",
         "system_dashboard": "Painel do sistema",
-        "breadcrumb": "Trilha de navegação"
+        "breadcrumb": "Trilha de navegação",
+        "back": "Voltar",
+        "home": "Início",
+        "logout": "Sair"
     },
     "titles": {
         "my_projects": "Meus Projetos"

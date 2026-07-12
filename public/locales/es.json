@@ -18,11 +18,14 @@
         "projects": "Proyectos",
         "interviews": "Entrevistas",
         "design": "Diseñar formularios",
-        "interview": "Pasar entrevistas",
+        "interview": "Realizar entrevistas",
         "catalogs": "Catálogos",
         "data": "Datos",
         "system_dashboard": "Panel del sistema",
-        "breadcrumb": "Ruta de navegación"
+        "breadcrumb": "Ruta de navegación",
+        "back": "Volver",
+        "home": "Inicio",
+        "logout": "Cerrar sesión"
     },
     "titles": {
         "my_projects": "Mis proyectos"
