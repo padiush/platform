@@ -463,7 +463,9 @@
             "charts": {
                 "download": "Descargar PNG",
                 "index": "Índice",
-                "by_index": "Especies principales por índice"
+                "by_index": "Especies principales por índice",
+                "heatmap": "Especies × categorías de uso",
+                "heatmap_note": "El tono y el número de cada celda indican los reportes de uso por especie y categoría."
             },
             "empty": {
                 "title": "Aún no hay índices",
