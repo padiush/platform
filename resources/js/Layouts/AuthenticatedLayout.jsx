@@ -1,5 +1,7 @@
 import ApplicationLogo from '@/Components/ApplicationLogo';
+import Breadcrumbs from '@/Components/Breadcrumbs';
 import ErrorBoundary from '@/Components/ErrorBoundary';
+import ThemeToggle from '@/Components/ThemeToggle';
 import TranslationToggle from '@/Components/TranslationToggle';
 import { useFlashMessage } from '@/Hooks/useFlashMessage';
 import { faRightFromBracket } from '@fortawesome/pro-regular-svg-icons';
@@ -13,14 +15,64 @@ export default function AuthenticatedLayout({
     subtitle,
     action,
     actionRight,
+    breadcrumbs = null,
+    // Plain-text document title for when `title` is JSX.
+    headTitle = null,
 }) {
     const { auth } = usePage().props;
     const { t } = useTranslation();
     const { FlashAlert, flashShown } = useFlashMessage();
 
+    const activeWhen = (pattern) =>
+        route().current(pattern) ? 'menu-active' : '';
+
+    // One flat, capability-gated list feeding both menus: the navbar only
+    // promises sections the user's project roles actually unlock.
+    const capabilities = auth.capabilities ?? {};
+    const navItems = [
+        {
+            label: t('navigation.projects'),
+            href: route('projects.index'),
+            pattern: 'projects.*',
+            show: true,
+        },
+        {
+            label: t('navigation.system_dashboard'),
+            href: route('system.index'),
+            pattern: 'system.*',
+            show: Boolean(auth.user.system_admin),
+        },
+        {
+            label: t('navigation.design'),
+            href: route('designer.index'),
+            pattern: 'designer.*',
+            show: Boolean(capabilities.manage_forms),
+        },
+        {
+            label: t('navigation.interview'),
+            href: route('interviews.index'),
+            pattern: 'interviews.*',
+            show: Boolean(capabilities.record_data),
+        },
+        {
+            label: t('navigation.catalogs'),
+            href: route('catalogs.index'),
+            pattern: 'catalogs.*',
+            show: Boolean(capabilities.view_catalog),
+        },
+        {
+            label: t('navigation.data'),
+            href: route('data.index'),
+            pattern: 'data.*',
+            show: Boolean(capabilities.data),
+        },
+    ].filter((item) => item.show);
+
     return (
         <div className="z-10 flex h-screen w-full flex-col overflow-hidden">
-            <Head title={title} />
+            <Head
+                title={headTitle ?? (typeof title === 'string' ? title : '')}
+            />
             <div className="navbar bg-primary text-primary-content sticky top-0 z-30 h-16 shadow-xl">
                 <div className="navbar-start">
                     <div className="dropdown">
@@ -49,128 +101,42 @@ export default function AuthenticatedLayout({
                             tabIndex={0}
                             className="menu menu-sm dropdown-content bg-base-100 text-base-content rounded-box z-1 mt-3 w-52 p-2 shadow"
                         >
-                            <li>
-                                <Link href={route('projects.index')}>
-                                    {t('navigation.projects')}
-                                </Link>
-                            </li>
-                            {auth.user.system_admin && (
-                                <li>
-                                    <Link href={route('system.index')}>
-                                        {t('navigation.system_dashboard')}
+                            {navItems.map((item) => (
+                                <li key={item.pattern}>
+                                    <Link
+                                        href={item.href}
+                                        className={activeWhen(item.pattern)}
+                                    >
+                                        {item.label}
                                     </Link>
                                 </li>
-                            )}
-                            {auth.projects > 0 && (
-                                <>
-                                    <li>
-                                        <details>
-                                            <summary>
-                                                {t('navigation.interviews')}
-                                            </summary>
-                                            <ul className="bg-base-200 z-20 p-2 shadow-xl">
-                                                <li>
-                                                    <Link
-                                                        href={route(
-                                                            'designer.index',
-                                                        )}
-                                                    >
-                                                        {t('navigation.design')}
-                                                    </Link>
-                                                </li>
-                                                <li>
-                                                    <Link
-                                                        href={route(
-                                                            'interviews.index',
-                                                        )}
-                                                    >
-                                                        {t(
-                                                            'navigation.interview',
-                                                        )}
-                                                    </Link>
-                                                </li>
-                                            </ul>
-                                        </details>
-                                    </li>
-                                    <li>
-                                        <Link href={route('catalogs.index')}>
-                                            {t('navigation.catalogs')}
-                                        </Link>
-                                    </li>
-                                    <li>
-                                        <Link href={route('data.index')}>
-                                            {t('navigation.data')}
-                                        </Link>
-                                    </li>
-                                </>
-                            )}
+                            ))}
                         </ul>
                     </div>
                     <Link
                         className="btn btn-ghost text-xl"
                         href={route('dashboard')}
+                        aria-label={t('navigation.home')}
                     >
                         <ApplicationLogo className="h-10 w-auto fill-current" />
                     </Link>
                 </div>
                 <div className="navbar-center hidden lg:flex">
                     <ul className="menu menu-horizontal px-1">
-                        <li>
-                            <Link href={route('projects.index')}>
-                                {t('navigation.projects')}
-                            </Link>
-                        </li>
-                        {auth.user.system_admin && (
-                            <li>
-                                <Link href={route('system.index')}>
-                                    {t('navigation.system_dashboard')}
+                        {navItems.map((item) => (
+                            <li key={item.pattern}>
+                                <Link
+                                    href={item.href}
+                                    className={activeWhen(item.pattern)}
+                                >
+                                    {item.label}
                                 </Link>
                             </li>
-                        )}
-                        {auth.projects > 0 && (
-                            <>
-                                <li>
-                                    <details>
-                                        <summary>
-                                            {t('navigation.interviews')}
-                                        </summary>
-                                        <ul className="bg-base-200 z-20 p-2 shadow-xl">
-                                            <li>
-                                                <Link
-                                                    href={route(
-                                                        'designer.index',
-                                                    )}
-                                                >
-                                                    {t('navigation.design')}
-                                                </Link>
-                                            </li>
-                                            <li>
-                                                <Link
-                                                    href={route(
-                                                        'interviews.index',
-                                                    )}
-                                                >
-                                                    {t('navigation.interview')}
-                                                </Link>
-                                            </li>
-                                        </ul>
-                                    </details>
-                                </li>
-                                <li>
-                                    <Link href={route('catalogs.index')}>
-                                        {t('navigation.catalogs')}
-                                    </Link>
-                                </li>
-                                <li>
-                                    <Link href={route('data.index')}>
-                                        {t('navigation.data')}
-                                    </Link>
-                                </li>
-                            </>
-                        )}
+                        ))}
                     </ul>
                 </div>
                 <div className="navbar-end">
+                    <ThemeToggle />
                     <TranslationToggle />
 
                     <Link
@@ -178,24 +144,33 @@ export default function AuthenticatedLayout({
                         href="/logout"
                         method="post"
                         as="button"
+                        aria-label={t('navigation.logout')}
+                        title={t('navigation.logout')}
                     >
                         <FontAwesomeIcon icon={faRightFromBracket} />
                     </Link>
                 </div>
             </div>
 
-            <div className="bg-base-200 sticky top-16 z-20 flex items-center justify-between gap-4 px-4 py-4 text-lg font-semibold shadow-xl md:px-12 md:py-6 md:text-xl lg:px-24 lg:text-2xl">
+            <div className="bg-base-100/95 border-base-300 sticky top-16 z-20 flex items-center justify-between gap-4 border-b px-4 py-3 backdrop-blur md:px-12 lg:px-24">
                 {action && action}
 
-                <div className="items-left flex grow flex-col">
-                    <div className="text-2xl font-bold">{title}</div>
-                    <div className="text-lg font-semibold">{subtitle}</div>
+                <div className="items-left flex min-w-0 grow flex-col gap-0.5">
+                    {breadcrumbs && <Breadcrumbs items={breadcrumbs} />}
+                    <div className="truncate text-xl font-bold md:text-2xl">
+                        {title}
+                    </div>
+                    {subtitle && (
+                        <div className="text-base-content/60 truncate text-sm font-medium">
+                            {subtitle}
+                        </div>
+                    )}
                 </div>
 
                 {actionRight && actionRight}
             </div>
 
-            <div className="bg-base-100 flex-1 overflow-y-auto">
+            <div className="bg-base-200/50 flex-1 overflow-y-auto">
                 {flashShown && <FlashAlert />}
 
                 <ErrorBoundary>{children}</ErrorBoundary>

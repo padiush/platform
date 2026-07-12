@@ -1,8 +1,15 @@
 import Card from '@/Components/Card';
 import DeletionModal from '@/Components/DeletionModal';
+import IconButton from '@/Components/IconButton';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { formatLongDate, formatRelativeTime } from '@/utils/datetime';
-import { faCircleInfo } from '@fortawesome/pro-regular-svg-icons';
+import {
+    faCircleInfo,
+    faPenToSquare,
+    faPlus,
+    faTrashCan,
+    faUsers,
+} from '@fortawesome/pro-regular-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link } from '@inertiajs/react';
 import { useRef, useState } from 'react';
@@ -60,9 +67,9 @@ export default function Index({ projects, invites }) {
                                                     )}
                                                 </td>
                                                 <td>
-                                                    <div className="btn-group">
+                                                    <div className="flex gap-2">
                                                         <a
-                                                            className="btn btn-success btn-xs"
+                                                            className="btn btn-primary btn-sm"
                                                             href={route(
                                                                 'projects.invites.accept',
                                                                 invite.id,
@@ -73,7 +80,7 @@ export default function Index({ projects, invites }) {
                                                             )}
                                                         </a>
                                                         <a
-                                                            className="btn btn-error btn-xs"
+                                                            className="btn btn-ghost btn-sm text-error"
                                                             href={route(
                                                                 'projects.invites.decline',
                                                                 invite.id,
@@ -111,17 +118,20 @@ export default function Index({ projects, invites }) {
                                     )}
 
                                     {project.can_manage && (
-                                        <div className="mt-2 flex flex-col gap-2">
+                                        <div className="mt-2 flex flex-wrap items-center gap-2">
                                             <Link
-                                                className="btn btn-primary btn-sm"
+                                                className="btn btn-outline btn-sm"
                                                 href={route('projects.edit', {
                                                     project: project.id,
                                                 })}
                                             >
+                                                <FontAwesomeIcon
+                                                    icon={faPenToSquare}
+                                                />
                                                 {t('actions.edit_details')}
                                             </Link>
                                             <Link
-                                                className="btn btn-primary btn-sm"
+                                                className="btn btn-outline btn-sm"
                                                 href={route(
                                                     'projects.accesses',
                                                     {
@@ -129,16 +139,19 @@ export default function Index({ projects, invites }) {
                                                     },
                                                 )}
                                             >
+                                                <FontAwesomeIcon
+                                                    icon={faUsers}
+                                                />
                                                 {t('actions.manage_access')}
                                             </Link>
-                                            <div
-                                                className="btn btn-error btn-sm"
+                                            <IconButton
+                                                icon={faTrashCan}
+                                                label={t('actions.delete')}
+                                                className="text-error"
                                                 onClick={() =>
                                                     handleDelete(project)
                                                 }
-                                            >
-                                                {t('actions.delete')}
-                                            </div>
+                                            />
                                         </div>
                                     )}
                                 </Card>
@@ -156,15 +169,15 @@ export default function Index({ projects, invites }) {
                         </div>
                     )}
 
-                    {/* Botón crear proyecto */}
-                    <Card className="mt-4">
+                    <div className="mt-6 flex justify-end">
                         <Link
                             className="btn btn-primary"
                             href={route('projects.create')}
                         >
+                            <FontAwesomeIcon icon={faPlus} />
                             {t('projects.create')}
                         </Link>
-                    </Card>
+                    </div>
                 </div>
             </div>
 

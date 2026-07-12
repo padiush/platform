@@ -1,4 +1,6 @@
 import Card from '@/Components/Card';
+import EmptyState from '@/Components/EmptyState';
+import MetricCard from '@/Components/MetricCard';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Link } from '@inertiajs/react';
 import { useTranslation } from 'react-i18next';
@@ -10,53 +12,56 @@ export default function CatalogOverview({ projects }) {
         <AuthenticatedLayout title={t('catalogs.title')}>
             <div className="p-4 md:pt-8 lg:pt-12">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
+                    {projects.length === 0 && (
+                        <EmptyState
+                            title={t('hubs.empty.title_catalogs')}
+                            hint={t('hubs.empty.hint_catalogs')}
+                            ctaHref={route('projects.index')}
+                            ctaLabel={t('hubs.empty.cta')}
+                        />
+                    )}
                     {projects.length > 0 && (
                         <div className="grid w-full grid-cols-1 gap-4">
                             {projects.map((project) => (
                                 <Card key={project.id} title={project.name}>
-                                    <div className="stats stats-vertical lg:stats-horizontal bg-base-300">
-                                        <div className="stat">
-                                            <div className="stat-value">
-                                                {project.catalog_species_count}
-                                            </div>
-                                            <div className="stat-title">
-                                                {t('catalogs.total_species')}
-                                            </div>
-                                        </div>
-                                        <div className="stat">
-                                            <div className="stat-value">
-                                                {project.linked_species_count}
-                                            </div>
-                                            <div className="stat-title">
-                                                {t('catalogs.reported_species')}
-                                            </div>
-                                        </div>
-                                        <div className="stat">
-                                            <div className="stat-value">
-                                                {project.linked_families_count}
-                                            </div>
-                                            <div className="stat-title">
-                                                {t(
-                                                    'catalogs.reported_families',
-                                                )}
-                                            </div>
-                                        </div>
+                                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                                        <MetricCard
+                                            label={t('catalogs.total_species')}
+                                            value={
+                                                project.catalog_species_count
+                                            }
+                                            tone="primary"
+                                        />
+                                        <MetricCard
+                                            label={t(
+                                                'catalogs.reported_species',
+                                            )}
+                                            value={project.linked_species_count}
+                                        />
+                                        <MetricCard
+                                            label={t(
+                                                'catalogs.reported_families',
+                                            )}
+                                            value={
+                                                project.linked_families_count
+                                            }
+                                        />
                                     </div>
 
-                                    <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
+                                    <div className="mt-4 flex flex-wrap justify-end gap-2">
                                         {project.can_edit_catalog ? (
                                             <Link
                                                 href={route(
                                                     'catalogs.species.register',
                                                     { project: project.id },
                                                 )}
-                                                className="btn btn-primary w-full"
+                                                className="btn btn-outline btn-primary btn-sm"
                                             >
                                                 {t('catalogs.register_species')}
                                             </Link>
                                         ) : (
                                             <span
-                                                className="btn btn-primary btn-disabled w-full"
+                                                className="btn btn-outline btn-sm btn-disabled"
                                                 aria-disabled="true"
                                             >
                                                 {t('catalogs.register_species')}
@@ -69,13 +74,13 @@ export default function CatalogOverview({ projects }) {
                                                 href={route('catalogs.show', {
                                                     project: project.id,
                                                 })}
-                                                className="btn btn-primary w-full"
+                                                className="btn btn-primary btn-sm"
                                             >
                                                 {t('catalogs.view_catalog')}
                                             </Link>
                                         ) : (
                                             <span
-                                                className="btn btn-primary btn-disabled w-full"
+                                                className="btn btn-sm btn-disabled"
                                                 aria-disabled="true"
                                             >
                                                 {t('catalogs.view_catalog')}

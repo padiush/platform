@@ -39,7 +39,11 @@ export default function DesignerForm({ project, form = null }) {
             }
             subtitle={project.name}
             action={
-                <Link className="btn btn-ghost" href={route('designer.index')}>
+                <Link
+                    className="btn btn-ghost"
+                    href={route('designer.index')}
+                    aria-label={t('navigation.back')}
+                >
                     <FontAwesomeIcon icon={faArrowLeft} />
                 </Link>
             }

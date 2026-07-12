@@ -1,4 +1,6 @@
 import Card from '@/Components/Card';
+import EmptyState from '@/Components/EmptyState';
+import MetricCard from '@/Components/MetricCard';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Link } from '@inertiajs/react';
 import { useTranslation } from 'react-i18next';
@@ -10,6 +12,14 @@ export default function DataProcessing({ projects }) {
         <AuthenticatedLayout title={t('data.data_processing')}>
             <div className="p-4 md:pt-8 lg:pt-12">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
+                    {projects.length === 0 && (
+                        <EmptyState
+                            title={t('hubs.empty.title_data')}
+                            hint={t('hubs.empty.hint_data')}
+                            ctaHref={route('projects.index')}
+                            ctaLabel={t('hubs.empty.cta')}
+                        />
+                    )}
                     {projects.length > 0 && (
                         <div className="grid w-full grid-cols-1 gap-4">
                             {projects.map((project) => {
@@ -23,38 +33,38 @@ export default function DataProcessing({ projects }) {
 
                                 return (
                                     <Card key={project.id} title={project.name}>
-                                        <div className="stats stats-vertical lg:stats-horizontal bg-base-300">
-                                            <div className="stat">
-                                                <div className="stat-value">
-                                                    {unlinkedCount}
-                                                </div>
-                                                <div className="stat-title">
-                                                    {t('data.unlinked_reports')}
-                                                </div>
-                                            </div>
-                                            <div className="stat">
-                                                <div className="stat-value">
-                                                    {linkedCount}
-                                                </div>
-                                                <div className="stat-title">
-                                                    {t('data.linked_reports')}
-                                                </div>
-                                            </div>
+                                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                                            <MetricCard
+                                                label={t(
+                                                    'data.unlinked_reports',
+                                                )}
+                                                value={unlinkedCount}
+                                                tone={
+                                                    unlinkedCount > 0
+                                                        ? 'warning'
+                                                        : 'default'
+                                                }
+                                            />
+                                            <MetricCard
+                                                label={t('data.linked_reports')}
+                                                value={linkedCount}
+                                                tone="primary"
+                                            />
                                         </div>
 
-                                        <div className="mt-4 grid w-full grid-cols-1 gap-4 lg:grid-cols-3">
+                                        <div className="mt-4 flex flex-wrap justify-end gap-2">
                                             {canManageData ? (
                                                 <Link
                                                     href={route('data.link', {
                                                         project: project.id,
                                                     })}
-                                                    className="btn btn-primary w-full"
+                                                    className="btn btn-primary btn-sm"
                                                 >
                                                     {t('data.link_species')}
                                                 </Link>
                                             ) : (
                                                 <span
-                                                    className="btn btn-primary btn-disabled w-full"
+                                                    className="btn btn-sm btn-disabled"
                                                     aria-disabled="true"
                                                 >
                                                     {t('data.link_species')}
@@ -69,7 +79,7 @@ export default function DataProcessing({ projects }) {
                                                             project: project.id,
                                                         },
                                                     )}
-                                                    className="btn btn-primary w-full"
+                                                    className="btn btn-outline btn-primary btn-sm"
                                                 >
                                                     {t(
                                                         'data.generate_ethnobotanyr',
@@ -77,7 +87,7 @@ export default function DataProcessing({ projects }) {
                                                 </Link>
                                             ) : (
                                                 <span
-                                                    className="btn btn-primary btn-disabled w-full"
+                                                    className="btn btn-outline btn-sm btn-disabled"
                                                     aria-disabled="true"
                                                 >
                                                     {t(
@@ -91,13 +101,13 @@ export default function DataProcessing({ projects }) {
                                                     href={route('data.custom', {
                                                         project: project.id,
                                                     })}
-                                                    className="btn btn-primary w-full"
+                                                    className="btn btn-outline btn-primary btn-sm"
                                                 >
                                                     {t('data.custom_export')}
                                                 </Link>
                                             ) : (
                                                 <span
-                                                    className="btn btn-primary btn-disabled w-full"
+                                                    className="btn btn-outline btn-sm btn-disabled"
                                                     aria-disabled="true"
                                                 >
                                                     {t('data.custom_export')}

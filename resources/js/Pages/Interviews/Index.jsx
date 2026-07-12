@@ -1,4 +1,5 @@
 import Card from '@/Components/Card';
+import EmptyState from '@/Components/EmptyState';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { faCircleInfo } from '@fortawesome/pro-regular-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -12,6 +13,14 @@ export default function InterviewOverview({ projects }) {
         <AuthenticatedLayout title={t('interviews.title')}>
             <div className="p-4 md:pt-8 lg:pt-12">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
+                    {projects.length === 0 && (
+                        <EmptyState
+                            title={t('hubs.empty.title_interviews')}
+                            hint={t('hubs.empty.hint_interviews')}
+                            ctaHref={route('projects.index')}
+                            ctaLabel={t('hubs.empty.cta')}
+                        />
+                    )}
                     {projects.length > 0 && (
                         <div className="grid w-full grid-cols-1 gap-4">
                             {projects.map((project) => (
@@ -59,7 +68,7 @@ export default function InterviewOverview({ projects }) {
                                                                         'interviews.create',
                                                                         form.id,
                                                                     )}
-                                                                    className="btn btn-xs btn-primary"
+                                                                    className="btn btn-sm btn-primary"
                                                                 >
                                                                     {t(
                                                                         'interviews.new_interview',
@@ -70,7 +79,7 @@ export default function InterviewOverview({ projects }) {
                                                                         'interviews.instances',
                                                                         form.id,
                                                                     )}
-                                                                    className="btn btn-xs btn-primary"
+                                                                    className="btn btn-sm btn-ghost"
                                                                 >
                                                                     {t(
                                                                         'interviews.view_existing',

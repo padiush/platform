@@ -54,15 +54,6 @@ class InterviewFormController extends Controller
             }
         }
 
-        if ($projects->count() == 0) {
-            return redirect()
-                ->route('projects.index')
-                ->with(
-                    'error',
-                    'No tienes proyectos activos para diseñar entrevistas.'
-                );
-        }
-
         return Inertia::render('Designer/Index', [
             'projects' => $projects,
         ]);

@@ -30,11 +30,19 @@ export default function Accesses({
     return (
         <AuthenticatedLayout
             title={t('projects.access')}
+            breadcrumbs={[
+                {
+                    label: t('navigation.projects'),
+                    href: route('projects.index'),
+                },
+                { label: project.name },
+            ]}
             subtitle={project.name}
             action={
                 <Link
                     href={route('projects.index')}
                     className="btn btn-ghost btn-circle"
+                    aria-label={t('navigation.back')}
                 >
                     <FontAwesomeIcon icon={faArrowLeft} />
                 </Link>
@@ -57,7 +65,7 @@ export default function Accesses({
                                                 project: project.id,
                                             },
                                         )}
-                                        className="btn btn-primary w-full"
+                                        className="btn btn-primary self-start"
                                     >
                                         {t('projects.view_pending_invites')}
                                     </a>
@@ -125,7 +133,7 @@ export default function Accesses({
                                     <div className="mt-4 w-full">
                                         <button
                                             type="submit"
-                                            className="btn btn-primary w-full"
+                                            className="btn btn-primary self-start"
                                             disabled={processing}
                                         >
                                             {t('actions.invite')}
@@ -188,7 +196,7 @@ export default function Accesses({
                                                     <td>
                                                         <button
                                                             type="button"
-                                                            className="btn btn-error btn-xs"
+                                                            className="btn btn-ghost btn-sm text-error"
                                                             disabled={
                                                                 user.id ===
                                                                 auth.user.id

@@ -101,7 +101,7 @@ class InterviewTest extends TestCase
         );
     }
 
-    public function test_interview_designer_does_not_render_if_all_projects_are_finished()
+    public function test_interview_designer_renders_empty_when_all_projects_are_finished()
     {
         $user = User::factory()->create();
 
@@ -110,7 +110,7 @@ class InterviewTest extends TestCase
             'finished' => true,
         ]);
 
-        $access = ProjectAccess::factory()->create([
+        ProjectAccess::factory()->create([
             'user_id' => $user->id,
             'project_id' => $project->id,
             'project_capability_id' => ProjectCapability::where('manage_forms', true)->first()->id,
@@ -118,7 +118,13 @@ class InterviewTest extends TestCase
 
         $response = $this->actingAs($user)->get(route('designer.index'));
 
-        $response->assertRedirect(route('projects.index'));
-        $response->assertSessionHas('error', 'No tienes proyectos activos para diseñar entrevistas.');
+        // The page stays put with an in-place empty state instead of
+        // bouncing the user to Projects with an error flash.
+        $response->assertOk();
+        $response->assertInertia(
+            fn ($page) => $page
+                ->component('Designer/Index')
+                ->has('projects', 0)
+        );
     }
 }
