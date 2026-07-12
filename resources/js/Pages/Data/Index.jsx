@@ -53,18 +53,27 @@ export default function DataProcessing({ projects }) {
                                         </div>
 
                                         <div className="mt-4 flex flex-wrap justify-end gap-2">
+                                            <Link
+                                                href={route('data.view', {
+                                                    project: project.id,
+                                                })}
+                                                className="btn btn-primary btn-sm"
+                                            >
+                                                {t('data.view.title')}
+                                            </Link>
+
                                             {canManageData ? (
                                                 <Link
                                                     href={route('data.link', {
                                                         project: project.id,
                                                     })}
-                                                    className="btn btn-primary btn-sm"
+                                                    className="btn btn-outline btn-primary btn-sm"
                                                 >
                                                     {t('data.link_species')}
                                                 </Link>
                                             ) : (
                                                 <span
-                                                    className="btn btn-sm btn-disabled"
+                                                    className="btn btn-outline btn-sm btn-disabled"
                                                     aria-disabled="true"
                                                 >
                                                     {t('data.link_species')}

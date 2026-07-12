@@ -146,11 +146,17 @@ class InterviewDataController extends Controller
                 : $table->rows($form, $section, $filters, (int) $request->integer('page', 1)),
             'filters' => $filters,
             'interviewers' => $interviewers,
-            // Decrypting a whole section to aggregate is only worth it when the
-            // Summary tab asks for it, so keep it an optional (partial-reload) prop.
+            // Decrypting a whole section to aggregate is only worth it for the
+            // Summary tab: eager when that tab is requested (so a direct link
+            // renders without a round-trip), optional otherwise so the Table
+            // tab never pays for it.
             'summary' => $section === null
                 ? null
-                : Inertia::optional(fn () => $table->summary($form, $section)),
+                : ($filters['tab'] === 'summary'
+                    ? fn () => $table->summary($form, $section)
+                    : Inertia::optional(fn () => $table->summary($form, $section))),
+            // For the native-form "export this section" download.
+            'csrf_token' => csrf_token(),
         ]);
     }
 

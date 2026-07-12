@@ -47,7 +47,8 @@
         "motion": "^12.10.5",
         "react": "^19.1.0",
         "react-dom": "^19.1.0",
-        "react-i18next": "^15.5.1"
+        "react-i18next": "^15.5.1",
+        "recharts": "^3.9.2"
     },
     "type": "module"
 }
