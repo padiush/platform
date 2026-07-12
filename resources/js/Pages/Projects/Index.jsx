@@ -1,6 +1,8 @@
 import Card from '@/Components/Card';
 import DeletionModal from '@/Components/DeletionModal';
+import FormModal from '@/Components/FormModal';
 import IconButton from '@/Components/IconButton';
+import useQueryModal from '@/Hooks/useQueryModal';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { formatLongDate, formatRelativeTime } from '@/utils/datetime';
 import {
@@ -14,6 +16,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link } from '@inertiajs/react';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import ProjectForm from './Partials/ProjectForm';
 
 export default function Index({ projects, invites }) {
     const { t, i18n } = useTranslation();
@@ -23,6 +26,12 @@ export default function Index({ projects, invites }) {
         url: '',
         name: '',
     });
+
+    const [createParam, setCreate] = useQueryModal('create');
+    const [editParam, setEdit] = useQueryModal('edit');
+    const editing = editParam
+        ? projects.find((p) => p.id === Number(editParam))
+        : null;
 
     const handleDelete = (project) => {
         setDeletionModalOptions({
@@ -119,17 +128,18 @@ export default function Index({ projects, invites }) {
 
                                     {project.can_manage && (
                                         <div className="mt-2 flex flex-wrap items-center gap-2">
-                                            <Link
+                                            <button
+                                                type="button"
                                                 className="btn btn-outline btn-sm"
-                                                href={route('projects.edit', {
-                                                    project: project.id,
-                                                })}
+                                                onClick={() =>
+                                                    setEdit(project.id)
+                                                }
                                             >
                                                 <FontAwesomeIcon
                                                     icon={faPenToSquare}
                                                 />
                                                 {t('actions.edit_details')}
-                                            </Link>
+                                            </button>
                                             <Link
                                                 className="btn btn-outline btn-sm"
                                                 href={route(
@@ -170,13 +180,14 @@ export default function Index({ projects, invites }) {
                     )}
 
                     <div className="mt-6 flex justify-end">
-                        <Link
+                        <button
+                            type="button"
                             className="btn btn-primary"
-                            href={route('projects.create')}
+                            onClick={() => setCreate('1')}
                         >
                             <FontAwesomeIcon icon={faPlus} />
                             {t('projects.create')}
-                        </Link>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -186,6 +197,26 @@ export default function Index({ projects, invites }) {
                 name={deletionModalOptions.name}
                 url={deletionModalOptions.url}
             />
+
+            <FormModal
+                open={createParam != null}
+                onClose={() => setCreate(null)}
+                title={t('projects.create_project')}
+            >
+                <ProjectForm onClose={() => setCreate(null)} />
+            </FormModal>
+
+            <FormModal
+                open={!!editing}
+                onClose={() => setEdit(null)}
+                title={t('projects.edit_project_details')}
+            >
+                <ProjectForm
+                    key={editParam}
+                    project={editing}
+                    onClose={() => setEdit(null)}
+                />
+            </FormModal>
         </AuthenticatedLayout>
     );
 }
