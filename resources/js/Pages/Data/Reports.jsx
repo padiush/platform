@@ -1,4 +1,5 @@
 import Card from '@/Components/Card';
+import ChartCard from '@/Components/ChartCard';
 import EmptyState from '@/Components/EmptyState';
 import MetricCard from '@/Components/MetricCard';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
@@ -6,6 +7,7 @@ import { faArrowLeft, faDownload } from '@fortawesome/pro-regular-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link } from '@inertiajs/react';
 import { useTranslation } from 'react-i18next';
+import IndexBarChart from './Partials/IndexBarChart';
 
 const ratio = (value) => Number(value).toFixed(2);
 const percent = (value) => `${Number(value).toFixed(1)}%`;
@@ -383,6 +385,13 @@ export default function Reports({ project, indices }) {
                                     </div>
                                 </Card>
                             )}
+
+                            <ChartCard
+                                title={t('data.reports.charts.by_index')}
+                                filename="species-by-index.png"
+                            >
+                                <IndexBarChart species={species} />
+                            </ChartCard>
 
                             <Card title={t('data.reports.references')}>
                                 <p className="text-sm opacity-80">
