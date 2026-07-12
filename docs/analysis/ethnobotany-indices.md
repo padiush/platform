@@ -23,27 +23,21 @@ Mapping to the data model ([../data-model.md](../data-model.md)):
 |---|---|---|
 | Informant *i* | one `InterviewInstance` (one interview = one informant's responses) | ✅ exists |
 | Species *s* | `InstanceAnswer.catalog_species_id` (the folk-name → taxon link) | ✅ exists |
-| Use-category *u* | **not yet modeled** | ⚠️ **open decision — blocks ICF/FL/CI** |
+| Use-category *u* | a **use-category item role** ([ADR 0007](../decisions/0007-use-category-as-item-role.md)) | ✅ decided · ⏳ to build |
 | Informant count *N* | number of `InterviewInstance` rows for the form(s) in scope | ✅ exists |
 
-> ### ⚠️ OPEN DECISION — how a "use" is identified
+> ### ✅ DECIDED — how a "use" is identified
 >
 > Every index below needs to know, for a linked answer, **which use-category it
-> belongs to**. Today only `link_to_species` is semantic; there is no
-> use-category role on `InterviewItem`. Until this is decided, only the
-> use-category-independent indices (**RFC**, and **UV** in its simplest reading)
-> can be computed; ICF, FL, and CI cannot.
+> belongs to**. This is now a **use-category role on `InterviewItem`**, mirroring
+> `link_to_species` — set at instrument-design time so categorization is
+> structured and consistent. The answer to a use-category item, within the same
+> repeatable set as the linked species, supplies *u*. See
+> [../decisions/0007-use-category-as-item-role.md](../decisions/0007-use-category-as-item-role.md).
 >
-> **Recommended default (proposed):** add a use-category semantic to the form
-> designer, mirroring `link_to_species` — e.g. an item flag `is_use_category`
-> (or a small typed role enum on items: `taxon` | `use_category` | `plain`). The
-> answer to that item, within the same repeatable set as the linked species,
-> supplies *u*. This keeps categorization at instrument-design time (structured,
-> consistent) rather than as fragile post-hoc mapping.
->
-> Alternatives: (b) map items → roles at analysis time in the report builder;
-> (c) treat each option of a `multi` "uses" item as a use-category. This needs a
-> product call before the indices are built — see [Open decisions](#open-decisions).
+> **Milestone dependency:** the first analysis milestone ships **all five indices
+> together**, so this item role must land **before or with** the index
+> computation — ICF, FL, and CI cannot be computed without it.
 
 **N (the denominator)** is *all informants surveyed*, not just those who cited a
 given species. A species no informant mentioned contributes 0 to UV/RFC/CI, which
@@ -198,14 +192,15 @@ from memory):
 - **Gate** these behind `generate_reports` (all roles have it today) — see the
   access-control note in [../data-model.md](../data-model.md).
 
-## Open decisions
+## Decisions & open points
 
-1. **Use-category modeling** (blocks ICF/FL/CI) — the recommended default is an
-   `is_use_category` / role on `InterviewItem`. Needs a product call.
-2. **UV variant** — confirm the "mean use-reports per informant" reading vs. a
-   Phillips & Gentry uses-based count.
-3. **v1 scope** — ship all five, or start with the category-independent pair
-   (RFC, UV) and add ICF/FL/CI once use-categories exist?
+- ✅ **Use-category modeling** — a use-category role on `InterviewItem`
+  ([ADR 0007](../decisions/0007-use-category-as-item-role.md)).
+- ✅ **v1 scope** — all five indices (RFC, UV, CI, ICF, FL) ship together; the
+  use-category role is a prerequisite of the milestone.
+- ⏳ **UV variant** — still to confirm at implementation: the "mean use-reports per
+  informant" reading (used here) vs. a Phillips & Gentry uses-based count. Low
+  stakes; lock it when the fixture is encoded.
 
 ## Sources
 

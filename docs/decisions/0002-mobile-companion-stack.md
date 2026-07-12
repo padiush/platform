@@ -1,8 +1,7 @@
 # 0002 — Build companion apps on Expo / React Native
 
-- **Status:** Proposed
-- **Deciders:** Project owner (not yet committed — snappiness of native vs. RN is
-  an open concern)
+- **Status:** Accepted
+- **Deciders:** Project owner
 
 ## Context
 
@@ -19,8 +18,7 @@ regardless of framework; the JS layer only orchestrates light UI.
 
 ## Decision
 
-Build the companion apps with **Expo / React Native**, pending the owner
-validating the feel on a real device.
+Build the companion apps with **Expo / React Native** — committed.
 
 ## Consequences
 
@@ -33,9 +31,10 @@ validating the feel on a real device.
   reachable — the old "you'll have to eject" fear no longer applies.
 - Native cold-start and memory are marginally worse than a true-native app, but
   not on any path this app's users will notice.
-- **Validation gate:** build a throwaway Expo prototype of the capture screen
-  (a form + record button + SQLite write) and run it on a physical device before
-  committing. If it feels wrong, revisit.
+- **De-risking spike (advisory, not a gate):** an early capture-screen spike
+  (a form + record button + SQLite write) on a physical device is still worth
+  doing first — to shake out the native module wiring and confirm the feel — but
+  the stack decision no longer waits on it.
 
 ## Alternatives considered
 
