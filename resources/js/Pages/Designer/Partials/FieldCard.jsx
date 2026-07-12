@@ -73,7 +73,7 @@ export default function FieldCard({
                 <div className="flex flex-wrap items-center gap-1">
                     {count > 1 && (
                         <select
-                            className="select select-bordered select-sm w-auto"
+                            className="select select-bordered select-sm hidden w-auto sm:block"
                             aria-label={t('designer.position_label', {
                                 position: index + 1,
                                 count,
