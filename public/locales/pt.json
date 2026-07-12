@@ -340,7 +340,32 @@
         "custom_instructions": "Selecione os campos que deseja incluir no relatório. Você não pode misturar campos de seções repetíveis com seções únicas.",
         "repeatable": "seção repetível",
         "unique": "seção única",
-        "no_projects": "Você não tem projetos disponíveis."
+        "no_projects": "Você não tem projetos disponíveis.",
+        "search_placeholder": "Pesquisar por nome reportado…",
+        "status": {
+            "label": "Estado",
+            "all": "Todos",
+            "unlinked": "Sem ligação",
+            "linked": "Ligados"
+        },
+        "group_by_name": "Agrupar por nome",
+        "linked_of_total": "ligados",
+        "mixed": "Várias espécies",
+        "change": "Alterar",
+        "link_action": "Ligar",
+        "link_all": "Ligar tudo",
+        "link_error": "Ocorreu um erro ao ligar a espécie.",
+        "interview_count": "{{count}} entrevistas",
+        "toggle_members": "Mostrar entrevistas",
+        "no_matches_title": "Sem correspondências",
+        "no_matches_hint": "Ajuste a pesquisa ou os filtros para ver mais respostas.",
+        "picker": {
+            "title": "Ligar a uma espécie",
+            "search_placeholder": "Pesquisar espécie…",
+            "no_matches": "Nenhuma espécie encontrada.",
+            "error": "Ocorreu um erro ao pesquisar espécies.",
+            "unlink": "Remover ligação"
+        }
     },
     "public": {
         "home": "Início",
