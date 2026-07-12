@@ -32,7 +32,7 @@ against, the data model they extend, and the decisions that frame them.
 ## Decisions register
 
 ### ✅ Settled
-- **Use-category modeling** — a use-category role on `InterviewItem`
+- **Use-category modeling** — built as `InterviewItem.is_use_category`
   ([ADR 0007](decisions/0007-use-category-as-item-role.md)).
 - **Index scope** — all five (RFC, UV, CI, ICF, FL) ship together; the
   use-category role is a prerequisite.
