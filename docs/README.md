@@ -41,20 +41,35 @@ the ethnobotany vertical.
   ([ADR 0007](decisions/0007-use-category-as-item-role.md)).
 - **Index scope** — all five (RFC, UV, CI, ICF, FL) ship together; the
   use-category role is a prerequisite.
+- **UV variant** — "mean use-reports per informant" (`UV = ΣUR/N`); implemented
+  and matching the worked-example fixture
+  ([indices spec](analysis/ethnobotany-indices.md#decisions--open-points)).
 - **Mobile stack** — Expo / React Native, committed
   ([ADR 0002](decisions/0002-mobile-companion-stack.md)).
 - **Transcription** — self-hosted Whisper; requires provisioning a real queue
   driver ([ADR 0005](decisions/0005-interview-transcription-whisper.md)).
+- **Form-version skew strategy** *(confirmed 2026-07-12)* — **snapshot-at-capture**;
+  the versioned-forms alternative is rejected. Built on the existing
+  `FormStructureService` answer-detach guard
+  ([sync protocol](contracts/sync-protocol.md#form-version-skew--the-case-that-bites)).
+- **`instance_answers.client_id`** *(confirmed 2026-07-12)* — add a `client_id`
+  uuid column for offline-created answers (the one schema change the sync model
+  needs). Migration lands with the companion milestone.
+- **Sanctum token model** *(confirmed 2026-07-12)* — issue a single `capture`
+  ability; the per-project gate stays enforced by `ProjectPolicy` on every request,
+  so tokens are user-scoped, not project-scoped
+  ([companion API](contracts/companion-api.md#authentication)).
+- **Post-sync conflict policy** *(confirmed 2026-07-12)* — **last-writer-wins per
+  answer row** on **device edit-time** (server-clamped), with overwritten values
+  kept in an audit trail so nothing is silently lost. Flips
+  [ADR 0004](decisions/0004-offline-sync-model.md) to **Accepted**
+  ([sync protocol](contracts/sync-protocol.md#conflict-resolution--deliberately-simple)).
 
 ### ⏳ Still open (documented with a proposed default; settle before the work)
-- **Use Value variant** — "mean use-reports per informant" (used in the spec) vs.
-  a Phillips-&-Gentry uses-based count. Low stakes; lock with the fixture.
-- **Form-version skew strategy** — snapshot-at-capture (*proposed*) vs. explicit
-  form versioning ([sync protocol](contracts/sync-protocol.md#open-decisions)).
-- **`instance_answers.client_id`** — confirm adding a uuid for offline-created
-  answers (implied by the sync model).
-- **Sanctum token model** — single `capture` ability + policy gate (*proposed*)
-  vs. per-project token scoping.
+- *None blocking the roadmap.* The one remaining open point is contract-level:
+  whether `instances:sync` also pulls server-side changes (two-way) or stays
+  push-only (recommended: push-only) —
+  [companion API](contracts/companion-api.md#open-decisions).
 
 ## Maintaining these docs
 
