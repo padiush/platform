@@ -12,6 +12,7 @@ use App\Models\InterviewSection;
 use App\Models\Project;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Laravel\Sanctum\Sanctum;
@@ -287,6 +288,45 @@ class InstanceSyncTest extends TestCase
 
         $response->assertOk()->assertJsonPath('results.0.id', $firstInstance);
         $this->assertNull(InterviewInstance::find($secondInstance));
+    }
+
+    public function test_timestamps_round_trip_under_a_non_utc_app_timezone(): void
+    {
+        // The instant a device sends must survive storage even when the app
+        // timezone isn't UTC, or last-writer-wins compares shifted times.
+        $original = date_default_timezone_get();
+        config(['app.timezone' => 'America/Guatemala']); // UTC-6
+        date_default_timezone_set('America/Guatemala');
+
+        try {
+            $this->actingAsRecorder();
+            $instanceId = (string) Str::uuid();
+            $clientId = (string) Str::uuid();
+
+            $this->postJson($this->syncUrl(), ['instances' => [
+                $this->instancePayload($instanceId, [
+                    $this->answerPayload($clientId, 'first', '2026-07-12T15:00:00Z'),
+                ], ['captured_at' => '2026-07-12T15:00:00Z']),
+            ]])->assertOk();
+
+            // captured_at is the same instant that was sent, not shifted by the offset.
+            $instance = InterviewInstance::find($instanceId);
+            $this->assertTrue(
+                $instance->captured_at->equalTo(Carbon::parse('2026-07-12T15:00:00Z')),
+                'captured_at instant must be preserved'
+            );
+
+            // A later UTC instant still wins even though its wall-clock is earlier.
+            $this->postJson($this->syncUrl(), ['instances' => [
+                $this->instancePayload($instanceId, [
+                    $this->answerPayload($clientId, 'later', '2026-07-12T18:00:00Z'),
+                ]),
+            ]])->assertJsonPath('results.0.status', 'updated');
+
+            $this->assertSame('later', InstanceAnswer::where('client_id', $clientId)->first()->answer);
+        } finally {
+            date_default_timezone_set($original);
+        }
     }
 
     public function test_member_without_record_data_is_forbidden(): void
