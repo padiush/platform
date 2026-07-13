@@ -16,10 +16,13 @@ class InstanceAnswer extends Model
         'repeatable_index',
         'answer',
         'catalog_species_id',
+        'client_id',
+        'edited_at',
     ];
 
     protected $casts = [
         'answer' => 'encrypted',
+        'edited_at' => 'datetime',
     ];
 
     public function instance()
@@ -46,5 +49,10 @@ class InstanceAnswer extends Model
     public function species()
     {
         return $this->belongsTo(CatalogSpecies::class, 'catalog_species_id');
+    }
+
+    public function revisions()
+    {
+        return $this->hasMany(InstanceAnswerRevision::class);
     }
 }
