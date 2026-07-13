@@ -29,9 +29,8 @@ Offline-created records need identifiers before the server ever sees them.
   `HasUuids`) — the device mints the instance `id`.
 - **Answers** are integer-PK today (`instance_answers`). Offline creation needs a
   device-minted `client_id` (uuid) on each answer — **the one schema change this
-  protocol requires** *(confirmed 2026-07-12; migration lands with the companion
-  milestone)*. Server keeps its own PK; `client_id` is the idempotency key and the
-  device's stable reference.
+  protocol requires** *(✅ built 2026-07-12)*. Server keeps its own PK; `client_id`
+  is the idempotency key and the device's stable reference.
 
 ## The loop
 

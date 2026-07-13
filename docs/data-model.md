@@ -36,8 +36,10 @@ Project ─┬─ ProjectAccess ── ProjectCapability      (who can do what)
 | `InterviewForm` | An interview instrument | `project_id`, `name`, `description`, `is_active` | int |
 | `InterviewSection` | A group of items; may repeat | `interview_form_id`, `name`, `order`, `repeatable` | int |
 | `InterviewItem` | A question | `interview_section_id`, `label`, `name`, `type`, `required`, `options[]`, `link_to_species`, `is_use_category`, `order` | int |
-| `InterviewInstance` | **One completed interview** | `interview_form_id`, `user_id` (recorder) | **uuid** |
-| `InstanceAnswer` | One informant response to one item | `interview_instance_id` (uuid), `interview_section_id`, `interview_item_id`, `repeatable_index`, `answer` (**encrypted**), `catalog_species_id?` | int |
+| `InterviewInstance` | **One completed interview** | `interview_form_id`, `user_id` (recorder), `captured_at?`, `location_lat?`/`location_lng?`/`location_accuracy_m?`/`location_captured_at?` (GPS) | **uuid** |
+| `InstanceAnswer` | One informant response to one item | `interview_instance_id` (uuid), `interview_section_id`, `interview_item_id`, `repeatable_index`, `answer` (**encrypted**), `catalog_species_id?`, `client_id?` (device uuid), `edited_at?` (LWW key) | int |
+| `InstanceAnswerRevision` | Overwrite audit trail for last-writer-wins | `instance_answer_id`, `answer` (**encrypted**), `catalog_species_id?`, `edited_at?`, `source` — immutable | int |
+| `InstanceMedia` | Audio/photo capture artifact | `interview_instance_id` (uuid), `client_id` (device uuid), `kind` (audio·photo), `storage_disk`/`storage_key`, `content_type`, `byte_size?`, `duration_s?`, `status`, `transcription_status?`, `transcription_text?` (**encrypted**), `captured_at?` | int |
 | `CatalogSpecies` | A scientific taxon in the project catalog | `project_id`, `family`, `genus`, `name`, `authority` | int |
 | `CatalogSpeciesPhoto` | Reference image for a taxon | `catalog_species_id`, … | int |
 | `ChartPreference` | Persisted per-field chart choice (data viewer) | field key, chart type | int |
@@ -93,17 +95,17 @@ absorb them without a rewrite.
   (mutually exclusive with it). This supplies the *u* the indices need
   ([decisions/0007-use-category-as-item-role.md](decisions/0007-use-category-as-item-role.md)).
   Remaining for the indices milestone: the computation itself.
-- **`InstanceAnswer` client UUID** — ✅ **decided (2026-07-12):** add a
-  `client_id` uuid column to `instance_answers` (instances are already UUID-keyed;
-  answers are integer-PK). Offline capture mints it on-device; the server keeps its
-  own integer PK and treats `client_id` as the idempotency key. *Migration not yet
-  built — lands with the companion capture milestone.* See
-  [contracts/sync-protocol.md](contracts/sync-protocol.md).
-- **Conflict-policy fields** — ✅ **decided (2026-07-12):** the post-sync
-  last-writer-wins policy ([decisions/0004-offline-sync-model.md](decisions/0004-offline-sync-model.md))
-  adds a per-answer device-supplied **edit timestamp** (the LWW key) and an
-  **overwrite audit trail** retaining clobbered values. Pencilled in alongside
-  `client_id`; built in the companion milestone.
-- **Capture artifacts** — GPS, audio (+ transcript), voucher/specimen metadata,
-  and (for zoology subfields) conservation status. Introduced by the companion
-  apps; see [contracts/companion-api.md](contracts/companion-api.md).
+- **`InstanceAnswer` client UUID** — ✅ **built (2026-07-12).**
+  `instance_answers.client_id` (uuid, nullable, unique) is the device-minted
+  idempotency key; the server keeps its own integer PK. Offline capture mints it
+  on-device. See [contracts/sync-protocol.md](contracts/sync-protocol.md).
+- **Conflict-policy fields** — ✅ **built (2026-07-12).** `instance_answers.edited_at`
+  is the device edit-time (the last-writer-wins key), and `instance_answer_revisions`
+  is the overwrite audit trail retaining clobbered values
+  ([decisions/0004-offline-sync-model.md](decisions/0004-offline-sync-model.md)).
+  Web answer saves stamp `edited_at` too, so corrections take part in the policy.
+- **Capture artifacts** — ✅ **audio + photo built (2026-07-12)** as `instance_media`
+  (kind, storage key, upload status, and audio transcription status/text);
+  `interview_instances` gained `captured_at` and a GPS location. Still pencilled in:
+  voucher/specimen metadata and (for zoology subfields) conservation status. See
+  [contracts/companion-api.md](contracts/companion-api.md).

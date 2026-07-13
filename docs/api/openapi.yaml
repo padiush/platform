@@ -1,0 +1,507 @@
+openapi: 3.0.3
+info:
+  title: Padiush Companion Capture API
+  version: "1.0.0"
+  description: >
+    The HTTP surface the Padiush mobile companion apps build against: field
+    capture (interviews, GPS, audio, photos) and the sync that backs it. Form
+    design, species linking, analysis and export stay on the web and are out of
+    scope here (ADR 0003).
+
+
+    Authorization reuses the web's per-project RBAC (ProjectPolicy): capture
+    requires the `record_data` capability on the project. Errors share one JSON
+    envelope — `{ message, message_type: "error", errors? }` — where `message`
+    is an i18n key the app localizes.
+servers:
+  - url: /api/v1
+    description: Version 1 (breaking changes bump the path prefix)
+tags:
+  - name: Auth
+    description: Device token issuance and revocation
+  - name: Pull
+    description: Cache what the device needs offline
+  - name: Push
+    description: Sync captured interviews
+  - name: Media
+    description: Audio and photo capture
+security:
+  - bearerAuth: []
+paths:
+  /tokens:
+    post:
+      tags: [Auth]
+      summary: Exchange credentials for a device token
+      description: >
+        Mobile can't use the web session cookie, so a device holds a personal
+        access token. Issued with a single `capture` ability; the per-project
+        gate is still enforced on every request. Throttled harder than the rest
+        of the API. The app must store only the token (secure storage), never the
+        password.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenRequest'
+      responses:
+        '200':
+          description: Token issued
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+        '422':
+          description: Invalid credentials or validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '429':
+          description: Too many attempts
+  /tokens/current:
+    delete:
+      tags: [Auth]
+      summary: Revoke this device's token
+      responses:
+        '200':
+          description: Token revoked
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: { type: string, example: api.tokens.revoked }
+                  message_type: { type: string, example: success }
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+  /me:
+    get:
+      tags: [Pull]
+      summary: The caller and the projects they can record data on
+      responses:
+        '200':
+          description: Identity and project list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user: { $ref: '#/components/schemas/User' }
+                  projects:
+                    type: array
+                    items: { $ref: '#/components/schemas/ProjectSummary' }
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+  /projects/{project}/bundle:
+    get:
+      tags: [Pull]
+      summary: The offline capture bundle — every active form's full structure
+      description: >
+        `?since` makes it incremental (only forms whose structure changed after
+        the cursor). The device stores `form_version_cursor` and carries it on
+        captured instances to anchor snapshot-at-capture form-version skew. The
+        species catalog is deliberately not pulled — linking is a web-side task.
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - name: since
+          in: query
+          required: false
+          schema: { type: string, format: date-time }
+          description: ISO-8601 cursor from a previous bundle's form_version_cursor.
+      responses:
+        '200':
+          description: Active form structures
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Bundle' }
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          description: Invalid `since`
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+  /projects/{project}/instances:sync:
+    post:
+      tags: [Push]
+      summary: Sync captured interviews (idempotent batch upsert)
+      description: >
+        One idempotent, batched upsert keyed on client-generated UUIDs (instance
+        `id`, answer `client_id`) — safe to retry. Each element carries its own
+        result, so partial success is normal. Answers whose item no longer exists
+        are `rejected` with a reason, not dropped. Post-sync conflicts on the same
+        answer resolve by last-writer-wins on the device `edited_at` (clamped
+        against future clocks); the overwritten value is kept in an audit trail.
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - name: Idempotency-Key
+          in: header
+          required: false
+          schema: { type: string }
+          description: Optional; dedupes an entire batch within a short window.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/SyncRequest' }
+      responses:
+        '200':
+          description: Per-instance results
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  results:
+                    type: array
+                    items: { $ref: '#/components/schemas/SyncResult' }
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          description: Validation error
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+  /instances/{instance}:
+    get:
+      tags: [Push]
+      summary: A captured interview's media and transcription status
+      parameters:
+        - $ref: '#/components/parameters/InstanceId'
+      responses:
+        '200':
+          description: Instance detail
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/InstanceDetail' }
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /instances/{instance}/media/intent:
+    post:
+      tags: [Media]
+      summary: Register a media upload and get a presigned URL
+      description: >
+        Large files go direct to object storage, not through the app server. The
+        device then PUTs the file to `upload_url` (resumable), then calls complete.
+      parameters:
+        - $ref: '#/components/parameters/InstanceId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/MediaIntentRequest' }
+      responses:
+        '200':
+          description: Presigned upload target
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/MediaIntentResponse' }
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: client_id already used on another instance
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+        '422':
+          description: Validation error (e.g. content_type does not match kind)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+  /instances/{instance}/media/complete:
+    post:
+      tags: [Media]
+      summary: Mark an uploaded file stored (and enqueue transcription for audio)
+      parameters:
+        - $ref: '#/components/parameters/InstanceId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/MediaCompleteRequest' }
+      responses:
+        '200':
+          description: Stored
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/MediaCompleteResponse' }
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          description: Storage key mismatch or validation error
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: Sanctum personal access token carrying the `capture` ability.
+  parameters:
+    ProjectId:
+      name: project
+      in: path
+      required: true
+      schema: { type: integer }
+    InstanceId:
+      name: instance
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+  responses:
+    Unauthenticated:
+      description: Missing or invalid token
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    Forbidden:
+      description: Token lacks the ability, or the user lacks record_data
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    NotFound:
+      description: Resource not found or out of scope
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+  schemas:
+    Error:
+      type: object
+      required: [message, message_type]
+      properties:
+        message: { type: string, description: i18n key or text }
+        message_type: { type: string, enum: [error] }
+        errors:
+          type: object
+          additionalProperties:
+            type: array
+            items: { type: string }
+    TokenRequest:
+      type: object
+      required: [email, password, device_name]
+      properties:
+        email: { type: string, format: email }
+        password: { type: string, format: password }
+        device_name: { type: string, description: Names the token so a lost device can be revoked. }
+    TokenResponse:
+      type: object
+      properties:
+        token: { type: string }
+        user: { $ref: '#/components/schemas/User' }
+    User:
+      type: object
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        email: { type: string, format: email }
+    Capabilities:
+      type: object
+      properties:
+        manage_project: { type: boolean }
+        manage_users: { type: boolean }
+        manage_forms: { type: boolean }
+        record_data: { type: boolean }
+        manage_data: { type: boolean }
+        generate_reports: { type: boolean }
+        view_catalog: { type: boolean }
+        edit_catalog: { type: boolean }
+    ProjectSummary:
+      type: object
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        capabilities: { $ref: '#/components/schemas/Capabilities' }
+        updated_at: { type: string, format: date-time, nullable: true }
+    Bundle:
+      type: object
+      properties:
+        form_version_cursor: { type: string, format: date-time, nullable: true }
+        server_time: { type: string, format: date-time }
+        forms:
+          type: array
+          items: { $ref: '#/components/schemas/Form' }
+    Form:
+      type: object
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        description: { type: string, nullable: true }
+        is_active: { type: boolean }
+        updated_at: { type: string, format: date-time, nullable: true }
+        sections:
+          type: array
+          items: { $ref: '#/components/schemas/Section' }
+    Section:
+      type: object
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        order: { type: integer, nullable: true }
+        repeatable: { type: boolean }
+        items:
+          type: array
+          items: { $ref: '#/components/schemas/Item' }
+    Item:
+      type: object
+      properties:
+        id: { type: integer }
+        label: { type: string }
+        name: { type: string }
+        type: { type: string, enum: [text, number, date, multi, select] }
+        required: { type: boolean }
+        options:
+          type: array
+          nullable: true
+          items: { type: string }
+        link_to_species: { type: boolean }
+        is_use_category: { type: boolean }
+        min: { nullable: true }
+        max: { nullable: true }
+        step: { nullable: true }
+        order: { type: integer, nullable: true }
+    SyncRequest:
+      type: object
+      required: [instances]
+      properties:
+        instances:
+          type: array
+          maxItems: 100
+          items: { $ref: '#/components/schemas/InstancePush' }
+    InstancePush:
+      type: object
+      required: [id, interview_form_id]
+      properties:
+        id: { type: string, format: uuid, description: Device-minted instance UUID. }
+        interview_form_id: { type: integer }
+        captured_at: { type: string, format: date-time, nullable: true }
+        form_version_cursor:
+          type: string
+          format: date-time
+          nullable: true
+          description: The bundle cursor the interview was captured against (advisory).
+        location: { $ref: '#/components/schemas/Location' }
+        answers:
+          type: array
+          items: { $ref: '#/components/schemas/AnswerPush' }
+    AnswerPush:
+      type: object
+      required: [client_id, interview_section_id, interview_item_id]
+      properties:
+        client_id: { type: string, format: uuid, description: Device-minted idempotency key. }
+        interview_section_id: { type: integer }
+        interview_item_id: { type: integer }
+        repeatable_index: { type: integer, nullable: true }
+        value:
+          nullable: true
+          description: Plaintext over TLS; the server encrypts it at rest. Arrays for multi-selects.
+        edited_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: Device edit-time — the last-writer-wins key. Defaults to receipt time.
+    Location:
+      type: object
+      nullable: true
+      required: [lat, lng]
+      properties:
+        lat: { type: number, format: double, minimum: -90, maximum: 90 }
+        lng: { type: number, format: double, minimum: -180, maximum: 180 }
+        accuracy_m: { type: number, format: double, nullable: true }
+        captured_at: { type: string, format: date-time, nullable: true }
+    SyncResult:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        status: { type: string, enum: [created, updated, unchanged, rejected] }
+        errors:
+          type: object
+          description: Present when the instance or some of its answers were rejected.
+          additionalProperties: true
+    InstanceDetail:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        interview_form_id: { type: integer }
+        captured_at: { type: string, format: date-time, nullable: true }
+        location: { $ref: '#/components/schemas/Location' }
+        answers_count: { type: integer }
+        media:
+          type: array
+          items: { $ref: '#/components/schemas/Media' }
+    Media:
+      type: object
+      properties:
+        id: { type: integer }
+        client_id: { type: string, format: uuid }
+        kind: { type: string, enum: [audio, photo] }
+        status: { type: string, enum: [pending, stored] }
+        content_type: { type: string, nullable: true }
+        duration_s: { type: integer, nullable: true }
+        transcription:
+          nullable: true
+          description: Present for audio only.
+          allOf:
+            - $ref: '#/components/schemas/Transcription'
+    Transcription:
+      type: object
+      properties:
+        status: { type: string, enum: [queued, processing, done, failed], nullable: true }
+        text: { type: string, nullable: true, description: Present only when status is done. }
+    MediaIntentRequest:
+      type: object
+      required: [client_id, kind, content_type, byte_size]
+      properties:
+        client_id: { type: string, format: uuid }
+        kind: { type: string, enum: [audio, photo] }
+        content_type: { type: string, description: Must match the kind (audio/* or image/*). }
+        byte_size: { type: integer, minimum: 1, maximum: 524288000 }
+    MediaIntentResponse:
+      type: object
+      properties:
+        upload_url: { type: string, description: Presigned PUT URL. }
+        headers:
+          type: object
+          additionalProperties: { type: string }
+        storage_key: { type: string }
+        expires_at: { type: string, format: date-time }
+    MediaCompleteRequest:
+      type: object
+      required: [client_id, storage_key]
+      properties:
+        client_id: { type: string, format: uuid }
+        storage_key: { type: string, description: Must equal the key issued at intent. }
+        duration_s: { type: integer, minimum: 0, nullable: true }
+    MediaCompleteResponse:
+      type: object
+      properties:
+        id: { type: integer }
+        status: { type: string, enum: [stored] }
+        transcription:
+          type: string
+          enum: [queued]
+          description: Present only when audio transcription was enqueued.
