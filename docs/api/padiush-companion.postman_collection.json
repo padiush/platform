@@ -1,0 +1,292 @@
+{
+  "info": {
+    "name": "Padiush Companion API (v1)",
+    "description": "Field-capture API for the Padiush mobile companion apps. Set {{base_url}}, then run Auth > Create token \u2014 its test script saves the bearer token to the collection so every other request is authenticated. See docs/api/openapi.yaml for the full contract.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000/api/v1"
+    },
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "project_id",
+      "value": "1"
+    },
+    {
+      "key": "instance_id",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Create token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/tokens",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "tokens"
+              ]
+            },
+            "description": "Exchange credentials for a device token. The test script stores it as {{token}}.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"field@example.org\",\n  \"password\": \"password\",\n  \"device_name\": \"Pixel 8\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json && json.token) {",
+                  "  pm.collectionVariables.set('token', json.token);",
+                  "  console.log('Saved token to {{token}}');",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Revoke current device",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/tokens/current",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "tokens",
+                "current"
+              ]
+            },
+            "description": "Sign this device out \u2014 revokes the token this request authenticates with."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Pull",
+      "item": [
+        {
+          "name": "Me",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/me",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "me"
+              ]
+            },
+            "description": "The caller and the projects they can record data on."
+          }
+        },
+        {
+          "name": "Project bundle",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/projects/{{project_id}}/bundle?since=",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "projects",
+                "{{project_id}}",
+                "bundle"
+              ],
+              "query": [
+                {
+                  "key": "since",
+                  "value": "",
+                  "disabled": true,
+                  "description": "ISO-8601 cursor from a previous bundle."
+                }
+              ]
+            },
+            "description": "Every active form's full structure for offline capture."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Push",
+      "item": [
+        {
+          "name": "Sync instances",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/projects/{{project_id}}/instances:sync",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "projects",
+                "{{project_id}}",
+                "instances:sync"
+              ]
+            },
+            "description": "Idempotent batch upsert of captured interviews. Add an Idempotency-Key header to dedupe a whole batch.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"instances\": [\n    {\n      \"id\": \"{{$guid}}\",\n      \"interview_form_id\": 1,\n      \"captured_at\": \"2026-07-12T15:04:05Z\",\n      \"location\": {\n        \"lat\": -12.05,\n        \"lng\": -77.04,\n        \"accuracy_m\": 8.5\n      },\n      \"answers\": [\n        {\n          \"client_id\": \"{{$guid}}\",\n          \"interview_section_id\": 1,\n          \"interview_item_id\": 1,\n          \"repeatable_index\": 0,\n          \"value\": \"guaba\",\n          \"edited_at\": \"2026-07-12T15:04:05Z\"\n        }\n      ]\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Get instance",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/instances/{{instance_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "instances",
+                "{{instance_id}}"
+              ]
+            },
+            "description": "A captured interview's media and transcription status."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Media",
+      "item": [
+        {
+          "name": "Media intent",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/instances/{{instance_id}}/media/intent",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "instances",
+                "{{instance_id}}",
+                "media",
+                "intent"
+              ]
+            },
+            "description": "Register a media upload; returns a presigned PUT URL. PUT the file to upload_url, then call complete.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"client_id\": \"{{$guid}}\",\n  \"kind\": \"audio\",\n  \"content_type\": \"audio/mp4\",\n  \"byte_size\": 2048000\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Media complete",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/instances/{{instance_id}}/media/complete",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "instances",
+                "{{instance_id}}",
+                "media",
+                "complete"
+              ]
+            },
+            "description": "Mark the uploaded file stored. For audio, enqueues transcription when enabled.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"client_id\": \"PASTE_INTENT_CLIENT_ID\",\n  \"storage_key\": \"PASTE_INTENT_STORAGE_KEY\",\n  \"duration_s\": 42\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

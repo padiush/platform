@@ -1,10 +1,21 @@
-# Companion API contract (proposed)
+# Companion API contract (v1 — implemented)
 
-**Status: proposed.** `routes/api.php` today holds only Sanctum's default
-`/user` route — this document is the contract to *build against*, not one that
-exists. It is the interface between the web platform and the mobile companion
-apps; both sides depend on it, so it is versioned and written down. When
-implemented, formalize this as an OpenAPI document generated from the routes.
+**Status: implemented (2026-07-12).** The `/api/v1` routes exist in
+`routes/api.php` (controllers under `App\Http\Controllers\Api\V1`). This document
+is the human-readable narrative; the machine-readable contract is
+[`../api/openapi.yaml`](../api/openapi.yaml), and a ready-to-run
+[Postman collection](../api/padiush-companion.postman_collection.json) exercises
+every endpoint. The mobile capture apps themselves are still to build.
+
+> **Implementation extends this contract in three backward-compatible ways**,
+> reflected in the OpenAPI spec: bundle `Item`s also carry `is_use_category`,
+> `min`, `max` and `step` (the capture app renders numeric constraints and
+> use-category fields); each pushed answer may carry `edited_at` (the device
+> edit-time — the last-writer-wins key,
+> [sync protocol](sync-protocol.md#conflict-resolution--deliberately-simple));
+> and a pushed instance may carry `form_version_cursor` (the bundle cursor it was
+> captured against, advisory). Audio/photo capture, transcription status, and the
+> instance-detail read are all built as described below.
 
 Scope follows [0003 — capture-only companion scope](../decisions/0003-capture-only-companion-scope.md):
 the API serves **field capture** (record interviews, audio, GPS, photos) and the

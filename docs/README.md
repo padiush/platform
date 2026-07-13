@@ -14,8 +14,9 @@ For coding standards, commits, and workflow, see [`../AGENTS.md`](../AGENTS.md).
 |---|---|---|
 | [data-model.md](data-model.md) | The domain map — entities, links, the folk-name → taxon pipeline, and pencilled-in roadmap slots | Living reference |
 | [analysis/ethnobotany-indices.md](analysis/ethnobotany-indices.md) | Quantitative-ethnobiology index formulas, edge cases, citations, and worked examples that double as test fixtures | Scientific contract |
-| [contracts/companion-api.md](contracts/companion-api.md) | The `/api/v1` HTTP contract for the mobile capture apps | Contract (proposed) |
-| [contracts/sync-protocol.md](contracts/sync-protocol.md) | How offline capture reconciles with the server | Contract (proposed) |
+| [contracts/companion-api.md](contracts/companion-api.md) | The `/api/v1` HTTP contract for the mobile capture apps | Contract (v1, built) |
+| [api/openapi.yaml](api/openapi.yaml) · [Postman](api/padiush-companion.postman_collection.json) | Machine-readable `/api/v1` spec and a runnable request collection | Generated contract |
+| [contracts/sync-protocol.md](contracts/sync-protocol.md) | How offline capture reconciles with the server | Contract (v1, built) |
 | [decisions/](decisions/) | Architecture Decision Records — the *why* behind the roadmap | Decisions |
 
 ## Roadmap at a glance
@@ -31,8 +32,11 @@ against, the data model they extend, and the decisions that frame them.
 
 **Progress:** the built-in indices are complete — the use-category role, the
 [computation](analysis/ethnobotany-indices.md) (`EthnobiologyIndices`), and the
-report page + export. The **companion capture apps** are the remaining piece of
-the ethnobotany vertical.
+report page + export. The **companion capture API** (`/api/v1`) is now built —
+token auth, offline pull (`me`, project `bundle`), idempotent interview sync with
+last-writer-wins, and audio/photo media with transcription plumbing (gated on
+ADR 0005). The remaining piece of the ethnobotany vertical is the **mobile
+companion apps** themselves, which build against that API.
 
 ## Decisions register
 
