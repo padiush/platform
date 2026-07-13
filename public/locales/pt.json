@@ -473,6 +473,7 @@
                 "bg_transparent": "Transparente",
                 "resolution": "Resolução",
                 "resolution_note": "Somente PNG",
+                "grayscale": "Escala de cinza",
                 "png": "PNG",
                 "svg": "SVG (vetorial)"
             },

@@ -15,10 +15,14 @@ export default function ChartCard({ title, filename, children }) {
     const bodyRef = useRef(null);
     const [background, setBackground] = useState('themed');
     const [scale, setScale] = useState(2);
+    const [grayscale, setGrayscale] = useState(false);
 
     const backgroundColor = () => {
         if (background === 'white') return '#ffffff';
         if (background === 'transparent') return 'transparent';
+        // Grayscale is a light/print treatment, so a themed (dark) background
+        // would clash with its dark ink — export it on white instead.
+        if (grayscale) return '#ffffff';
         const card = bodyRef.current?.closest('.card');
         return card ? getComputedStyle(card).backgroundColor : '#ffffff';
     };
@@ -32,11 +36,13 @@ export default function ChartCard({ title, filename, children }) {
         if (format === 'svg') {
             downloadChartSvg(target, `${filename}.svg`, {
                 background: backgroundColor(),
+                grayscale,
             });
         } else {
             downloadChartPng(target, `${filename}.png`, {
                 background: backgroundColor(),
                 scale,
+                grayscale,
             });
         }
         // Close the dropdown.
@@ -103,6 +109,18 @@ export default function ChartCard({ title, filename, children }) {
                             <span className="text-[10px] opacity-50">
                                 {t('data.reports.charts.resolution_note')}
                             </span>
+                        </label>
+
+                        <label className="flex items-center gap-2 text-sm">
+                            <input
+                                type="checkbox"
+                                className="checkbox checkbox-sm"
+                                checked={grayscale}
+                                onChange={(event) =>
+                                    setGrayscale(event.target.checked)
+                                }
+                            />
+                            <span>{t('data.reports.charts.grayscale')}</span>
                         </label>
 
                         <div className="flex gap-2">
