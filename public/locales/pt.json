@@ -461,12 +461,20 @@
             "references_intro": "Cite o artigo original de cada índice que você reportar.",
             "ethnobotanyr_note": "um pacote R (Whitney, C.) que implementa estes índices; as definições vêm das fontes primárias acima.",
             "charts": {
-                "download": "Baixar PNG",
+                "download": "Baixar",
                 "index": "Índice",
                 "by_index": "Espécies principais por índice",
                 "heatmap": "Espécies × categorias de uso",
                 "heatmap_note": "O tom e o número de cada célula indicam os relatos de uso por espécie e categoria.",
-                "sankey": "Fluxos de relatos de uso"
+                "sankey": "Fluxos de relatos de uso",
+                "background": "Fundo",
+                "bg_themed": "Do tema",
+                "bg_white": "Branco",
+                "bg_transparent": "Transparente",
+                "resolution": "Resolução",
+                "resolution_note": "Somente PNG",
+                "png": "PNG",
+                "svg": "SVG (vetorial)"
             },
             "empty": {
                 "title": "Ainda não há índices",

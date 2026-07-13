@@ -461,12 +461,20 @@
             "references_intro": "Cite the source paper for each index you report.",
             "ethnobotanyr_note": "an R package (Whitney, C.) that implements these indices — the definitions come from the primary sources above.",
             "charts": {
-                "download": "Download PNG",
+                "download": "Download",
                 "index": "Index",
                 "by_index": "Top species by index",
                 "heatmap": "Species × use categories",
                 "heatmap_note": "Cell shade and number show the use reports for each species and use category.",
-                "sankey": "Use-report flows"
+                "sankey": "Use-report flows",
+                "background": "Background",
+                "bg_themed": "Themed",
+                "bg_white": "White",
+                "bg_transparent": "Transparent",
+                "resolution": "Resolution",
+                "resolution_note": "PNG only",
+                "png": "PNG",
+                "svg": "SVG (vector)"
             },
             "empty": {
                 "title": "No indices yet",
