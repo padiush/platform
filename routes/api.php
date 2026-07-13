@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\V1\BundleController;
+use App\Http\Controllers\Api\V1\InstanceSyncController;
 use App\Http\Controllers\Api\V1\MeController;
 use App\Http\Controllers\Api\V1\TokenController;
 use Illuminate\Http\Request;
@@ -36,5 +37,9 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
         Route::get('me', [MeController::class, 'show'])->name('me');
         Route::get('projects/{project}/bundle', [BundleController::class, 'show'])
             ->name('projects.bundle');
+
+        // Push — sync captured interviews (idempotent batch upsert).
+        Route::post('projects/{project}/instances:sync', [InstanceSyncController::class, 'sync'])
+            ->name('projects.instances.sync');
     });
 });
