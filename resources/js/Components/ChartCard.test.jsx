@@ -23,5 +23,11 @@ describe('ChartCard', () => {
         ).toBeInTheDocument();
         // Background + resolution selects.
         expect(screen.getAllByRole('combobox')).toHaveLength(2);
+        // Grayscale toggle (unchecked by default).
+        const grayscale = screen.getByRole('checkbox', {
+            name: 'data.reports.charts.grayscale',
+        });
+        expect(grayscale).toBeInTheDocument();
+        expect(grayscale).not.toBeChecked();
     });
 });
