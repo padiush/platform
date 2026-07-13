@@ -27,6 +27,8 @@ use Illuminate\Routing\Middleware\ThrottleRequests;
 use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use Laravel\Sanctum\Http\Middleware\CheckAbilities;
+use Laravel\Sanctum\Http\Middleware\CheckForAnyAbility;
 use Spatie\Honeypot\ProtectAgainstSpam;
 
 class Kernel extends HttpKernel
@@ -91,5 +93,7 @@ class Kernel extends HttpKernel
         'verified' => EnsureEmailIsVerified::class,
         'honeypot' => ProtectAgainstSpam::class,
         'system_admin' => EnsureSystemAdmin::class,
+        'abilities' => CheckAbilities::class,
+        'ability' => CheckForAnyAbility::class,
     ];
 }
