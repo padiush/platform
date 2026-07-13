@@ -40,9 +40,10 @@ POST /api/v1/tokens
 ```
 
 - `device_name` names the token so a user can revoke a lost device.
-- **Token abilities (proposed):** issue with a single `capture` ability; the
-  per-project gate is still enforced by the policy on every request, so the token
-  is user-scoped, not project-scoped.
+- **Token abilities (accepted 2026-07-12):** issue with a single `capture`
+  ability; the per-project gate is still enforced by the policy on every request,
+  so the token is user-scoped, not project-scoped. (Per-project token scoping was
+  the rejected alternative.)
 - **Prohibited handling:** the app must never store the password; only the
   returned token, in the platform secure store (Keychain / Keystore).
 - Revocation: `DELETE /api/v1/tokens/current` (this device) — web manages the
@@ -144,8 +145,11 @@ its own contract; it does not bend the capture API.
 
 ## Open decisions
 
-- Token model: single `capture` ability + policy gate (proposed) vs. per-project
-  token scoping.
 - Whether `instances:sync` should also *pull* server-side changes to the same
   instances (two-way) or stay push-only (recommended: push-only; the device owns
   its captures until synced — [sync-protocol.md](sync-protocol.md)).
+
+## Settled decisions
+
+- **Token model** *(accepted 2026-07-12)* — single `capture` ability + policy
+  gate, not per-project token scoping. See [Authentication](#authentication).

@@ -29,8 +29,9 @@ Offline-created records need identifiers before the server ever sees them.
   `HasUuids`) — the device mints the instance `id`.
 - **Answers** are integer-PK today (`instance_answers`). Offline creation needs a
   device-minted `client_id` (uuid) on each answer — **the one schema change this
-  protocol requires**. Server keeps its own PK; `client_id` is the idempotency
-  key and the device's stable reference.
+  protocol requires** *(confirmed 2026-07-12; migration lands with the companion
+  milestone)*. Server keeps its own PK; `client_id` is the idempotency key and the
+  device's stable reference.
 
 ## The loop
 
@@ -65,12 +66,18 @@ same answer are rare. So:
 
 - **An unsynced record is owned by its device.** No server state exists to
   conflict with.
-- **After sync**, if the same instance is somehow edited from two places (e.g. two
-  devices logged into the same account), resolve per-field by **last-writer-wins
-  on `updated_at`**. This is adequate precisely because the event is rare and the
-  data is additive; do **not** reach for CRDTs.
+- **After sync**, if the same answer is somehow edited from two places (e.g. two
+  devices on one account, or a web correction racing a device re-sync), resolve
+  **per answer row** by **last-writer-wins**. The winner is the latest **device
+  edit-time** — carried per-answer in the sync payload and server-clamped against
+  implausible/future values — **not** server-receipt time: receipt time would let a
+  late-syncing offline edit clobber a newer web correction, the exact field
+  scenario this system exists for. Overwritten values are retained in a
+  **lightweight audit trail**, so a clobbered field is recoverable, never silently
+  lost. This is adequate precisely because the event is rare and the data is
+  additive; do **not** reach for CRDTs.
 - Web-side edits to captured interviews are possible but expected to be light
-  (corrections). They win only if newer.
+  (corrections). They win only if newer (by edit-time).
 
 ## Form-version skew — the case that bites
 
@@ -78,23 +85,25 @@ A device caches form **v1**, goes offline, and captures against it. Meanwhile th
 web edits the form to **v2** (renames an item, deletes a section). The device's
 answers reference v1 items. Two ways to keep those answers valid:
 
-**Recommended — snapshot at capture.** When an interview is created on the device,
-it captures against the *cached* structure and the pushed instance carries the
-`form_version_cursor` it was built from. The server accepts answers validated
+**Decided (2026-07-12) — snapshot at capture.** When an interview is created on the
+device, it captures against the *cached* structure and the pushed instance carries
+the `form_version_cursor` it was built from. The server accepts answers validated
 against the structure as of that cursor, not only the latest. Answers whose item
 truly no longer exists are `rejected` with a clear reason (not silently dropped),
 and surfaced to the researcher to resolve on the web.
 
-**Alternative — versioned forms.** Give `InterviewForm` explicit versions and pin
-each instance to the version it was captured under. Heavier, but unambiguous, and
-it also improves web-side reproducibility.
+**Rejected alternative — versioned forms.** Give `InterviewForm` explicit versions
+and pin each instance to the version it was captured under. Heavier, but
+unambiguous, and it also improves web-side reproducibility — revisit only if
+snapshot-at-capture proves insufficient.
 
 Either way, the existing **answer-detach guard** in `FormStructureService` (which
 already reasons about structure changes vs. existing answers) is the seam to build
 on — extend that logic to the sync path rather than inventing a parallel one.
 
-> Decide snapshot-vs-versioning before building offline capture; retrofitting the
-> other is expensive. Listed in [Open decisions](#open-decisions).
+> **Decided (2026-07-12): snapshot-at-capture.** The choice was made before
+> building because retrofitting the other is expensive. See
+> [Open decisions](#open-decisions).
 
 ## Deletions
 
@@ -127,8 +136,15 @@ without it; the file and transcript attach when they arrive.
 
 ## Open decisions
 
-1. **Form-version skew strategy** — snapshot-at-capture (recommended) vs. explicit
-   form versioning. Blocks offline capture design.
-2. **Answer `client_id`** — confirm adding a uuid column to `instance_answers`.
-3. **Conflict policy** — confirm last-writer-wins-on-`updated_at` for the rare
-   post-sync collision.
+None — all settled; [ADR 0004](../decisions/0004-offline-sync-model.md) is
+**Accepted**.
+
+## Settled decisions
+
+1. ✅ **Form-version skew strategy** *(2026-07-12)* — **snapshot-at-capture**;
+   versioned forms rejected. Built on the `FormStructureService` answer-detach guard.
+2. ✅ **Answer `client_id`** *(2026-07-12)* — add a uuid column to
+   `instance_answers`; server keeps its integer PK.
+3. ✅ **Conflict policy** *(2026-07-12)* — **last-writer-wins per answer row** on
+   **device edit-time** (server-clamped), with overwritten values kept in an audit
+   trail. See [Conflict resolution](#conflict-resolution--deliberately-simple).

@@ -93,10 +93,17 @@ absorb them without a rewrite.
   (mutually exclusive with it). This supplies the *u* the indices need
   ([decisions/0007-use-category-as-item-role.md](decisions/0007-use-category-as-item-role.md)).
   Remaining for the indices milestone: the computation itself.
-- **`InstanceAnswer` client UUID** — instances are already UUID-keyed; answers
-  are integer-PK. Offline capture creates answers on-device, so they will need a
-  client-generated identifier. See
+- **`InstanceAnswer` client UUID** — ✅ **decided (2026-07-12):** add a
+  `client_id` uuid column to `instance_answers` (instances are already UUID-keyed;
+  answers are integer-PK). Offline capture mints it on-device; the server keeps its
+  own integer PK and treats `client_id` as the idempotency key. *Migration not yet
+  built — lands with the companion capture milestone.* See
   [contracts/sync-protocol.md](contracts/sync-protocol.md).
+- **Conflict-policy fields** — ✅ **decided (2026-07-12):** the post-sync
+  last-writer-wins policy ([decisions/0004-offline-sync-model.md](decisions/0004-offline-sync-model.md))
+  adds a per-answer device-supplied **edit timestamp** (the LWW key) and an
+  **overwrite audit trail** retaining clobbered values. Pencilled in alongside
+  `client_id`; built in the companion milestone.
 - **Capture artifacts** — GPS, audio (+ transcript), voucher/specimen metadata,
   and (for zoology subfields) conservation status. Introduced by the companion
   apps; see [contracts/companion-api.md](contracts/companion-api.md).
