@@ -390,14 +390,14 @@ export default function Reports({ project, indices }) {
 
                             <ChartCard
                                 title={t('data.reports.charts.by_index')}
-                                filename="species-by-index.png"
+                                filename="species-by-index"
                             >
                                 <IndexBarChart species={species} />
                             </ChartCard>
 
                             <ChartCard
                                 title={t('data.reports.charts.heatmap')}
-                                filename="species-use-heatmap.png"
+                                filename="species-use-heatmap"
                             >
                                 <UseHeatmap
                                     species={species}
@@ -407,7 +407,7 @@ export default function Reports({ project, indices }) {
 
                             <ChartCard
                                 title={t('data.reports.charts.sankey')}
-                                filename="species-use-flows.png"
+                                filename="species-use-flows"
                             >
                                 <UsesSankey
                                     species={species}
