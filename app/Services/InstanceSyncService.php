@@ -93,9 +93,7 @@ class InstanceSyncService
     private function applyInstanceFields(InterviewInstance $instance, array $payload): void
     {
         if (array_key_exists('captured_at', $payload)) {
-            $instance->captured_at = $payload['captured_at']
-                ? Carbon::parse($payload['captured_at'])
-                : null;
+            $instance->captured_at = $this->toAppTime($payload['captured_at']);
         }
 
         if (array_key_exists('location', $payload) && is_array($payload['location'])) {
@@ -103,10 +101,22 @@ class InstanceSyncService
             $instance->location_lat = $location['lat'] ?? null;
             $instance->location_lng = $location['lng'] ?? null;
             $instance->location_accuracy_m = $location['accuracy_m'] ?? null;
-            $instance->location_captured_at = isset($location['captured_at'])
-                ? Carbon::parse($location['captured_at'])
-                : null;
+            $instance->location_captured_at = $this->toAppTime($location['captured_at'] ?? null);
         }
+    }
+
+    /**
+     * Parse a device timestamp (ISO-8601, any offset) into the app timezone.
+     * The instant is preserved; the wall-clock is normalized so it round-trips
+     * through the tz-naive datetime columns correctly even when the app timezone
+     * isn't UTC — otherwise a "...Z" edit-time would be re-read shifted and break
+     * the last-writer-wins comparison.
+     */
+    private function toAppTime(?string $value): ?Carbon
+    {
+        return $value === null || $value === ''
+            ? null
+            : Carbon::parse($value)->setTimezone(config('app.timezone'));
     }
 
     /**
@@ -232,12 +242,11 @@ class InstanceSyncService
     private function clampEditedAt(?string $value): Carbon
     {
         $now = Carbon::now();
+        $edited = $this->toAppTime($value);
 
-        if ($value === null) {
+        if ($edited === null) {
             return $now;
         }
-
-        $edited = Carbon::parse($value);
 
         return $edited->greaterThan($now) ? $now : $edited;
     }
