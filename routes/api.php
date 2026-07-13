@@ -1,8 +1,10 @@
 <?php
 
 use App\Http\Controllers\Api\V1\BundleController;
+use App\Http\Controllers\Api\V1\InstanceController;
 use App\Http\Controllers\Api\V1\InstanceSyncController;
 use App\Http\Controllers\Api\V1\MeController;
+use App\Http\Controllers\Api\V1\MediaController;
 use App\Http\Controllers\Api\V1\TokenController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -41,5 +43,15 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
         // Push — sync captured interviews (idempotent batch upsert).
         Route::post('projects/{project}/instances:sync', [InstanceSyncController::class, 'sync'])
             ->name('projects.instances.sync');
+
+        // A captured interview after the fact — media and transcription status.
+        Route::get('instances/{instance}', [InstanceController::class, 'show'])
+            ->name('instances.show');
+
+        // Media — audio & photos, uploaded direct to object storage.
+        Route::post('instances/{instance}/media/intent', [MediaController::class, 'intent'])
+            ->name('instances.media.intent');
+        Route::post('instances/{instance}/media/complete', [MediaController::class, 'complete'])
+            ->name('instances.media.complete');
     });
 });
