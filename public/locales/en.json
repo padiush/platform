@@ -353,6 +353,20 @@
             "is_accepted": "Is an accepted name",
             "accepted_as": "Accepted as",
             "no_accepted": "WFO lists no accepted name for this record."
+        },
+        "accept": {
+            "use_this": "Use this name",
+            "use_accepted": "Use the accepted name",
+            "title": "Adopt WFO name",
+            "summary": "The catalog entry will be updated with:",
+            "current": "Current",
+            "proposed": "Proposed",
+            "confirm": "Apply",
+            "cancel": "Cancel",
+            "preview_error": "Could not fetch the WFO details.",
+            "updated": "The species was updated from WFO.",
+            "wfo_error": "WFO could not be reached. Please try again.",
+            "name_not_found": "WFO no longer has that record."
         }
     },
     "data": {

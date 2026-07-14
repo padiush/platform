@@ -146,6 +146,16 @@ Route::middleware(['auth'])->group(function () {
             'showSpecies'
         )->name('catalogs.species.show');
 
+        // Preview the taxonomy a WFO name would apply, then adopt it.
+        Route::post(
+            '/catalogs/{project}/species/{species}/wfo-preview',
+            'previewWfoName'
+        )->name('catalogs.species.wfo-preview');
+        Route::patch(
+            '/catalogs/{project}/species/{species}',
+            'updateSpecies'
+        )->name('catalogs.species.update');
+
         Route::delete(
             '/catalogs/{project}/species/{species}/delete',
             'destroySpecies'

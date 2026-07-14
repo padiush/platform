@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('axios', () => ({
@@ -7,6 +7,7 @@ vi.mock('axios', () => ({
 
 vi.mock('@inertiajs/react', () => ({
     Link: ({ children, ...props }) => <a {...props}>{children}</a>,
+    router: { patch: vi.fn() },
 }));
 
 vi.mock('@/Layouts/AuthenticatedLayout', () => ({
@@ -119,5 +120,58 @@ describe('SpeciesShow', () => {
         // The gated note shares a paragraph with the count, so match a substring.
         expect(screen.getByText(/catalogs\.linked\.gated/)).toBeInTheDocument();
         expect(screen.queryByText('guarumo')).not.toBeInTheDocument();
+    });
+
+    it('offers accept actions and previews the change when the user can edit', async () => {
+        axios.post.mockImplementation((url) => {
+            if (url.includes('wfo-preview')) {
+                return Promise.resolve({
+                    data: {
+                        current: {
+                            family: 'Acanthaceae',
+                            genus: 'Justicia',
+                            name: 'carthagenensis',
+                            authority: 'Jacq.',
+                        },
+                        proposed: {
+                            family: 'Acanthaceae',
+                            genus: 'Justicia',
+                            name: 'carthaginensis',
+                            authority: 'Jacq.',
+                        },
+                    },
+                });
+            }
+            return Promise.resolve({ data: spellingVariantResult });
+        });
+
+        render(
+            <SpeciesShow species={species} project={project} canEdit={true} />,
+        );
+
+        const acceptButton = await screen.findByText(
+            'catalogs.accept.use_this',
+        );
+        fireEvent.click(acceptButton);
+
+        // The preview modal opens and shows the proposed corrected epithet.
+        expect(
+            await screen.findByText('catalogs.accept.title'),
+        ).toBeInTheDocument();
+        expect(await screen.findByText('carthaginensis')).toBeInTheDocument();
+        expect(
+            axios.post.mock.calls.some(([url]) => url.includes('wfo-preview')),
+        ).toBe(true);
+    });
+
+    it('hides accept actions from a user who cannot edit', async () => {
+        axios.post.mockResolvedValue({ data: spellingVariantResult });
+
+        render(<SpeciesShow species={species} project={project} />);
+
+        await screen.findByText('catalogs.wfo.spelling_variant');
+        expect(
+            screen.queryByText('catalogs.accept.use_this'),
+        ).not.toBeInTheDocument();
     });
 });

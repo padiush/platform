@@ -353,6 +353,20 @@
             "is_accepted": "Es un nombre aceptado",
             "accepted_as": "Aceptado como",
             "no_accepted": "WFO no indica un nombre aceptado para este registro."
+        },
+        "accept": {
+            "use_this": "Usar este nombre",
+            "use_accepted": "Usar el nombre aceptado",
+            "title": "Adoptar nombre de WFO",
+            "summary": "Se actualizará la entrada del catálogo con estos datos:",
+            "current": "Actual",
+            "proposed": "Propuesto",
+            "confirm": "Aplicar",
+            "cancel": "Cancelar",
+            "preview_error": "No se pudo obtener la información de WFO.",
+            "updated": "Se actualizó la especie con el nombre de WFO.",
+            "wfo_error": "No se pudo consultar WFO. Inténtalo de nuevo.",
+            "name_not_found": "WFO ya no tiene ese registro."
         }
     },
     "data": {

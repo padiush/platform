@@ -5,20 +5,22 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import {
     faArrowLeft,
     faArrowUpRightFromSquare,
+    faCircleCheck,
     faTrashCan,
 } from '@fortawesome/pro-regular-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Link } from '@inertiajs/react';
+import { Link, router } from '@inertiajs/react';
 import axios from 'axios';
-import { useEffect, useRef, useState } from 'react';
+import { Fragment, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 /**
  * One WFO name with its accepted-name status and, optionally, a "spelling
  * variant" flag. `full_name_html` already carries WFO's own italic markup.
  */
-function WfoName({ name, highlight = false }) {
+function WfoName({ name, highlight = false, canEdit = false, onAccept }) {
     const { t } = useTranslation();
+    const canAccept = canEdit && name.wfo_id;
 
     return (
         <div
@@ -60,25 +62,49 @@ function WfoName({ name, highlight = false }) {
                     </span>
                 )}
             </div>
-            {name.stable_uri && (
-                <a
-                    href={name.stable_uri}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="btn btn-ghost btn-xs mt-2"
-                >
-                    <FontAwesomeIcon
-                        icon={faArrowUpRightFromSquare}
-                        className="mr-1"
-                    />
-                    {t('catalogs.view_on_wfo')}
-                </a>
-            )}
+            <div className="mt-2 flex flex-wrap gap-2">
+                {name.stable_uri && (
+                    <a
+                        href={name.stable_uri}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="btn btn-ghost btn-xs"
+                    >
+                        <FontAwesomeIcon
+                            icon={faArrowUpRightFromSquare}
+                            className="mr-1"
+                        />
+                        {t('catalogs.view_on_wfo')}
+                    </a>
+                )}
+                {canAccept && (
+                    <button
+                        type="button"
+                        className="btn btn-outline btn-primary btn-xs"
+                        onClick={() => onAccept(name.wfo_id, false)}
+                    >
+                        <FontAwesomeIcon
+                            icon={faCircleCheck}
+                            className="mr-1"
+                        />
+                        {t('catalogs.accept.use_this')}
+                    </button>
+                )}
+                {canAccept && name.accepted_name && (
+                    <button
+                        type="button"
+                        className="btn btn-ghost btn-xs"
+                        onClick={() => onAccept(name.wfo_id, true)}
+                    >
+                        {t('catalogs.accept.use_accepted')}
+                    </button>
+                )}
+            </div>
         </div>
     );
 }
 
-function TaxonomicMatch({ wfo }) {
+function TaxonomicMatch({ wfo, canEdit, onAccept }) {
     const { t } = useTranslation();
     const hasCandidates = wfo.candidates.length > 0;
 
@@ -97,7 +123,12 @@ function TaxonomicMatch({ wfo }) {
                     <p className="text-sm font-medium">
                         {t('catalogs.wfo.exact_match')}
                     </p>
-                    <WfoName name={wfo.match} highlight />
+                    <WfoName
+                        name={wfo.match}
+                        highlight
+                        canEdit={canEdit}
+                        onAccept={onAccept}
+                    />
                 </div>
             ) : (
                 <p className="text-warning text-sm">
@@ -118,12 +149,123 @@ function TaxonomicMatch({ wfo }) {
                                 key={candidate.wfo_id ?? index}
                                 name={candidate}
                                 highlight={!wfo.match && index === 0}
+                                canEdit={canEdit}
+                                onAccept={onAccept}
                             />
                         ))}
                     </div>
                 </div>
             )}
         </div>
+    );
+}
+
+function AcceptNameModal({
+    open,
+    loading,
+    error,
+    preview,
+    submitting,
+    onConfirm,
+    onCancel,
+}) {
+    const { t } = useTranslation();
+
+    if (!open) return null;
+
+    const labelFor = {
+        family: 'catalogs.family',
+        genus: 'catalogs.genus',
+        name: 'catalogs.species',
+        authority: 'catalogs.authority',
+    };
+
+    return (
+        <dialog className="modal modal-open">
+            <div className="modal-box">
+                <h3 className="text-lg font-bold">
+                    {t('catalogs.accept.title')}
+                </h3>
+
+                {loading ? (
+                    <p className="text-base-content/70 py-4 text-sm">
+                        {t('catalogs.loading')}
+                    </p>
+                ) : error ? (
+                    <p className="text-error py-4 text-sm">{error}</p>
+                ) : preview ? (
+                    <div className="py-4">
+                        <p className="text-base-content/60 mb-2 text-sm">
+                            {t('catalogs.accept.summary')}
+                        </p>
+                        <div className="grid grid-cols-3 gap-x-2 gap-y-1 text-sm">
+                            <span className="text-base-content/50 text-xs uppercase" />
+                            <span className="text-base-content/50 text-xs uppercase">
+                                {t('catalogs.accept.current')}
+                            </span>
+                            <span className="text-base-content/50 text-xs uppercase">
+                                {t('catalogs.accept.proposed')}
+                            </span>
+                            {['family', 'genus', 'name', 'authority'].map(
+                                (field) => {
+                                    const current =
+                                        preview.current[field] || '—';
+                                    const proposed =
+                                        preview.proposed[field] || '—';
+                                    const changed = current !== proposed;
+
+                                    return (
+                                        <Fragment key={field}>
+                                            <span className="text-base-content/60">
+                                                {t(labelFor[field])}
+                                            </span>
+                                            <span
+                                                className={
+                                                    changed
+                                                        ? 'text-base-content/50 line-through'
+                                                        : ''
+                                                }
+                                            >
+                                                {current}
+                                            </span>
+                                            <span
+                                                className={
+                                                    changed
+                                                        ? 'text-success font-medium'
+                                                        : ''
+                                                }
+                                            >
+                                                {proposed}
+                                            </span>
+                                        </Fragment>
+                                    );
+                                },
+                            )}
+                        </div>
+                    </div>
+                ) : null}
+
+                <div className="modal-action">
+                    <button
+                        type="button"
+                        className="btn btn-ghost"
+                        onClick={onCancel}
+                        disabled={submitting}
+                    >
+                        {t('catalogs.accept.cancel')}
+                    </button>
+                    <button
+                        type="button"
+                        className="btn btn-primary"
+                        onClick={onConfirm}
+                        disabled={submitting || !preview}
+                    >
+                        {t('catalogs.accept.confirm')}
+                    </button>
+                </div>
+            </div>
+            <div className="modal-backdrop" onClick={onCancel} />
+        </dialog>
     );
 }
 
@@ -242,6 +384,7 @@ export default function SpeciesShow({
     linkedCount = 0,
     canViewData = false,
     linkedRecords = null,
+    canEdit = false,
 }) {
     const { t } = useTranslation();
     const deletionModalRef = useRef();
@@ -249,7 +392,62 @@ export default function SpeciesShow({
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
+    // Accepting a WFO name: preview the change, then commit it.
+    const [acceptTarget, setAcceptTarget] = useState(null);
+    const [preview, setPreview] = useState(null);
+    const [previewLoading, setPreviewLoading] = useState(false);
+    const [previewError, setPreviewError] = useState(null);
+    const [submitting, setSubmitting] = useState(false);
+
     const scientificName = `${species.genus} ${species.name}`;
+
+    const openAccept = (wfoId, useAccepted) => {
+        setAcceptTarget({ wfoId, useAccepted });
+        setPreview(null);
+        setPreviewError(null);
+        setPreviewLoading(true);
+
+        axios
+            .post(
+                route('catalogs.species.wfo-preview', {
+                    project: project.id,
+                    species: species.id,
+                }),
+                { wfo_id: wfoId, use_accepted: useAccepted },
+            )
+            .then((response) => setPreview(response.data))
+            .catch(() => setPreviewError(t('catalogs.accept.preview_error')))
+            .finally(() => setPreviewLoading(false));
+    };
+
+    const closeAccept = () => {
+        setAcceptTarget(null);
+        setPreview(null);
+        setPreviewError(null);
+    };
+
+    const confirmAccept = () => {
+        if (!acceptTarget) return;
+
+        setSubmitting(true);
+        router.patch(
+            route('catalogs.species.update', {
+                project: project.id,
+                species: species.id,
+            }),
+            {
+                wfo_id: acceptTarget.wfoId,
+                use_accepted: acceptTarget.useAccepted,
+            },
+            {
+                preserveScroll: true,
+                onFinish: () => {
+                    setSubmitting(false);
+                    closeAccept();
+                },
+            },
+        );
+    };
 
     useEffect(() => {
         let active = true;
@@ -343,7 +541,11 @@ export default function SpeciesShow({
                         ) : error ? (
                             <p className="text-error text-sm">{error}</p>
                         ) : wfo ? (
-                            <TaxonomicMatch wfo={wfo} />
+                            <TaxonomicMatch
+                                wfo={wfo}
+                                canEdit={canEdit}
+                                onAccept={openAccept}
+                            />
                         ) : (
                             <p className="text-error text-sm">
                                 {t('catalogs.not_found')}
@@ -419,6 +621,15 @@ export default function SpeciesShow({
                     project: project.id,
                     species: species.id,
                 })}
+            />
+            <AcceptNameModal
+                open={acceptTarget !== null}
+                loading={previewLoading}
+                error={previewError}
+                preview={preview}
+                submitting={submitting}
+                onConfirm={confirmAccept}
+                onCancel={closeAccept}
             />
         </AuthenticatedLayout>
     );

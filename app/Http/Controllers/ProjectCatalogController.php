@@ -6,12 +6,15 @@ use App\Models\CatalogSpecies;
 use App\Models\InstanceAnswer;
 use App\Models\Project;
 use App\Services\CatalogSpeciesSearch;
+use App\Services\WfoNameResolver;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
+use Throwable;
 
 class ProjectCatalogController extends Controller
 {
@@ -245,7 +248,168 @@ class ProjectCatalogController extends Controller
             'linkedRecords' => $canViewData
                 ? $this->linkedRecords($species, (int) $request->integer('page', 1))
                 : null,
+            'canEdit' => (bool) $user->can('editCatalog', $project),
         ]);
+    }
+
+    /**
+     * Previews the catalog fields a WFO name would apply, without saving, so the
+     * species page can show a before/after before the user commits.
+     */
+    public function previewWfoName(
+        Request $request,
+        Project $project,
+        CatalogSpecies $species,
+        WfoNameResolver $resolver
+    ): JsonResponse {
+        if (! Auth::user()->can('editCatalog', $project)) {
+            return response()->json(['error' => 'forbidden'], 403);
+        }
+
+        if ($species->project_id !== $project->id) {
+            return response()->json(['error' => 'not_found'], 404);
+        }
+
+        $validated = $request->validate([
+            'wfo_id' => ['required', 'string', 'max:255'],
+            'use_accepted' => ['sometimes', 'boolean'],
+        ]);
+
+        try {
+            $proposed = $this->proposedTaxonomy(
+                $resolver,
+                $validated['wfo_id'],
+                $request->boolean('use_accepted')
+            );
+        } catch (Throwable $e) {
+            report($e);
+
+            return response()->json(['error' => 'wfo_unreachable'], 502);
+        }
+
+        if ($proposed === null) {
+            return response()->json(['error' => 'name_not_found'], 404);
+        }
+
+        return response()->json([
+            'current' => [
+                'family' => $species->family,
+                'genus' => $species->genus,
+                'name' => $species->name,
+                'authority' => $species->authority,
+            ],
+            'proposed' => $proposed,
+        ]);
+    }
+
+    /**
+     * Adopts a WFO name: re-resolves it (never trusting client-sent taxonomy)
+     * and overwrites the entry's family, genus, epithet and authority, recording
+     * the WFO provenance in metadata.
+     */
+    public function updateSpecies(
+        Request $request,
+        Project $project,
+        CatalogSpecies $species,
+        WfoNameResolver $resolver
+    ): RedirectResponse {
+        if (! Auth::user()->can('editCatalog', $project)) {
+            return redirect()
+                ->route('catalogs.index')
+                ->with('message', 'catalogs.no_access')
+                ->with('message_type', 'error');
+        }
+
+        if ($species->project_id !== $project->id) {
+            return redirect()
+                ->route('catalogs.index')
+                ->with('message', 'catalogs.species_not_found')
+                ->with('message_type', 'error');
+        }
+
+        $validated = $request->validate([
+            'wfo_id' => ['required', 'string', 'max:255'],
+            'use_accepted' => ['sometimes', 'boolean'],
+        ]);
+
+        try {
+            $proposed = $this->proposedTaxonomy(
+                $resolver,
+                $validated['wfo_id'],
+                $request->boolean('use_accepted')
+            );
+        } catch (Throwable $e) {
+            report($e);
+
+            return redirect()
+                ->route('catalogs.species.show', [
+                    'project' => $project->id,
+                    'species' => $species->id,
+                ])
+                ->with('message', 'catalogs.accept.wfo_error')
+                ->with('message_type', 'error');
+        }
+
+        if ($proposed === null) {
+            return redirect()
+                ->route('catalogs.species.show', [
+                    'project' => $project->id,
+                    'species' => $species->id,
+                ])
+                ->with('message', 'catalogs.accept.name_not_found')
+                ->with('message_type', 'error');
+        }
+
+        $metadata = $species->metadata ?? [];
+        $metadata['wfo'] = [
+            'id' => $proposed['wfo_id'],
+            'name' => $proposed['applied_name'],
+            'accepted_at' => now()->toIso8601String(),
+        ];
+
+        $species->update([
+            'family' => $proposed['family'],
+            'genus' => $proposed['genus'],
+            'name' => $proposed['name'],
+            'authority' => $proposed['authority'],
+            'metadata' => $metadata,
+        ]);
+
+        return redirect()
+            ->route('catalogs.species.show', [
+                'project' => $project->id,
+                'species' => $species->id,
+            ])
+            ->with('message', 'catalogs.accept.updated')
+            ->with('message_type', 'success');
+    }
+
+    /**
+     * Resolves a WFO name id to the catalog fields to apply. When $useAccepted
+     * and the name is a synonym, adopts its accepted name instead.
+     *
+     * @return array{wfo_id: string, applied_name: string, family: ?string, genus: string, name: string, authority: ?string}|null
+     */
+    private function proposedTaxonomy(
+        WfoNameResolver $resolver,
+        string $wfoId,
+        bool $useAccepted
+    ): ?array {
+        $name = $resolver->fetchName($wfoId);
+
+        if ($name === null) {
+            return null;
+        }
+
+        $source = ($useAccepted && $name['accepted'] !== null)
+            ? $name['accepted']
+            : $name;
+
+        return [
+            'wfo_id' => $source['wfo_id'] ?? $wfoId,
+            'applied_name' => $source['full_name_plain'],
+            ...$source['apply'],
+        ];
     }
 
     /**

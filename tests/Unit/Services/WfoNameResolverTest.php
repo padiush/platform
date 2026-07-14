@@ -156,4 +156,110 @@ class WfoNameResolverTest extends TestCase
         $this->assertTrue($ids->contains('wfo-0000354479'));
         $this->assertFalse($ids->contains('wfo-9999'));
     }
+
+    /**
+     * @param  array<int, array{name: string, rank: string}>  $ranks
+     */
+    private function detailNode(
+        string $id,
+        string $noAuthors,
+        string $genus,
+        string $author,
+        array $accepted,
+        array $path
+    ): array {
+        return [
+            'id' => $id,
+            'fullNameStringPlain' => trim("{$noAuthors} {$author}"),
+            'fullNameStringHtml' => "<i>{$noAuthors}</i> {$author}",
+            'fullNameStringNoAuthorsPlain' => $noAuthors,
+            'genusString' => $genus,
+            'authorsString' => $author,
+            'currentPreferredUsage' => [
+                'hasName' => $accepted,
+                'path' => array_map(
+                    fn (array $p) => ['hasName' => ['nameString' => $p['name'], 'rank' => $p['rank']]],
+                    $path
+                ),
+            ],
+        ];
+    }
+
+    private function fakeNameById(?array $node): void
+    {
+        Http::fake([
+            'list.worldfloraonline.org/*' => Http::response([
+                'data' => ['taxonNameById' => $node],
+            ]),
+        ]);
+    }
+
+    public function test_fetch_name_maps_an_accepted_name_with_its_family()
+    {
+        $self = [
+            'id' => 'wfo-0000354479',
+            'fullNameStringPlain' => 'Justicia carthaginensis Jacq.',
+            'fullNameStringHtml' => '<i>Justicia carthaginensis</i> Jacq.',
+            'fullNameStringNoAuthorsPlain' => 'Justicia carthaginensis',
+            'genusString' => 'Justicia',
+            'authorsString' => 'Jacq.',
+        ];
+        $this->fakeNameById($this->detailNode(
+            'wfo-0000354479', 'Justicia carthaginensis', 'Justicia', 'Jacq.',
+            $self,
+            [['name' => 'Justicia', 'rank' => 'genus'], ['name' => 'Acanthaceae', 'rank' => 'family']],
+        ));
+
+        $result = (new WfoNameResolver)->fetchName('wfo-0000354479');
+
+        $this->assertTrue($result['is_accepted']);
+        $this->assertNull($result['accepted']);
+        $this->assertSame([
+            'family' => 'Acanthaceae',
+            'genus' => 'Justicia',
+            'name' => 'carthaginensis',
+            'authority' => 'Jacq.',
+        ], $result['apply']);
+    }
+
+    public function test_fetch_name_exposes_the_accepted_name_for_a_synonym()
+    {
+        $accepted = [
+            'id' => 'wfo-0000402095',
+            'fullNameStringPlain' => 'Ruellia blechum L.',
+            'fullNameStringHtml' => '<i>Ruellia blechum</i> L.',
+            'fullNameStringNoAuthorsPlain' => 'Ruellia blechum',
+            'genusString' => 'Ruellia',
+            'authorsString' => 'L.',
+        ];
+        // Synonym's classification path is the accepted taxon's.
+        $this->fakeNameById($this->detailNode(
+            'wfo-0000354748', 'Justicia carthagenensis', 'Justicia', 'Willd. ex Nees',
+            $accepted,
+            [['name' => 'Ruellia', 'rank' => 'genus'], ['name' => 'Acanthaceae', 'rank' => 'family']],
+        ));
+
+        $result = (new WfoNameResolver)->fetchName('wfo-0000354748');
+
+        $this->assertFalse($result['is_accepted']);
+        $this->assertSame([
+            'family' => 'Acanthaceae',
+            'genus' => 'Justicia',
+            'name' => 'carthagenensis',
+            'authority' => 'Willd. ex Nees',
+        ], $result['apply']);
+        $this->assertSame([
+            'family' => 'Acanthaceae',
+            'genus' => 'Ruellia',
+            'name' => 'blechum',
+            'authority' => 'L.',
+        ], $result['accepted']['apply']);
+    }
+
+    public function test_fetch_name_returns_null_for_an_unknown_id()
+    {
+        $this->fakeNameById(null);
+
+        $this->assertNull((new WfoNameResolver)->fetchName('wfo-does-not-exist'));
+    }
 }
