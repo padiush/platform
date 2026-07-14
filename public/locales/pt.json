@@ -333,6 +333,26 @@
             "label": "Ordenar por",
             "family": "Família (taxonómico)",
             "linked": "Mais ligadas"
+        },
+        "linked": {
+            "title": "Registros vinculados",
+            "count_one": "{{count}} registro vinculado",
+            "count_other": "{{count}} registros vinculados",
+            "gated": "você precisa de acesso aos dados para ver os registros",
+            "none_title": "Sem registros vinculados",
+            "none_hint": "Nenhuma entrevista vinculou um nome a esta espécie ainda.",
+            "view_in_data": "Ver nos dados"
+        },
+        "wfo": {
+            "searched_for": "Consulta no WFO: {{name}}",
+            "exact_match": "Correspondência por autoria",
+            "no_exact_match": "Nenhuma correspondência exata para a autoria registrada.",
+            "closest_names": "Nomes mais próximos no WFO",
+            "other_names": "Outros nomes no WFO",
+            "spelling_variant": "possível variante ortográfica",
+            "is_accepted": "É um nome aceito",
+            "accepted_as": "Aceito como",
+            "no_accepted": "O WFO não indica um nome aceito para este registro."
         }
     },
     "data": {

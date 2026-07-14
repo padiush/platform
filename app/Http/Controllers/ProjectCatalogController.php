@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\CatalogSpecies;
+use App\Models\InstanceAnswer;
 use App\Models\Project;
 use App\Services\CatalogSpeciesSearch;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -13,6 +15,9 @@ use Inertia\Response;
 
 class ProjectCatalogController extends Controller
 {
+    /** Linked interview records shown per page on the species page. */
+    private const LINKED_PER_PAGE = 15;
+
     public function index(): Response|RedirectResponse
     {
         $accesses = Auth::user()
@@ -198,10 +203,13 @@ class ProjectCatalogController extends Controller
     }
 
     public function showSpecies(
+        Request $request,
         Project $project,
         CatalogSpecies $species
     ): Response|RedirectResponse {
-        if (! Auth::user()->can('viewCatalog', $project)) {
+        $user = Auth::user();
+
+        if (! $user->can('viewCatalog', $project)) {
             return redirect()
                 ->route('catalogs.index')
                 ->with('error', 'No tienes permisos para ver este catálogo.');
@@ -213,6 +221,12 @@ class ProjectCatalogController extends Controller
                 ->with('message', 'catalogs.species_not_found')
                 ->with('message_type', 'error');
         }
+
+        // Linked answers are interview data: everyone with view_catalog sees the
+        // count, but the per-interview breakdown is gated behind the same
+        // capability that guards the data views.
+        $canViewData = $user->can('manageData', $project)
+            || $user->can('generateReports', $project);
 
         return Inertia::render('Catalog/SpeciesShow', [
             'project' => [
@@ -226,7 +240,64 @@ class ProjectCatalogController extends Controller
                 'name' => $species->name,
                 'authority' => $species->authority,
             ],
+            'linkedCount' => $species->answers()->count(),
+            'canViewData' => $canViewData,
+            'linkedRecords' => $canViewData
+                ? $this->linkedRecords($species, (int) $request->integer('page', 1))
+                : null,
         ]);
+    }
+
+    /**
+     * The interview records whose species-linked answers point at this species:
+     * the recorded name, when and by whom it was recorded, and where it lives, so
+     * the entry can be opened in the data view. Most recent first.
+     */
+    private function linkedRecords(CatalogSpecies $species, int $page): LengthAwarePaginator
+    {
+        return InstanceAnswer::query()
+            ->where('instance_answers.catalog_species_id', $species->id)
+            ->join(
+                'interview_instances',
+                'interview_instances.id',
+                '=',
+                'instance_answers.interview_instance_id'
+            )
+            ->with([
+                'instance.user:id,name',
+                'instance.form:id,name',
+                'section:id,name',
+            ])
+            ->orderByDesc('interview_instances.created_at')
+            ->select('instance_answers.*')
+            ->paginate(self::LINKED_PER_PAGE, ['*'], 'page', max(1, $page))
+            ->through(fn (InstanceAnswer $answer) => [
+                'id' => $answer->id,
+                'recorded_name' => $this->recordedName($answer, $species),
+                'recorded_at' => $answer->instance?->created_at?->toIso8601String(),
+                'recorder' => $answer->instance?->user?->name,
+                'form' => [
+                    'id' => $answer->instance?->interview_form_id,
+                    'name' => $answer->instance?->form?->name,
+                ],
+                'section' => [
+                    'id' => $answer->interview_section_id,
+                    'name' => $answer->section?->name,
+                ],
+            ]);
+    }
+
+    /**
+     * The name as recorded in the interview (the encrypted answer text), falling
+     * back to the species binomial when the linked answer carried no free text.
+     */
+    private function recordedName(InstanceAnswer $answer, CatalogSpecies $species): string
+    {
+        $recorded = trim((string) $answer->answer);
+
+        return $recorded !== ''
+            ? $recorded
+            : trim("{$species->genus} {$species->name}");
     }
 
     public function destroySpecies(
