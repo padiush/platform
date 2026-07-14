@@ -8,7 +8,7 @@ function RequiredMarks({ required, selective }) {
         <>
             {required && (
                 <span
-                    className="text-error tooltip tooltip-bottom select-none"
+                    className="text-error tooltip tooltip-left select-none"
                     data-tip={t('designer.required')}
                 >
                     *
