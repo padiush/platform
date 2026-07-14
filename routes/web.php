@@ -23,6 +23,8 @@ Route::middleware(['auth'])->group(function () {
         ->group(function () {
             Route::get('/', [SystemController::class, 'index'])
                 ->name('index');
+            Route::post('/registration-invites', [SystemController::class, 'inviteRegistration'])
+                ->name('registration-invites.store');
             // Bulk delete must be defined before single delete to avoid
             // "bulk-delete" being treated as a {user} parameter.
             Route::delete('/users/bulk-delete', [SystemController::class, 'destroyUsers'])

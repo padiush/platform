@@ -3,11 +3,16 @@ import AuthLayout from '@/Layouts/AuthLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { useTranslation } from 'react-i18next';
 
-export default function Register({ bgImage, honeypot }) {
+export default function Register({
+    bgImage,
+    honeypot,
+    invitation = null,
+    registrationUrl = null,
+}) {
     const { t } = useTranslation();
     const { data, setData, post, processing, errors } = useForm({
-        name: '',
-        email: '',
+        name: invitation?.name ?? '',
+        email: invitation?.email ?? '',
         password: '',
         password_confirmation: '',
         ...(honeypot
@@ -20,13 +25,19 @@ export default function Register({ bgImage, honeypot }) {
 
     const submit = (e) => {
         e.preventDefault();
-        post(route('register'));
+        post(registrationUrl ?? route('register'));
     };
 
     return (
         <AuthLayout title={t('auth.register')} bgUrl={bgImage}>
             <Head title={t('auth.register')} />
-            <p className="text-base-content">{t('auth.register_prompt')}</p>
+            <p className="text-base-content">
+                {t(
+                    invitation
+                        ? 'auth.invited_register_prompt'
+                        : 'auth.register_prompt',
+                )}
+            </p>
             <form
                 onSubmit={submit}
                 className="mx-auto w-full px-4 pt-4 sm:w-2/3 lg:px-0"
@@ -46,6 +57,7 @@ export default function Register({ bgImage, honeypot }) {
                     value={data.email}
                     onChange={(e) => setData('email', e.target.value)}
                     error={errors.email}
+                    readOnly={Boolean(invitation)}
                     required
                 />
                 <Input

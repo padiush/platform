@@ -6,6 +6,7 @@ use App\Models\ProjectInvite;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use Illuminate\Support\Facades\URL;
 
 class InviteNotification extends Notification
 {
@@ -57,6 +58,11 @@ class InviteNotification extends Notification
             'inviting_user' => $project_invite->invitingUser,
             'invited_name' => $project_invite->invited_name,
             'invited_email' => $project_invite->invited_email,
+            'registration_url' => URL::temporarySignedRoute(
+                'register.project-invite',
+                $project_invite->expires_at,
+                ['invite' => $project_invite]
+            ),
         ]);
     }
 

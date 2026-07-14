@@ -110,7 +110,7 @@
         <div class="container">
             <p>{{ $inviting_user->name }} te ha invitado a formar parte del proyecto "{{ $project->name }}" en Padiush.</p>
             <p>Padiush es un sistema informático para investigaciones etnobotánicas, que te permitirá gestionar tus proyectos de investigación de forma sencilla y eficiente, y compartirlos con otros investigadores o asistentes.</p>
-            <p>Según nuestros registros, no tienes una cuenta en Padiush. Si deseas aceptar la invitación y formar parte del proyecto, solo hace falta que crees una cuenta en Padiush haciendo clic aquí: <a href="{{ route('register') }}" class="link">Crear cuenta</a>.</p>
+            <p>Según nuestros registros, no tienes una cuenta en Padiush. Si deseas aceptar la invitación y formar parte del proyecto, crea tu cuenta con este enlace personal: <a href="{{ $registration_url }}" class="link">Crear cuenta</a>.</p>
             <p>Toma en cuenta que si no aceptas la invitación en un plazo de 7 días, esta se cancelará, y deberás solicitar una nueva invitación.</p>
 
             <p>¡Te deseamos muchos éxitos en tu proyecto!</p>
