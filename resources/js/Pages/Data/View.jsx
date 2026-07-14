@@ -32,7 +32,7 @@ function Cell({ cell }) {
     }
 
     if (cell.kind === 'species') {
-        return <span className="italic">{cell.value}</span>;
+        return <span>{cell.value}</span>;
     }
 
     return cell.value;

@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use App\Models\CatalogSpecies;
 use App\Models\InstanceAnswer;
 use App\Models\InterviewForm;
 use App\Models\InterviewInstance;
@@ -216,19 +215,23 @@ class InterviewDataTable
             return null;
         }
 
-        if ($item->link_to_species && $answer->species) {
-            $species = $answer->species;
-
-            return [
-                'kind' => 'species',
-                'value' => trim("{$species->genus} {$species->name}"),
-            ];
-        }
-
         $raw = $answer->answer;
 
         if ($raw === null || $raw === '') {
+            if ($item->link_to_species && $answer->species) {
+                $species = $answer->species;
+
+                return [
+                    'kind' => 'species',
+                    'value' => trim("{$species->genus} {$species->name}"),
+                ];
+            }
+
             return null;
+        }
+
+        if ($item->link_to_species) {
+            return ['kind' => 'species', 'value' => (string) $raw];
         }
 
         if ($item->type === 'multi') {
@@ -286,32 +289,16 @@ class InterviewDataTable
         };
     }
 
-    /**
-     * catalog_species_id isn't encrypted, so citations group in SQL.
-     */
     private function speciesSummary(InterviewItem $item): array
     {
-        $counts = InstanceAnswer::query()
+        $values = InstanceAnswer::query()
             ->where('interview_item_id', $item->id)
-            ->whereNotNull('catalog_species_id')
-            ->selectRaw('catalog_species_id, COUNT(*) as total')
-            ->groupBy('catalog_species_id')
-            ->pluck('total', 'catalog_species_id');
-
-        $names = CatalogSpecies::whereIn('id', $counts->keys())
             ->get()
-            ->mapWithKeys(fn ($s) => [$s->id => trim("{$s->genus} {$s->name}")]);
-
-        $sorted = $counts
-            ->map(fn ($total, $id) => ['label' => $names[$id] ?? '—', 'count' => $total])
-            ->sortByDesc('count')
+            ->pluck('answer')
+            ->filter(fn ($value) => $value !== null && $value !== '')
             ->values();
 
-        return [
-            'data' => $sorted->take(self::DISPLAY_MAX)->all(),
-            'total_distinct' => $sorted->count(),
-            'total_count' => $sorted->sum('count'),
-        ];
+        return $this->categoricalSummary($values);
     }
 
     private function categoricalSummary(Collection $values): array
