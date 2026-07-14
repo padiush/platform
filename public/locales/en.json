@@ -389,6 +389,9 @@
             "resolve_error": "Could not load the name.",
             "accepted": "Accepted name",
             "synonym": "Synonym"
+        },
+        "photo": {
+            "title": "Reference photo"
         }
     },
     "data": {

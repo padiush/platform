@@ -7,14 +7,17 @@ use App\Models\InstanceAnswer;
 use App\Models\Project;
 use App\Services\CatalogSpeciesSearch;
 use App\Services\GbifDistribution;
+use App\Services\INaturalistPhoto;
 use App\Services\WfoNameResolver;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
 use Inertia\Inertia;
 use Inertia\Response;
+use Symfony\Component\HttpFoundation\Response as HttpResponse;
 use Throwable;
 
 class ProjectCatalogController extends Controller
@@ -175,6 +178,86 @@ class ProjectCatalogController extends Controller
             'wfo_id' => $name['wfo_id'],
             'name_plain' => $name['full_name_plain'],
         ] + $name['apply']);
+    }
+
+    /**
+     * Attribution for a species' iNaturalist reference photo, shown as a
+     * visual-confirmation aid during registration. The photo itself is served by
+     * the proxy below; this returns only the credit (photographer + platform).
+     */
+    public function inaturalistInfo(
+        Request $request,
+        Project $project,
+        INaturalistPhoto $inaturalist
+    ): JsonResponse {
+        if (! Auth::user()->can('viewCatalog', $project)) {
+            return response()->json(['error' => 'forbidden'], 403);
+        }
+
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+        ]);
+
+        try {
+            $photo = $inaturalist->forName($validated['name']);
+        } catch (Throwable $e) {
+            report($e);
+
+            return response()->json(['error' => 'inaturalist_unreachable'], 502);
+        }
+
+        if ($photo === null) {
+            return response()->json(['found' => false]);
+        }
+
+        return response()->json([
+            'found' => true,
+            'attribution' => $photo['attribution'],
+            'license' => $photo['license'],
+            'source' => INaturalistPhoto::SOURCE_LABEL,
+            'page_url' => $photo['page_url'],
+        ]);
+    }
+
+    /**
+     * Streams a species' iNaturalist photo through our origin so the browser
+     * never contacts a third party directly (no IP leak) — and we never store
+     * it. Only known iNaturalist photo hosts are fetched (SSRF guard).
+     */
+    public function inaturalistPhoto(
+        Request $request,
+        Project $project,
+        INaturalistPhoto $inaturalist
+    ): HttpResponse {
+        abort_unless(Auth::user()->can('viewCatalog', $project), 403);
+
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+        ]);
+
+        // Resolve the photo URL and fetch the bytes in a try (network can fail);
+        // keep the abort()s outside it so they aren't caught and masked as 502.
+        try {
+            $photo = $inaturalist->forName($validated['name']);
+            $image = ($photo !== null && $inaturalist->isAllowedPhotoUrl($photo['photo_url']))
+                ? Http::timeout(12)->get($photo['photo_url'])
+                : null;
+        } catch (Throwable $e) {
+            report($e);
+            abort(502);
+        }
+
+        abort_if($photo === null || $image === null || $image->failed(), 404);
+
+        return response(
+            $image->body(),
+            200,
+            [
+                'Content-Type' => $image->header('Content-Type') ?: 'image/jpeg',
+                // Browser-side cache only; the origin never persists the bytes.
+                'Cache-Control' => 'private, max-age=86400',
+            ]
+        );
     }
 
     public function show(

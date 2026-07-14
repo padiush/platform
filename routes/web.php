@@ -152,6 +152,17 @@ Route::middleware(['auth'])->group(function () {
             'resolveWfoName'
         )->name('catalogs.species.wfo-resolve');
 
+        // iNaturalist reference photo: attribution (JSON) + a same-origin,
+        // never-stored image proxy. Literal paths, before the {species} route.
+        Route::get(
+            '/catalogs/{project}/species/inaturalist',
+            'inaturalistInfo'
+        )->name('catalogs.species.inaturalist');
+        Route::get(
+            '/catalogs/{project}/species/inaturalist-photo',
+            'inaturalistPhoto'
+        )->name('catalogs.species.inaturalist-photo');
+
         Route::get(
             '/catalogs/{project}/species/{species}',
             'showSpecies'

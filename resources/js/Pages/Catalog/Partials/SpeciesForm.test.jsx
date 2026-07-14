@@ -90,6 +90,8 @@ describe('SpeciesForm', () => {
     });
 
     it('keeps manual entry working without a source lookup', async () => {
+        axios.get.mockResolvedValue({ data: { found: false } });
+
         const { container } = render(
             <SpeciesForm project={project} onClose={() => {}} />,
         );
@@ -98,6 +100,47 @@ describe('SpeciesForm', () => {
         fireEvent.change(genus, { target: { value: 'Inga' } });
 
         expect(genus.value).toBe('Inga');
+        // No genus+epithet yet, so no source search or photo lookup fires.
         expect(axios.get).not.toHaveBeenCalled();
+    });
+
+    it('shows a credited reference photo once genus and epithet are set', async () => {
+        axios.get.mockImplementation((url) => {
+            if (url.includes('inaturalist')) {
+                return Promise.resolve({
+                    data: {
+                        found: true,
+                        attribution: '(c) Someone, (CC BY-NC)',
+                        license: 'cc-by-nc',
+                        source: 'iNaturalist',
+                        page_url: 'https://www.inaturalist.org/taxa/1',
+                    },
+                });
+            }
+            return Promise.resolve({ data: { results: [] } });
+        });
+
+        const { container } = render(
+            <SpeciesForm project={project} onClose={() => {}} />,
+        );
+
+        fireEvent.change(container.querySelector('input[name="genus"]'), {
+            target: { value: 'Cecropia' },
+        });
+        fireEvent.change(container.querySelector('input[name="name"]'), {
+            target: { value: 'obtusifolia' },
+        });
+
+        // The photographer and the platform are both credited.
+        expect(await screen.findByText(/Someone/)).toBeInTheDocument();
+        const platform = screen.getByText('iNaturalist');
+        expect(platform).toHaveAttribute(
+            'href',
+            'https://www.inaturalist.org/taxa/1',
+        );
+
+        // The image is served through our proxy, not iNaturalist directly.
+        const img = screen.getByAltText('Cecropia obtusifolia');
+        expect(img.getAttribute('src')).toContain('inaturalist-photo');
     });
 });
