@@ -9,6 +9,7 @@ use App\Models\ProjectAccess;
 use App\Models\ProjectCapability;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Http;
 use Inertia\Testing\AssertableInertia as Assert;
 use Tests\Concerns\InteractsWithProjects;
 use Tests\TestCase;
@@ -340,5 +341,156 @@ class CatalogSpeciesTest extends TestCase
         $response->assertInertia(fn (Assert $page) => $page
             ->where('linkedRecords.data.0.recorded_name', 'Cecropia obtusifolia')
         );
+    }
+
+    /**
+     * Fakes WFO's taxonNameById for one name, with its accepted-usage node and a
+     * classification path carrying the family.
+     */
+    private function fakeWfoName(
+        string $id,
+        string $noAuthors,
+        string $genus,
+        string $author,
+        array $accepted,
+        string $family
+    ): void {
+        Http::fake([
+            'list.worldfloraonline.org/*' => Http::response([
+                'data' => [
+                    'taxonNameById' => [
+                        'id' => $id,
+                        'fullNameStringPlain' => trim("{$noAuthors} {$author}"),
+                        'fullNameStringHtml' => "<i>{$noAuthors}</i> {$author}",
+                        'fullNameStringNoAuthorsPlain' => $noAuthors,
+                        'genusString' => $genus,
+                        'authorsString' => $author,
+                        'currentPreferredUsage' => [
+                            'hasName' => $accepted,
+                            'path' => [
+                                ['hasName' => ['nameString' => $genus, 'rank' => 'genus']],
+                                ['hasName' => ['nameString' => $family, 'rank' => 'family']],
+                            ],
+                        ],
+                    ],
+                ],
+            ]),
+        ]);
+    }
+
+    private function acceptedNode(string $id, string $noAuthors, string $genus, string $author): array
+    {
+        return [
+            'id' => $id,
+            'fullNameStringPlain' => trim("{$noAuthors} {$author}"),
+            'fullNameStringHtml' => "<i>{$noAuthors}</i> {$author}",
+            'fullNameStringNoAuthorsPlain' => $noAuthors,
+            'genusString' => $genus,
+            'authorsString' => $author,
+        ];
+    }
+
+    public function test_editor_can_accept_a_wfo_name_and_update_the_species()
+    {
+        $species = $this->species([
+            'family' => 'Acanthaceae',
+            'genus' => 'Justicia',
+            'name' => 'carthagenensis', // recorded misspelling
+            'authority' => 'Jacq.',
+        ]);
+        $this->fakeWfoName(
+            'wfo-0000354479', 'Justicia carthaginensis', 'Justicia', 'Jacq.',
+            $this->acceptedNode('wfo-0000354479', 'Justicia carthaginensis', 'Justicia', 'Jacq.'),
+            'Acanthaceae'
+        );
+
+        $user = $this->userWithCapability($this->project, 'edit_catalog');
+
+        $response = $this->actingAs($user)->patch(
+            route('catalogs.species.update', ['project' => $this->project, 'species' => $species]),
+            ['wfo_id' => 'wfo-0000354479']
+        );
+
+        $response->assertRedirect(route('catalogs.species.show', [
+            'project' => $this->project->id,
+            'species' => $species->id,
+        ]));
+        $response->assertSessionHas('message', 'catalogs.accept.updated');
+
+        $species->refresh();
+        $this->assertSame('carthaginensis', $species->name); // corrected spelling
+        $this->assertSame('Acanthaceae', $species->family);
+        $this->assertSame('wfo-0000354479', $species->metadata['wfo']['id']);
+    }
+
+    public function test_accepting_a_synonym_with_use_accepted_adopts_the_accepted_name()
+    {
+        $species = $this->species([
+            'family' => 'Acanthaceae',
+            'genus' => 'Justicia',
+            'name' => 'carthagenensis',
+            'authority' => 'Willd. ex Nees',
+        ]);
+        $this->fakeWfoName(
+            'wfo-0000354748', 'Justicia carthagenensis', 'Justicia', 'Willd. ex Nees',
+            $this->acceptedNode('wfo-0000402095', 'Ruellia blechum', 'Ruellia', 'L.'),
+            'Acanthaceae'
+        );
+
+        $user = $this->userWithCapability($this->project, 'edit_catalog');
+
+        $this->actingAs($user)->patch(
+            route('catalogs.species.update', ['project' => $this->project, 'species' => $species]),
+            ['wfo_id' => 'wfo-0000354748', 'use_accepted' => true]
+        );
+
+        $species->refresh();
+        $this->assertSame('Ruellia', $species->genus);
+        $this->assertSame('blechum', $species->name);
+        $this->assertSame('L.', $species->authority);
+    }
+
+    public function test_viewer_without_edit_capability_cannot_accept_a_name()
+    {
+        Http::fake();
+        $species = $this->species(['genus' => 'Justicia', 'name' => 'carthagenensis']);
+        // "Usuario de consulta": view_catalog but not edit_catalog.
+        $user = $this->userWithCapability($this->project, 'edit_catalog', false);
+
+        $response = $this->actingAs($user)->patch(
+            route('catalogs.species.update', ['project' => $this->project, 'species' => $species]),
+            ['wfo_id' => 'wfo-0000354479']
+        );
+
+        $response->assertRedirect(route('catalogs.index'));
+        $this->assertSame('carthagenensis', $species->refresh()->name);
+        Http::assertNothingSent();
+    }
+
+    public function test_preview_returns_the_current_and_proposed_taxonomy()
+    {
+        $species = $this->species([
+            'family' => 'Acanthaceae',
+            'genus' => 'Justicia',
+            'name' => 'carthagenensis',
+            'authority' => 'Jacq.',
+        ]);
+        $this->fakeWfoName(
+            'wfo-0000354479', 'Justicia carthaginensis', 'Justicia', 'Jacq.',
+            $this->acceptedNode('wfo-0000354479', 'Justicia carthaginensis', 'Justicia', 'Jacq.'),
+            'Acanthaceae'
+        );
+
+        $user = $this->userWithCapability($this->project, 'edit_catalog');
+
+        $response = $this->actingAs($user)->postJson(
+            route('catalogs.species.wfo-preview', ['project' => $this->project, 'species' => $species]),
+            ['wfo_id' => 'wfo-0000354479']
+        );
+
+        $response->assertOk();
+        $response->assertJsonPath('current.name', 'carthagenensis');
+        $response->assertJsonPath('proposed.name', 'carthaginensis');
+        $response->assertJsonPath('proposed.family', 'Acanthaceae');
     }
 }

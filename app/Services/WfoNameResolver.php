@@ -75,6 +75,30 @@ class WfoNameResolver
     }
     GRAPHQL;
 
+    private const FETCH_QUERY = <<<'GRAPHQL'
+    query Fetch($id: String!) {
+        taxonNameById(nameId: $id) {
+            id
+            fullNameStringPlain
+            fullNameStringHtml
+            fullNameStringNoAuthorsPlain
+            genusString
+            authorsString
+            currentPreferredUsage {
+                hasName {
+                    id
+                    fullNameStringPlain
+                    fullNameStringHtml
+                    fullNameStringNoAuthorsPlain
+                    genusString
+                    authorsString
+                }
+                path { hasName { nameString rank } }
+            }
+        }
+    }
+    GRAPHQL;
+
     /**
      * @return array{
      *     recorded: string,
@@ -88,7 +112,10 @@ class WfoNameResolver
         $binomial = trim("{$genus} {$name}");
         $recorded = trim($binomial.' '.trim((string) $authority));
 
-        $data = $this->query($recorded, $this->suggestTerms($genus, $name));
+        $data = $this->query(
+            ['match' => $recorded, 'suggest' => $this->suggestTerms($genus, $name)],
+            self::QUERY,
+        );
 
         $match = $data['taxonNameMatch']['match'] ?? null;
         $match = $match ? $this->name($match) : null;
@@ -104,6 +131,102 @@ class WfoNameResolver
                 $match['wfo_id'] ?? null,
             ),
         ];
+    }
+
+    /**
+     * Fetches one WFO name by id with the taxonomy an "accept" action applies:
+     * family (from the classification path), genus, specific epithet and author —
+     * both for the name itself and, when it is a synonym, for its accepted name.
+     *
+     * @return array{
+     *     wfo_id: string,
+     *     full_name_plain: string,
+     *     full_name_html: string,
+     *     is_accepted: bool,
+     *     apply: array{family: ?string, genus: string, name: string, authority: ?string},
+     *     accepted: ?array{wfo_id: ?string, full_name_plain: string, full_name_html: string, apply: array{family: ?string, genus: string, name: string, authority: ?string}}
+     * }|null  Null when WFO has no name with that id.
+     */
+    public function fetchName(string $wfoId): ?array
+    {
+        $node = $this->query(['id' => $wfoId], self::FETCH_QUERY)['taxonNameById'] ?? null;
+
+        if ($node === null) {
+            return null;
+        }
+
+        $preferred = $node['currentPreferredUsage'] ?? [];
+        $acceptedNode = $preferred['hasName'] ?? null;
+
+        // A synonym's classification path is that of its accepted taxon, so it is
+        // the best-available family for both the name and its accepted name.
+        $family = $this->familyFromPath($preferred['path'] ?? []);
+
+        $isAccepted = $acceptedNode !== null
+            && ($acceptedNode['id'] ?? null) === ($node['id'] ?? null);
+
+        return [
+            'wfo_id' => $node['id'] ?? $wfoId,
+            'full_name_plain' => $node['fullNameStringPlain'] ?? '',
+            'full_name_html' => $node['fullNameStringHtml'] ?? '',
+            'is_accepted' => $isAccepted,
+            'apply' => $this->applicableParts($node, $family),
+            'accepted' => (! $isAccepted && $acceptedNode !== null) ? [
+                'wfo_id' => $acceptedNode['id'] ?? null,
+                'full_name_plain' => $acceptedNode['fullNameStringPlain'] ?? '',
+                'full_name_html' => $acceptedNode['fullNameStringHtml'] ?? '',
+                'apply' => $this->applicableParts($acceptedNode, $family),
+            ] : null,
+        ];
+    }
+
+    /**
+     * The catalog fields (family, genus, epithet, author) a WFO name node maps
+     * to. Genus comes from the dedicated field; the epithet is the remainder of
+     * the author-less name after the genus.
+     *
+     * @param  array<string, mixed>  $node
+     * @return array{family: ?string, genus: string, name: string, authority: ?string}
+     */
+    private function applicableParts(array $node, ?string $family): array
+    {
+        $noAuthors = trim((string) ($node['fullNameStringNoAuthorsPlain'] ?? ''));
+        $genus = trim((string) ($node['genusString'] ?? '')) ?: $this->tokenAt($noAuthors, 0);
+
+        $epithet = trim(Str::of($noAuthors)->after($genus)->toString());
+        if ($epithet === '') {
+            $epithet = $this->tokenAt($noAuthors, 1);
+        }
+
+        $authority = trim((string) ($node['authorsString'] ?? ''));
+
+        return [
+            'family' => $family,
+            'genus' => $genus,
+            'name' => $epithet,
+            'authority' => $authority !== '' ? $authority : null,
+        ];
+    }
+
+    /**
+     * @param  array<int, array<string, mixed>>  $path
+     */
+    private function familyFromPath(array $path): ?string
+    {
+        foreach ($path as $node) {
+            if (($node['hasName']['rank'] ?? null) === 'family') {
+                return $node['hasName']['nameString'] ?? null;
+            }
+        }
+
+        return null;
+    }
+
+    private function tokenAt(string $value, int $index): string
+    {
+        $parts = preg_split('/\s+/', trim($value)) ?: [];
+
+        return $parts[$index] ?? '';
     }
 
     /**
@@ -224,17 +347,18 @@ class WfoNameResolver
     }
 
     /**
+     * @param  array<string, string>  $variables
      * @return array<string, mixed>
      */
-    private function query(string $match, string $suggest): array
+    private function query(array $variables, string $query): array
     {
         $response = Http::timeout(self::TIMEOUT)
             // WFO's server omits its intermediate certificate; see the bundle's header.
             ->withOptions(['verify' => base_path('resources/certs/wfo-ca-chain.pem')])
             ->acceptJson()
             ->post(self::ENDPOINT, [
-                'query' => self::QUERY,
-                'variables' => ['match' => $match, 'suggest' => $suggest],
+                'query' => $query,
+                'variables' => $variables,
             ]);
 
         if ($response->failed()) {
