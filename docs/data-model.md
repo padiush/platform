@@ -40,7 +40,7 @@ Project ─┬─ ProjectAccess ── ProjectCapability      (who can do what)
 | `InstanceAnswer` | One informant response to one item | `interview_instance_id` (uuid), `interview_section_id`, `interview_item_id`, `repeatable_index`, `answer` (**encrypted**), `catalog_species_id?`, `client_id?` (device uuid), `edited_at?` (LWW key) | int |
 | `InstanceAnswerRevision` | Overwrite audit trail for last-writer-wins | `instance_answer_id`, `answer` (**encrypted**), `catalog_species_id?`, `edited_at?`, `source` — immutable | int |
 | `InstanceMedia` | Audio/photo capture artifact | `interview_instance_id` (uuid), `client_id` (device uuid), `kind` (audio·photo), `storage_disk`/`storage_key`, `content_type`, `byte_size?`, `duration_s?`, `status`, `transcription_status?`, `transcription_text?` (**encrypted**), `captured_at?` | int |
-| `CatalogSpecies` | A scientific taxon in the project catalog | `project_id`, `family`, `genus`, `name`, `authority` | int |
+| `CatalogSpecies` | A scientific taxon in the project catalog | `project_id`, `family`, `genus`, `name`, `authority`, optional `metadata` | int |
 | `CatalogSpeciesPhoto` | Reference image for a taxon | `catalog_species_id`, … | int |
 | `ChartPreference` | Persisted per-field chart choice (data viewer) | field key, chart type | int |
 
