@@ -2,49 +2,33 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\WfoNameResolver;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Http;
+use Throwable;
 
 class WfoController extends Controller
 {
-    public function query(Request $request)
+    public function query(Request $request, WfoNameResolver $resolver): JsonResponse
     {
         $validated = $request->validate([
-            'input' => ['required', 'string', 'max:255'],
+            'genus' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:255'],
+            'authority' => ['nullable', 'string', 'max:255'],
         ]);
 
-        $terms = $validated['input'];
+        try {
+            $result = $resolver->resolve(
+                $validated['genus'],
+                $validated['name'],
+                $validated['authority'] ?? null,
+            );
+        } catch (Throwable $e) {
+            report($e);
 
-        $query = <<<'GRAPHQL'
-    query NameSearch($terms: String!) {
-        taxonNameSuggestion(termsString: $terms, limit: 100) {
-            id
-            stableUri
-            fullNameStringPlain
-            fullNameStringHtml
-            currentPreferredUsage {
-                hasName {
-                    id
-                    stableUri
-                    fullNameStringHtml
-                }
-            }
+            return response()->json(['error' => 'wfo_unreachable'], 502);
         }
-    }
-GRAPHQL;
 
-        // WFO's server omits its intermediate certificate; see the bundle's header.
-        $response = Http::timeout(15)
-            ->withOptions(['verify' => base_path('resources/certs/wfo-ca-chain.pem')])
-            ->withHeaders([
-                'Content-Type' => 'application/json',
-            ])->post('https://list.worldfloraonline.org/gql.php', [
-                'query' => $query,
-                'variables' => [
-                    'terms' => $terms,
-                ],
-            ]);
-
-        return response()->json($response->json());
+        return response()->json($result);
     }
 }

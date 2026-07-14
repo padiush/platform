@@ -5,6 +5,9 @@ namespace Tests\Feature;
 use App\Models\CatalogSpecies;
 use App\Models\InstanceAnswer;
 use App\Models\Project;
+use App\Models\ProjectAccess;
+use App\Models\ProjectCapability;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia as Assert;
 use Tests\Concerns\InteractsWithProjects;
@@ -234,5 +237,108 @@ class CatalogSpeciesTest extends TestCase
         );
 
         $response->assertRedirect(route('catalogs.index'));
+    }
+
+    /**
+     * A catalog-only role: can view the catalog, but has none of the
+     * data-viewing capabilities. Every seeded role that can view the catalog
+     * also has data access, so this bespoke role is built explicitly.
+     */
+    private function catalogOnlyViewer(): User
+    {
+        $capability = ProjectCapability::create([
+            'name' => 'Catalog only',
+            'manage_project' => false,
+            'manage_users' => false,
+            'manage_forms' => false,
+            'record_data' => false,
+            'manage_data' => false,
+            'generate_reports' => false,
+            'view_catalog' => true,
+            'edit_catalog' => false,
+        ]);
+
+        $user = User::factory()->create();
+        ProjectAccess::factory()->create([
+            'user_id' => $user->id,
+            'project_id' => $this->project->id,
+            'project_capability_id' => $capability->id,
+        ]);
+
+        return $user;
+    }
+
+    public function test_species_page_shows_the_linked_count_but_gates_the_records_from_a_catalog_only_viewer()
+    {
+        $species = $this->species(['genus' => 'Cecropia', 'name' => 'obtusifolia']);
+        InstanceAnswer::factory()->create([
+            'catalog_species_id' => $species->id,
+            'answer' => 'guarumo',
+        ]);
+
+        $response = $this->actingAs($this->catalogOnlyViewer())->get(
+            route('catalogs.species.show', [
+                'project' => $this->project,
+                'species' => $species,
+            ])
+        );
+
+        $response->assertOk();
+        $response->assertInertia(fn (Assert $page) => $page
+            ->component('Catalog/SpeciesShow')
+            ->where('canViewData', false)
+            ->where('linkedCount', 1)
+            ->where('linkedRecords', null)
+        );
+    }
+
+    public function test_data_capable_viewer_sees_the_linked_records()
+    {
+        $species = $this->species(['genus' => 'Cecropia', 'name' => 'obtusifolia']);
+        InstanceAnswer::factory()->create([
+            'catalog_species_id' => $species->id,
+            'answer' => 'guarumo',
+        ]);
+
+        // The seeded catalog-viewing roles all carry generate_reports.
+        $user = $this->userWithCapability($this->project, 'view_catalog');
+
+        $response = $this->actingAs($user)->get(
+            route('catalogs.species.show', [
+                'project' => $this->project,
+                'species' => $species,
+            ])
+        );
+
+        $response->assertOk();
+        $response->assertInertia(fn (Assert $page) => $page
+            ->component('Catalog/SpeciesShow')
+            ->where('canViewData', true)
+            ->where('linkedCount', 1)
+            ->has('linkedRecords.data', 1)
+            ->where('linkedRecords.data.0.recorded_name', 'guarumo')
+        );
+    }
+
+    public function test_linked_record_name_falls_back_to_the_binomial_when_no_free_text()
+    {
+        $species = $this->species(['genus' => 'Cecropia', 'name' => 'obtusifolia']);
+        InstanceAnswer::factory()->create([
+            'catalog_species_id' => $species->id,
+            'answer' => '',
+        ]);
+
+        $user = $this->userWithCapability($this->project, 'view_catalog');
+
+        $response = $this->actingAs($user)->get(
+            route('catalogs.species.show', [
+                'project' => $this->project,
+                'species' => $species,
+            ])
+        );
+
+        $response->assertInertia(fn (Assert $page) => $page
+            ->where('linkedRecords.data.0.recorded_name', 'Cecropia obtusifolia')
+        );
     }
 }

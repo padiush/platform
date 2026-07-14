@@ -1,5 +1,6 @@
 import Card from '@/Components/Card';
 import DeletionModal from '@/Components/DeletionModal';
+import EmptyState from '@/Components/EmptyState';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import {
     faArrowLeft,
@@ -12,44 +13,279 @@ import axios from 'axios';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-export default function SpeciesShow({ species, project }) {
+/**
+ * One WFO name with its accepted-name status and, optionally, a "spelling
+ * variant" flag. `full_name_html` already carries WFO's own italic markup.
+ */
+function WfoName({ name, highlight = false }) {
+    const { t } = useTranslation();
+
+    return (
+        <div
+            className={
+                highlight
+                    ? 'border-primary/40 bg-primary/5 rounded-box border p-3'
+                    : 'border-base-300 rounded-box border p-3'
+            }
+        >
+            <div className="flex flex-wrap items-center gap-2">
+                <span
+                    className="text-base"
+                    dangerouslySetInnerHTML={{ __html: name.full_name_html }}
+                />
+                {name.is_spelling_variant && (
+                    <span className="badge badge-warning badge-sm">
+                        {t('catalogs.wfo.spelling_variant')}
+                    </span>
+                )}
+            </div>
+            <div className="mt-1 text-sm">
+                {name.is_accepted ? (
+                    <span className="text-success font-medium">
+                        {t('catalogs.wfo.is_accepted')}
+                    </span>
+                ) : name.accepted_name ? (
+                    <span className="text-base-content/70">
+                        {t('catalogs.wfo.accepted_as')}{' '}
+                        <span
+                            className="text-success"
+                            dangerouslySetInnerHTML={{
+                                __html: name.accepted_name.full_name_html,
+                            }}
+                        />
+                    </span>
+                ) : (
+                    <span className="text-warning">
+                        {t('catalogs.wfo.no_accepted')}
+                    </span>
+                )}
+            </div>
+            {name.stable_uri && (
+                <a
+                    href={name.stable_uri}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn btn-ghost btn-xs mt-2"
+                >
+                    <FontAwesomeIcon
+                        icon={faArrowUpRightFromSquare}
+                        className="mr-1"
+                    />
+                    {t('catalogs.view_on_wfo')}
+                </a>
+            )}
+        </div>
+    );
+}
+
+function TaxonomicMatch({ wfo }) {
+    const { t } = useTranslation();
+    const hasCandidates = wfo.candidates.length > 0;
+
+    if (!wfo.match && !hasCandidates) {
+        return <p className="text-error text-sm">{t('catalogs.not_found')}</p>;
+    }
+
+    return (
+        <div className="space-y-4">
+            <p className="text-base-content/60 text-sm">
+                {t('catalogs.wfo.searched_for', { name: wfo.recorded })}
+            </p>
+
+            {wfo.match ? (
+                <div className="space-y-2">
+                    <p className="text-sm font-medium">
+                        {t('catalogs.wfo.exact_match')}
+                    </p>
+                    <WfoName name={wfo.match} highlight />
+                </div>
+            ) : (
+                <p className="text-warning text-sm">
+                    {t('catalogs.wfo.no_exact_match')}
+                </p>
+            )}
+
+            {hasCandidates && (
+                <div className="space-y-2">
+                    <p className="text-sm font-medium">
+                        {wfo.match
+                            ? t('catalogs.wfo.other_names')
+                            : t('catalogs.wfo.closest_names')}
+                    </p>
+                    <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                        {wfo.candidates.map((candidate, index) => (
+                            <WfoName
+                                key={candidate.wfo_id ?? index}
+                                name={candidate}
+                                highlight={!wfo.match && index === 0}
+                            />
+                        ))}
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+}
+
+function LinkedRecords({ project, canViewData, linkedCount, linkedRecords }) {
+    const { t, i18n } = useTranslation();
+
+    const formatDate = (iso) => {
+        if (!iso) return null;
+        const date = new Date(iso);
+        if (Number.isNaN(date.getTime())) return null;
+
+        try {
+            return date.toLocaleDateString(i18n.language);
+        } catch {
+            return date.toLocaleDateString();
+        }
+    };
+
+    if (!canViewData) {
+        return (
+            <p className="text-base-content/70 text-sm">
+                {t('catalogs.linked.count', { count: linkedCount })}
+                {' — '}
+                {t('catalogs.linked.gated')}
+            </p>
+        );
+    }
+
+    if (!linkedRecords || linkedRecords.data.length === 0) {
+        return (
+            <EmptyState
+                title={t('catalogs.linked.none_title')}
+                hint={t('catalogs.linked.none_hint')}
+            />
+        );
+    }
+
+    return (
+        <div className="space-y-4">
+            <p className="text-base-content/60 text-sm">
+                {t('catalogs.linked.count', { count: linkedCount })}
+            </p>
+
+            <ul className="border-base-300 divide-base-300 rounded-box divide-y border">
+                {linkedRecords.data.map((record) => {
+                    const meta = [
+                        record.recorder,
+                        record.form?.name,
+                        record.section?.name,
+                        formatDate(record.recorded_at),
+                    ]
+                        .filter(Boolean)
+                        .join(' · ');
+
+                    return (
+                        <li
+                            key={record.id}
+                            className="flex items-center justify-between gap-3 px-4 py-3"
+                        >
+                            <div className="min-w-0">
+                                <span className="block truncate font-medium">
+                                    {record.recorded_name}
+                                </span>
+                                {meta && (
+                                    <span className="text-base-content/60 block truncate text-xs">
+                                        {meta}
+                                    </span>
+                                )}
+                            </div>
+                            {record.form?.id && record.section?.id && (
+                                <Link
+                                    href={route('data.view', {
+                                        project: project.id,
+                                        form: record.form.id,
+                                        section: record.section.id,
+                                    })}
+                                    className="btn btn-ghost btn-xs shrink-0"
+                                >
+                                    {t('catalogs.linked.view_in_data')}
+                                    <FontAwesomeIcon
+                                        icon={faArrowUpRightFromSquare}
+                                    />
+                                </Link>
+                            )}
+                        </li>
+                    );
+                })}
+            </ul>
+
+            {linkedRecords.links.length > 3 && (
+                <div className="flex justify-center">
+                    <div className="join">
+                        {linkedRecords.links.map((link, index) => (
+                            <Link
+                                key={index}
+                                href={link.url || '#'}
+                                only={['linkedRecords']}
+                                preserveState
+                                preserveScroll
+                                className={`join-item btn btn-sm ${
+                                    link.active ? 'btn-primary' : 'btn-ghost'
+                                } ${link.url ? '' : 'btn-disabled'}`}
+                                dangerouslySetInnerHTML={{ __html: link.label }}
+                            />
+                        ))}
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+}
+
+export default function SpeciesShow({
+    species,
+    project,
+    linkedCount = 0,
+    canViewData = false,
+    linkedRecords = null,
+}) {
     const { t } = useTranslation();
     const deletionModalRef = useRef();
-    const [wfoData, setWfoData] = useState(null);
+    const [wfo, setWfo] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
     const scientificName = `${species.genus} ${species.name}`;
 
     useEffect(() => {
-        const fetchWFOData = async () => {
+        let active = true;
+
+        const fetchWfo = async () => {
+            setLoading(true);
+            setError(null);
+
             try {
                 const response = await axios.post(route('wfo.query'), {
-                    input: scientificName,
+                    genus: species.genus,
+                    name: species.name,
+                    authority: species.authority ?? '',
                 });
 
-                const suggestions = response.data.data?.taxonNameSuggestion;
-
-                if (!suggestions || suggestions.length === 0) {
-                    setWfoData(null);
-                    return;
+                if (active) {
+                    setWfo(response.data);
                 }
-
-                // Optionally, pick the first match or filter as needed
-                setWfoData(suggestions); // or set all if you want a list
             } catch (err) {
                 console.error('Error fetching WFO data:', err);
-                setError(t('catalogs.fetch_error'));
+                if (active) {
+                    setError(t('catalogs.fetch_error'));
+                }
             } finally {
-                setLoading(false);
+                if (active) {
+                    setLoading(false);
+                }
             }
         };
 
-        if (scientificName?.length > 0) {
-            setLoading(true);
-            fetchWFOData();
-        }
-    }, [scientificName, t]);
+        fetchWfo();
+
+        return () => {
+            active = false;
+        };
+    }, [species.genus, species.name, species.authority, t]);
 
     return (
         <AuthenticatedLayout
@@ -94,7 +330,7 @@ export default function SpeciesShow({ species, project }) {
                 </button>
             }
         >
-            <div className="p-4 md:pt-8 lg:pt-12">
+            <div className="space-y-4 p-4 md:pt-8 lg:pt-12">
                 <div className="grid w-full grid-cols-1 gap-4 lg:grid-cols-3">
                     <Card className="lg:col-span-2">
                         <h2 className="card-title">
@@ -106,66 +342,8 @@ export default function SpeciesShow({ species, project }) {
                             </p>
                         ) : error ? (
                             <p className="text-error text-sm">{error}</p>
-                        ) : wfoData && Array.isArray(wfoData) ? (
-                            <div className="space-y-4">
-                                <p className="text-sm">
-                                    {t('catalogs.wfo_query_info', {
-                                        name: scientificName,
-                                    })}
-                                </p>
-
-                                <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-                                    {wfoData.map((item, index) => (
-                                        <div
-                                            key={index}
-                                            className="border-b pb-3"
-                                        >
-                                            <div
-                                                className="text-lg italic"
-                                                dangerouslySetInnerHTML={{
-                                                    __html: item.fullNameStringHtml,
-                                                }}
-                                            />
-                                            {item.currentPreferredUsage
-                                                ?.hasName ? (
-                                                <div
-                                                    className="text-success text-sm"
-                                                    dangerouslySetInnerHTML={{
-                                                        __html:
-                                                            `<span class="font-medium">${t('catalogs.accepted_as')}:</span> ` +
-                                                            item
-                                                                .currentPreferredUsage
-                                                                .hasName
-                                                                .fullNameStringHtml,
-                                                    }}
-                                                />
-                                            ) : (
-                                                <p className="text-warning text-sm">
-                                                    {t(
-                                                        'catalogs.no_preferred_usage',
-                                                    )}
-                                                </p>
-                                            )}
-                                            <div className="mt-2">
-                                                <a
-                                                    href={item.stableUri}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className="btn btn-primary btn-xs"
-                                                >
-                                                    <FontAwesomeIcon
-                                                        icon={
-                                                            faArrowUpRightFromSquare
-                                                        }
-                                                        className="mr-2"
-                                                    />
-                                                    {t('catalogs.view_on_wfo')}
-                                                </a>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
+                        ) : wfo ? (
+                            <TaxonomicMatch wfo={wfo} />
                         ) : (
                             <p className="text-error text-sm">
                                 {t('catalogs.not_found')}
@@ -223,6 +401,16 @@ export default function SpeciesShow({ species, project }) {
                         </div>
                     </Card>
                 </div>
+
+                <Card>
+                    <h2 className="card-title">{t('catalogs.linked.title')}</h2>
+                    <LinkedRecords
+                        project={project}
+                        canViewData={canViewData}
+                        linkedCount={linkedCount}
+                        linkedRecords={linkedRecords}
+                    />
+                </Card>
             </div>
             <DeletionModal
                 modalRef={deletionModalRef}

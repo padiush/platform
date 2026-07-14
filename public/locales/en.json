@@ -333,6 +333,26 @@
             "label": "Sort by",
             "family": "Family (taxonomic)",
             "linked": "Most linked"
+        },
+        "linked": {
+            "title": "Linked records",
+            "count_one": "{{count}} linked record",
+            "count_other": "{{count}} linked records",
+            "gated": "you need data access to view the records",
+            "none_title": "No linked records",
+            "none_hint": "No interview has linked a name to this species yet.",
+            "view_in_data": "View in data"
+        },
+        "wfo": {
+            "searched_for": "WFO query: {{name}}",
+            "exact_match": "Authorship match",
+            "no_exact_match": "No exact match for the recorded authorship.",
+            "closest_names": "Closest names in WFO",
+            "other_names": "Other names in WFO",
+            "spelling_variant": "possible spelling variant",
+            "is_accepted": "Is an accepted name",
+            "accepted_as": "Accepted as",
+            "no_accepted": "WFO lists no accepted name for this record."
         }
     },
     "data": {
