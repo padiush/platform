@@ -6,6 +6,7 @@ use App\Models\CatalogSpecies;
 use App\Models\InstanceAnswer;
 use App\Models\Project;
 use App\Services\CatalogSpeciesSearch;
+use App\Services\GbifDistribution;
 use App\Services\WfoNameResolver;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\JsonResponse;
@@ -249,7 +250,46 @@ class ProjectCatalogController extends Controller
                 ? $this->linkedRecords($species, (int) $request->integer('page', 1))
                 : null,
             'canEdit' => (bool) $user->can('editCatalog', $project),
+            // Cached range only (no external call on page load); the page fetches
+            // it on demand when absent.
+            'distribution' => $species->metadata['distribution'] ?? null,
         ]);
+    }
+
+    /**
+     * Fetches the species' geographic range from WCVP (via GBIF) and caches it in
+     * the entry's metadata, so subsequent page views read it without a round trip.
+     */
+    public function fetchDistribution(
+        Project $project,
+        CatalogSpecies $species,
+        GbifDistribution $gbif
+    ): JsonResponse {
+        if (! Auth::user()->can('viewCatalog', $project)) {
+            return response()->json(['error' => 'forbidden'], 403);
+        }
+
+        if ($species->project_id !== $project->id) {
+            return response()->json(['error' => 'not_found'], 404);
+        }
+
+        try {
+            $distribution = $gbif->forSpecies(
+                $species->genus,
+                $species->name,
+                $species->authority,
+            ) + ['fetched_at' => now()->toIso8601String()];
+        } catch (Throwable $e) {
+            report($e);
+
+            return response()->json(['error' => 'gbif_unreachable'], 502);
+        }
+
+        $metadata = $species->metadata ?? [];
+        $metadata['distribution'] = $distribution;
+        $species->update(['metadata' => $metadata]);
+
+        return response()->json($distribution);
     }
 
     /**

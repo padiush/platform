@@ -367,6 +367,17 @@
             "updated": "Se actualizó la especie con el nombre de WFO.",
             "wfo_error": "No se pudo consultar WFO. Inténtalo de nuevo.",
             "name_not_found": "WFO ya no tiene ese registro."
+        },
+        "distribution": {
+            "title": "Distribución geográfica",
+            "native": "Nativa",
+            "introduced": "Introducida",
+            "no_match": "No se encontró la especie en GBIF/WCVP.",
+            "no_range": "WCVP no tiene datos de distribución para esta especie.",
+            "source": "Fuente: {{source}} · CC BY",
+            "refresh": "Actualizar",
+            "loading": "Consultando la distribución…",
+            "error": "No se pudo obtener la distribución."
         }
     },
     "data": {

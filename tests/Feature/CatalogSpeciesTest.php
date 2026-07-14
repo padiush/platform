@@ -467,6 +467,64 @@ class CatalogSpeciesTest extends TestCase
         Http::assertNothingSent();
     }
 
+    public function test_fetch_distribution_resolves_caches_and_returns_the_range()
+    {
+        $species = $this->species(['genus' => 'Cecropia', 'name' => 'obtusifolia']);
+        Http::fake([
+            'api.gbif.org/v1/species/match*' => Http::response([
+                'usageKey' => 2984473, 'scientificName' => 'Cecropia obtusifolia Bertol.',
+                'status' => 'ACCEPTED', 'matchType' => 'EXACT',
+            ]),
+            'api.gbif.org/v1/species/*/distributions*' => Http::response(['results' => [
+                ['locationId' => 'TDWG:BLZ', 'locality' => 'Belize', 'source' => 'The World Checklist of Vascular Plants (WCVP)'],
+                ['locationId' => 'TDWG:HWI', 'locality' => 'Hawaii', 'source' => 'The World Checklist of Vascular Plants (WCVP)', 'establishmentMeans' => 'INTRODUCED'],
+            ]]),
+        ]);
+
+        $user = $this->userWithCapability($this->project, 'view_catalog');
+
+        $response = $this->actingAs($user)->postJson(
+            route('catalogs.species.distribution', ['project' => $this->project, 'species' => $species])
+        );
+
+        $response->assertOk();
+        $response->assertJsonPath('native.0.name', 'Belize');
+        $response->assertJsonPath('introduced.0.name', 'Hawaii');
+
+        // Cached into the entry's metadata for subsequent page loads.
+        $species->refresh();
+        $this->assertSame('Belize', $species->metadata['distribution']['native'][0]['name']);
+        $this->assertArrayHasKey('fetched_at', $species->metadata['distribution']);
+    }
+
+    public function test_outsider_cannot_fetch_distribution()
+    {
+        Http::fake();
+        $species = $this->species(['genus' => 'Cecropia', 'name' => 'obtusifolia']);
+
+        $response = $this->actingAs($this->outsider())->postJson(
+            route('catalogs.species.distribution', ['project' => $this->project, 'species' => $species])
+        );
+
+        $response->assertForbidden();
+        Http::assertNothingSent();
+    }
+
+    public function test_fetch_distribution_returns_502_when_gbif_is_unreachable()
+    {
+        $species = $this->species(['genus' => 'Cecropia', 'name' => 'obtusifolia']);
+        Http::fake(['api.gbif.org/*' => Http::response('', 500)]);
+
+        $user = $this->userWithCapability($this->project, 'view_catalog');
+
+        $response = $this->actingAs($user)->postJson(
+            route('catalogs.species.distribution', ['project' => $this->project, 'species' => $species])
+        );
+
+        $response->assertStatus(502);
+        $response->assertJsonPath('error', 'gbif_unreachable');
+    }
+
     public function test_preview_returns_the_current_and_proposed_taxonomy()
     {
         $species = $this->species([

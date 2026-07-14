@@ -1,5 +1,5 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('axios', () => ({
     default: { post: vi.fn() },
@@ -48,6 +48,11 @@ const spellingVariantResult = {
 };
 
 describe('SpeciesShow', () => {
+    beforeEach(() => {
+        // Each test sets its own axios.post behaviour; isolate call history.
+        axios.post.mockReset();
+    });
+
     it('queries WFO with the authored name and flags an accepted spelling variant', async () => {
         axios.post.mockResolvedValue({ data: spellingVariantResult });
 
@@ -173,5 +178,56 @@ describe('SpeciesShow', () => {
         expect(
             screen.queryByText('catalogs.accept.use_this'),
         ).not.toBeInTheDocument();
+    });
+
+    it('renders a cached distribution without refetching it', async () => {
+        axios.post.mockResolvedValue({ data: spellingVariantResult });
+
+        render(
+            <SpeciesShow
+                species={species}
+                project={project}
+                distribution={{
+                    matched: { name: 'Justicia carthaginensis Jacq.' },
+                    native: [{ code: 'TDWG:BLZ', name: 'Belize' }],
+                    introduced: [{ code: 'TDWG:HWI', name: 'Hawaii' }],
+                    source: 'WCVP via GBIF',
+                }}
+            />,
+        );
+
+        expect(await screen.findByText('Belize')).toBeInTheDocument();
+        expect(screen.getByText('Hawaii')).toBeInTheDocument();
+        // Cached range is used as-is; no distribution request is made.
+        expect(
+            axios.post.mock.calls.every(
+                ([url]) => !url.includes('distribution'),
+            ),
+        ).toBe(true);
+    });
+
+    it('fetches the distribution when none is cached', async () => {
+        axios.post.mockImplementation((url) => {
+            if (url.includes('distribution')) {
+                return Promise.resolve({
+                    data: {
+                        matched: { name: 'Cecropia obtusifolia Bertol.' },
+                        native: [
+                            { code: 'TDWG:MXN', name: 'Mexico Northwest' },
+                        ],
+                        introduced: [],
+                        source: 'WCVP via GBIF',
+                    },
+                });
+            }
+            return Promise.resolve({ data: spellingVariantResult });
+        });
+
+        render(<SpeciesShow species={species} project={project} />);
+
+        expect(await screen.findByText('Mexico Northwest')).toBeInTheDocument();
+        expect(
+            axios.post.mock.calls.some(([url]) => url.includes('distribution')),
+        ).toBe(true);
     });
 });
