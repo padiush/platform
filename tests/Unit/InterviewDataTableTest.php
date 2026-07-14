@@ -144,7 +144,7 @@ class InterviewDataTableTest extends TestCase
         $this->assertNull($cells[$blank->id]);
     }
 
-    public function test_species_cell_shows_the_linked_binomial()
+    public function test_species_cell_preserves_the_recorded_name()
     {
         $section = $this->section();
         $item = $this->item($section, 'text', ['link_to_species' => true]);
@@ -160,7 +160,7 @@ class InterviewDataTableTest extends TestCase
         $cell = $this->rows($section)->items()[0]['cells'][$item->id];
 
         $this->assertSame('species', $cell['kind']);
-        $this->assertSame('Cecropia obtusifolia', $cell['value']);
+        $this->assertSame('guarumo', $cell['value']);
     }
 
     public function test_interviewer_filter_narrows_rows()
@@ -297,7 +297,7 @@ class InterviewDataTableTest extends TestCase
         ));
     }
 
-    public function test_summary_counts_species_citations()
+    public function test_summary_counts_recorded_names_for_species_linked_fields()
     {
         $section = $this->section();
         $item = $this->item($section, 'text', ['link_to_species' => true]);
@@ -309,13 +309,14 @@ class InterviewDataTableTest extends TestCase
 
         $this->answer($this->interview(), $section, $item, 'guaba', null, $species->id);
         $this->answer($this->interview(), $section, $item, 'guama', null, $species->id);
+        $this->answer($this->interview(), $section, $item, 'guaba');
 
         $summary = collect($this->table->summary($this->form, $section))
             ->firstWhere('item_id', $item->id);
 
         $this->assertSame('species', $summary['kind']);
         $this->assertSame(
-            ['Inga edulis' => 2],
+            ['guaba' => 2, 'guama' => 1],
             collect($summary['data'])->pluck('count', 'label')->all(),
         );
     }
