@@ -133,6 +133,41 @@ class WfoNameResolver
         ];
     }
 
+    private const SEARCH_QUERY = <<<'GRAPHQL'
+    query Search($terms: String!) {
+        taxonNameSuggestion(termsString: $terms, limit: 20) {
+            id
+            stableUri
+            fullNameStringPlain
+            fullNameStringHtml
+            currentPreferredUsage {
+                hasName { id stableUri fullNameStringPlain fullNameStringHtml }
+            }
+        }
+    }
+    GRAPHQL;
+
+    /**
+     * Free-text WFO name search for registration: candidate names with their
+     * accepted/synonym status, in WFO's suggestion order.
+     *
+     * @return list<array<string, mixed>>
+     */
+    public function search(string $terms): array
+    {
+        $terms = trim($terms);
+
+        if ($terms === '') {
+            return [];
+        }
+
+        $data = $this->query(['terms' => $terms], self::SEARCH_QUERY);
+
+        return (new Collection($data['taxonNameSuggestion'] ?? []))
+            ->map(fn (array $node) => $this->name($node))
+            ->all();
+    }
+
     /**
      * Fetches one WFO name by id with the taxonomy an "accept" action applies:
      * family (from the classification path), genus, specific epithet and author —

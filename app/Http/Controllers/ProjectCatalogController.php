@@ -86,6 +86,8 @@ class ProjectCatalogController extends Controller
             'genus' => 'required|string',
             'name' => 'required|string',
             'authority' => 'nullable|string',
+            // Provenance when the entry was prefilled from a WFO name.
+            'wfo_id' => 'nullable|string|max:255',
         ]);
 
         if (! Auth::user()->can('editCatalog', $project)) {
@@ -101,12 +103,78 @@ class ProjectCatalogController extends Controller
             'genus' => $request->genus,
             'name' => $request->name,
             'authority' => $request->authority,
+            'metadata' => $request->filled('wfo_id')
+                ? ['wfo' => ['id' => $request->wfo_id, 'based_at' => now()->toIso8601String()]]
+                : null,
         ]);
 
         return redirect()
             ->route('catalogs.index')
             ->with('message', 'catalogs.species_registered')
             ->with('message_type', 'success');
+    }
+
+    /**
+     * Free-text WFO name search used to prefill the registration form from a
+     * recognised source instead of hand-typing (and mistyping) the taxonomy.
+     */
+    public function searchWfoNames(
+        Request $request,
+        Project $project,
+        WfoNameResolver $resolver
+    ): JsonResponse {
+        if (! Auth::user()->can('editCatalog', $project)) {
+            return response()->json(['error' => 'forbidden'], 403);
+        }
+
+        $validated = $request->validate([
+            'q' => ['required', 'string', 'min:2', 'max:255'],
+        ]);
+
+        try {
+            $results = $resolver->search($validated['q']);
+        } catch (Throwable $e) {
+            report($e);
+
+            return response()->json(['error' => 'wfo_unreachable'], 502);
+        }
+
+        return response()->json(['results' => $results]);
+    }
+
+    /**
+     * Resolves a chosen WFO name to the catalog fields the registration form
+     * prefills (family, genus, epithet, authority).
+     */
+    public function resolveWfoName(
+        Request $request,
+        Project $project,
+        WfoNameResolver $resolver
+    ): JsonResponse {
+        if (! Auth::user()->can('editCatalog', $project)) {
+            return response()->json(['error' => 'forbidden'], 403);
+        }
+
+        $validated = $request->validate([
+            'wfo_id' => ['required', 'string', 'max:255'],
+        ]);
+
+        try {
+            $name = $resolver->fetchName($validated['wfo_id']);
+        } catch (Throwable $e) {
+            report($e);
+
+            return response()->json(['error' => 'wfo_unreachable'], 502);
+        }
+
+        if ($name === null) {
+            return response()->json(['error' => 'name_not_found'], 404);
+        }
+
+        return response()->json([
+            'wfo_id' => $name['wfo_id'],
+            'name_plain' => $name['full_name_plain'],
+        ] + $name['apply']);
     }
 
     public function show(
