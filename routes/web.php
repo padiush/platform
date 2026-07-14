@@ -141,6 +141,17 @@ Route::middleware(['auth'])->group(function () {
         )->name('catalogs.species.register');
         Route::post('/catalogs/{project}/species/register', 'storeSpecies');
 
+        // Prefill registration from a WFO name. Literal paths must precede the
+        // {species} route below, or they'd be captured as a species id.
+        Route::get(
+            '/catalogs/{project}/species/wfo-search',
+            'searchWfoNames'
+        )->name('catalogs.species.wfo-search');
+        Route::post(
+            '/catalogs/{project}/species/wfo-resolve',
+            'resolveWfoName'
+        )->name('catalogs.species.wfo-resolve');
+
         Route::get(
             '/catalogs/{project}/species/{species}',
             'showSpecies'

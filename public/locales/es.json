@@ -378,6 +378,17 @@
             "refresh": "Actualizar",
             "loading": "Consultando la distribución…",
             "error": "No se pudo obtener la distribución."
+        },
+        "source": {
+            "label": "Buscar en una fuente (WFO)",
+            "placeholder": "Escribe el nombre científico…",
+            "prefilled": "Prellenado desde WFO: {{name}}",
+            "searching": "Buscando…",
+            "no_results": "Sin coincidencias en WFO.",
+            "error": "No se pudo consultar WFO.",
+            "resolve_error": "No se pudo obtener el nombre.",
+            "accepted": "Nombre aceptado",
+            "synonym": "Sinónimo"
         }
     },
     "data": {

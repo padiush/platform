@@ -551,4 +551,87 @@ class CatalogSpeciesTest extends TestCase
         $response->assertJsonPath('proposed.name', 'carthaginensis');
         $response->assertJsonPath('proposed.family', 'Acanthaceae');
     }
+
+    public function test_editor_can_search_wfo_names_for_registration()
+    {
+        Http::fake([
+            'list.worldfloraonline.org/*' => Http::response(['data' => [
+                'taxonNameSuggestion' => [[
+                    'id' => 'wfo-0000354479',
+                    'stableUri' => 'https://list.worldfloraonline.org/wfo-0000354479',
+                    'fullNameStringPlain' => 'Justicia carthaginensis Jacq.',
+                    'fullNameStringHtml' => '<i>Justicia carthaginensis</i> Jacq.',
+                    'currentPreferredUsage' => ['hasName' => [
+                        'id' => 'wfo-0000354479',
+                        'fullNameStringPlain' => 'Justicia carthaginensis Jacq.',
+                        'fullNameStringHtml' => '<i>Justicia carthaginensis</i> Jacq.',
+                    ]],
+                ]],
+            ]]),
+        ]);
+
+        $user = $this->userWithCapability($this->project, 'edit_catalog');
+
+        $response = $this->actingAs($user)->getJson(
+            route('catalogs.species.wfo-search', ['project' => $this->project, 'q' => 'Justicia cartha'])
+        );
+
+        $response->assertOk();
+        $response->assertJsonPath('results.0.full_name_plain', 'Justicia carthaginensis Jacq.');
+        $response->assertJsonPath('results.0.is_accepted', true);
+    }
+
+    public function test_wfo_search_requires_edit_capability()
+    {
+        Http::fake();
+        $user = $this->userWithCapability($this->project, 'edit_catalog', false);
+
+        $response = $this->actingAs($user)->getJson(
+            route('catalogs.species.wfo-search', ['project' => $this->project, 'q' => 'Justicia'])
+        );
+
+        $response->assertForbidden();
+        Http::assertNothingSent();
+    }
+
+    public function test_resolve_wfo_name_returns_the_prefill_fields()
+    {
+        $this->fakeWfoName(
+            'wfo-0000354479', 'Justicia carthaginensis', 'Justicia', 'Jacq.',
+            $this->acceptedNode('wfo-0000354479', 'Justicia carthaginensis', 'Justicia', 'Jacq.'),
+            'Acanthaceae'
+        );
+        $user = $this->userWithCapability($this->project, 'edit_catalog');
+
+        $response = $this->actingAs($user)->postJson(
+            route('catalogs.species.wfo-resolve', ['project' => $this->project]),
+            ['wfo_id' => 'wfo-0000354479']
+        );
+
+        $response->assertOk();
+        $response->assertJson([
+            'wfo_id' => 'wfo-0000354479',
+            'family' => 'Acanthaceae',
+            'genus' => 'Justicia',
+            'name' => 'carthaginensis',
+            'authority' => 'Jacq.',
+        ]);
+    }
+
+    public function test_registering_with_a_wfo_id_records_provenance()
+    {
+        $user = $this->userWithCapability($this->project, 'edit_catalog');
+
+        $this->actingAs($user)->post(
+            route('catalogs.species.register', $this->project),
+            [
+                'family' => 'Acanthaceae', 'genus' => 'Justicia',
+                'name' => 'carthaginensis', 'authority' => 'Jacq.',
+                'wfo_id' => 'wfo-0000354479',
+            ]
+        );
+
+        $species = CatalogSpecies::where('project_id', $this->project->id)->firstOrFail();
+        $this->assertSame('wfo-0000354479', $species->metadata['wfo']['id']);
+    }
 }

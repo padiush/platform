@@ -378,6 +378,17 @@
             "refresh": "Refresh",
             "loading": "Loading distribution…",
             "error": "Could not load the distribution."
+        },
+        "source": {
+            "label": "Search a source (WFO)",
+            "placeholder": "Type the scientific name…",
+            "prefilled": "Prefilled from WFO: {{name}}",
+            "searching": "Searching…",
+            "no_results": "No matches in WFO.",
+            "error": "Could not search WFO.",
+            "resolve_error": "Could not load the name.",
+            "accepted": "Accepted name",
+            "synonym": "Synonym"
         }
     },
     "data": {
