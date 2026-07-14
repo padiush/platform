@@ -28,8 +28,15 @@ export default function SpeciesForm({ project, onClose }) {
     const [searching, setSearching] = useState(false);
     const [searchError, setSearchError] = useState(null);
     const [sourceName, setSourceName] = useState(null);
+    const [photoInfo, setPhotoInfo] = useState(null);
 
     const showResults = query.trim().length >= 2;
+    const scientificName = `${data.genus} ${data.name}`.trim();
+    const showPhoto =
+        data.genus.trim() &&
+        data.name.trim() &&
+        photoInfo?.found &&
+        photoInfo.for === scientificName;
 
     useEffect(() => {
         const term = query.trim();
@@ -63,6 +70,37 @@ export default function SpeciesForm({ project, onClose }) {
             clearTimeout(timer);
         };
     }, [query, project.id, t]);
+
+    // A reference photo (from iNaturalist) to visually confirm the species being
+    // registered. Fetched on the current genus + epithet, whether prefilled or
+    // typed. The image itself is proxied and never stored.
+    useEffect(() => {
+        const sci = `${data.genus} ${data.name}`.trim();
+        if (!data.genus.trim() || !data.name.trim()) return undefined;
+
+        let active = true;
+        const timer = setTimeout(() => {
+            axios
+                .get(
+                    route('catalogs.species.inaturalist', {
+                        project: project.id,
+                    }),
+                    {
+                        params: { name: sci },
+                    },
+                )
+                .then(
+                    (response) =>
+                        active && setPhotoInfo({ ...response.data, for: sci }),
+                )
+                .catch(() => active && setPhotoInfo(null));
+        }, 500);
+
+        return () => {
+            active = false;
+            clearTimeout(timer);
+        };
+    }, [data.genus, data.name, project.id]);
 
     const selectCandidate = (candidate) => {
         axios
@@ -198,6 +236,41 @@ export default function SpeciesForm({ project, onClose }) {
                 {field('name', t('catalogs.species'), true)}
                 {field('authority', t('catalogs.authority'))}
             </div>
+
+            {showPhoto && (
+                <figure className="mt-4 max-w-xs">
+                    <p className="mb-2 text-sm font-medium">
+                        {t('catalogs.photo.title')}
+                    </p>
+                    <img
+                        src={route('catalogs.species.inaturalist-photo', {
+                            project: project.id,
+                            name: scientificName,
+                        })}
+                        alt={scientificName}
+                        loading="lazy"
+                        className="border-base-300 rounded-box w-full border"
+                        onError={() => setPhotoInfo(null)}
+                    />
+                    <figcaption className="text-base-content/60 mt-1 text-xs">
+                        {photoInfo.attribution}
+                        {photoInfo.page_url && (
+                            <>
+                                {' · '}
+                                <a
+                                    href={photoInfo.page_url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="link"
+                                >
+                                    {photoInfo.source}
+                                </a>
+                            </>
+                        )}
+                    </figcaption>
+                </figure>
+            )}
+
             <div className="mt-4 flex justify-end gap-2">
                 <button
                     type="button"

@@ -634,4 +634,75 @@ class CatalogSpeciesTest extends TestCase
         $species = CatalogSpecies::where('project_id', $this->project->id)->firstOrFail();
         $this->assertSame('wfo-0000354479', $species->metadata['wfo']['id']);
     }
+
+    private function fakeInaturalist(string $photoUrl): void
+    {
+        Http::fake([
+            'api.inaturalist.org/*' => Http::response(['results' => [[
+                'id' => 160255,
+                'name' => 'Cecropia obtusifolia',
+                'default_photo' => [
+                    'medium_url' => $photoUrl,
+                    'attribution' => '(c) Reinaldo Aguilar (CC BY-NC-SA)',
+                    'license_code' => 'cc-by-nc-sa',
+                ],
+            ]]]),
+            'static.inaturalist.org/*' => Http::response('IMAGEBYTES', 200, ['Content-Type' => 'image/jpeg']),
+        ]);
+    }
+
+    public function test_inaturalist_info_returns_the_photo_credit()
+    {
+        $this->fakeInaturalist('https://static.inaturalist.org/photos/1/medium.jpg');
+        $user = $this->userWithCapability($this->project, 'view_catalog');
+
+        $response = $this->actingAs($user)->getJson(
+            route('catalogs.species.inaturalist', ['project' => $this->project, 'name' => 'Cecropia obtusifolia'])
+        );
+
+        $response->assertOk();
+        $response->assertJsonPath('found', true);
+        $response->assertJsonPath('attribution', '(c) Reinaldo Aguilar (CC BY-NC-SA)');
+        $response->assertJsonPath('source', 'iNaturalist');
+    }
+
+    public function test_inaturalist_photo_streams_from_an_allowed_host()
+    {
+        $this->fakeInaturalist('https://static.inaturalist.org/photos/1/medium.jpg');
+        $user = $this->userWithCapability($this->project, 'view_catalog');
+
+        $response = $this->actingAs($user)->get(
+            route('catalogs.species.inaturalist-photo', ['project' => $this->project, 'name' => 'Cecropia obtusifolia'])
+        );
+
+        $response->assertOk();
+        $this->assertSame('image/jpeg', $response->headers->get('Content-Type'));
+        $this->assertSame('IMAGEBYTES', $response->getContent());
+    }
+
+    public function test_inaturalist_photo_refuses_a_host_outside_the_allowlist()
+    {
+        // iNaturalist's API points at an unexpected host: the proxy must not fetch it.
+        $this->fakeInaturalist('https://evil.example.com/x.jpg');
+        $user = $this->userWithCapability($this->project, 'view_catalog');
+
+        $response = $this->actingAs($user)->get(
+            route('catalogs.species.inaturalist-photo', ['project' => $this->project, 'name' => 'Cecropia obtusifolia'])
+        );
+
+        $response->assertNotFound();
+        Http::assertNotSent(fn ($request) => str_contains($request->url(), 'evil.example.com'));
+    }
+
+    public function test_inaturalist_endpoints_require_catalog_access()
+    {
+        Http::fake();
+
+        $response = $this->actingAs($this->outsider())->getJson(
+            route('catalogs.species.inaturalist', ['project' => $this->project, 'name' => 'Cecropia'])
+        );
+
+        $response->assertForbidden();
+        Http::assertNothingSent();
+    }
 }

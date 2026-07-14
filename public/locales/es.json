@@ -389,6 +389,9 @@
             "resolve_error": "No se pudo obtener el nombre.",
             "accepted": "Nombre aceptado",
             "synonym": "Sinónimo"
+        },
+        "photo": {
+            "title": "Foto de referencia"
         }
     },
     "data": {
