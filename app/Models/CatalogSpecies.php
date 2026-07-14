@@ -15,6 +15,11 @@ class CatalogSpecies extends Model
         'genus',
         'name',
         'authority',
+        'metadata',
+    ];
+
+    protected $casts = [
+        'metadata' => 'array',
     ];
 
     public function project()
