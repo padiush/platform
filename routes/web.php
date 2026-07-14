@@ -146,6 +146,12 @@ Route::middleware(['auth'])->group(function () {
             'showSpecies'
         )->name('catalogs.species.show');
 
+        // Fetch (and cache) the species' geographic range from WCVP via GBIF.
+        Route::post(
+            '/catalogs/{project}/species/{species}/distribution',
+            'fetchDistribution'
+        )->name('catalogs.species.distribution');
+
         // Preview the taxonomy a WFO name would apply, then adopt it.
         Route::post(
             '/catalogs/{project}/species/{species}/wfo-preview',

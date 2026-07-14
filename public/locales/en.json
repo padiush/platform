@@ -367,6 +367,17 @@
             "updated": "The species was updated from WFO.",
             "wfo_error": "WFO could not be reached. Please try again.",
             "name_not_found": "WFO no longer has that record."
+        },
+        "distribution": {
+            "title": "Geographic distribution",
+            "native": "Native",
+            "introduced": "Introduced",
+            "no_match": "Species not found in GBIF/WCVP.",
+            "no_range": "WCVP has no distribution data for this species.",
+            "source": "Source: {{source}} · CC BY",
+            "refresh": "Refresh",
+            "loading": "Loading distribution…",
+            "error": "Could not load the distribution."
         }
     },
     "data": {

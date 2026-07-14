@@ -378,6 +378,90 @@ function LinkedRecords({ project, canViewData, linkedCount, linkedRecords }) {
     );
 }
 
+function RegionChips({ label, regions, tone }) {
+    if (regions.length === 0) return null;
+
+    return (
+        <div className="space-y-1">
+            <p className="text-sm font-medium">
+                {label} · {regions.length}
+            </p>
+            <div className="flex flex-wrap gap-1">
+                {regions.map((region) => (
+                    <span
+                        key={(region.code ?? '') + region.name}
+                        className={`badge badge-sm ${tone}`}
+                    >
+                        {region.name}
+                    </span>
+                ))}
+            </div>
+        </div>
+    );
+}
+
+function DistributionCard({ distribution, loading, error, onRefresh }) {
+    const { t } = useTranslation();
+
+    if (loading) {
+        return (
+            <p className="text-base-content/70 text-sm">
+                {t('catalogs.distribution.loading')}
+            </p>
+        );
+    }
+
+    if (error) {
+        return <p className="text-error text-sm">{error}</p>;
+    }
+
+    if (!distribution) return null;
+
+    const { matched, native, introduced } = distribution;
+    const hasRange = matched && (native.length > 0 || introduced.length > 0);
+
+    return (
+        <div className="space-y-4">
+            {!matched ? (
+                <p className="text-warning text-sm">
+                    {t('catalogs.distribution.no_match')}
+                </p>
+            ) : !hasRange ? (
+                <p className="text-base-content/70 text-sm">
+                    {t('catalogs.distribution.no_range')}
+                </p>
+            ) : (
+                <>
+                    <RegionChips
+                        label={t('catalogs.distribution.native')}
+                        regions={native}
+                        tone="badge-success badge-outline"
+                    />
+                    <RegionChips
+                        label={t('catalogs.distribution.introduced')}
+                        regions={introduced}
+                        tone="badge-warning badge-outline"
+                    />
+                </>
+            )}
+            <div className="flex items-center justify-between gap-2">
+                <p className="text-base-content/50 text-xs">
+                    {t('catalogs.distribution.source', {
+                        source: distribution.source,
+                    })}
+                </p>
+                <button
+                    type="button"
+                    className="btn btn-ghost btn-xs"
+                    onClick={onRefresh}
+                >
+                    {t('catalogs.distribution.refresh')}
+                </button>
+            </div>
+        </div>
+    );
+}
+
 export default function SpeciesShow({
     species,
     project,
@@ -385,6 +469,7 @@ export default function SpeciesShow({
     canViewData = false,
     linkedRecords = null,
     canEdit = false,
+    distribution = null,
 }) {
     const { t } = useTranslation();
     const deletionModalRef = useRef();
@@ -399,7 +484,53 @@ export default function SpeciesShow({
     const [previewError, setPreviewError] = useState(null);
     const [submitting, setSubmitting] = useState(false);
 
+    // Geographic range (WCVP via GBIF): served from cache when present, fetched
+    // once on demand otherwise. Start in the loading state when there's no cache
+    // so the effect's async fetch never sets state synchronously.
+    const [dist, setDist] = useState(distribution);
+    const [distLoading, setDistLoading] = useState(!distribution);
+    const [distError, setDistError] = useState(null);
+
     const scientificName = `${species.genus} ${species.name}`;
+
+    useEffect(() => {
+        if (distribution) return undefined;
+
+        let active = true;
+        axios
+            .post(
+                route('catalogs.species.distribution', {
+                    project: project.id,
+                    species: species.id,
+                }),
+            )
+            .then((response) => active && setDist(response.data))
+            .catch(
+                () => active && setDistError(t('catalogs.distribution.error')),
+            )
+            .finally(() => active && setDistLoading(false));
+
+        return () => {
+            active = false;
+        };
+        // Only the initial, uncached load; refresh is user-triggered.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [species.id]);
+
+    const refreshDistribution = () => {
+        setDistLoading(true);
+        setDistError(null);
+        axios
+            .post(
+                route('catalogs.species.distribution', {
+                    project: project.id,
+                    species: species.id,
+                }),
+            )
+            .then((response) => setDist(response.data))
+            .catch(() => setDistError(t('catalogs.distribution.error')))
+            .finally(() => setDistLoading(false));
+    };
 
     const openAccept = (wfoId, useAccepted) => {
         setAcceptTarget({ wfoId, useAccepted });
@@ -603,6 +734,18 @@ export default function SpeciesShow({
                         </div>
                     </Card>
                 </div>
+
+                <Card>
+                    <h2 className="card-title">
+                        {t('catalogs.distribution.title')}
+                    </h2>
+                    <DistributionCard
+                        distribution={dist}
+                        loading={distLoading}
+                        error={distError}
+                        onRefresh={refreshDistribution}
+                    />
+                </Card>
 
                 <Card>
                     <h2 className="card-title">{t('catalogs.linked.title')}</h2>
