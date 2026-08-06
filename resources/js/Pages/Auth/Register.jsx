@@ -1,10 +1,9 @@
 import Input from '@/Components/Input';
 import AuthLayout from '@/Layouts/AuthLayout';
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Link, useForm } from '@inertiajs/react';
 import { useTranslation } from 'react-i18next';
 
 export default function Register({
-    bgImage,
     honeypot,
     invitation = null,
     registrationUrl = null,
@@ -29,21 +28,19 @@ export default function Register({
     };
 
     return (
-        <AuthLayout title={t('auth.register')} bgUrl={bgImage}>
-            <Head title={t('auth.register')} />
-            <p className="text-base-content">
-                {t(
-                    invitation
-                        ? 'auth.invited_register_prompt'
-                        : 'auth.register_prompt',
-                )}
-            </p>
-            <form
-                onSubmit={submit}
-                className="mx-auto w-full px-4 pt-4 sm:w-2/3 lg:px-0"
-            >
+        <AuthLayout
+            title={t('auth.register')}
+            heading={t('auth.register')}
+            description={t(
+                invitation
+                    ? 'auth.invited_register_prompt'
+                    : 'auth.register_prompt',
+            )}
+        >
+            <form onSubmit={submit} className="space-y-2">
                 <Input
                     name="name"
+                    autoComplete="name"
                     label={t('auth.name')}
                     value={data.name}
                     onChange={(e) => setData('name', e.target.value)}
@@ -53,6 +50,7 @@ export default function Register({
                 <Input
                     name="email"
                     type="email"
+                    autoComplete="email"
                     label={t('auth.email')}
                     value={data.email}
                     onChange={(e) => setData('email', e.target.value)}
@@ -63,6 +61,7 @@ export default function Register({
                 <Input
                     name="password"
                     type="password"
+                    autoComplete="new-password"
                     label={t('auth.password')}
                     value={data.password}
                     onChange={(e) => setData('password', e.target.value)}
@@ -72,6 +71,7 @@ export default function Register({
                 <Input
                     name="password_confirmation"
                     type="password"
+                    autoComplete="new-password"
                     label={t('auth.confirm_password')}
                     value={data.password_confirmation}
                     onChange={(e) =>
@@ -80,11 +80,9 @@ export default function Register({
                     error={errors.password_confirmation}
                     required
                 />
+
                 {honeypot?.enabled && (
-                    <div
-                        name={`${honeypot.nameFieldName}_wrap`}
-                        style={{ display: 'none' }}
-                    >
+                    <div style={{ display: 'none' }}>
                         <input
                             type="text"
                             name={honeypot.nameFieldName}
@@ -93,35 +91,33 @@ export default function Register({
                             onChange={(e) =>
                                 setData(honeypot.nameFieldName, e.target.value)
                             }
+                            tabIndex={-1}
+                            autoComplete="off"
                         />
                         <input
                             type="text"
                             name={honeypot.validFromFieldName}
                             value={data[honeypot.validFromFieldName]}
-                            onChange={(e) =>
-                                setData(
-                                    honeypot.validFromFieldName,
-                                    e.target.value,
-                                )
-                            }
+                            readOnly
                         />
                     </div>
                 )}
-                <div className="px-4 pt-4 pb-2">
-                    <button
-                        type="submit"
-                        className="btn btn-primary"
-                        disabled={processing}
-                    >
-                        {t('auth.register')}
-                    </button>
-                </div>
+
+                <button
+                    type="submit"
+                    className="btn btn-primary mt-4 w-full"
+                    disabled={processing}
+                >
+                    {t('auth.register')}
+                </button>
             </form>
-            <div className="pt-2">
-                <Link href={route('login')} className="link link-hover text-sm">
-                    {t('auth.already_registered')}
+
+            <p className="text-base-content/70 mt-6 text-sm">
+                {t('auth.already_registered')}{' '}
+                <Link href={route('login')} className="link link-primary">
+                    {t('auth.login')}
                 </Link>
-            </div>
+            </p>
         </AuthLayout>
     );
 }

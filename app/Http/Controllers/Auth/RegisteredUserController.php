@@ -13,7 +13,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules;
@@ -102,10 +101,6 @@ class RegisteredUserController extends Controller
         ?string $email = null
     ): Response {
         return Inertia::render('Auth/Register', [
-            'bgImage' => Storage::disk('s3')->temporaryUrl(
-                'public/bg.jpg',
-                now()->addMinutes(5)
-            ),
             'honeypot' => $honeypot,
             'invitation' => $email ? [
                 'name' => $name,
