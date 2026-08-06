@@ -5,24 +5,19 @@ namespace App\Notifications;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use Illuminate\Support\HtmlString;
 
 class ContactFormNotification extends Notification
 {
     use Queueable;
 
-    /**
-     * Create a new notification instance.
-     */
-    public function __construct($name, $email_address, $text_message)
-    {
-        $this->name = $name;
-        $this->email_address = $email_address;
-        $this->text_message = $text_message;
-    }
+    public function __construct(
+        protected string $name,
+        protected string $emailAddress,
+        protected string $textMessage
+    ) {}
 
     /**
-     * Get the notification's delivery channels.
-     *
      * @return array<int, string>
      */
     public function via(object $notifiable): array
@@ -30,27 +25,38 @@ class ContactFormNotification extends Notification
         return ['mail'];
     }
 
-    /**
-     * Get the mail representation of the notification.
-     */
     public function toMail(object $notifiable): MailMessage
     {
-        return (new MailMessage)->subject('[Padiush] Nuevo mensaje de contacto')->view('email.contact', [
-            'name' => $this->name,
-            'email_address' => $this->email_address,
-            'text_message' => $this->text_message,
-        ]);
+        return (new MailMessage)
+            ->subject(__('emails.contact.subject'))
+            ->greeting(__('emails.contact.greeting'))
+            ->line(__('emails.contact.introduction', [
+                'name' => $this->name,
+                'email' => $this->emailAddress,
+            ]))
+            // The message is quoted in a panel so it reads as the sender's
+            // words rather than ours, and so line breaks survive.
+            ->line(new HtmlString(
+                '<blockquote>'.nl2br(e($this->textMessage)).'</blockquote>'
+            ))
+            ->action(
+                __('emails.contact.action', ['name' => $this->name]),
+                'mailto:'.$this->emailAddress
+            )
+            ->line(__('emails.contact.received_at', [
+                'date' => now()->isoFormat('LLL'),
+            ]))
+            ->salutation(__('emails.salutation'));
     }
 
     /**
-     * Get the array representation of the notification.
-     *
      * @return array<string, mixed>
      */
     public function toArray(object $notifiable): array
     {
         return [
-            //
+            'name' => $this->name,
+            'email' => $this->emailAddress,
         ];
     }
 }

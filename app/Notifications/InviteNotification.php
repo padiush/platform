@@ -12,82 +12,73 @@ class InviteNotification extends Notification
 {
     use Queueable;
 
-    protected ProjectInvite $invite;
+    public function __construct(protected ProjectInvite $invite) {}
 
     /**
-     * Create a new notification instance.
-     *
-     * @return void
+     * @return array<int, string>
      */
-    public function __construct(ProjectInvite $invite)
-    {
-        $this->invite = $invite;
-    }
-
-    /**
-     * Get the notification's delivery channels.
-     *
-     * @param  mixed  $notifiable
-     * @return array
-     */
-    public function via($notifiable)
+    public function via(object $notifiable): array
     {
         return ['mail'];
     }
 
-    /**
-     * Get the mail representation of the notification.
-     *
-     * @param  mixed  $notifiable
-     * @return MailMessage
-     */
-    public function toMail($notifiable)
+    public function toMail(object $notifiable): MailMessage
     {
-        $project_invite = $this->invite;
+        $invite = $this->invite;
+        $invitedUser = $invite->invitedUser;
 
-        if ($project_invite->invitedUser) {
-            return (new MailMessage)->subject('Has recibido una invitación a un proyecto en Padiush')->view('email.invite', [
-                'project' => $project_invite->project,
-                'inviting_user' => $project_invite->invitingUser,
-                'invited_user' => $project_invite->invitedUser,
-            ]);
+        $message = (new MailMessage)
+            ->subject(__('emails.invite.subject'))
+            ->greeting(__('emails.invite.greeting', [
+                'name' => $invitedUser->name ?? $invite->invited_name,
+            ]))
+            ->line(__('emails.invite.introduction', [
+                'inviter' => $invite->invitingUser->name,
+                'project' => $invite->project->name,
+            ]));
+
+        // Someone who already has an account accepts from inside the app; a new
+        // recipient needs the signed registration link, and some idea of what
+        // they are being invited into.
+        if ($invitedUser) {
+            $message
+                ->line(__('emails.invite.existing_explanation'))
+                ->action(__('emails.invite.existing_action'), route('projects.index'));
+        } else {
+            $message
+                ->line(__('emails.invite.what_is_padiush'))
+                ->line(__('emails.invite.new_explanation'))
+                ->action(__('emails.invite.new_action'), URL::temporarySignedRoute(
+                    'register.project-invite',
+                    $invite->expires_at,
+                    ['invite' => $invite]
+                ));
         }
 
-        return (new MailMessage)->subject('Has recibido una invitación a un proyecto en Padiush')->view('email.invite', [
-            'project' => $project_invite->project,
-            'inviting_user' => $project_invite->invitingUser,
-            'invited_name' => $project_invite->invited_name,
-            'invited_email' => $project_invite->invited_email,
-            'registration_url' => URL::temporarySignedRoute(
-                'register.project-invite',
-                $project_invite->expires_at,
-                ['invite' => $project_invite]
-            ),
-        ]);
+        return $message
+            ->line(__('emails.invite.expiration', [
+                'date' => $invite->expires_at->isoFormat('LL'),
+            ]))
+            ->line(__('emails.invite.ignore'))
+            ->salutation(__('emails.salutation'));
     }
 
     /**
-     * Get the array representation of the notification.
-     *
-     * @param  mixed  $notifiable
-     * @return array
+     * @return array<string, mixed>
      */
-    public function toArray($notifiable)
+    public function toArray(object $notifiable): array
     {
-        $project_invite = $this->invite;
-        if ($project_invite->invitedUser) {
-            return [
-                'project' => $project_invite->project,
-                'inviting_user' => $project_invite->invitingUser,
-                'invited_user' => $project_invite->invitedUser,
-            ];
-        }
+        $invite = $this->invite;
 
         return [
-            'project' => $project_invite->project,
-            'inviting_user' => $project_invite->invitingUser,
-            'invited_name' => $project_invite->invited_name,
-            'invited_email' => $project_invite->invited_email,
+            'project' => $invite->project,
+            'inviting_user' => $invite->invitingUser,
+            ...$invite->invitedUser
+                ? ['invited_user' => $invite->invitedUser]
+                : [
+                    'invited_name' => $invite->invited_name,
+                    'invited_email' => $invite->invited_email,
+                ],
         ];
     }
 }
