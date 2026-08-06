@@ -16,6 +16,17 @@
             : 'padiushlight');
       } catch (e) {}
     </script>
+    @if (config('padiush.analytics.umami_src') && config('padiush.analytics.umami_website_id'))
+      {{-- Self-hosted Umami: no cookies, no cross-site tracking. It follows
+           Inertia's pushState navigations on its own, so no manual pageview
+           calls are needed. Honours Do Not Track. --}}
+      <script
+        defer
+        src="{{ config('padiush.analytics.umami_src') }}"
+        data-website-id="{{ config('padiush.analytics.umami_website_id') }}"
+        data-do-not-track="true"
+      ></script>
+    @endif
     @routes
     @viteReactRefresh
     @vite('resources/js/app.jsx')
