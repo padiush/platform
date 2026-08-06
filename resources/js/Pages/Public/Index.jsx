@@ -5,8 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link, usePage } from '@inertiajs/react';
 import { useTranslation } from 'react-i18next';
 import CaptureDevice from './Partials/CaptureDevice';
-import ProductPreview from './Partials/ProductPreview';
-import TaxonomyCard from './Partials/TaxonomyCard';
+import Screenshot from './Partials/Screenshot';
 
 const INDICES = ['FC', 'RFC', 'NU', 'UV', 'CI', 'RI', 'CV', 'ICF', 'FL'];
 
@@ -78,7 +77,7 @@ export default function Index() {
                         content width, so the wide tables scroll inside their
                         own box instead of stretching the page. */}
                     <div className="min-w-0">
-                        <ProductPreview />
+                        <Screenshot name="reports" chrome />
                         <p className="text-primary-content/70 mt-3 text-center text-xs">
                             {t('public.preview_caption')}
                         </p>
@@ -135,7 +134,7 @@ export default function Index() {
                 points={[1, 2, 3, 4].map((n) =>
                     t(`public.taxonomy_point_${n}`),
                 )}
-                visual={<TaxonomyCard />}
+                visual={<Screenshot name="catalog" chrome />}
                 reversed
             />
 
@@ -147,12 +146,13 @@ export default function Index() {
                     t(`public.analysis_point_${n}`),
                 )}
                 tinted
-                visual={
-                    <div className="bg-base-100 border-base-300 rounded-box mx-auto w-full max-w-md border p-6 shadow-xl">
+                visual={<Screenshot name="sankey" />}
+                extra={
+                    <div className="mt-6">
                         <p className="text-base-content/50 text-[0.6875rem] font-semibold tracking-[0.16em] uppercase">
                             {t('public.analysis_indices_label')}
                         </p>
-                        <div className="mt-4 flex flex-wrap gap-2">
+                        <div className="mt-3 flex flex-wrap gap-2">
                             {INDICES.map((index) => (
                                 <span
                                     key={index}
@@ -161,18 +161,6 @@ export default function Index() {
                                     {index}
                                 </span>
                             ))}
-                        </div>
-                        <div className="border-base-300 mt-6 flex flex-wrap gap-2 border-t pt-5">
-                            {['CSV', 'Excel', 'SVG', 'PNG', 'ethnobotanyR'].map(
-                                (format) => (
-                                    <span
-                                        key={format}
-                                        className="bg-base-200 text-base-content/70 rounded px-2.5 py-1 text-xs"
-                                    >
-                                        {format}
-                                    </span>
-                                ),
-                            )}
                         </div>
                     </div>
                 }
@@ -222,6 +210,7 @@ function Capability({
     description,
     points,
     visual,
+    extra = null,
     reversed = false,
     tinted = false,
 }) {
@@ -251,6 +240,7 @@ function Capability({
                             </li>
                         ))}
                     </ul>
+                    {extra}
                 </div>
                 <div className={`min-w-0 ${reversed ? 'lg:order-1' : ''}`}>
                     {visual}
