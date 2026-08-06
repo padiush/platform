@@ -57,11 +57,29 @@ const HEATMAP = [
 
 const PEAK = 21;
 
+/**
+ * Fill steps for the heatmap, darkest first. Each step pairs its own text
+ * colour with its fill: a continuous opacity ramp looks tidier but puts dark
+ * ink on the darkest cells, which is exactly where the numbers stop being
+ * readable. daisyUI guarantees primary-content reads on primary in both themes.
+ */
+const LEVELS = [
+    { from: 0.66, className: 'bg-primary text-primary-content' },
+    { from: 0.33, className: 'bg-primary/45 text-base-content' },
+    { from: 0.01, className: 'bg-primary/20 text-base-content' },
+];
+
+const levelFor = (count) =>
+    LEVELS.find((level) => count / PEAK >= level.from)?.className ?? '';
+
 export default function ProductPreview() {
     const { t } = useTranslation();
 
     return (
-        <figure className="bg-base-100 border-base-300 rounded-box overflow-hidden border shadow-xl">
+        // text-base-content is required, not decorative: the hero sets
+        // text-primary-content on everything inside it, which is near-white and
+        // vanishes against this card's light surface.
+        <figure className="bg-base-100 border-base-300 text-base-content rounded-box overflow-hidden border shadow-xl">
             <div className="bg-base-200 border-base-300 flex items-center gap-2 border-b px-4 py-2.5">
                 <span className="flex gap-1.5" aria-hidden="true">
                     <span className="bg-base-content/20 h-2.5 w-2.5 rounded-full" />
@@ -171,14 +189,9 @@ function Heatmap({ t }) {
                             {counts.map((count, index) => (
                                 <td
                                     key={index}
-                                    className="border-base-300/60 rounded border text-center"
-                                    style={{
-                                        backgroundColor: count
-                                            ? `color-mix(in oklab, var(--color-primary) ${Math.round((count / PEAK) * 100)}%, transparent)`
-                                            : 'transparent',
-                                    }}
+                                    className={`border-base-300/60 rounded border text-center ${levelFor(count)}`}
                                 >
-                                    <span className="text-base-content px-1 leading-5 tabular-nums">
+                                    <span className="px-1 leading-5 tabular-nums">
                                         {count || ''}
                                     </span>
                                 </td>

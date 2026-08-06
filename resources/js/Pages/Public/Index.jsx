@@ -52,13 +52,19 @@ export default function Index() {
                         <div className="mt-8 flex flex-wrap gap-3">
                             <Link
                                 href={primaryCta.href}
-                                className="btn btn-lg bg-base-100 text-base-content hover:bg-base-200 border-none"
+                                className="btn btn-lg [--btn-bg:var(--color-base-100)] [--btn-border:var(--color-base-100)] [--btn-fg:var(--color-base-content)]"
                             >
                                 {primaryCta.label}
                             </Link>
                             <a
                                 href="#how-it-works"
-                                className="btn btn-lg btn-outline border-primary-content text-primary-content hover:bg-primary-content hover:text-primary"
+                                /* daisyUI's .btn sets `color: var(--btn-fg)`,
+                                   which beats a plain text-* utility — so the
+                                   colours have to be set through its own
+                                   variables or the button silently keeps the
+                                   default base-content and disappears against
+                                   the primary hero. */
+                                className="btn btn-lg [--btn-bg:transparent] [--btn-border:var(--color-primary-content)] [--btn-fg:var(--color-primary-content)]"
                             >
                                 {t('public.cta_how_it_works')}
                             </a>
