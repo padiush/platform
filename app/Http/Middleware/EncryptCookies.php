@@ -12,6 +12,9 @@ class EncryptCookies extends Middleware
      * @var array<int, string>
      */
     protected $except = [
-        //
+        // i18next writes the interface language from the browser, so this one
+        // is never encrypted. Without the exemption Laravel fails to decrypt
+        // it and drops it, and SetLocale never sees the visitor's choice.
+        'i18next',
     ];
 }

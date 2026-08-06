@@ -3,12 +3,13 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
-class User extends Authenticatable
+class User extends Authenticatable implements HasLocalePreference
 {
     use HasApiTokens, HasFactory, Notifiable;
 
@@ -71,5 +72,18 @@ class User extends Authenticatable
         }
 
         return false;
+    }
+
+    /**
+     * The language this account's notifications should be written in.
+     *
+     * Laravel reads this when sending, so a queued email lands in the
+     * recipient's language even though no request is in flight. Null falls
+     * back to the application locale, which is right for accounts that have
+     * never expressed a preference.
+     */
+    public function preferredLocale(): ?string
+    {
+        return $this->locale;
     }
 }
