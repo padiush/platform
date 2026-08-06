@@ -47,6 +47,39 @@ class PublicPagesTest extends TestCase
         $response->assertSee('rel="canonical"', false);
     }
 
+    public function test_public_pages_carry_a_link_preview_image()
+    {
+        $response = $this->get(route('public.index'));
+
+        $response->assertOk();
+        // A crawler fetches this long after reading the page and caches the
+        // result, so it has to be an absolute URL to a static file.
+        $response->assertSee(
+            '<meta property="og:image" content="'.config('app.url').'/images/site/og-card.png">',
+            false
+        );
+        // Without an explicit card type X renders a small square thumbnail
+        // even when og:image is present.
+        $response->assertSee('<meta name="twitter:card" content="summary_large_image">', false);
+        $response->assertSee('<meta name="twitter:image"', false);
+    }
+
+    public function test_the_link_preview_image_exists_and_is_a_png()
+    {
+        $file = public_path('images/site/og-card.png');
+
+        $this->assertFileExists($file);
+
+        // WhatsApp and some LinkedIn paths refuse WebP, and drop previews that
+        // are too heavy — both fail silently, so assert the shape here.
+        [$width, $height, $type] = getimagesize($file);
+
+        $this->assertSame(IMAGETYPE_PNG, $type);
+        $this->assertSame(1200, $width);
+        $this->assertSame(630, $height);
+        $this->assertLessThan(300 * 1024, filesize($file));
+    }
+
     public function test_pinch_zoom_is_not_blocked()
     {
         $response = $this->get(route('public.index'));

@@ -151,6 +151,96 @@ async function capture(page, { name, url, theme, waitFor, chartIndex }) {
     return file;
 }
 
+/**
+ * The link-preview card.
+ *
+ * Built inside a loaded page rather than from a standalone file so it inherits
+ * the real stylesheet and typeface, and so the wordmark can be cloned from the
+ * footer instead of duplicating several hundred lines of path data.
+ *
+ * Layout uses inline styles because Tailwind compiles from source: classes
+ * invented at runtime would not exist in the built CSS.
+ *
+ * PNG, not WebP — WhatsApp and some LinkedIn paths refuse to render a WebP
+ * og:image, and the preview silently falls back to no image at all.
+ */
+async function captureOgCard(browser, { url, tagline, site }) {
+    const page = await browser.newPage();
+
+    // 1200x630 is the size every platform crops toward. Kept at 1x on
+    // purpose: at 2x the file passed 480 KB, and WhatsApp quietly drops
+    // previews well before that.
+    await page.setViewport({ width: 1200, height: 630, deviceScaleFactor: 1 });
+    await page.goto(url, { waitUntil: 'networkidle0' });
+
+    await page.evaluate(
+        ({ line, host }) => {
+            const mark = document.querySelector('footer svg');
+            const font = getComputedStyle(document.body).fontFamily;
+
+            const card = document.createElement('div');
+            card.id = 'og-card';
+            Object.assign(card.style, {
+                position: 'fixed',
+                inset: '0',
+                width: '1200px',
+                height: '630px',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'flex-start',
+                gap: '34px',
+                padding: '0 96px',
+                background:
+                    'linear-gradient(135deg, #3c6200 0%, #4c7a08 55%, #5c8f12 100%)',
+                fontFamily: font,
+                color: '#f4f7ec',
+                zIndex: '2147483647',
+            });
+
+            if (mark) {
+                const logo = mark.cloneNode(true);
+                logo.removeAttribute('class');
+                logo.setAttribute('height', '96');
+                logo.style.height = '96px';
+                logo.style.width = 'auto';
+                logo.style.fill = '#f4f7ec';
+                card.append(logo);
+            }
+
+            const text = document.createElement('p');
+            text.textContent = line;
+            Object.assign(text.style, {
+                margin: '0',
+                maxWidth: '900px',
+                fontSize: '46px',
+                lineHeight: '1.25',
+                fontWeight: '600',
+            });
+            card.append(text);
+
+            const domain = document.createElement('p');
+            domain.textContent = host;
+            Object.assign(domain.style, {
+                margin: '0',
+                fontSize: '26px',
+                opacity: '0.75',
+            });
+            card.append(domain);
+
+            document.body.append(card);
+        },
+        { line: tagline, host: site },
+    );
+
+    const file = path.join(OUT, 'og-card.png');
+    const card = await page.$('#og-card');
+    await card.screenshot({ path: file, type: 'png' });
+    await page.close();
+
+    return file;
+}
+
 const browser = await puppeteer.launch({
     headless: true,
     defaultViewport: VIEWPORT,
@@ -190,6 +280,13 @@ try {
             console.log(`wrote ${path.relative(process.cwd(), file)}`);
         }
     }
+
+    const card = await captureOgCard(browser, {
+        url: BASE,
+        tagline: 'Plataforma de investigación etnobotánica',
+        site: 'padiushbio.com',
+    });
+    console.log(`wrote ${path.relative(process.cwd(), card)}`);
 } finally {
     await browser.close();
 }

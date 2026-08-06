@@ -10,13 +10,14 @@
          the page, so shared links previewed as blank. Inertia owns <title>, so
          only the pieces it does not emit are rendered here — a full
          SEOTools::generate() would add a competing second <title>. --}}
-    @if ($description = SEOMeta::getDescription())
+    @if ($description = \Artesaos\SEOTools\Facades\SEOMeta::getDescription())
       <meta name="description" content="{{ $description }}" />
     @endif
-    @if ($canonical = SEOMeta::getCanonical())
+    @if ($canonical = \Artesaos\SEOTools\Facades\SEOMeta::getCanonical())
       <link rel="canonical" href="{{ $canonical }}" />
     @endif
-    {!! OpenGraph::generate() !!}
+    {!! \Artesaos\SEOTools\Facades\OpenGraph::generate() !!}
+    {!! \Artesaos\SEOTools\Facades\TwitterCard::generate() !!}
     {{-- Resolve the theme before first paint to avoid a flash: the stored
          choice wins, otherwise the OS preference. Keep in sync with
          ThemeToggle.jsx. --}}
