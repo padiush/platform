@@ -1,134 +1,255 @@
 import PublicLayout from '@/Layouts/PublicLayout';
+import { primaryCtaTarget } from '@/lib/publicCta';
+import { faCheck } from '@fortawesome/pro-regular-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link, usePage } from '@inertiajs/react';
 import { useTranslation } from 'react-i18next';
+import CaptureDevice from './Partials/CaptureDevice';
+import ProductPreview from './Partials/ProductPreview';
+import TaxonomyCard from './Partials/TaxonomyCard';
+
+const INDICES = ['FC', 'RFC', 'NU', 'UV', 'CI', 'RI', 'CV', 'ICF', 'FL'];
 
 export default function Index() {
-    const { images, auth } = usePage().props;
+    const { auth, registrationEnabled } = usePage().props;
     const { t } = useTranslation();
 
-    const primaryCta = auth?.user ? (
-        <Link href={route('dashboard')} className="btn btn-primary btn-lg">
-            {t('public.enter_platform')}
-        </Link>
-    ) : (
-        <Link href={route('register')} className="btn btn-primary btn-lg">
-            {t('public.try_now')}
-        </Link>
-    );
+    const CTA = {
+        dashboard: {
+            href: () => route('dashboard'),
+            label: 'public.enter_platform',
+        },
+        register: {
+            href: () => route('register'),
+            label: 'public.cta_create_account',
+        },
+        contact: {
+            href: () => route('public.contact'),
+            label: 'public.cta_request_access',
+        },
+    };
+
+    const cta =
+        CTA[
+            primaryCtaTarget({
+                signedIn: Boolean(auth?.user),
+                registrationEnabled: Boolean(registrationEnabled),
+            })
+        ];
+    const primaryCta = { href: cta.href(), label: t(cta.label) };
 
     return (
         <PublicLayout title="Padiush">
-            <div
-                className="hero min-h-[calc(100vh-4rem)]"
-                style={{ backgroundImage: `url(${images.hero})` }}
-            >
-                <div className="hero-overlay bg-black/60" />
-                <div className="hero-content text-center">
-                    <div className="max-w-2xl lg:max-w-3xl">
-                        <h1 className="mb-6 text-4xl font-bold text-white md:text-6xl">
+            <section className="from-primary to-primary/80 text-primary-content bg-gradient-to-br">
+                <div className="mx-auto grid max-w-7xl items-center gap-10 px-6 py-16 lg:grid-cols-2 lg:gap-14 lg:py-24">
+                    <div>
+                        <h1 className="text-3xl leading-tight font-bold text-balance md:text-5xl">
                             {t('public.hero_title')}
                         </h1>
-                        <p className="mb-8 text-lg text-white/90 md:text-xl">
+                        <p className="text-primary-content/85 mt-5 text-lg md:text-xl">
                             {t('public.hero_subtitle')}
                         </p>
-                        <div className="flex flex-wrap justify-center gap-3">
-                            {primaryCta}
+                        <div className="mt-8 flex flex-wrap gap-3">
                             <Link
-                                href={route('public.about')}
-                                className="btn btn-outline btn-lg border-white text-white hover:border-white hover:bg-white hover:text-neutral-950"
+                                href={primaryCta.href}
+                                className="btn btn-lg bg-base-100 text-base-content hover:bg-base-200 border-none"
                             >
-                                {t('public.learn_more')}
+                                {primaryCta.label}
                             </Link>
+                            <a
+                                href="#how-it-works"
+                                className="btn btn-lg btn-outline border-primary-content text-primary-content hover:bg-primary-content hover:text-primary"
+                            >
+                                {t('public.cta_how_it_works')}
+                            </a>
                         </div>
+                        <p className="text-primary-content/70 mt-6 text-sm">
+                            {t('public.hero_note')}
+                        </p>
+                    </div>
+
+                    {/* min-w-0 lets the grid column shrink below the preview's
+                        content width, so the wide tables scroll inside their
+                        own box instead of stretching the page. */}
+                    <div className="min-w-0">
+                        <ProductPreview />
+                        <p className="text-primary-content/70 mt-3 text-center text-xs">
+                            {t('public.preview_caption')}
+                        </p>
                     </div>
                 </div>
-            </div>
+            </section>
 
-            <section className="mx-auto max-w-7xl px-6 py-16 md:py-24">
-                <div className="mx-auto mb-12 max-w-2xl text-center md:mb-16">
+            <section
+                id="how-it-works"
+                className="mx-auto max-w-7xl scroll-mt-20 px-6 py-16 md:py-24"
+            >
+                <div className="mx-auto max-w-2xl text-center">
                     <h2 className="text-base-content text-3xl font-bold md:text-4xl">
-                        {t('public.features_title')}
+                        {t('public.workflow_title')}
                     </h2>
                     <p className="text-base-content/70 mt-4 text-lg">
-                        {t('public.features_subtitle')}
+                        {t('public.workflow_subtitle')}
                     </p>
                 </div>
-                <div className="grid w-full grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-                    <FeatureCard
-                        image={images.collab}
-                        title={t('public.feature_collab_title')}
-                    >
-                        {t('public.feature_collab_desc')}
-                    </FeatureCard>
-                    <FeatureCard
-                        image={images.custom}
-                        title={t('public.feature_custom_title')}
-                    >
-                        {t('public.feature_custom_desc')}
-                    </FeatureCard>
-                    <FeatureCard
-                        image={images.catalog}
-                        title={t('public.feature_catalog_title')}
-                    >
-                        {t('public.feature_catalog_desc')}
-                    </FeatureCard>
-                    <FeatureCard
-                        image={images.usage}
-                        title={t('public.feature_usage_title')}
-                    >
-                        {t('public.feature_usage_desc')}
-                    </FeatureCard>
-                    <FeatureCard
-                        image={images.data}
-                        title={t('public.feature_data_title')}
-                    >
-                        {t('public.feature_data_desc')}
-                    </FeatureCard>
-                    <FeatureCard
-                        image={images.community}
-                        title={t('public.feature_community_title')}
-                    >
-                        {t('public.feature_community_desc')}
-                    </FeatureCard>
+
+                <ol className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+                    {[1, 2, 3, 4].map((step) => (
+                        <li
+                            key={step}
+                            className="border-base-300 bg-base-100 rounded-box border p-6"
+                        >
+                            <span className="bg-primary text-primary-content flex h-9 w-9 items-center justify-center rounded-full text-sm font-bold">
+                                {step}
+                            </span>
+                            <h3 className="text-base-content mt-4 text-lg font-semibold">
+                                {t(`public.workflow_${step}_title`)}
+                            </h3>
+                            <p className="text-base-content/70 mt-2 text-sm">
+                                {t(`public.workflow_${step}_desc`)}
+                            </p>
+                        </li>
+                    ))}
+                </ol>
+            </section>
+
+            <Capability
+                kicker={t('public.capture_kicker')}
+                title={t('public.capture_title')}
+                description={t('public.capture_desc')}
+                points={[1, 2, 3, 4].map((n) => t(`public.capture_point_${n}`))}
+                visual={<CaptureDevice />}
+                tinted
+            />
+
+            <Capability
+                kicker={t('public.taxonomy_kicker')}
+                title={t('public.taxonomy_title')}
+                description={t('public.taxonomy_desc')}
+                points={[1, 2, 3, 4].map((n) =>
+                    t(`public.taxonomy_point_${n}`),
+                )}
+                visual={<TaxonomyCard />}
+                reversed
+            />
+
+            <Capability
+                kicker={t('public.analysis_kicker')}
+                title={t('public.analysis_title')}
+                description={t('public.analysis_desc')}
+                points={[1, 2, 3, 4].map((n) =>
+                    t(`public.analysis_point_${n}`),
+                )}
+                tinted
+                visual={
+                    <div className="bg-base-100 border-base-300 rounded-box mx-auto w-full max-w-md border p-6 shadow-xl">
+                        <p className="text-base-content/50 text-[0.6875rem] font-semibold tracking-[0.16em] uppercase">
+                            {t('public.analysis_indices_label')}
+                        </p>
+                        <div className="mt-4 flex flex-wrap gap-2">
+                            {INDICES.map((index) => (
+                                <span
+                                    key={index}
+                                    className="border-primary/30 bg-primary/10 text-base-content rounded-full border px-3 py-1 font-mono text-sm"
+                                >
+                                    {index}
+                                </span>
+                            ))}
+                        </div>
+                        <div className="border-base-300 mt-6 flex flex-wrap gap-2 border-t pt-5">
+                            {['CSV', 'Excel', 'SVG', 'PNG', 'ethnobotanyR'].map(
+                                (format) => (
+                                    <span
+                                        key={format}
+                                        className="bg-base-200 text-base-content/70 rounded px-2.5 py-1 text-xs"
+                                    >
+                                        {format}
+                                    </span>
+                                ),
+                            )}
+                        </div>
+                    </div>
+                }
+            />
+
+            <section className="mx-auto max-w-7xl px-6 py-16 md:py-24">
+                <h2 className="text-base-content text-center text-3xl font-bold md:text-4xl">
+                    {t('public.trust_title')}
+                </h2>
+                <div className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+                    {[1, 2, 3, 4].map((n) => (
+                        <div key={n}>
+                            <h3 className="text-base-content border-primary border-l-4 pl-3 text-lg font-semibold">
+                                {t(`public.trust_${n}_title`)}
+                            </h3>
+                            <p className="text-base-content/70 mt-3 text-sm">
+                                {t(`public.trust_${n}_desc`)}
+                            </p>
+                        </div>
+                    ))}
                 </div>
             </section>
 
             <section className="bg-primary text-primary-content">
-                <div className="mx-auto flex max-w-4xl flex-col items-center gap-6 px-6 py-16 text-center md:py-20">
+                <div className="mx-auto flex max-w-3xl flex-col items-center gap-5 px-6 py-16 text-center md:py-20">
                     <h2 className="text-3xl font-bold md:text-4xl">
-                        {t('public.cta_title')}
+                        {t('public.final_cta_title')}
                     </h2>
-                    {auth?.user ? (
-                        <Link
-                            href={route('dashboard')}
-                            className="btn btn-lg bg-base-100 text-base-content hover:bg-base-200 border-none"
-                        >
-                            {t('public.enter_platform')}
-                        </Link>
-                    ) : (
-                        <Link
-                            href={route('register')}
-                            className="btn btn-lg bg-base-100 text-base-content hover:bg-base-200 border-none"
-                        >
-                            {t('public.try_now')}
-                        </Link>
-                    )}
+                    <p className="text-primary-content/85 text-lg">
+                        {t('public.final_cta_desc')}
+                    </p>
+                    <Link
+                        href={primaryCta.href}
+                        className="btn btn-lg bg-base-100 text-base-content hover:bg-base-200 border-none"
+                    >
+                        {primaryCta.label}
+                    </Link>
                 </div>
             </section>
         </PublicLayout>
     );
 }
 
-function FeatureCard({ image, title, children }) {
+function Capability({
+    kicker,
+    title,
+    description,
+    points,
+    visual,
+    reversed = false,
+    tinted = false,
+}) {
     return (
-        <div className="card bg-base-200 text-base-content shadow-md transition-all duration-200 hover:-translate-y-1 hover:shadow-xl">
-            <figure>
-                <img src={image} alt="" className="h-48 w-full object-cover" />
-            </figure>
-            <div className="card-body">
-                <h3 className="card-title">{title}</h3>
-                <p>{children}</p>
+        <section className={tinted ? 'bg-base-200' : ''}>
+            <div className="mx-auto grid max-w-7xl items-center gap-10 px-6 py-16 md:py-24 lg:grid-cols-2 lg:gap-16">
+                <div className={reversed ? 'lg:order-2' : ''}>
+                    <p className="text-primary text-xs font-semibold tracking-[0.18em] uppercase">
+                        {kicker}
+                    </p>
+                    <h2 className="text-base-content mt-3 text-3xl font-bold md:text-4xl">
+                        {title}
+                    </h2>
+                    <p className="text-base-content/70 mt-4 text-lg">
+                        {description}
+                    </p>
+                    <ul className="mt-6 space-y-3">
+                        {points.map((point) => (
+                            <li key={point} className="flex gap-3">
+                                <FontAwesomeIcon
+                                    icon={faCheck}
+                                    className="text-primary mt-1 shrink-0"
+                                />
+                                <span className="text-base-content/80">
+                                    {point}
+                                </span>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+                <div className={`min-w-0 ${reversed ? 'lg:order-1' : ''}`}>
+                    {visual}
+                </div>
             </div>
-        </div>
+        </section>
     );
 }
