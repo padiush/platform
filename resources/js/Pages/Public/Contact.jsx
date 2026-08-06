@@ -29,14 +29,14 @@ export default function Contact() {
 
     return (
         <PublicLayout title={t('public.contact')}>
-            <div className="bg-base-300 text-base-content py-12">
+            <div className="bg-primary text-primary-content py-12">
                 <h1 className="text-center text-3xl font-bold md:text-5xl">
                     {t('public.contact')}
                 </h1>
             </div>
             <div className="flex justify-center">
                 <div className="w-full max-w-2xl px-4 py-8 md:py-12">
-                    <div className="card bg-base-200 text-base-content shadow-xl">
+                    <div className="card bg-base-100 border-base-300 text-base-content border shadow-sm">
                         <div className="card-body">
                             <div>
                                 <h2 className="text-2xl font-bold">
@@ -44,6 +44,15 @@ export default function Contact() {
                                 </h2>
                                 <p className="text-base-content/70">
                                     {t('public.contact_desc')}
+                                </p>
+                                <p className="text-base-content/70 mt-2">
+                                    {t('public.contact_direct')}{' '}
+                                    <a
+                                        className="link link-primary"
+                                        href="mailto:hola@padiushbio.com"
+                                    >
+                                        hola@padiushbio.com
+                                    </a>
                                 </p>
                             </div>
                             <form onSubmit={submit} className="space-y-2">

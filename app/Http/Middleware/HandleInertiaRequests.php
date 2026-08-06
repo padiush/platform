@@ -72,6 +72,10 @@ class HandleInertiaRequests extends Middleware
                 'message_type' => $request->session()->get('message_type'),
             ],
             'environment' => config('app.env'),
+            // The public pages point their call to action at registration when
+            // it is open and at the contact form when it is not, so the button
+            // never promises a sign-up that would just bounce to login.
+            'registrationEnabled' => (bool) config('padiush.registration_enabled'),
         ];
     }
 }

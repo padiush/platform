@@ -126,7 +126,7 @@ export default function PublicLayout({ children, title }) {
                 <aside>
                     <ApplicationFullLogo className="text-primary h-12 w-auto fill-current" />
                     <p className="text-base-content/70 max-w-xs">
-                        {t('public.hero_subtitle')}
+                        {t('public.tagline')}
                     </p>
                 </aside>
                 <div>
