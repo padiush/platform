@@ -11,6 +11,7 @@ use App\Models\User;
 use App\Notifications\InviteNotification;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Notifications\AnonymousNotifiable;
 use Illuminate\Support\Facades\URL;
 use Inertia\Testing\AssertableInertia as Assert;
 use Spatie\Honeypot\Honeypot;
@@ -82,9 +83,11 @@ class InvitationRegistrationTest extends TestCase
             'expires_at' => now()->addDays(7),
         ]);
 
-        $mail = (new InviteNotification($invite))->toMail(null);
+        // Sent to an address with no account, so the notifiable is anonymous;
+        // the signed link now rides on the mail's action rather than view data.
+        $mail = (new InviteNotification($invite))->toMail(new AnonymousNotifiable);
 
-        $this->get($mail->viewData['registration_url'])
+        $this->get($mail->actionUrl)
             ->assertOk()
             ->assertInertia(fn (Assert $page) => $page
                 ->component('Auth/Register')
