@@ -52,8 +52,10 @@ class PublicPagesTest extends TestCase
         $response = $this->get(route('public.privacy'));
 
         $response->assertOk();
+        // The document itself lives in the `legal` translation namespace so it
+        // follows the language toggle; the server only picks the page.
         $response->assertInertia(
-            fn (Assert $page) => $page->component('Public/Privacy')->has('pageContent')
+            fn (Assert $page) => $page->component('Public/Privacy')->missing('pageContent')
         );
     }
 
@@ -63,7 +65,7 @@ class PublicPagesTest extends TestCase
 
         $response->assertOk();
         $response->assertInertia(
-            fn (Assert $page) => $page->component('Public/Terms')->has('pageContent')
+            fn (Assert $page) => $page->component('Public/Terms')->missing('pageContent')
         );
     }
 }

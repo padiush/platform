@@ -20,6 +20,9 @@ vi.mock('react-i18next', () => ({
             options && typeof options === 'object'
                 ? `${key} ${JSON.stringify(options)}`
                 : key,
+        // Lazily-loaded namespaces expose `ready`; the default mock is always
+        // resolved so components don't sit on their loading state.
+        ready: true,
         i18n: {
             language: 'en',
             changeLanguage: () => Promise.resolve(),

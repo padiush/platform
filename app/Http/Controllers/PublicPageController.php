@@ -83,9 +83,7 @@ class PublicPageController extends Controller
         SEOTools::opengraph()->setUrl(config('app.url').'/privacidad');
         SEOTools::setCanonical(config('app.url').'/privacidad');
 
-        return Inertia::render('Public/Privacy', [
-            'pageContent' => view('public.privacy')->render(),
-        ]);
+        return Inertia::render('Public/Privacy');
     }
 
     public function terms()
@@ -95,8 +93,6 @@ class PublicPageController extends Controller
         SEOTools::opengraph()->setUrl(config('app.url').'/terminos');
         SEOTools::setCanonical(config('app.url').'/terminos');
 
-        return Inertia::render('Public/Terms', [
-            'pageContent' => view('public.terms')->render(),
-        ]);
+        return Inertia::render('Public/Terms');
     }
 }
