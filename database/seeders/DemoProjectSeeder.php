@@ -15,7 +15,6 @@ use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 
 /**
  * A self-contained demonstration study, used for the public-site screenshots
@@ -35,6 +34,13 @@ class DemoProjectSeeder extends Seeder
     private const PROJECT_NAME = 'Plantas útiles de la cordillera (estudio demostrativo)';
 
     private const DEMO_EMAIL = 'demo@padiush.test';
+
+    /**
+     * A fixture credential for a fixture account, so the screenshot capture
+     * script can sign in the way a person would. Harmless because this seeder
+     * refuses to run in production and the account exists nowhere else.
+     */
+    private const DEMO_PASSWORD = 'demo-screenshots';
 
     /** Fixed so the figures, and therefore the screenshots, are reproducible. */
     private const SEED = 20260806;
@@ -128,11 +134,14 @@ class DemoProjectSeeder extends Seeder
 
     private function demoUser(): User
     {
-        return User::firstOrCreate(
+        // updateOrCreate, not firstOrCreate: re-running the seeder should leave
+        // the fixture in a known state rather than keeping whatever password an
+        // earlier run happened to set.
+        return User::updateOrCreate(
             ['email' => self::DEMO_EMAIL],
             [
                 'name' => 'Equipo Padiush',
-                'password' => Hash::make(Str::random(32)),
+                'password' => Hash::make(self::DEMO_PASSWORD),
                 'email_verified_at' => now(),
             ]
         );
