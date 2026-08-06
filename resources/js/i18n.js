@@ -18,7 +18,14 @@ i18n.init({
         escapeValue: false,
     },
     backend: {
-        loadPath: '/locales/{{lng}}.json',
+        // The default namespace stays one file per language, loaded on every
+        // page. Any other namespace lives in its own directory and is fetched
+        // only by the pages that ask for it — that keeps long documents (the
+        // privacy policy, the terms) out of the payload every visitor pays for.
+        loadPath: (lngs, namespaces) =>
+            namespaces[0] === 'translation'
+                ? '/locales/{{lng}}.json'
+                : '/locales/{{ns}}/{{lng}}.json',
         queryStringParams: { v: Date.now() }, // bust cache
     },
     detection: {
