@@ -2,8 +2,21 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+    {{-- No maximum-scale: pinning it blocks pinch-zoom, which WCAG 1.4.4
+         requires to stay available. --}}
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    {{-- The public controllers populate SEOTools, but none of it was reaching
+         the page, so shared links previewed as blank. Inertia owns <title>, so
+         only the pieces it does not emit are rendered here — a full
+         SEOTools::generate() would add a competing second <title>. --}}
+    @if ($description = SEOMeta::getDescription())
+      <meta name="description" content="{{ $description }}" />
+    @endif
+    @if ($canonical = SEOMeta::getCanonical())
+      <link rel="canonical" href="{{ $canonical }}" />
+    @endif
+    {!! OpenGraph::generate() !!}
     {{-- Resolve the theme before first paint to avoid a flash: the stored
          choice wins, otherwise the OS preference. Keep in sync with
          ThemeToggle.jsx. --}}
