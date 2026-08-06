@@ -1,5 +1,5 @@
+import FieldLabel from '@/Components/FieldLabel';
 import { useId } from 'react';
-import { useTranslation } from 'react-i18next';
 
 export default function Select({
     className = '',
@@ -13,7 +13,6 @@ export default function Select({
     error = null,
     ...props
 }) {
-    const { t } = useTranslation();
     const generatedId = useId();
     const id = props.id ?? generatedId;
 
@@ -31,27 +30,12 @@ export default function Select({
 
     return (
         <div className={`fieldset w-full ${className}`}>
-            {label && (
-                <label htmlFor={id} className="fieldset-legend">
-                    {label}{' '}
-                    {required && (
-                        <span
-                            className="text-error tooltip tooltip-bottom"
-                            data-tip={t('designer.required')}
-                        >
-                            *
-                        </span>
-                    )}{' '}
-                    {selective && (
-                        <span
-                            className="text-warning tooltip tooltip-bottom"
-                            data-tip={t('validation.at_least_one')}
-                        >
-                            *
-                        </span>
-                    )}
-                </label>
-            )}
+            <FieldLabel
+                id={id}
+                label={label}
+                required={required}
+                selective={selective}
+            />
             <select
                 placeholder={placeholder}
                 className={`select select-bordered w-full ${selectClassName}`}
