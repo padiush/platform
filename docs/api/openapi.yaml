@@ -342,6 +342,19 @@ components:
       properties:
         form_version_cursor: { type: string, format: date-time, nullable: true }
         server_time: { type: string, format: date-time }
+        active_form_ids:
+          type: array
+          description: >
+            Every form the project still records against — always the full set,
+            never a delta, and the client reconciles its cache against it on
+            every pull. `forms` is a delta once `since` is sent, and a delta
+            cannot express a removal: a form retired on the web simply stops
+            appearing, which is indistinguishable from one that has not changed.
+            A client that only adds what it receives goes on recording against a
+            retired instrument. Retire cached forms missing from this set, but
+            deactivate rather than delete one a local interview still needs —
+            its structure is what that interview's unsent answers push against.
+          items: { type: integer }
         forms:
           type: array
           items: { $ref: '#/components/schemas/Form' }

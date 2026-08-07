@@ -110,6 +110,58 @@ class BundleTest extends TestCase
             ->assertJsonCount(1, 'forms');
     }
 
+    /**
+     * `forms` is a delta once `since` is given, and a delta cannot express a
+     * removal: a deactivated form simply stops appearing, which a device cannot
+     * tell apart from one that has not changed. Without the full active set, a
+     * form retired on the web keeps accepting interviews on every device that
+     * already cached it.
+     */
+    public function test_lists_every_active_form_id_alongside_the_delta(): void
+    {
+        $this->actingAsRecorder();
+
+        $other = InterviewForm::factory()->create([
+            'project_id' => $this->project->id,
+            'is_active' => true,
+        ]);
+
+        $response = $this->getJson("/api/v1/projects/{$this->project->id}/bundle");
+
+        $response->assertOk()
+            ->assertJsonCount(2, 'active_form_ids');
+        $this->assertEqualsCanonicalizing(
+            [$this->activeForm->id, $other->id],
+            $response->json('active_form_ids')
+        );
+    }
+
+    public function test_the_active_set_is_complete_even_when_the_delta_is_empty(): void
+    {
+        $this->actingAsRecorder();
+
+        // Nothing changed since the cursor, so no form is sent…
+        $response = $this->getJson(
+            "/api/v1/projects/{$this->project->id}/bundle?since=".urlencode(now()->addDay()->toIso8601String())
+        );
+
+        $response->assertOk()->assertJsonCount(0, 'forms');
+        // …but the device still learns which forms remain active.
+        $this->assertSame([$this->activeForm->id], $response->json('active_form_ids'));
+    }
+
+    public function test_a_deactivated_form_leaves_the_active_set(): void
+    {
+        $this->actingAsRecorder();
+
+        $this->activeForm->update(['is_active' => false]);
+
+        $response = $this->getJson("/api/v1/projects/{$this->project->id}/bundle");
+
+        $response->assertOk();
+        $this->assertSame([], $response->json('active_form_ids'));
+    }
+
     public function test_invalid_since_is_rejected(): void
     {
         $this->actingAsRecorder();

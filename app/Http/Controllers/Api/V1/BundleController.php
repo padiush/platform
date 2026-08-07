@@ -57,6 +57,13 @@ class BundleController extends ApiController
 
         return response()->json([
             'form_version_cursor' => $cursor?->toIso8601String(),
+            // Every form the device should still be able to record against.
+            // `forms` is a delta once `since` is given, and a delta cannot
+            // express a removal: a deactivated or deleted form simply stops
+            // appearing, which is indistinguishable from one that has not
+            // changed. Without this list a form retired on the web keeps
+            // accepting interviews on every device that already cached it.
+            'active_form_ids' => $forms->pluck('id')->values(),
             'forms' => $payload,
             'server_time' => now()->toIso8601String(),
         ]);
