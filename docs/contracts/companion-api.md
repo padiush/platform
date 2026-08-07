@@ -71,13 +71,25 @@ what the user can't do.
 
 ```
 GET /api/v1/projects/{project}/bundle?since=<iso8601>
-  → { form_version_cursor, forms: [ Form ], server_time }
+  → { form_version_cursor, active_form_ids: [ id ], forms: [ Form ], server_time }
 ```
 The offline capture bundle: every **active** form's full structure. `?since`
 makes it incremental (return only forms changed after the cursor). `Form` =
 `{ id, name, description, is_active, updated_at, sections: [ { id, name, order,
 repeatable, items: [ Item ] } ] }`; `Item` = `{ id, label, name, type, required,
-options, link_to_species, order }`.
+options, link_to_species, is_use_category, min, max, step, order }`.
+
+**`active_form_ids` is the full active set, never a delta**, and the client must
+reconcile its cache against it on every pull. `forms` is a delta once `since` is
+sent, and a delta cannot express a removal: a form deactivated or deleted on the
+web simply stops appearing, which is indistinguishable from one that has not
+changed. A client that only ever adds what it receives will go on recording
+interviews against an instrument that was retired.
+
+Retire a cached form that is missing from the set — but a form a local interview
+still references should be **deactivated in place rather than deleted**. Its
+structure is what renders that interview and what its unsent answers are pushed
+against; deleting it strands them.
 
 > The device does **not** pull the species catalog — linking is a web-side task
 > ([0003](../decisions/0003-capture-only-companion-scope.md)). It captures the
