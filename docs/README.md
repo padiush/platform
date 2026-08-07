@@ -32,11 +32,20 @@ against, the data model they extend, and the decisions that frame them.
 
 **Progress:** the built-in indices are complete — the use-category role, the
 [computation](analysis/ethnobotany-indices.md) (`EthnobiologyIndices`), and the
-report page + export. The **companion capture API** (`/api/v1`) is now built —
-token auth, offline pull (`me`, project `bundle`), idempotent interview sync with
+report page + export. The **companion capture API** (`/api/v1`) is built — token
+auth, offline pull (`me`, project `bundle`), idempotent interview sync with
 last-writer-wins, and audio/photo media with transcription plumbing (gated on
-ADR 0005). The remaining piece of the ethnobotany vertical is the **mobile
-companion apps** themselves, which build against that API.
+ADR 0005). The **mobile companion app** is built too, in its own repository
+(`padiush-companion`): Expo / React Native, an encrypted offline store, capture
+of answers, GPS, audio and photos, and the full sync loop against this API.
+
+That completes the ethnobotany vertical's moving parts. What remains before
+field deployment for sensitive studies is hardening rather than new surface —
+tracked as: **resumable media upload** (single PUT today, so a long recording
+restarts from the beginning on a lost connection), **transcription** (null-bound
+plumbing until a real queue and a self-hosted Whisper are provisioned, per
+[ADR 0005](decisions/0005-interview-transcription-whisper.md)), and testing on
+physical devices.
 
 ## Decisions register
 
