@@ -2,7 +2,7 @@
     "updated_on": "Updated on {{date}}",
     "privacy": {
         "title": "Privacy policy",
-        "updated": "6 August 2026",
+        "updated": "7 August 2026",
         "summary": "Padiush stores ethnobotanical research data: interviews, audio recordings, photographs and field locations. This policy explains what we collect, why, where it lives and what control you have over it. We do not sell data, we do not use it for advertising, and we do not train artificial intelligence models on it.",
         "sections": [
             {
@@ -64,7 +64,7 @@
                             },
                             {
                                 "term": "Field-captured data:",
-                                "text": "capture date and time, GPS coordinates when the device provides them, audio recordings and photographs."
+                                "text": "capture date and time, GPS coordinates when the device provides them, audio recordings and photographs. Audio recording continues when the app moves to the background or the screen turns off, because an interview lasts longer than a phone's screen timeout. While the microphone is live, the app shows a persistent notification that can stop the recording, unless you have turned its notifications off."
                             },
                             {
                                 "term": "Data about interviewees:",

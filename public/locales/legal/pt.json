@@ -2,7 +2,7 @@
     "updated_on": "Atualizado em {{date}}",
     "privacy": {
         "title": "Política de privacidade",
-        "updated": "6 de agosto de 2026",
+        "updated": "7 de agosto de 2026",
         "summary": "O Padiush armazena dados de pesquisa etnobotânica: entrevistas, gravações de áudio, fotografias e localizações de campo. Esta política explica o que coletamos, para quê, onde essa informação fica e que controle você tem sobre ela. Não vendemos dados, não os usamos para publicidade e não treinamos modelos de inteligência artificial com eles.",
         "sections": [
             {
@@ -64,7 +64,7 @@
                             },
                             {
                                 "term": "Dados capturados em campo:",
-                                "text": "data e hora da captura, coordenadas de GPS quando o dispositivo as fornece, gravações de áudio e fotografias."
+                                "text": "data e hora da captura, coordenadas de GPS quando o dispositivo as fornece, gravações de áudio e fotografias. A gravação de áudio continua quando o aplicativo vai para segundo plano ou a tela se apaga, porque uma entrevista dura mais do que o tempo de espera do telefone. Enquanto o microfone está ativo, o aplicativo exibe uma notificação permanente que permite interromper a gravação, a menos que você tenha desativado suas notificações."
                             },
                             {
                                 "term": "Dados das pessoas entrevistadas:",
