@@ -8,6 +8,7 @@ use App\Models\InterviewForm;
 use App\Models\InterviewInstance;
 use App\Models\Project;
 use App\Models\User;
+use App\Services\Media\StoredObjectInspector;
 use App\Services\Media\UploadUrlFactory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Queue;
@@ -71,6 +72,20 @@ class MediaTest extends TestCase
         return "/api/v1/instances/{$this->instance->id}/media/complete";
     }
 
+    /**
+     * @param  array{byte_size:int, content_type:?string}|null  $result
+     */
+    private function expectStoredObject(string $key, ?array $result): void
+    {
+        $inspector = \Mockery::mock(StoredObjectInspector::class);
+        $inspector->shouldReceive('inspect')
+            ->once()
+            ->with('s3', $key)
+            ->andReturn($result);
+
+        $this->app->instance(StoredObjectInspector::class, $inspector);
+    }
+
     public function test_intent_issues_a_presigned_url_and_records_pending_media(): void
     {
         $this->actingAsRecorder();
@@ -118,7 +133,13 @@ class MediaTest extends TestCase
             'storage_disk' => 's3',
             'storage_key' => 'projects/1/photo.jpg',
             'content_type' => 'image/jpeg',
+            'byte_size' => 1_000,
             'status' => 'pending',
+        ]);
+
+        $this->expectStoredObject('projects/1/photo.jpg', [
+            'byte_size' => 1_000,
+            'content_type' => 'image/jpeg',
         ]);
 
         Queue::fake();
@@ -147,7 +168,13 @@ class MediaTest extends TestCase
             'storage_disk' => 's3',
             'storage_key' => 'projects/1/audio.m4a',
             'content_type' => 'audio/mp4',
+            'byte_size' => 2_000,
             'status' => 'pending',
+        ]);
+
+        $this->expectStoredObject('projects/1/audio.m4a', [
+            'byte_size' => 2_000,
+            'content_type' => 'audio/mp4',
         ]);
 
         Queue::fake();
@@ -176,7 +203,13 @@ class MediaTest extends TestCase
             'storage_disk' => 's3',
             'storage_key' => 'projects/1/audio.m4a',
             'content_type' => 'audio/mp4',
+            'byte_size' => 2_000,
             'status' => 'pending',
+        ]);
+
+        $this->expectStoredObject('projects/1/audio.m4a', [
+            'byte_size' => 2_000,
+            'content_type' => 'audio/mp4',
         ]);
 
         Queue::fake();
@@ -212,6 +245,123 @@ class MediaTest extends TestCase
             'storage_key' => 'projects/1/spoofed.jpg',
         ])->assertStatus(422)
             ->assertJsonPath('message', 'api.media.storage_key_mismatch');
+    }
+
+    public function test_complete_rejects_a_missing_upload(): void
+    {
+        $this->actingAsRecorder();
+        $clientId = (string) Str::uuid();
+
+        $media = InstanceMedia::create([
+            'interview_instance_id' => $this->instance->id,
+            'client_id' => $clientId,
+            'kind' => 'photo',
+            'storage_disk' => 's3',
+            'storage_key' => 'projects/1/missing.jpg',
+            'content_type' => 'image/jpeg',
+            'byte_size' => 1_000,
+            'status' => 'pending',
+        ]);
+
+        $this->expectStoredObject('projects/1/missing.jpg', null);
+
+        $this->postJson($this->completeUrl(), [
+            'client_id' => $clientId,
+            'storage_key' => 'projects/1/missing.jpg',
+        ])->assertStatus(422)
+            ->assertJsonPath('message', 'api.media.upload_missing');
+
+        $this->assertSame('pending', $media->fresh()->status);
+    }
+
+    public function test_complete_rejects_an_upload_with_the_wrong_size(): void
+    {
+        $this->actingAsRecorder();
+        $clientId = (string) Str::uuid();
+
+        $media = InstanceMedia::create([
+            'interview_instance_id' => $this->instance->id,
+            'client_id' => $clientId,
+            'kind' => 'audio',
+            'storage_disk' => 's3',
+            'storage_key' => 'projects/1/wrong-size.m4a',
+            'content_type' => 'audio/mp4',
+            'byte_size' => 2_000,
+            'status' => 'pending',
+        ]);
+
+        $this->expectStoredObject('projects/1/wrong-size.m4a', [
+            'byte_size' => 1_999,
+            'content_type' => 'audio/mp4',
+        ]);
+
+        $this->postJson($this->completeUrl(), [
+            'client_id' => $clientId,
+            'storage_key' => 'projects/1/wrong-size.m4a',
+        ])->assertStatus(422)
+            ->assertJsonPath('message', 'api.media.byte_size_mismatch');
+
+        $this->assertSame('pending', $media->fresh()->status);
+    }
+
+    public function test_complete_rejects_an_upload_with_the_wrong_content_type(): void
+    {
+        $this->actingAsRecorder();
+        $clientId = (string) Str::uuid();
+
+        $media = InstanceMedia::create([
+            'interview_instance_id' => $this->instance->id,
+            'client_id' => $clientId,
+            'kind' => 'photo',
+            'storage_disk' => 's3',
+            'storage_key' => 'projects/1/not-a-photo.jpg',
+            'content_type' => 'image/jpeg',
+            'byte_size' => 1_000,
+            'status' => 'pending',
+        ]);
+
+        $this->expectStoredObject('projects/1/not-a-photo.jpg', [
+            'byte_size' => 1_000,
+            'content_type' => 'application/octet-stream',
+        ]);
+
+        $this->postJson($this->completeUrl(), [
+            'client_id' => $clientId,
+            'storage_key' => 'projects/1/not-a-photo.jpg',
+        ])->assertStatus(422)
+            ->assertJsonPath('message', 'api.media.content_type_mismatch');
+
+        $this->assertSame('pending', $media->fresh()->status);
+    }
+
+    public function test_complete_rejects_an_upload_without_content_type_metadata(): void
+    {
+        $this->actingAsRecorder();
+        $clientId = (string) Str::uuid();
+
+        $media = InstanceMedia::create([
+            'interview_instance_id' => $this->instance->id,
+            'client_id' => $clientId,
+            'kind' => 'photo',
+            'storage_disk' => 's3',
+            'storage_key' => 'projects/1/no-content-type.jpg',
+            'content_type' => 'image/jpeg',
+            'byte_size' => 1_000,
+            'status' => 'pending',
+        ]);
+
+        $this->expectStoredObject('projects/1/no-content-type.jpg', [
+            'byte_size' => 1_000,
+            'content_type' => null,
+        ]);
+
+        $this->postJson($this->completeUrl(), [
+            'client_id' => $clientId,
+            'storage_key' => 'projects/1/no-content-type.jpg',
+        ])->assertStatus(422)
+            ->assertJsonPath('message', 'api.media.content_type_mismatch');
+
+        $this->assertSame('pending', $media->fresh()->status);
     }
 
     public function test_complete_unknown_media_is_not_found(): void

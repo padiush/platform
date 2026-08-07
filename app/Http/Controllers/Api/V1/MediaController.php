@@ -7,6 +7,7 @@ use App\Http\Requests\Api\StoreMediaIntentRequest;
 use App\Jobs\TranscribeAudio;
 use App\Models\InstanceMedia;
 use App\Models\InterviewInstance;
+use App\Services\Media\StoredObjectInspector;
 use App\Services\Media\UploadUrlFactory;
 use Illuminate\Http\JsonResponse;
 
@@ -66,8 +67,11 @@ class MediaController extends ApiController
         ]);
     }
 
-    public function complete(CompleteMediaRequest $request, InterviewInstance $instance): JsonResponse
-    {
+    public function complete(
+        CompleteMediaRequest $request,
+        InterviewInstance $instance,
+        StoredObjectInspector $objects
+    ): JsonResponse {
         $project = $this->projectForInstance($instance);
         $this->requireCapability($request->user(), $project, 'record_data');
 
@@ -82,6 +86,23 @@ class MediaController extends ApiController
         // The completing key must be the one we issued at intent.
         if ($media->storage_key !== $request->input('storage_key')) {
             $this->fail('api.media.storage_key_mismatch', 422);
+        }
+
+        $stored = $objects->inspect($media->storage_disk, $media->storage_key);
+
+        if ($stored === null) {
+            $this->fail('api.media.upload_missing', 422);
+        }
+
+        if ($media->byte_size !== null && $stored['byte_size'] !== $media->byte_size) {
+            $this->fail('api.media.byte_size_mismatch', 422);
+        }
+
+        if (
+            $stored['content_type'] === null
+            || $this->normalizedContentType($stored['content_type']) !== $this->normalizedContentType($media->content_type)
+        ) {
+            $this->fail('api.media.content_type_mismatch', 422);
         }
 
         $media->status = InstanceMedia::STATUS_STORED;
@@ -143,5 +164,10 @@ class MediaController extends ApiController
             'image/heic', 'image/heif' => 'heic',
             default => 'bin',
         };
+    }
+
+    private function normalizedContentType(string $contentType): string
+    {
+        return strtolower(trim(explode(';', $contentType, 2)[0]));
     }
 }
