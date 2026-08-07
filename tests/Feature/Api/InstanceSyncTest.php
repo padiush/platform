@@ -228,6 +228,105 @@ class InstanceSyncTest extends TestCase
         $this->assertNotNull(InterviewInstance::find($instanceId));
     }
 
+    /**
+     * The form's numeric bounds arrive in the bundle and were enforced nowhere:
+     * the device opened a numeric keyboard without bounding what was typed, and
+     * the sync validated only the payload's shape. Out-of-range figures reached
+     * the analysis. Range travels with the value, so it is checked here;
+     * completeness cannot be, since an unanswered question sends no row.
+     */
+    private function numericItem(array $bounds): InterviewItem
+    {
+        return InterviewItem::factory()->create(array_merge([
+            'interview_section_id' => $this->section->id,
+            'type' => 'number',
+        ], $bounds));
+    }
+
+    private function syncNumber(InterviewItem $item, mixed $value)
+    {
+        $this->actingAsRecorder();
+
+        return $this->postJson($this->syncUrl(), ['instances' => [
+            $this->instancePayload((string) Str::uuid(), [[
+                'client_id' => (string) Str::uuid(),
+                'interview_section_id' => $this->section->id,
+                'interview_item_id' => $item->id,
+                'repeatable_index' => 0,
+                'value' => $value,
+            ]]),
+        ]]);
+    }
+
+    public function test_a_number_below_the_minimum_is_rejected(): void
+    {
+        $response = $this->syncNumber($this->numericItem(['min' => 10]), '4');
+
+        $response->assertOk()
+            ->assertJsonPath('results.0.errors.answers.0.error', 'api.sync.below_min');
+        $this->assertSame(0, InstanceAnswer::count());
+    }
+
+    public function test_a_number_above_the_maximum_is_rejected(): void
+    {
+        $response = $this->syncNumber($this->numericItem(['max' => 10]), '11');
+
+        $response->assertOk()
+            ->assertJsonPath('results.0.errors.answers.0.error', 'api.sync.above_max');
+    }
+
+    public function test_text_in_a_number_field_is_rejected(): void
+    {
+        $response = $this->syncNumber($this->numericItem([]), 'about ten');
+
+        $response->assertOk()
+            ->assertJsonPath('results.0.errors.answers.0.error', 'api.sync.not_a_number');
+    }
+
+    public function test_a_number_off_the_declared_step_is_rejected(): void
+    {
+        $response = $this->syncNumber($this->numericItem(['min' => 10, 'step' => 5]), '12');
+
+        $response->assertOk()
+            ->assertJsonPath('results.0.errors.answers.0.error', 'api.sync.off_step');
+    }
+
+    public function test_a_number_on_a_step_counted_from_the_minimum_is_accepted(): void
+    {
+        $response = $this->syncNumber($this->numericItem(['min' => 10, 'step' => 5]), '15');
+
+        $response->assertOk()->assertJsonMissingPath('results.0.errors');
+        $this->assertSame(1, InstanceAnswer::count());
+    }
+
+    public function test_the_bounds_themselves_are_accepted(): void
+    {
+        $item = $this->numericItem(['min' => 10, 'max' => 20]);
+
+        $this->syncNumber($item, '10')->assertJsonMissingPath('results.0.errors');
+        $this->syncNumber($item, '20')->assertJsonMissingPath('results.0.errors');
+    }
+
+    public function test_clearing_a_bounded_number_is_allowed(): void
+    {
+        // Blanking a field is legitimate; whether it may be left blank is a
+        // completeness question, and completeness is the device's to enforce.
+        $response = $this->syncNumber($this->numericItem(['min' => 10]), null);
+
+        $response->assertOk()->assertJsonMissingPath('results.0.errors');
+    }
+
+    public function test_bounds_on_a_text_item_do_not_constrain_it(): void
+    {
+        $item = InterviewItem::factory()->create([
+            'interview_section_id' => $this->section->id,
+            'type' => 'text',
+            'max' => 5,
+        ]);
+
+        $this->syncNumber($item, '99')->assertJsonMissingPath('results.0.errors');
+    }
+
     public function test_a_non_owner_cannot_update_an_instance(): void
     {
         $this->actingAsRecorder();
