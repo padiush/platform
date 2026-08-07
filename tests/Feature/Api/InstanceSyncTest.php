@@ -327,6 +327,44 @@ class InstanceSyncTest extends TestCase
         $this->syncNumber($item, '99')->assertJsonMissingPath('results.0.errors');
     }
 
+    /**
+     * The device has always sent this and the request has always validated it,
+     * but nothing stored it, so it was discarded on arrival. It is what makes a
+     * skew rejection explicable: an answer refused because its item is gone is
+     * otherwise indistinguishable from a malformed one, and this says whether
+     * the device was recording against a structure that has since changed.
+     */
+    public function test_the_structure_version_an_interview_was_captured_against_is_kept(): void
+    {
+        $this->actingAsRecorder();
+
+        $instanceId = (string) Str::uuid();
+        $cursor = now()->subDays(3)->startOfSecond();
+
+        $this->postJson($this->syncUrl(), ['instances' => [
+            $this->instancePayload($instanceId, [], [
+                'form_version_cursor' => $cursor->toIso8601String(),
+            ]),
+        ]])->assertOk();
+
+        $this->assertTrue(
+            $cursor->equalTo(InterviewInstance::find($instanceId)->form_version_cursor)
+        );
+    }
+
+    public function test_an_interview_without_a_structure_version_is_still_accepted(): void
+    {
+        $this->actingAsRecorder();
+
+        $instanceId = (string) Str::uuid();
+
+        $this->postJson($this->syncUrl(), ['instances' => [
+            $this->instancePayload($instanceId, []),
+        ]])->assertOk();
+
+        $this->assertNull(InterviewInstance::find($instanceId)->form_version_cursor);
+    }
+
     public function test_a_non_owner_cannot_update_an_instance(): void
     {
         $this->actingAsRecorder();

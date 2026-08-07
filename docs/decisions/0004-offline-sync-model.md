@@ -26,8 +26,15 @@ its captures until they sync. Genuine concurrent edits to the same answer are ra
   which would let a late-syncing offline edit clobber a newer web correction.
   Overwritten values are kept in a **lightweight audit trail**, so a clobbered
   field is recoverable, never silently lost. **No CRDTs.** ✅ *Confirmed 2026-07-12.*
-- **Form-version skew** is handled by snapshot-at-capture (preferred) built on the
-  existing `FormStructureService` answer-detach guard. ✅ *Confirmed 2026-07-12.*
+- **Form-version skew** is handled by validating answers against the form's
+  **current** structure and refusing what no longer fits, with a reason the
+  capture client can act on. Deleting a field on the web already discards its
+  answers behind a confirmation (the existing `FormStructureService`
+  answer-detach guard), so a departed item means that data was deliberately
+  given up and a late arrival for it should not resurrect it. ✅ *Confirmed
+  2026-07-12 as "snapshot-at-capture"; the wording was corrected 2026-08-06 to
+  describe what was actually built — the accept-against-a-historical-structure
+  reading would have required the versioned forms this ADR rejects.*
 
 Full mechanics: [../contracts/sync-protocol.md](../contracts/sync-protocol.md).
 
@@ -43,8 +50,10 @@ Full mechanics: [../contracts/sync-protocol.md](../contracts/sync-protocol.md).
   flagging) only if multi-device shared accounts become common.
 - Schema touch for the companion milestone (all **confirmed 2026-07-12**): a
   `client_id` uuid on `instance_answers`, a per-answer **edit timestamp** (the LWW
-  key) and an **overwrite audit trail** for the conflict policy, plus
-  snapshot-at-capture for form-version skew. None built yet.
+  key) and an **overwrite audit trail** for the conflict policy, plus a
+  `form_version_cursor` on `interview_instances` recording which structure a
+  device captured against — diagnostic, so a skew refusal can be explained. ✅
+  *All built.*
 
 ## Alternatives considered
 

@@ -18,11 +18,13 @@ class InterviewInstance extends Model
         'location_lng',
         'location_accuracy_m',
         'location_captured_at',
+        'form_version_cursor',
     ];
 
     protected $casts = [
         'captured_at' => 'datetime',
         'location_captured_at' => 'datetime',
+        'form_version_cursor' => 'datetime',
         'location_lat' => 'float',
         'location_lng' => 'float',
         'location_accuracy_m' => 'float',

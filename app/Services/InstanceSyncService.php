@@ -96,6 +96,12 @@ class InstanceSyncService
             $instance->captured_at = $this->toAppTime($payload['captured_at']);
         }
 
+        // The structure the device held when it recorded this. Kept so a skew
+        // rejection can be explained afterwards — see the note on syncAnswer.
+        if (array_key_exists('form_version_cursor', $payload)) {
+            $instance->form_version_cursor = $this->toAppTime($payload['form_version_cursor']);
+        }
+
         if (array_key_exists('location', $payload) && is_array($payload['location'])) {
             $location = $payload['location'];
             $instance->location_lat = $location['lat'] ?? null;
@@ -150,8 +156,16 @@ class InstanceSyncService
     {
         $item = InterviewItem::find($payload['interview_item_id']);
 
-        // Snapshot-at-capture: an answer whose item no longer exists (or was
-        // never in this form) is rejected with a clear reason, not dropped.
+        // Answers are validated against the form's CURRENT structure, and one
+        // whose item no longer exists is rejected with a reason rather than
+        // dropped. This is deliberately not snapshot-at-capture, which would
+        // need historical structures the platform does not keep: deleting a
+        // field on the web already discards its answers behind a confirmation
+        // (FormStructureService), so an item that is gone means that data was
+        // deliberately given up, and accepting more of it would resurrect what
+        // a researcher chose to remove. The interview's form_version_cursor
+        // records which structure the device was holding, so a rejection can be
+        // explained rather than merely reported.
         if (! $item || $item->section?->interview_form_id !== $form->id) {
             return ['status' => 'rejected', 'error' => 'api.sync.item_not_in_form'];
         }
