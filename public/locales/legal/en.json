@@ -271,7 +271,24 @@
                 "blocks": [
                     {
                         "type": "p",
-                        "text": "If we change this policy we will let you know by email at least 30 days before the changes take effect, so you have time to review them."
+                        "text": "We update this policy when the platform changes or the law requires it. The date at the top always shows the version in force."
+                    },
+                    {
+                        "type": "ul",
+                        "items": [
+                            {
+                                "term": "Substantial changes:",
+                                "text": "we tell you by email at least 30 days before they take effect. A change is substantial when it widens the data we collect, puts it to a new purpose, adds someone who receives it, or reduces your rights."
+                            },
+                            {
+                                "term": "Minor changes:",
+                                "text": "take effect when they are published. These are corrections of wording, clarifications, and descriptions of new features that do not alter what we collect, what for, or who receives it."
+                            }
+                        ]
+                    },
+                    {
+                        "type": "p",
+                        "text": "If you disagree with a substantial change, that period is yours to export your information and close your account before it takes effect."
                     }
                 ]
             },

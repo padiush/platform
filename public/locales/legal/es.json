@@ -271,7 +271,24 @@
                 "blocks": [
                     {
                         "type": "p",
-                        "text": "Si cambiamos esta política te lo haremos saber por correo electrónico al menos 30 días antes de que los cambios entren en vigor, para que tengas tiempo de revisarlos."
+                        "text": "Actualizamos esta política cuando la plataforma cambia o cuando la ley lo exige. La fecha del encabezado indica siempre la versión vigente."
+                    },
+                    {
+                        "type": "ul",
+                        "items": [
+                            {
+                                "term": "Cambios sustanciales:",
+                                "text": "te avisamos por correo electrónico al menos 30 días antes de que entren en vigor. Es sustancial un cambio que amplíe los datos que recopilamos, les dé una finalidad nueva, sume a alguien que los reciba o reduzca tus derechos."
+                            },
+                            {
+                                "term": "Cambios menores:",
+                                "text": "entran en vigor al publicarse. Son menores las correcciones de redacción, las aclaraciones y la descripción de funciones nuevas que no alteran qué recopilamos, para qué ni quién lo recibe."
+                            }
+                        ]
+                    },
+                    {
+                        "type": "p",
+                        "text": "Si no estás de acuerdo con un cambio sustancial, ese plazo es tuyo para exportar tu información y cerrar tu cuenta antes de que entre en vigor."
                     }
                 ]
             },

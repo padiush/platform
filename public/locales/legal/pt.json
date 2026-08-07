@@ -271,7 +271,24 @@
                 "blocks": [
                     {
                         "type": "p",
-                        "text": "Se alterarmos esta política, avisaremos por e-mail pelo menos 30 dias antes de as mudanças entrarem em vigor, para que você tenha tempo de revisá-las."
+                        "text": "Atualizamos esta política quando a plataforma muda ou quando a lei exige. A data do cabeçalho indica sempre a versão vigente."
+                    },
+                    {
+                        "type": "ul",
+                        "items": [
+                            {
+                                "term": "Alterações substanciais:",
+                                "text": "avisamos por e-mail pelo menos 30 dias antes de entrarem em vigor. É substancial a alteração que amplie os dados que coletamos, lhes dê uma nova finalidade, acrescente alguém que os receba ou reduza seus direitos."
+                            },
+                            {
+                                "term": "Alterações menores:",
+                                "text": "entram em vigor ao serem publicadas. São menores as correções de redação, os esclarecimentos e a descrição de funcionalidades novas que não alteram o que coletamos, para quê nem quem recebe."
+                            }
+                        ]
+                    },
+                    {
+                        "type": "p",
+                        "text": "Se você não concordar com uma alteração substancial, esse prazo é seu para exportar suas informações e encerrar sua conta antes que ela entre em vigor."
                     }
                 ]
             },
