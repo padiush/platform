@@ -161,6 +161,14 @@ class InstanceSyncService
             return ['status' => 'rejected', 'error' => 'api.sync.section_mismatch'];
         }
 
+        // The form's own numeric bounds. The device gates completeness, which
+        // it can see and the server cannot (an absent answer is not a payload
+        // row), but a value's range travels with it and is checked here so an
+        // out-of-range figure never reaches the analysis.
+        if ($error = $this->numericViolation($item, $payload['value'] ?? null)) {
+            return ['status' => 'rejected', 'error' => $error];
+        }
+
         $editedAt = $this->clampEditedAt($payload['edited_at'] ?? null);
         $repeatableIndex = $payload['repeatable_index'] ?? null;
         $value = $this->encodeValue($item, $payload['value'] ?? null);
@@ -220,6 +228,49 @@ class InstanceSyncService
         $existing->save();
 
         return ['status' => 'updated'];
+    }
+
+    /**
+     * Check a numeric answer against the bounds its item declares, returning
+     * the message key for the first one it breaks.
+     *
+     * A blank answer is not checked — clearing a field is legitimate, and
+     * whether it may be left blank is a completeness question the device
+     * answers. Steps count from `min` where there is one, so a field stepping
+     * by 5 from 10 accepts 15 and not 12; the comparison carries a small
+     * tolerance so a fractional step does not reject its own valid values.
+     */
+    private function numericViolation(InterviewItem $item, mixed $value): ?string
+    {
+        if ($item->type !== 'number' || $value === null || $value === '') {
+            return null;
+        }
+
+        if (! is_numeric($value)) {
+            return 'api.sync.not_a_number';
+        }
+
+        $number = (float) $value;
+
+        if ($item->min !== null && $number < (float) $item->min) {
+            return 'api.sync.below_min';
+        }
+
+        if ($item->max !== null && $number > (float) $item->max) {
+            return 'api.sync.above_max';
+        }
+
+        if ($item->step !== null && (float) $item->step > 0) {
+            $step = (float) $item->step;
+            $offset = $number - (float) ($item->min ?? 0);
+            $remainder = abs(fmod($offset, $step));
+
+            if (min($remainder, abs($step - $remainder)) > 1e-9) {
+                return 'api.sync.off_step';
+            }
+        }
+
+        return null;
     }
 
     /**

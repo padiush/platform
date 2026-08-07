@@ -123,6 +123,39 @@ POST /api/v1/projects/{project}/instances:sync
   [sync-protocol.md](sync-protocol.md).
 - Partial success is normal: each element carries its own status.
 
+### Errors on a result
+
+`errors` has two shapes, and a client that reads only `status` will lose data:
+
+| Shape | When | Meaning |
+|---|---|---|
+| `{ <field>: [key, …] }` | with `status: "rejected"` | the whole instance was refused |
+| `{ answers: [{ client_id, error }] }` | **with any status**, including `created` and `updated` | the instance landed; these answers did not |
+
+The second is the trap. A `created` result carrying `errors.answers` is **not a
+clean sync** — the interview is on the server without those answers. Treat it as
+unresolved, keep the reasons against the answers they name, and do not re-push
+unchanged: it will be refused identically. Correct or drop the answer first.
+
+Per-answer `error` keys are message keys the client localizes:
+
+| Key | Cause |
+|---|---|
+| `api.sync.item_not_in_form` | the item is not in this form (usually deleted on the web) |
+| `api.sync.section_mismatch` | the item belongs to a different section than claimed |
+| `api.sync.client_id_conflict` | that `client_id` is already an answer on another instance |
+| `api.sync.not_a_number` | a non-numeric value for a `number` item |
+| `api.sync.below_min` / `api.sync.above_max` | outside the item's declared bounds |
+| `api.sync.off_step` | not on the item's `step` grid, counted from `min` |
+
+Instance-level keys are `api.sync.form_not_in_project`, `api.sync.form_mismatch`
+(an instance cannot move between forms) and `api.sync.not_owner`.
+
+**What the server does not check: completeness.** `required` is enforced by the
+capture client, because an unanswered question sends no row at all — absence is
+not something a push can carry. Range travels with the value, so range is checked
+here.
+
 ## Media — audio & photos (offload to object storage)
 
 Large files over field connectivity should not stream through the app server.

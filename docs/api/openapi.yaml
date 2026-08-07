@@ -440,8 +440,36 @@ components:
         status: { type: string, enum: [created, updated, unchanged, rejected] }
         errors:
           type: object
-          description: Present when the instance or some of its answers were rejected.
+          description: >
+            Present when the instance or some of its answers were rejected.
+            `answers` can accompany ANY status, including created and updated:
+            the instance landed, those answers did not. A client that reads
+            only `status` treats that as a clean sync and loses them. Other
+            keys are field errors, and only accompany status `rejected`.
+          properties:
+            answers:
+              type: array
+              items: { $ref: '#/components/schemas/AnswerSyncError' }
           additionalProperties: true
+    AnswerSyncError:
+      type: object
+      description: One answer the server refused, named by its client id.
+      properties:
+        client_id: { type: string, format: uuid, nullable: true }
+        error:
+          type: string
+          description: >
+            A message key the client localizes. Range keys are enforced from the
+            item's own min/max/step; `required` is not among them, because an
+            unanswered question sends no row for the server to refuse.
+          enum:
+            - api.sync.item_not_in_form
+            - api.sync.section_mismatch
+            - api.sync.client_id_conflict
+            - api.sync.not_a_number
+            - api.sync.below_min
+            - api.sync.above_max
+            - api.sync.off_step
     InstanceDetail:
       type: object
       properties:
