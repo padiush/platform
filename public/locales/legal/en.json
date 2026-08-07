@@ -75,6 +75,10 @@
                                 "text": "the name you give a device and a per-device access token for the mobile app."
                             },
                             {
+                                "term": "Integrity events:",
+                                "text": "if the mobile app loses its local store, or cannot delete an unencrypted file, the phone records a code from a closed list along with the app and operating system versions. It carries no messages, no file paths and no interview content, and it reaches only our own servers. It exists so that a loss of data does not go unnoticed."
+                            },
+                            {
                                 "term": "Contact form:",
                                 "text": "your name, email address and the message you send us."
                             },

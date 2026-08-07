@@ -75,6 +75,10 @@
                                 "text": "el nombre que asignas al dispositivo y un token de acceso por dispositivo para la aplicación móvil."
                             },
                             {
+                                "term": "Eventos de integridad:",
+                                "text": "si la aplicación móvil pierde el almacén local o no consigue borrar un archivo sin cifrar, el teléfono registra un código de una lista cerrada junto con la versión de la aplicación y del sistema operativo. No incluye mensajes, rutas de archivos ni contenido de las entrevistas, y solo llega a nuestros servidores. Existe para que una pérdida de datos no pase inadvertida."
+                            },
+                            {
                                 "term": "Formulario de contacto:",
                                 "text": "nombre, correo electrónico y el mensaje que nos envías."
                             },

@@ -75,6 +75,10 @@
                                 "text": "o nome que você atribui ao dispositivo e um token de acesso por dispositivo para o aplicativo móvel."
                             },
                             {
+                                "term": "Eventos de integridade:",
+                                "text": "se o aplicativo móvel perde o armazenamento local ou não consegue apagar um arquivo sem criptografia, o telefone registra um código de uma lista fechada junto com as versões do aplicativo e do sistema operacional. Não inclui mensagens, caminhos de arquivos nem conteúdo das entrevistas, e chega apenas aos nossos servidores. Existe para que uma perda de dados não passe despercebida."
+                            },
+                            {
                                 "term": "Formulário de contato:",
                                 "text": "nome, e-mail e a mensagem que você nos envia."
                             },
