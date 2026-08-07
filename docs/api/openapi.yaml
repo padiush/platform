@@ -25,6 +25,8 @@ tags:
     description: Sync captured interviews
   - name: Media
     description: Audio and photo capture
+  - name: Diagnostics
+    description: Integrity events reported by the device
 security:
   - bearerAuth: []
 paths:
@@ -256,6 +258,48 @@ paths:
           $ref: '#/components/responses/NotFound'
         '422':
           description: Storage key mismatch or validation error
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+  /diagnostics:
+    post:
+      tags: [Diagnostics]
+      summary: Report integrity events from the device
+      description: >
+        A few failures on a device destroy unsynced captures or leave an
+        unencrypted recording behind. They used to be written to a console
+        nobody reads, so a researcher could lose a day's interviews without
+        anyone ever learning it happened.
+
+
+        Deliberately not a log. An event is one of a closed set of codes plus
+        the build it happened on — there is no message field and no payload, so
+        nothing an informant said can travel this channel. Unknown codes are
+        rejected rather than stored.
+
+
+        Account-scoped, not per-project: the events that matter most are the
+        ones where the local store is gone, and with it any record of which
+        project the lost work belonged to. Accepting is idempotent on
+        `client_id`, so a device that never saw the response can safely retry;
+        it clears locally only what comes back in `accepted`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/DiagnosticsRequest' }
+      responses:
+        '202':
+          description: Events recorded
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/DiagnosticsResponse' }
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '422':
+          description: Unknown code, malformed event, or a batch over 100 events
           content:
             application/json:
               schema: { $ref: '#/components/schemas/Error' }
@@ -549,3 +593,51 @@ components:
           type: string
           enum: [queued]
           description: Present only when audio transcription was enqueued.
+    DiagnosticsRequest:
+      type: object
+      required: [events]
+      properties:
+        events:
+          type: array
+          minItems: 1
+          maxItems: 100
+          items: { $ref: '#/components/schemas/DiagnosticEvent' }
+    DiagnosticEvent:
+      type: object
+      required: [client_id, code, occurred_at]
+      description: >
+        Every field is bounded. There is no free-text member by design — adding
+        one would turn this into a channel that could carry informant data.
+      properties:
+        client_id:
+          type: string
+          format: uuid
+          description: Device-minted idempotency key, stable across retries.
+        code:
+          type: string
+          enum:
+            - store_reset_unrecoverable
+            - store_reset_foreign_account
+            - plaintext_capture_retained
+            - capture_cache_sweep_failed
+          description: >
+            `store_reset_unrecoverable` — the capture store could not be read
+            with or without its key and was deleted; unsynced work is gone.
+            `store_reset_foreign_account` — the store belonged to another
+            account and was replaced. `plaintext_capture_retained` — an
+            unencrypted original survived ingestion and is still on the device.
+            `capture_cache_sweep_failed` — the capture cache could not be swept.
+        occurred_at:
+          type: string
+          format: date-time
+          description: When it happened on the device, which may be long before it is reported.
+        app_version: { type: string, maxLength: 32, nullable: true }
+        platform: { type: string, enum: [android, ios], nullable: true }
+        os_version: { type: string, maxLength: 32, nullable: true }
+    DiagnosticsResponse:
+      type: object
+      properties:
+        accepted:
+          type: array
+          description: The client_ids now safely stored; the device clears only these.
+          items: { type: string, format: uuid }

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\V1\BundleController;
+use App\Http\Controllers\Api\V1\DiagnosticsController;
 use App\Http\Controllers\Api\V1\InstanceController;
 use App\Http\Controllers\Api\V1\InstanceSyncController;
 use App\Http\Controllers\Api\V1\MeController;
@@ -53,5 +54,12 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
             ->name('instances.media.intent');
         Route::post('instances/{instance}/media/complete', [MediaController::class, 'complete'])
             ->name('instances.media.complete');
+
+        // Integrity events from the device — a closed set of codes, no payload.
+        // Account-scoped rather than per-project: the events worth reporting
+        // are the ones where the local store is gone, and with it any record
+        // of which project the lost work belonged to.
+        Route::post('diagnostics', [DiagnosticsController::class, 'store'])
+            ->name('diagnostics.store');
     });
 });

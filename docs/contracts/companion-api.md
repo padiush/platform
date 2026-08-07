@@ -193,6 +193,39 @@ POST /api/v1/instances/{instance}/media/complete
   `GET /api/v1/instances/{instance}` returns
   `{ …, transcription: { status: "queued"|"processing"|"done"|"failed", text? } }`.
 
+## Diagnostics — integrity events from the device
+
+A few failures on a device destroy unsynced captures or leave an unencrypted
+recording behind. They were written to a console nobody reads, so a researcher
+could lose a day's interviews and no one would ever learn it happened.
+
+```
+POST /api/v1/diagnostics
+  body: { events: [ { client_id, code, occurred_at, app_version?, platform?, os_version? } ] }
+  → 202 { accepted: [client_id, …] }
+```
+
+| code | means |
+| --- | --- |
+| `store_reset_unrecoverable` | The capture store could not be read with or without its key and was deleted. Unsynced work is gone. |
+| `store_reset_foreign_account` | The store belonged to another account and was replaced. |
+| `plaintext_capture_retained` | An unencrypted original survived ingestion and is still on the device. |
+| `capture_cache_sweep_failed` | The capture cache could not be swept. |
+
+- **This is not a log, and must not become one.** An event is a code plus the
+  build it happened on. There is no message field and no payload, so nothing an
+  informant said can reach this endpoint. Unknown codes are rejected rather than
+  stored — that rejection *is* the guarantee, so adding a free-text member later
+  would quietly undo the reason this lives here rather than at a crash-reporting
+  vendor.
+- **Account-scoped, not per-project.** The events worth reporting are the ones
+  where the local store is gone, and with it any record of which project the
+  lost work belonged to.
+- **Idempotent on `client_id`**, so a device that never saw the response can
+  retry. It clears locally only what comes back in `accepted`, and a flush that
+  fails is retried on the next sync rather than failing the sync.
+- The first three codes are logged at warning level on arrival, once per event.
+
 ## Not in this API
 
 Form design, species linking, index computation, export, user/role management —
