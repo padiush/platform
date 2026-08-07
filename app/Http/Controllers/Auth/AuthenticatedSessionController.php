@@ -20,11 +20,12 @@ class AuthenticatedSessionController extends Controller
      */
     public function create()
     {
-        $url = \Storage::disk('s3')->temporaryUrl('public/bg.jpg', now()->addMinutes(5));
-
         return Inertia::render('Auth/Login', [
-            'bgImage' => $url,
             'canResetPassword' => \Route::has('password.request'),
+            // Registration is invitation-only for stretches of the beta, and
+            // the route redirects back here when it is closed, so the link is
+            // only offered when it leads somewhere.
+            'canRegister' => (bool) config('padiush.registration_enabled'),
         ]);
     }
 

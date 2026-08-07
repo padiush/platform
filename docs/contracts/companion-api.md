@@ -1,10 +1,21 @@
-# Companion API contract (proposed)
+# Companion API contract (v1 — implemented)
 
-**Status: proposed.** `routes/api.php` today holds only Sanctum's default
-`/user` route — this document is the contract to *build against*, not one that
-exists. It is the interface between the web platform and the mobile companion
-apps; both sides depend on it, so it is versioned and written down. When
-implemented, formalize this as an OpenAPI document generated from the routes.
+**Status: implemented (2026-07-12).** The `/api/v1` routes exist in
+`routes/api.php` (controllers under `App\Http\Controllers\Api\V1`). This document
+is the human-readable narrative; the machine-readable contract is
+[`../api/openapi.yaml`](../api/openapi.yaml), and a ready-to-run
+[Postman collection](../api/padiush-companion.postman_collection.json) exercises
+every endpoint. The mobile capture apps themselves are still to build.
+
+> **Implementation extends this contract in three backward-compatible ways**,
+> reflected in the OpenAPI spec: bundle `Item`s also carry `is_use_category`,
+> `min`, `max` and `step` (the capture app renders numeric constraints and
+> use-category fields); each pushed answer may carry `edited_at` (the device
+> edit-time — the last-writer-wins key,
+> [sync protocol](sync-protocol.md#conflict-resolution--deliberately-simple));
+> and a pushed instance may carry `form_version_cursor` (the bundle cursor it was
+> captured against, advisory). Audio/photo capture, transcription status, and the
+> instance-detail read are all built as described below.
 
 Scope follows [0003 — capture-only companion scope](../decisions/0003-capture-only-companion-scope.md):
 the API serves **field capture** (record interviews, audio, GPS, photos) and the
@@ -40,9 +51,10 @@ POST /api/v1/tokens
 ```
 
 - `device_name` names the token so a user can revoke a lost device.
-- **Token abilities (proposed):** issue with a single `capture` ability; the
-  per-project gate is still enforced by the policy on every request, so the token
-  is user-scoped, not project-scoped.
+- **Token abilities (accepted 2026-07-12):** issue with a single `capture`
+  ability; the per-project gate is still enforced by the policy on every request,
+  so the token is user-scoped, not project-scoped. (Per-project token scoping was
+  the rejected alternative.)
 - **Prohibited handling:** the app must never store the password; only the
   returned token, in the platform secure store (Keychain / Keystore).
 - Revocation: `DELETE /api/v1/tokens/current` (this device) — web manages the
@@ -59,13 +71,25 @@ what the user can't do.
 
 ```
 GET /api/v1/projects/{project}/bundle?since=<iso8601>
-  → { form_version_cursor, forms: [ Form ], server_time }
+  → { form_version_cursor, active_form_ids: [ id ], forms: [ Form ], server_time }
 ```
 The offline capture bundle: every **active** form's full structure. `?since`
 makes it incremental (return only forms changed after the cursor). `Form` =
 `{ id, name, description, is_active, updated_at, sections: [ { id, name, order,
 repeatable, items: [ Item ] } ] }`; `Item` = `{ id, label, name, type, required,
-options, link_to_species, order }`.
+options, link_to_species, is_use_category, min, max, step, order }`.
+
+**`active_form_ids` is the full active set, never a delta**, and the client must
+reconcile its cache against it on every pull. `forms` is a delta once `since` is
+sent, and a delta cannot express a removal: a form deactivated or deleted on the
+web simply stops appearing, which is indistinguishable from one that has not
+changed. A client that only ever adds what it receives will go on recording
+interviews against an instrument that was retired.
+
+Retire a cached form that is missing from the set — but a form a local interview
+still references should be **deactivated in place rather than deleted**. Its
+structure is what renders that interview and what its unsent answers are pushed
+against; deleting it strands them.
 
 > The device does **not** pull the species catalog — linking is a web-side task
 > ([0003](../decisions/0003-capture-only-companion-scope.md)). It captures the
@@ -111,6 +135,39 @@ POST /api/v1/projects/{project}/instances:sync
   [sync-protocol.md](sync-protocol.md).
 - Partial success is normal: each element carries its own status.
 
+### Errors on a result
+
+`errors` has two shapes, and a client that reads only `status` will lose data:
+
+| Shape | When | Meaning |
+|---|---|---|
+| `{ <field>: [key, …] }` | with `status: "rejected"` | the whole instance was refused |
+| `{ answers: [{ client_id, error }] }` | **with any status**, including `created` and `updated` | the instance landed; these answers did not |
+
+The second is the trap. A `created` result carrying `errors.answers` is **not a
+clean sync** — the interview is on the server without those answers. Treat it as
+unresolved, keep the reasons against the answers they name, and do not re-push
+unchanged: it will be refused identically. Correct or drop the answer first.
+
+Per-answer `error` keys are message keys the client localizes:
+
+| Key | Cause |
+|---|---|
+| `api.sync.item_not_in_form` | the item is not in this form (usually deleted on the web) |
+| `api.sync.section_mismatch` | the item belongs to a different section than claimed |
+| `api.sync.client_id_conflict` | that `client_id` is already an answer on another instance |
+| `api.sync.not_a_number` | a non-numeric value for a `number` item |
+| `api.sync.below_min` / `api.sync.above_max` | outside the item's declared bounds |
+| `api.sync.off_step` | not on the item's `step` grid, counted from `min` |
+
+Instance-level keys are `api.sync.form_not_in_project`, `api.sync.form_mismatch`
+(an instance cannot move between forms) and `api.sync.not_owner`.
+
+**What the server does not check: completeness.** `required` is enforced by the
+capture client, because an unanswered question sends no row at all — absence is
+not something a push can carry. Range travels with the value, so range is checked
+here.
+
 ## Media — audio & photos (offload to object storage)
 
 Large files over field connectivity should not stream through the app server.
@@ -144,8 +201,11 @@ its own contract; it does not bend the capture API.
 
 ## Open decisions
 
-- Token model: single `capture` ability + policy gate (proposed) vs. per-project
-  token scoping.
 - Whether `instances:sync` should also *pull* server-side changes to the same
   instances (two-way) or stay push-only (recommended: push-only; the device owns
   its captures until synced — [sync-protocol.md](sync-protocol.md)).
+
+## Settled decisions
+
+- **Token model** *(accepted 2026-07-12)* — single `capture` ability + policy
+  gate, not per-project token scoping. See [Authentication](#authentication).

@@ -14,8 +14,9 @@ For coding standards, commits, and workflow, see [`../AGENTS.md`](../AGENTS.md).
 |---|---|---|
 | [data-model.md](data-model.md) | The domain map — entities, links, the folk-name → taxon pipeline, and pencilled-in roadmap slots | Living reference |
 | [analysis/ethnobotany-indices.md](analysis/ethnobotany-indices.md) | Quantitative-ethnobiology index formulas, edge cases, citations, and worked examples that double as test fixtures | Scientific contract |
-| [contracts/companion-api.md](contracts/companion-api.md) | The `/api/v1` HTTP contract for the mobile capture apps | Contract (proposed) |
-| [contracts/sync-protocol.md](contracts/sync-protocol.md) | How offline capture reconciles with the server | Contract (proposed) |
+| [contracts/companion-api.md](contracts/companion-api.md) | The `/api/v1` HTTP contract for the mobile capture apps | Contract (v1, built) |
+| [api/openapi.yaml](api/openapi.yaml) · [Postman](api/padiush-companion.postman_collection.json) | Machine-readable `/api/v1` spec and a runnable request collection | Generated contract |
+| [contracts/sync-protocol.md](contracts/sync-protocol.md) | How offline capture reconciles with the server | Contract (v1, built) |
 | [decisions/](decisions/) | Architecture Decision Records — the *why* behind the roadmap | Decisions |
 
 ## Roadmap at a glance
@@ -31,8 +32,20 @@ against, the data model they extend, and the decisions that frame them.
 
 **Progress:** the built-in indices are complete — the use-category role, the
 [computation](analysis/ethnobotany-indices.md) (`EthnobiologyIndices`), and the
-report page + export. The **companion capture apps** are the remaining piece of
-the ethnobotany vertical.
+report page + export. The **companion capture API** (`/api/v1`) is built — token
+auth, offline pull (`me`, project `bundle`), idempotent interview sync with
+last-writer-wins, and audio/photo media with transcription plumbing (gated on
+ADR 0005). The **mobile companion app** is built too, in its own repository
+(`padiush-companion`): Expo / React Native, an encrypted offline store, capture
+of answers, GPS, audio and photos, and the full sync loop against this API.
+
+That completes the ethnobotany vertical's moving parts. What remains before
+field deployment for sensitive studies is hardening rather than new surface —
+tracked as: **resumable media upload** (single PUT today, so a long recording
+restarts from the beginning on a lost connection), **transcription** (null-bound
+plumbing until a real queue and a self-hosted Whisper are provisioned, per
+[ADR 0005](decisions/0005-interview-transcription-whisper.md)), and testing on
+physical devices.
 
 ## Decisions register
 
@@ -41,20 +54,39 @@ the ethnobotany vertical.
   ([ADR 0007](decisions/0007-use-category-as-item-role.md)).
 - **Index scope** — all five (RFC, UV, CI, ICF, FL) ship together; the
   use-category role is a prerequisite.
+- **UV variant** — "mean use-reports per informant" (`UV = ΣUR/N`); implemented
+  and matching the worked-example fixture
+  ([indices spec](analysis/ethnobotany-indices.md#decisions--open-points)).
 - **Mobile stack** — Expo / React Native, committed
   ([ADR 0002](decisions/0002-mobile-companion-stack.md)).
 - **Transcription** — self-hosted Whisper; requires provisioning a real queue
   driver ([ADR 0005](decisions/0005-interview-transcription-whisper.md)).
+- **Form-version skew strategy** *(confirmed 2026-07-12, wording corrected
+  2026-08-06)* — answers are validated against the form's **current** structure
+  and a departed item is refused with an actionable reason; the versioned-forms
+  alternative is rejected. Rests on the existing `FormStructureService`
+  answer-detach guard: deleting a field already discards its answers behind a
+  confirmation, so a late arrival for it should not resurrect what a researcher
+  chose to remove
+  ([sync protocol](contracts/sync-protocol.md#form-version-skew--the-case-that-bites)).
+- **`instance_answers.client_id`** *(confirmed 2026-07-12)* — add a `client_id`
+  uuid column for offline-created answers (the one schema change the sync model
+  needs). Migration lands with the companion milestone.
+- **Sanctum token model** *(confirmed 2026-07-12)* — issue a single `capture`
+  ability; the per-project gate stays enforced by `ProjectPolicy` on every request,
+  so tokens are user-scoped, not project-scoped
+  ([companion API](contracts/companion-api.md#authentication)).
+- **Post-sync conflict policy** *(confirmed 2026-07-12)* — **last-writer-wins per
+  answer row** on **device edit-time** (server-clamped), with overwritten values
+  kept in an audit trail so nothing is silently lost. Flips
+  [ADR 0004](decisions/0004-offline-sync-model.md) to **Accepted**
+  ([sync protocol](contracts/sync-protocol.md#conflict-resolution--deliberately-simple)).
 
 ### ⏳ Still open (documented with a proposed default; settle before the work)
-- **Use Value variant** — "mean use-reports per informant" (used in the spec) vs.
-  a Phillips-&-Gentry uses-based count. Low stakes; lock with the fixture.
-- **Form-version skew strategy** — snapshot-at-capture (*proposed*) vs. explicit
-  form versioning ([sync protocol](contracts/sync-protocol.md#open-decisions)).
-- **`instance_answers.client_id`** — confirm adding a uuid for offline-created
-  answers (implied by the sync model).
-- **Sanctum token model** — single `capture` ability + policy gate (*proposed*)
-  vs. per-project token scoping.
+- *None blocking the roadmap.* The one remaining open point is contract-level:
+  whether `instances:sync` also pulls server-side changes (two-way) or stays
+  push-only (recommended: push-only) —
+  [companion API](contracts/companion-api.md#open-decisions).
 
 ## Maintaining these docs
 

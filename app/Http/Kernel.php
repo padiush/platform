@@ -8,6 +8,7 @@ use App\Http\Middleware\EnsureSystemAdmin;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\PreventRequestsDuringMaintenance;
 use App\Http\Middleware\RedirectIfAuthenticated;
+use App\Http\Middleware\SetLocale;
 use App\Http\Middleware\TrimStrings;
 use App\Http\Middleware\TrustProxies;
 use App\Http\Middleware\ValidateSignature;
@@ -27,6 +28,8 @@ use Illuminate\Routing\Middleware\ThrottleRequests;
 use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use Laravel\Sanctum\Http\Middleware\CheckAbilities;
+use Laravel\Sanctum\Http\Middleware\CheckForAnyAbility;
 use Spatie\Honeypot\ProtectAgainstSpam;
 
 class Kernel extends HttpKernel
@@ -61,6 +64,7 @@ class Kernel extends HttpKernel
             ShareErrorsFromSession::class,
             VerifyCsrfToken::class,
             SubstituteBindings::class,
+            SetLocale::class,
             HandleInertiaRequests::class,
         ],
 
@@ -91,5 +95,7 @@ class Kernel extends HttpKernel
         'verified' => EnsureEmailIsVerified::class,
         'honeypot' => ProtectAgainstSpam::class,
         'system_admin' => EnsureSystemAdmin::class,
+        'abilities' => CheckAbilities::class,
+        'ability' => CheckForAnyAbility::class,
     ];
 }

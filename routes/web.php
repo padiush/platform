@@ -23,6 +23,8 @@ Route::middleware(['auth'])->group(function () {
         ->group(function () {
             Route::get('/', [SystemController::class, 'index'])
                 ->name('index');
+            Route::post('/registration-invites', [SystemController::class, 'inviteRegistration'])
+                ->name('registration-invites.store');
             // Bulk delete must be defined before single delete to avoid
             // "bulk-delete" being treated as a {user} parameter.
             Route::delete('/users/bulk-delete', [SystemController::class, 'destroyUsers'])
@@ -139,10 +141,48 @@ Route::middleware(['auth'])->group(function () {
         )->name('catalogs.species.register');
         Route::post('/catalogs/{project}/species/register', 'storeSpecies');
 
+        // Prefill registration from a WFO name. Literal paths must precede the
+        // {species} route below, or they'd be captured as a species id.
+        Route::get(
+            '/catalogs/{project}/species/wfo-search',
+            'searchWfoNames'
+        )->name('catalogs.species.wfo-search');
+        Route::post(
+            '/catalogs/{project}/species/wfo-resolve',
+            'resolveWfoName'
+        )->name('catalogs.species.wfo-resolve');
+
+        // iNaturalist reference photo: attribution (JSON) + a same-origin,
+        // never-stored image proxy. Literal paths, before the {species} route.
+        Route::get(
+            '/catalogs/{project}/species/inaturalist',
+            'inaturalistInfo'
+        )->name('catalogs.species.inaturalist');
+        Route::get(
+            '/catalogs/{project}/species/inaturalist-photo',
+            'inaturalistPhoto'
+        )->name('catalogs.species.inaturalist-photo');
+
         Route::get(
             '/catalogs/{project}/species/{species}',
             'showSpecies'
         )->name('catalogs.species.show');
+
+        // Fetch (and cache) the species' geographic range from WCVP via GBIF.
+        Route::post(
+            '/catalogs/{project}/species/{species}/distribution',
+            'fetchDistribution'
+        )->name('catalogs.species.distribution');
+
+        // Preview the taxonomy a WFO name would apply, then adopt it.
+        Route::post(
+            '/catalogs/{project}/species/{species}/wfo-preview',
+            'previewWfoName'
+        )->name('catalogs.species.wfo-preview');
+        Route::patch(
+            '/catalogs/{project}/species/{species}',
+            'updateSpecies'
+        )->name('catalogs.species.update');
 
         Route::delete(
             '/catalogs/{project}/species/{species}/delete',

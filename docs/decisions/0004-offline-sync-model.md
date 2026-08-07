@@ -1,6 +1,6 @@
 # 0004 — Offline sync: client-owned records, UUIDs, last-writer-wins
 
-- **Status:** Proposed
+- **Status:** Accepted (2026-07-12)
 - **Deciders:** Project owner
 
 ## Context
@@ -18,12 +18,23 @@ its captures until they sync. Genuine concurrent edits to the same answer are ra
   with during capture.
 - **Client-generated UUIDs** identify offline-created records. Instances are
   already UUID-keyed; `instance_answers` gains a `client_id` uuid (the one schema
-  change).
+  change). ✅ *Confirmed 2026-07-12.*
 - **Idempotent upserts** keyed on those UUIDs; retrying a sync batch is a no-op.
-- **Last-writer-wins on `updated_at`** for the rare post-sync collision. **No
-  CRDTs.**
-- **Form-version skew** is handled by snapshot-at-capture (preferred) built on the
-  existing `FormStructureService` answer-detach guard.
+- **Last-writer-wins per answer row** for the rare post-sync collision, keyed on
+  the latest **device edit-time** — carried per-answer in the sync payload and
+  server-clamped against implausible/future values — **not** server-receipt time,
+  which would let a late-syncing offline edit clobber a newer web correction.
+  Overwritten values are kept in a **lightweight audit trail**, so a clobbered
+  field is recoverable, never silently lost. **No CRDTs.** ✅ *Confirmed 2026-07-12.*
+- **Form-version skew** is handled by validating answers against the form's
+  **current** structure and refusing what no longer fits, with a reason the
+  capture client can act on. Deleting a field on the web already discards its
+  answers behind a confirmation (the existing `FormStructureService`
+  answer-detach guard), so a departed item means that data was deliberately
+  given up and a late arrival for it should not resurrect it. ✅ *Confirmed
+  2026-07-12 as "snapshot-at-capture"; the wording was corrected 2026-08-06 to
+  describe what was actually built — the accept-against-a-historical-structure
+  reading would have required the versioned forms this ADR rejects.*
 
 Full mechanics: [../contracts/sync-protocol.md](../contracts/sync-protocol.md).
 
@@ -33,11 +44,16 @@ Full mechanics: [../contracts/sync-protocol.md](../contracts/sync-protocol.md).
   enumerable (dropped batch, partial success, form skew, tombstone) rather than
   emergent.
 - Retry-safety over flaky field connectivity is structural, not bolted on.
-- Cost: last-writer-wins can silently lose a field in the rare true-concurrent
-  case. Accepted given how rare that is here; revisit only if multi-device shared
-  accounts become common.
-- Requires a schema addition (`client_id`) and a decision on form-version skew
-  strategy before building.
+- Cost: last-writer-wins can lose a field in the rare true-concurrent case — but
+  the audit trail retains the overwritten value, so the loss is recoverable, not
+  silent. Accepted given how rare the collision is here; revisit (e.g. conflict
+  flagging) only if multi-device shared accounts become common.
+- Schema touch for the companion milestone (all **confirmed 2026-07-12**): a
+  `client_id` uuid on `instance_answers`, a per-answer **edit timestamp** (the LWW
+  key) and an **overwrite audit trail** for the conflict policy, plus a
+  `form_version_cursor` on `interview_instances` recording which structure a
+  device captured against — diagnostic, so a skew refusal can be explained. ✅
+  *All built.*
 
 ## Alternatives considered
 

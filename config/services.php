@@ -31,4 +31,11 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    // Companion audio transcription (ADR 0005). Off until a real queue driver
+    // and a Whisper transcriber are provisioned; the media endpoint only
+    // enqueues transcription when this is true.
+    'transcription' => [
+        'enabled' => env('TRANSCRIPTION_ENABLED', false),
+    ],
+
 ];

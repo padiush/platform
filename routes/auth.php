@@ -17,6 +17,22 @@ Route::middleware('guest')->group(function () {
     Route::post('register', [RegisteredUserController::class, 'store'])
         ->middleware(['honeypot']);
 
+    Route::get('register/project-invite/{invite}', [RegisteredUserController::class, 'createFromProjectInvite'])
+        ->middleware(['signed'])
+        ->name('register.project-invite');
+
+    Route::post('register/project-invite/{invite}', [RegisteredUserController::class, 'storeFromProjectInvite'])
+        ->middleware(['signed', 'honeypot'])
+        ->name('register.project-invite.store');
+
+    Route::get('register/platform-invite/{invite}', [RegisteredUserController::class, 'createFromPlatformInvite'])
+        ->middleware(['signed'])
+        ->name('register.platform-invite');
+
+    Route::post('register/platform-invite/{invite}', [RegisteredUserController::class, 'storeFromPlatformInvite'])
+        ->middleware(['signed', 'honeypot'])
+        ->name('register.platform-invite.store');
+
     Route::get('login', [AuthenticatedSessionController::class, 'create'])
         ->name('login');
 

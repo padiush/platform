@@ -6,8 +6,8 @@ re-litigating a decision; if you do change one, add a new ADR that supersedes it
 rather than editing the old one.
 
 These capture reasoning from the product/architecture discussions that shaped the
-current roadmap. Several are **Proposed**, not settled — the status line on each
-is accurate, and the open questions are surfaced in
+current roadmap. One (0003) is still **Proposed**, not settled — the status line on
+each is accurate, and any open questions are surfaced in
 [../README.md#open-decisions](../README.md).
 
 ## Index
@@ -17,7 +17,7 @@ is accurate, and the open questions are surfaced in
 | [0001](0001-complete-ethnobotany-before-generalizing.md) | Complete the ethnobotany vertical before generalizing to other subfields | Accepted |
 | [0002](0002-mobile-companion-stack.md) | Build companion apps on Expo / React Native | Accepted |
 | [0003](0003-capture-only-companion-scope.md) | Scope the companion apps to field capture only | Proposed |
-| [0004](0004-offline-sync-model.md) | Offline sync: client-owned records, UUIDs, last-writer-wins | Proposed |
+| [0004](0004-offline-sync-model.md) | Offline sync: client-owned records, UUIDs, last-writer-wins | Accepted |
 | [0005](0005-interview-transcription-whisper.md) | Transcribe interview audio with self-hosted Whisper | Accepted |
 | [0006](0006-multi-subfield-architecture.md) | Generalize to ethnobiology via subfield configuration | Accepted (impl. deferred) |
 | [0007](0007-use-category-as-item-role.md) | Model use-category as a form-item role | Accepted |

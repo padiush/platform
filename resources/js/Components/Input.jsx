@@ -1,40 +1,17 @@
+import Label, { RequiredMarks } from '@/Components/FieldLabel';
 import { useId } from 'react';
-import { useTranslation } from 'react-i18next';
-
-function RequiredMarks({ required, selective }) {
-    const { t } = useTranslation();
-
-    return (
-        <>
-            {required && (
-                <span
-                    className="text-error tooltip tooltip-bottom select-none"
-                    data-tip={t('designer.required')}
-                >
-                    *
-                </span>
-            )}{' '}
-            {selective && (
-                <span
-                    className="text-warning tooltip tooltip-bottom select-none"
-                    data-tip={t('validation.at_least_one')}
-                >
-                    *
-                </span>
-            )}
-        </>
-    );
-}
 
 function FieldLabel({ id, label, required, selective }) {
     if (!label) return null;
 
     return (
         <div className="fieldset">
-            <label htmlFor={id} className="fieldset-legend">
-                {label}{' '}
-                <RequiredMarks required={required} selective={selective} />
-            </label>
+            <Label
+                id={id}
+                label={label}
+                required={required}
+                selective={selective}
+            />
         </div>
     );
 }

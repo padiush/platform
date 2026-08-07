@@ -1,0 +1,498 @@
+{
+    "updated_on": "Actualizado el {{date}}",
+    "privacy": {
+        "title": "Política de privacidad",
+        "updated": "6 de agosto de 2026",
+        "summary": "Padiush guarda datos de investigación etnobotánica: entrevistas, grabaciones de audio, fotografías y ubicaciones de campo. Esta política explica qué recopilamos, para qué, dónde vive esa información y qué control tienes sobre ella. No vendemos datos, no los usamos con fines publicitarios y no entrenamos modelos de inteligencia artificial con ellos.",
+        "sections": [
+            {
+                "heading": "1. Quiénes somos y qué cubre esta política",
+                "blocks": [
+                    {
+                        "type": "p",
+                        "text": "Padiush es operado por Mercedes Menéndez y Rodrigo Arévalo, personas naturales, desde El Salvador. Actuamos como responsables conjuntos del tratamiento de los datos de las cuentas de usuario."
+                    },
+                    {
+                        "type": "p",
+                        "text": "Esta política cubre el sitio padiushbio.com, la plataforma web y la aplicación móvil Padiush Companion. Puedes escribirnos en cualquier momento a la dirección indicada al final."
+                    }
+                ]
+            },
+            {
+                "heading": "2. Dos tipos de datos, dos responsabilidades",
+                "blocks": [
+                    {
+                        "type": "p",
+                        "text": "La distinción más importante de esta política es quién responde por cada tipo de información."
+                    },
+                    {
+                        "type": "ul",
+                        "items": [
+                            {
+                                "term": "Datos de tu cuenta:",
+                                "text": "nosotros somos responsables. Son los datos que necesitamos para darte acceso y comunicarnos contigo."
+                            },
+                            {
+                                "term": "Datos de investigación:",
+                                "text": "la persona investigadora es la responsable. Incluye las respuestas de las entrevistas, el audio, las fotografías, la ubicación y cualquier dato personal de las personas entrevistadas. Nosotros actuamos como encargados del tratamiento y procesamos esa información siguiendo sus instrucciones."
+                            }
+                        ]
+                    },
+                    {
+                        "type": "p",
+                        "text": "Quien dirige una investigación es responsable de obtener el consentimiento informado de las personas entrevistadas y las aprobaciones éticas que correspondan. Nosotros no accedemos a los contenidos de una investigación salvo que sea imprescindible para prestar soporte técnico solicitado, restaurar información o cumplir una obligación legal."
+                    }
+                ]
+            },
+            {
+                "heading": "3. Qué información recopilamos",
+                "blocks": [
+                    {
+                        "type": "ul",
+                        "items": [
+                            {
+                                "term": "Datos de cuenta:",
+                                "text": "nombre, correo electrónico, contraseña (guardada como un hash irreversible, nunca en texto claro), estado de verificación del correo, idioma y tema visual."
+                            },
+                            {
+                                "term": "Datos del proyecto:",
+                                "text": "título, institución, país, autoría, integrantes del equipo, funciones asignadas e invitaciones."
+                            },
+                            {
+                                "term": "Contenido de investigación:",
+                                "text": "formularios de entrevista, respuestas registradas, catálogo de especies y los nombres tal como fueron reportados en campo."
+                            },
+                            {
+                                "term": "Datos capturados en campo:",
+                                "text": "fecha y hora de la captura, coordenadas GPS cuando el dispositivo las proporciona, grabaciones de audio y fotografías."
+                            },
+                            {
+                                "term": "Datos de las personas entrevistadas:",
+                                "text": "únicamente los que la persona investigadora decida registrar en sus formularios."
+                            },
+                            {
+                                "term": "Datos de dispositivo:",
+                                "text": "el nombre que asignas al dispositivo y un token de acceso por dispositivo para la aplicación móvil."
+                            },
+                            {
+                                "term": "Formulario de contacto:",
+                                "text": "nombre, correo electrónico y el mensaje que nos envías."
+                            },
+                            {
+                                "term": "Registros técnicos:",
+                                "text": "nuestro servidor guarda registros de acceso habituales (dirección IP, navegador, fecha y recurso solicitado) durante un periodo breve, con fines de seguridad y diagnóstico."
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "heading": "4. Para qué usamos la información",
+                "blocks": [
+                    {
+                        "type": "p",
+                        "text": "Usamos los datos únicamente para que la plataforma funcione: crear y autenticar tu cuenta, sincronizar las capturas hechas desde el móvil, calcular los índices etnobiológicos, generar tus exportaciones, enviarte correos necesarios (verificación, restablecimiento de contraseña, invitaciones y respuestas al formulario de contacto) y proteger el servicio frente a abusos."
+                    },
+                    {
+                        "type": "p",
+                        "text": "No vendemos ni alquilamos tu información. No la usamos para publicidad ni para crear perfiles comerciales. No entrenamos modelos de inteligencia artificial con tus datos ni con el contenido de las entrevistas."
+                    }
+                ]
+            },
+            {
+                "heading": "5. Analítica y cookies",
+                "blocks": [
+                    {
+                        "type": "p",
+                        "text": "Para entender cómo se usa la plataforma utilizamos Umami, una herramienta de analítica que alojamos en nuestra propia infraestructura. Los datos de uso no salen hacia un proveedor externo de analítica."
+                    },
+                    {
+                        "type": "p",
+                        "text": "Umami no usa cookies, no crea identificadores persistentes y no permite seguirte entre sitios distintos. No guarda tu dirección IP: la utiliza de forma transitoria para deducir una ubicación aproximada y un identificador anónimo que se renueva cada día. Además respeta la señal «Do Not Track» de tu navegador."
+                    },
+                    {
+                        "type": "p",
+                        "text": "Las únicas cookies que usamos son necesarias para el funcionamiento:"
+                    },
+                    {
+                        "type": "ul",
+                        "items": [
+                            {
+                                "term": "Sesión:",
+                                "text": "mantiene tu sesión iniciada."
+                            },
+                            {
+                                "term": "Token CSRF:",
+                                "text": "protege los formularios frente a peticiones falsificadas."
+                            },
+                            {
+                                "term": "Idioma:",
+                                "text": "recuerda el idioma que elegiste."
+                            }
+                        ]
+                    },
+                    {
+                        "type": "p",
+                        "text": "La preferencia de tema claro u oscuro se guarda en el almacenamiento local de tu navegador, no en una cookie."
+                    }
+                ]
+            },
+            {
+                "heading": "6. Con quién compartimos la información",
+                "blocks": [
+                    {
+                        "type": "p",
+                        "text": "No compartimos tu información con terceros para sus propios fines. Solo intervienen los proveedores necesarios para operar el servicio:"
+                    },
+                    {
+                        "type": "ul",
+                        "items": [
+                            {
+                                "term": "Amazon Web Services:",
+                                "text": "alojamiento, base de datos, almacenamiento de archivos y copias de seguridad cifradas, en servidores ubicados en Estados Unidos."
+                            },
+                            {
+                                "term": "Proveedor de correo saliente:",
+                                "text": "entrega de los correos transaccionales de la plataforma."
+                            }
+                        ]
+                    },
+                    {
+                        "type": "p",
+                        "text": "Dentro de la plataforma, la información de un proyecto es visible para las personas que su propietario haya invitado, según la función que les asigne. Solo entregaríamos información a una autoridad si la ley nos obliga."
+                    }
+                ]
+            },
+            {
+                "heading": "7. Consultas a fuentes botánicas externas",
+                "blocks": [
+                    {
+                        "type": "p",
+                        "text": "Para ayudarte a identificar especies consultamos World Flora Online, GBIF (que publica el World Checklist of Vascular Plants de Kew) e iNaturalist. Estas consultas viajan únicamente con nombres de plantas: nunca enviamos datos personales, respuestas de entrevistas, ubicaciones de campo ni identificadores de tu cuenta."
+                    },
+                    {
+                        "type": "p",
+                        "text": "Las fotografías de referencia de iNaturalist se sirven a través de nuestro propio servidor. Tu navegador nunca contacta directamente a iNaturalist, de modo que tu dirección IP no queda expuesta a ese servicio. No almacenamos esas imágenes: se muestran en el momento, con el crédito de su autoría, su licencia y un enlace a la fuente."
+                    }
+                ]
+            },
+            {
+                "heading": "8. Transcripción de audio",
+                "blocks": [
+                    {
+                        "type": "p",
+                        "text": "Actualmente no transcribimos las grabaciones de las entrevistas. Si activamos esa función, el procesamiento se hará en infraestructura bajo nuestro control: el audio no se enviará a servicios de transcripción de terceros, y te avisaremos antes de habilitarla."
+                    }
+                ]
+            },
+            {
+                "heading": "9. Dónde se guarda y cómo se protege",
+                "blocks": [
+                    {
+                        "type": "p",
+                        "text": "La información se aloja en servidores de Amazon Web Services en Estados Unidos. Si resides fuera de ese país, esto implica una transferencia internacional de datos; al usar la plataforma aceptas esa transferencia, que protegemos con las medidas técnicas descritas a continuación."
+                    },
+                    {
+                        "type": "ul",
+                        "items": [
+                            {
+                                "term": "En tránsito:",
+                                "text": "toda la comunicación viaja cifrada con HTTPS/TLS."
+                            },
+                            {
+                                "term": "En la base de datos:",
+                                "text": "las respuestas de las entrevistas y las transcripciones se cifran a nivel de aplicación."
+                            },
+                            {
+                                "term": "Archivos:",
+                                "text": "el audio y las fotografías se guardan en almacenamiento de objetos con acceso restringido, al que solo se llega mediante enlaces firmados de vigencia limitada."
+                            },
+                            {
+                                "term": "Control de acceso:",
+                                "text": "los permisos se verifican por proyecto y por función en cada petición, tanto desde la web como desde la aplicación móvil."
+                            },
+                            {
+                                "term": "En el teléfono:",
+                                "text": "la base de datos local se cifra con SQLCipher usando una clave generada en el propio dispositivo y guardada en el llavero del sistema. Las fotografías y grabaciones también se cifran, los archivos originales sin cifrar se eliminan tras incorporarlos, y el contenido se borra del teléfono cuando el servidor confirma que quedó almacenado. Si el cifrado no está disponible, la aplicación se niega a capturar en lugar de guardar información sin proteger. Tu contraseña nunca se guarda en el dispositivo."
+                            },
+                            {
+                                "term": "Copias de seguridad:",
+                                "text": "hacemos un respaldo completo diario y archivamos cada hora el registro de transacciones. Ambos se cifran con claves gestionadas, quedan protegidos contra borrado durante su periodo de retención y su restauración se ha probado. Conservamos los respaldos completos 400 días y los registros de transacciones 45 días."
+                            }
+                        ]
+                    },
+                    {
+                        "type": "p",
+                        "text": "Ningún sistema es completamente seguro y no podemos garantizar una protección absoluta. Si detectáramos un acceso no autorizado a tu información, te contactaríamos para explicarte qué ocurrió y cómo lo estamos resolviendo."
+                    }
+                ]
+            },
+            {
+                "heading": "10. Cuánto tiempo conservamos la información",
+                "blocks": [
+                    {
+                        "type": "p",
+                        "text": "Conservamos los datos de tu cuenta y de tus investigaciones mientras la cuenta exista. Cuando eliminas un proyecto o solicitas la eliminación de tu cuenta, la información se borra de los sistemas activos."
+                    },
+                    {
+                        "type": "p",
+                        "text": "Después de esa eliminación, los datos pueden permanecer en nuestras copias de seguridad cifradas hasta 400 días, plazo tras el cual expiran automáticamente. No usamos esas copias para nada distinto a restaurar el servicio ante un incidente."
+                    }
+                ]
+            },
+            {
+                "heading": "11. Tus derechos",
+                "blocks": [
+                    {
+                        "type": "p",
+                        "text": "Con independencia de dónde residas, te reconocemos los siguientes derechos sobre tus datos personales: acceso, rectificación, supresión, limitación del tratamiento, oposición, portabilidad y retirada del consentimiento. También puedes presentar una reclamación ante la autoridad de protección de datos que te corresponda."
+                    },
+                    {
+                        "type": "p",
+                        "text": "Varios de estos derechos ya están integrados en la plataforma: puedes consultar y corregir tus datos desde tu cuenta, exportar la información de tus investigaciones en formato CSV o XLSX, y eliminar los proyectos de los que seas propietario."
+                    },
+                    {
+                        "type": "p",
+                        "text": "La eliminación de la cuenta completa se tramita hoy a petición: escríbenos y la procesamos. Para cualquier otra solicitud, contáctanos por los medios del final de esta política; responderemos en un plazo máximo de 30 días."
+                    }
+                ]
+            },
+            {
+                "heading": "12. Menores de edad",
+                "blocks": [
+                    {
+                        "type": "p",
+                        "text": "La plataforma está dirigida a personas investigadoras mayores de 18 años y no creamos cuentas para menores de esa edad. Si una investigación involucra a personas menores de edad como entrevistadas, corresponde a quien dirige el estudio obtener los consentimientos y autorizaciones necesarios."
+                    }
+                ]
+            },
+            {
+                "heading": "13. Cambios a esta política",
+                "blocks": [
+                    {
+                        "type": "p",
+                        "text": "Si cambiamos esta política te lo haremos saber por correo electrónico al menos 30 días antes de que los cambios entren en vigor, para que tengas tiempo de revisarlos."
+                    }
+                ]
+            },
+            {
+                "heading": "14. Contacto",
+                "blocks": [
+                    {
+                        "type": "p",
+                        "text": "Escríbenos si tienes dudas sobre esta política o quieres ejercer cualquiera de tus derechos:"
+                    },
+                    {
+                        "type": "links",
+                        "items": [
+                            {
+                                "label": "hola@padiushbio.com",
+                                "href": "mailto:hola@padiushbio.com"
+                            },
+                            {
+                                "label": "Formulario de contacto",
+                                "href": "/contacto"
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    },
+    "terms": {
+        "title": "Términos y condiciones",
+        "updated": "6 de agosto de 2026",
+        "summary": "Padiush es una plataforma de investigación en fase beta. Tú conservas la propiedad de tus datos y de tu investigación; nosotros conservamos la del software. Estos términos explican qué esperamos de ti y qué puedes esperar de nosotros.",
+        "sections": [
+            {
+                "heading": "1. Aceptación de estos términos",
+                "blocks": [
+                    {
+                        "type": "p",
+                        "text": "Estos términos rigen tu acceso y uso de Padiush, tanto de la plataforma web como de la aplicación móvil Padiush Companion. Al crear una cuenta y usar la plataforma, los aceptas. Si no estás de acuerdo, no utilices el servicio."
+                    }
+                ]
+            },
+            {
+                "heading": "2. Quién puede usar la plataforma",
+                "blocks": [
+                    {
+                        "type": "p",
+                        "text": "Debes ser mayor de 18 años y registrarte con datos veraces. El acceso es actualmente por invitación y requiere verificar tu dirección de correo electrónico."
+                    },
+                    {
+                        "type": "p",
+                        "text": "Tu cuenta es personal e intransferible. Eres responsable de mantener la confidencialidad de tus credenciales y de la actividad que ocurra bajo tu cuenta. Avísanos de inmediato si sospechas de un uso no autorizado."
+                    }
+                ]
+            },
+            {
+                "heading": "3. La plataforma está en fase beta",
+                "blocks": [
+                    {
+                        "type": "p",
+                        "text": "Padiush está en desarrollo activo. Las funciones pueden cambiar, y en algunos casos retirarse, y pueden producirse interrupciones o errores. No garantizamos disponibilidad ininterrumpida ni ausencia de fallos."
+                    },
+                    {
+                        "type": "p",
+                        "text": "Por eso te recomendamos usar la función de exportación con regularidad y conservar tus propias copias de la información de investigación que sea importante para ti."
+                    }
+                ]
+            },
+            {
+                "heading": "4. Uso aceptable",
+                "blocks": [
+                    {
+                        "type": "p",
+                        "text": "Al usar la plataforma te comprometes a no:"
+                    },
+                    {
+                        "type": "ul",
+                        "items": [
+                            "Subir contenido ilegal, que infrinja derechos de autor, o que sea ofensivo o difamatorio.",
+                            "Aplicar ingeniería inversa al software, ni copiarlo, modificarlo o distribuirlo sin nuestro permiso.",
+                            "Acceder a información que no te corresponde, eludir los controles de acceso o aprovechar fallos para obtener datos ajenos.",
+                            "Usar la plataforma para hostigar a otras personas o para actividades ilegales.",
+                            "Interferir con el funcionamiento del servicio o con su infraestructura."
+                        ]
+                    },
+                    {
+                        "type": "p",
+                        "text": "Si descubres una vulnerabilidad o accedes accidentalmente a información que no te corresponde, estás obligado a reportárnoslo de inmediato y a no divulgarla ni aprovecharla."
+                    }
+                ]
+            },
+            {
+                "heading": "5. Tus responsabilidades como investigador o investigadora",
+                "blocks": [
+                    {
+                        "type": "p",
+                        "text": "Padiush guarda información sobre personas reales y sobre conocimiento tradicional. Al registrar datos en la plataforma declaras que:"
+                    },
+                    {
+                        "type": "ul",
+                        "items": [
+                            "Has obtenido el consentimiento informado de las personas entrevistadas, incluido el consentimiento específico para grabar audio y tomar fotografías cuando lo hagas.",
+                            "Cuentas con las aprobaciones éticas o institucionales que exija tu investigación.",
+                            "Cumples las obligaciones aplicables sobre conocimiento tradicional, incluidos los acuerdos con las comunidades y las normas de acceso y participación en los beneficios que correspondan.",
+                            "Tienes una base legal válida para tratar los datos personales que registres."
+                        ]
+                    },
+                    {
+                        "type": "p",
+                        "text": "Respecto de esa información, tú actúas como responsable del tratamiento y nosotros como encargados. Podemos suspender el acceso a contenidos que, de forma manifiesta, infrinjan estas condiciones."
+                    }
+                ]
+            },
+            {
+                "heading": "6. Propiedad intelectual",
+                "blocks": [
+                    {
+                        "type": "p",
+                        "text": "Tú conservas la titularidad de la información y del contenido que subes: tus proyectos, formularios, respuestas, catálogos, grabaciones e imágenes son tuyos."
+                    },
+                    {
+                        "type": "p",
+                        "text": "Para poder prestarte el servicio, nos concedes una licencia limitada, no exclusiva y revocable para alojar, respaldar, procesar y mostrar ese contenido, únicamente con el fin de operar la plataforma para ti y para las personas que invites. No usamos tu contenido con ningún otro propósito."
+                    },
+                    {
+                        "type": "p",
+                        "text": "El software de Padiush, su diseño y su marca nos pertenecen. No puedes copiarlo, modificarlo, distribuirlo ni crear obras derivadas sin nuestro permiso escrito."
+                    }
+                ]
+            },
+            {
+                "heading": "7. Datos de fuentes externas",
+                "blocks": [
+                    {
+                        "type": "p",
+                        "text": "La plataforma consulta World Flora Online, GBIF (World Checklist of Vascular Plants) e iNaturalist para ayudarte a identificar especies y conocer su distribución. Esa información pertenece a sus respectivas fuentes y está sujeta a sus propios términos y licencias."
+                    },
+                    {
+                        "type": "p",
+                        "text": "Las fotografías de referencia de iNaturalist siguen perteneciendo a quienes las tomaron y se rigen por la licencia que se indica junto a cada imagen. Si quieres reutilizarlas en una publicación, verifica esa licencia y respeta los créditos correspondientes."
+                    }
+                ]
+            },
+            {
+                "heading": "8. Responsabilidad científica",
+                "blocks": [
+                    {
+                        "type": "p",
+                        "text": "Los índices etnobiológicos, las coincidencias taxonómicas y los mapas de distribución que ofrece la plataforma son herramientas de cálculo y consulta, no dictámenes científicos. Las fuentes externas pueden contener errores o estar desactualizadas."
+                    },
+                    {
+                        "type": "p",
+                        "text": "Antes de publicar, verifica los resultados, las identificaciones y las citas. La responsabilidad científica de una publicación corresponde siempre a quien la firma."
+                    }
+                ]
+            },
+            {
+                "heading": "9. Limitación de responsabilidad",
+                "blocks": [
+                    {
+                        "type": "p",
+                        "text": "Nos esforzamos por mantener la plataforma segura y disponible, pero el servicio se ofrece «tal cual», sin más garantías que las exigidas por la ley."
+                    },
+                    {
+                        "type": "p",
+                        "text": "Hasta donde la ley lo permita, no respondemos por la pérdida accidental de información, por interrupciones del servicio, ni por daños indirectos o lucro cesante derivados del uso o de la imposibilidad de uso de la plataforma. Nada en estos términos excluye responsabilidades que no puedan limitarse legalmente."
+                    }
+                ]
+            },
+            {
+                "heading": "10. Suspensión y terminación",
+                "blocks": [
+                    {
+                        "type": "p",
+                        "text": "Si detectamos un incumplimiento de estos términos podemos suspender o eliminar tu cuenta e impedir la creación de nuevas cuentas. Salvo que la ley lo impida, te informaremos de la situación y te daremos la oportunidad de explicar tu versión antes de tomar una medida definitiva. Ante incumplimientos intencionales podemos ejercer las acciones legales que correspondan."
+                    },
+                    {
+                        "type": "p",
+                        "text": "Tú puedes dejar de usar la plataforma cuando quieras y solicitar la eliminación de tu cuenta según lo descrito en la política de privacidad."
+                    }
+                ]
+            },
+            {
+                "heading": "11. Cambios a estos términos",
+                "blocks": [
+                    {
+                        "type": "p",
+                        "text": "Si modificamos estos términos te lo comunicaremos por correo electrónico al menos 30 días antes de que los cambios entren en vigor. Si continúas usando la plataforma después de esa fecha, entenderemos que aceptas la nueva versión."
+                    }
+                ]
+            },
+            {
+                "heading": "12. Ley aplicable y jurisdicción",
+                "blocks": [
+                    {
+                        "type": "p",
+                        "text": "Estos términos se rigen por las leyes de la República de El Salvador. Cualquier controversia relacionada con ellos se resolverá ante los tribunales de la ciudad de San Salvador."
+                    }
+                ]
+            },
+            {
+                "heading": "13. Contacto",
+                "blocks": [
+                    {
+                        "type": "p",
+                        "text": "Si tienes dudas sobre estos términos, escríbenos:"
+                    },
+                    {
+                        "type": "links",
+                        "items": [
+                            {
+                                "label": "hola@padiushbio.com",
+                                "href": "mailto:hola@padiushbio.com"
+                            },
+                            {
+                                "label": "Formulario de contacto",
+                                "href": "/contacto"
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+}

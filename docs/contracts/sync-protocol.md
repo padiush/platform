@@ -1,6 +1,6 @@
-# Offline sync protocol (proposed)
+# Offline sync protocol
 
-**Status: proposed.** The choreography behind the companion apps' offline
+**Status: built (v1).** The choreography behind the companion apps' offline
 capability. The [companion API](companion-api.md) is the HTTP surface; this
 document is how the device and server dance over it so a field worker with no
 signal can record all day and reconcile later without losing or duplicating data.
@@ -29,8 +29,8 @@ Offline-created records need identifiers before the server ever sees them.
   `HasUuids`) — the device mints the instance `id`.
 - **Answers** are integer-PK today (`instance_answers`). Offline creation needs a
   device-minted `client_id` (uuid) on each answer — **the one schema change this
-  protocol requires**. Server keeps its own PK; `client_id` is the idempotency
-  key and the device's stable reference.
+  protocol requires** *(✅ built 2026-07-12)*. Server keeps its own PK; `client_id`
+  is the idempotency key and the device's stable reference.
 
 ## The loop
 
@@ -65,12 +65,18 @@ same answer are rare. So:
 
 - **An unsynced record is owned by its device.** No server state exists to
   conflict with.
-- **After sync**, if the same instance is somehow edited from two places (e.g. two
-  devices logged into the same account), resolve per-field by **last-writer-wins
-  on `updated_at`**. This is adequate precisely because the event is rare and the
-  data is additive; do **not** reach for CRDTs.
+- **After sync**, if the same answer is somehow edited from two places (e.g. two
+  devices on one account, or a web correction racing a device re-sync), resolve
+  **per answer row** by **last-writer-wins**. The winner is the latest **device
+  edit-time** — carried per-answer in the sync payload and server-clamped against
+  implausible/future values — **not** server-receipt time: receipt time would let a
+  late-syncing offline edit clobber a newer web correction, the exact field
+  scenario this system exists for. Overwritten values are retained in a
+  **lightweight audit trail**, so a clobbered field is recoverable, never silently
+  lost. This is adequate precisely because the event is rare and the data is
+  additive; do **not** reach for CRDTs.
 - Web-side edits to captured interviews are possible but expected to be light
-  (corrections). They win only if newer.
+  (corrections). They win only if newer (by edit-time).
 
 ## Form-version skew — the case that bites
 
@@ -78,23 +84,38 @@ A device caches form **v1**, goes offline, and captures against it. Meanwhile th
 web edits the form to **v2** (renames an item, deletes a section). The device's
 answers reference v1 items. Two ways to keep those answers valid:
 
-**Recommended — snapshot at capture.** When an interview is created on the device,
-it captures against the *cached* structure and the pushed instance carries the
-`form_version_cursor` it was built from. The server accepts answers validated
-against the structure as of that cursor, not only the latest. Answers whose item
-truly no longer exists are `rejected` with a clear reason (not silently dropped),
-and surfaced to the researcher to resolve on the web.
+**Built — validate against the current structure, and explain what is refused.**
+Answers are checked against the form as it stands now. One whose item no longer
+exists is `rejected` with a reason (`api.sync.item_not_in_form`), never silently
+dropped, and the capture client surfaces it against the field so the recorder can
+correct it or discard that one answer and let the rest of the interview through.
 
-**Alternative — versioned forms.** Give `InterviewForm` explicit versions and pin
-each instance to the version it was captured under. Heavier, but unambiguous, and
-it also improves web-side reproducibility.
+The device stamps each interview with the `form_version_cursor` it was recording
+against, and the server stores it. That is diagnostic, not permissive: it does
+not widen what is accepted, it records which structure the device was holding so
+a refusal can be explained rather than merely reported.
 
-Either way, the existing **answer-detach guard** in `FormStructureService` (which
-already reasons about structure changes vs. existing answers) is the seam to build
-on — extend that logic to the sync path rather than inventing a parallel one.
+**Why this is the right behaviour, not a shortfall.** Deleting a field on the web
+already deletes its answers, behind an explicit confirmation
+(`FormStructureService`'s answer-detach guard). An item that is gone therefore
+means a researcher deliberately gave that data up. Accepting late arrivals for it
+would resurrect exactly what they chose to remove — so refusing them is the
+correct outcome, and the useful work is making the refusal legible.
 
-> Decide snapshot-vs-versioning before building offline capture; retrofitting the
-> other is expensive. Listed in [Open decisions](#open-decisions).
+**Rejected alternative — versioned forms.** Give `InterviewForm` explicit versions
+and pin each instance to the version it was captured under. It is the only way to
+truly accept an answer against a structure that no longer exists, and it was
+rejected as too heavy for the benefit ([ADR 0004](../decisions/0004-offline-sync-model.md)).
+Nothing here is waiting on it.
+
+> **History (2026-08-06).** This section previously described
+> *snapshot-at-capture*: the server accepting answers validated against the
+> structure as of the cursor. That was never built, and could not be without the
+> historical structures the versioned-forms alternative was rejected for. The
+> cursor was sent, validated, and discarded unstored; the device never even read
+> it from its own cache, so every interview arrived claiming none. The contract
+> now describes what the code does, the cursor is stored, and the device sends a
+> real one.
 
 ## Deletions
 
@@ -127,8 +148,21 @@ without it; the file and transcript attach when they arrive.
 
 ## Open decisions
 
-1. **Form-version skew strategy** — snapshot-at-capture (recommended) vs. explicit
-   form versioning. Blocks offline capture design.
-2. **Answer `client_id`** — confirm adding a uuid column to `instance_answers`.
-3. **Conflict policy** — confirm last-writer-wins-on-`updated_at` for the rare
-   post-sync collision.
+None — all settled; [ADR 0004](../decisions/0004-offline-sync-model.md) is
+**Accepted**.
+
+## Settled decisions
+
+1. ✅ **Form-version skew strategy** *(2026-07-12, corrected 2026-08-06)* —
+   **validate against the current structure and explain refusals**; versioned
+   forms rejected. Deleting a field on the web already discards its answers
+   behind a confirmation (`FormStructureService`'s answer-detach guard), so an
+   item that is gone means the data was deliberately given up and late arrivals
+   for it should not be resurrected. Recorded as *snapshot-at-capture* until
+   2026-08-06, which described a guarantee the code never made; see
+   [Form-version skew](#form-version-skew--the-case-that-bites).
+2. ✅ **Answer `client_id`** *(2026-07-12)* — add a uuid column to
+   `instance_answers`; server keeps its integer PK.
+3. ✅ **Conflict policy** *(2026-07-12)* — **last-writer-wins per answer row** on
+   **device edit-time** (server-clamped), with overwritten values kept in an audit
+   trail. See [Conflict resolution](#conflict-resolution--deliberately-simple).

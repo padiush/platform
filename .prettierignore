@@ -1,0 +1,14 @@
+# Views published from a package (`artisan vendor:publish`). These are upstream
+# files that happen to live under resources/, not code written here: the mail
+# themes are Laravel's own, and `padiush.css` is that stock theme with our brand
+# rules appended below it rather than edited into it, precisely so it stays
+# recognisable and easy to re-diff when Laravel changes it.
+#
+# Formatting them would rewrite ~300 lines of upstream CSS in each file and make
+# every future upgrade a manual merge, to satisfy a style rule about code we do
+# not own. Our own additions sit in the appended block and follow the surrounding
+# conventions.
+resources/views/vendor/
+
+# Build output.
+public/build/

@@ -242,6 +242,10 @@ class InterviewInstancesController extends Controller
             $answer->answer = $validated['value'];
         }
 
+        // Stamp the edit-time so web corrections take part in the companion
+        // sync's last-writer-wins policy (docs/decisions/0004-offline-sync-model.md).
+        $answer->edited_at = now();
+
         $answer->save();
 
         return response()->json(['success' => true]);
