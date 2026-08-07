@@ -102,9 +102,12 @@ paths:
       summary: The offline capture bundle — every active form's full structure
       description: >
         `?since` makes it incremental (only forms whose structure changed after
-        the cursor). The device stores `form_version_cursor` and carries it on
-        captured instances to anchor snapshot-at-capture form-version skew. The
-        species catalog is deliberately not pulled — linking is a web-side task.
+        the cursor). The device stores `form_version_cursor` and stamps it on
+        captured instances, recording which structure each was recorded against
+        so a form-skew refusal can be explained; it does not widen what the sync
+        accepts. Read `active_form_ids` on every pull — the delta cannot express
+        a removal. The species catalog is deliberately not pulled: linking is a
+        web-side task.
       parameters:
         - $ref: '#/components/parameters/ProjectId'
         - name: since

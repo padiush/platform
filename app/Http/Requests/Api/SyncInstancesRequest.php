@@ -11,8 +11,10 @@ class SyncInstancesRequest extends ApiFormRequest
             'instances.*.id' => ['required', 'uuid'],
             'instances.*.interview_form_id' => ['required', 'integer'],
             'instances.*.captured_at' => ['nullable', 'date'],
-            // The structure cursor the interview was captured against (advisory;
-            // snapshot-at-capture is enforced by per-answer item validation).
+            // The structure cursor the interview was captured against. Stored,
+            // not enforced: answers are validated against the form's current
+            // structure, and this records which one the device was holding so a
+            // refusal can be explained.
             'instances.*.form_version_cursor' => ['nullable', 'date'],
             'instances.*.location' => ['nullable', 'array'],
             'instances.*.location.lat' => ['required_with:instances.*.location', 'numeric', 'between:-90,90'],

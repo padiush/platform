@@ -52,9 +52,13 @@ companion apps** themselves, which build against that API.
   ([ADR 0002](decisions/0002-mobile-companion-stack.md)).
 - **Transcription** — self-hosted Whisper; requires provisioning a real queue
   driver ([ADR 0005](decisions/0005-interview-transcription-whisper.md)).
-- **Form-version skew strategy** *(confirmed 2026-07-12)* — **snapshot-at-capture**;
-  the versioned-forms alternative is rejected. Built on the existing
-  `FormStructureService` answer-detach guard
+- **Form-version skew strategy** *(confirmed 2026-07-12, wording corrected
+  2026-08-06)* — answers are validated against the form's **current** structure
+  and a departed item is refused with an actionable reason; the versioned-forms
+  alternative is rejected. Rests on the existing `FormStructureService`
+  answer-detach guard: deleting a field already discards its answers behind a
+  confirmation, so a late arrival for it should not resurrect what a researcher
+  chose to remove
   ([sync protocol](contracts/sync-protocol.md#form-version-skew--the-case-that-bites)).
 - **`instance_answers.client_id`** *(confirmed 2026-07-12)* — add a `client_id`
   uuid column for offline-created answers (the one schema change the sync model

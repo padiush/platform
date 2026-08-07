@@ -17,9 +17,9 @@ use Illuminate\Http\Request;
  * catalog — linking is a web-side task (ADR 0003); it captures the raw folk name.
  *
  * form_version_cursor is the latest structure-change time across the project's
- * active forms; the device stores it and passes it back as `since`, and carries
- * it on captured instances to anchor snapshot-at-capture form-version skew
- * (docs/contracts/sync-protocol.md).
+ * active forms; the device stores it, passes it back as `since`, and stamps it
+ * on captured instances so a form-skew refusal can say which structure the
+ * device was recording against (docs/contracts/sync-protocol.md).
  */
 class BundleController extends ApiController
 {

@@ -1,6 +1,6 @@
-# Offline sync protocol (proposed)
+# Offline sync protocol
 
-**Status: proposed.** The choreography behind the companion apps' offline
+**Status: built (v1).** The choreography behind the companion apps' offline
 capability. The [companion API](companion-api.md) is the HTTP surface; this
 document is how the device and server dance over it so a field worker with no
 signal can record all day and reconcile later without losing or duplicating data.
@@ -84,25 +84,38 @@ A device caches form **v1**, goes offline, and captures against it. Meanwhile th
 web edits the form to **v2** (renames an item, deletes a section). The device's
 answers reference v1 items. Two ways to keep those answers valid:
 
-**Decided (2026-07-12) — snapshot at capture.** When an interview is created on the
-device, it captures against the *cached* structure and the pushed instance carries
-the `form_version_cursor` it was built from. The server accepts answers validated
-against the structure as of that cursor, not only the latest. Answers whose item
-truly no longer exists are `rejected` with a clear reason (not silently dropped),
-and surfaced to the researcher to resolve on the web.
+**Built — validate against the current structure, and explain what is refused.**
+Answers are checked against the form as it stands now. One whose item no longer
+exists is `rejected` with a reason (`api.sync.item_not_in_form`), never silently
+dropped, and the capture client surfaces it against the field so the recorder can
+correct it or discard that one answer and let the rest of the interview through.
+
+The device stamps each interview with the `form_version_cursor` it was recording
+against, and the server stores it. That is diagnostic, not permissive: it does
+not widen what is accepted, it records which structure the device was holding so
+a refusal can be explained rather than merely reported.
+
+**Why this is the right behaviour, not a shortfall.** Deleting a field on the web
+already deletes its answers, behind an explicit confirmation
+(`FormStructureService`'s answer-detach guard). An item that is gone therefore
+means a researcher deliberately gave that data up. Accepting late arrivals for it
+would resurrect exactly what they chose to remove — so refusing them is the
+correct outcome, and the useful work is making the refusal legible.
 
 **Rejected alternative — versioned forms.** Give `InterviewForm` explicit versions
-and pin each instance to the version it was captured under. Heavier, but
-unambiguous, and it also improves web-side reproducibility — revisit only if
-snapshot-at-capture proves insufficient.
+and pin each instance to the version it was captured under. It is the only way to
+truly accept an answer against a structure that no longer exists, and it was
+rejected as too heavy for the benefit ([ADR 0004](../decisions/0004-offline-sync-model.md)).
+Nothing here is waiting on it.
 
-Either way, the existing **answer-detach guard** in `FormStructureService` (which
-already reasons about structure changes vs. existing answers) is the seam to build
-on — extend that logic to the sync path rather than inventing a parallel one.
-
-> **Decided (2026-07-12): snapshot-at-capture.** The choice was made before
-> building because retrofitting the other is expensive. See
-> [Open decisions](#open-decisions).
+> **History (2026-08-06).** This section previously described
+> *snapshot-at-capture*: the server accepting answers validated against the
+> structure as of the cursor. That was never built, and could not be without the
+> historical structures the versioned-forms alternative was rejected for. The
+> cursor was sent, validated, and discarded unstored; the device never even read
+> it from its own cache, so every interview arrived claiming none. The contract
+> now describes what the code does, the cursor is stored, and the device sends a
+> real one.
 
 ## Deletions
 
@@ -140,8 +153,14 @@ None — all settled; [ADR 0004](../decisions/0004-offline-sync-model.md) is
 
 ## Settled decisions
 
-1. ✅ **Form-version skew strategy** *(2026-07-12)* — **snapshot-at-capture**;
-   versioned forms rejected. Built on the `FormStructureService` answer-detach guard.
+1. ✅ **Form-version skew strategy** *(2026-07-12, corrected 2026-08-06)* —
+   **validate against the current structure and explain refusals**; versioned
+   forms rejected. Deleting a field on the web already discards its answers
+   behind a confirmation (`FormStructureService`'s answer-detach guard), so an
+   item that is gone means the data was deliberately given up and late arrivals
+   for it should not be resurrected. Recorded as *snapshot-at-capture* until
+   2026-08-06, which described a guarantee the code never made; see
+   [Form-version skew](#form-version-skew--the-case-that-bites).
 2. ✅ **Answer `client_id`** *(2026-07-12)* — add a uuid column to
    `instance_answers`; server keeps its integer PK.
 3. ✅ **Conflict policy** *(2026-07-12)* — **last-writer-wins per answer row** on
