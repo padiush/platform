@@ -18,13 +18,19 @@ export default function PublicLayout({ children, title }) {
             <div className="navbar bg-primary text-primary-content sticky top-0 z-40">
                 <div className="navbar-start">
                     <div className="dropdown">
-                        <label tabIndex={0} className="btn btn-ghost lg:hidden">
+                        <button
+                            type="button"
+                            className="btn btn-ghost lg:hidden"
+                            aria-label={t('navigation.open_menu')}
+                            aria-controls="public-mobile-navigation"
+                        >
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
                                 className="h-5 w-5"
                                 fill="none"
                                 viewBox="0 0 24 24"
                                 stroke="currentColor"
+                                aria-hidden="true"
                             >
                                 <path
                                     strokeLinecap="round"
@@ -33,8 +39,9 @@ export default function PublicLayout({ children, title }) {
                                     d="M4 6h16M4 12h8m-8 6h16"
                                 />
                             </svg>
-                        </label>
+                        </button>
                         <ul
+                            id="public-mobile-navigation"
                             tabIndex={0}
                             className="menu menu-compact dropdown-content bg-base-200 text-base-content rounded-box mt-3 w-52 p-2 shadow-sm"
                         >
