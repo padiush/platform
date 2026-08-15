@@ -7,6 +7,7 @@ abstract: >-
   names against taxonomic backbones, the standard quantitative indices, and
   export for further analysis.
 type: software
+version: "1.0.0"
 authors:
   - family-names: "Menéndez"
     given-names: "Mercedes"
