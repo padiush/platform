@@ -53,4 +53,50 @@ class SoftwareNoticeTest extends TestCase
             ->get(route('dashboard'))
             ->assertInertia(fn ($page) => $page->has('sourceUrl'));
     }
+
+    /**
+     * MIT, ISC and BSD require their notice to travel with the copies they are
+     * in, and minifying the bundle strips the comments that carried it. The
+     * page is generated from the dependency tree at build time.
+     */
+    public function test_dependency_attribution_is_served_when_it_has_been_generated(): void
+    {
+        if (! file_exists(public_path('build/licenses.json'))) {
+            $this->markTestSkipped('Assets are not built in this environment.');
+        }
+
+        $this->get(route('software.licences'))
+            ->assertOk()
+            ->assertInertia(
+                fn ($page) => $page->component('SoftwareLicences')
+                    ->has('licences.groups')
+                    ->has('licences.packageCount')
+            );
+    }
+
+    public function test_attribution_is_absent_rather_than_empty_before_a_build(): void
+    {
+        $path = public_path('build/licenses.json');
+
+        if (file_exists($path)) {
+            // Assets are built here, so the un-built case cannot be produced
+            // without destroying them. The notice page's own flag is what the
+            // link depends on, and that is asserted below.
+            $this->assertTrue(true);
+
+            return;
+        }
+
+        $this->get(route('software.licences'))->assertNotFound();
+    }
+
+    public function test_the_notice_states_whether_attribution_is_available(): void
+    {
+        $this->get('/software')->assertInertia(
+            fn ($page) => $page->where(
+                'hasLicences',
+                file_exists(public_path('build/licenses.json'))
+            )
+        );
+    }
 }

@@ -13,7 +13,7 @@ import { useTranslation } from 'react-i18next';
  * links to the marketing pages and those may be switched off — this page has
  * to stand on a deployment that publishes nothing else.
  */
-export default function SoftwareNotice({ sourceUrl, appName }) {
+export default function SoftwareNotice({ sourceUrl, appName, hasLicences }) {
     const { t } = useTranslation();
     const user = usePage().props.auth?.user;
 
@@ -61,6 +61,20 @@ export default function SoftwareNotice({ sourceUrl, appName }) {
                     <p className="text-base-content/60 mt-8 text-sm leading-relaxed">
                         {t('software.modified_notice')}
                     </p>
+
+                    {/*
+                        Attribution for the packages Padiush is built on. Only
+                        offered once the assets have been built, since that is
+                        what generates the list.
+                    */}
+                    {hasLicences && (
+                        <Link
+                            href={route('software.licences')}
+                            className="link link-hover text-primary mt-6 self-start text-sm"
+                        >
+                            {t('software.licences_link')}
+                        </Link>
+                    )}
 
                     <Link
                         href={route(user ? 'dashboard' : 'login')}

@@ -238,6 +238,8 @@ Route::post('/api/wfo-query', [WfoController::class, 'query'])
 // source. Deliberately outside the public-site group — the offer has to stand
 // even on a deployment that publishes no marketing pages at all.
 Route::get('/software', [SoftwareNoticeController::class, 'show'])->name('software.notice');
+Route::get('/software/licencias', [SoftwareNoticeController::class, 'licences'])
+    ->name('software.licences');
 
 // The root stays ungated so that an installation with no marketing pages still
 // answers something useful there — it sends visitors to the application rather

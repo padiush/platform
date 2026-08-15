@@ -724,6 +724,11 @@
         "offer_of_source": "Puedes usarlo, estudiarlo, modificarlo y redistribuirlo. Si usas esta instancia a través de la red, tienes derecho a obtener el código fuente de la versión que se está ejecutando.",
         "get_the_source": "Obtener el código fuente",
         "modified_notice": "Si esta instancia ejecuta una versión modificada, el enlace anterior debe apuntar a ese código modificado. Mantenerlo correcto es responsabilidad de quien la opera.",
-        "back": "Volver"
+        "back": "Volver",
+        "licences_title": "Licencias de código abierto",
+        "licences_intro": "Padiush se apoya en {{count}} paquetes de código abierto que se envían a tu navegador. Sus autores exigen que sus avisos de licencia viajen con las copias, así que aquí están. Los paquetes con un aviso idéntico se agrupan.",
+        "licences_no_notice": "Sin archivo de licencia propio",
+        "licences_no_notice_body": "Estos paquetes declaran su licencia en sus metadatos pero no incluyen un archivo de aviso. Se listan para que la atribución esté completa.",
+        "licences_link": "Licencias de las dependencias"
     }
 }

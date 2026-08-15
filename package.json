@@ -4,7 +4,8 @@
     "license": "AGPL-3.0-or-later",
     "scripts": {
         "dev": "vite",
-        "build": "vite build",
+        "build": "vite build && npm run licenses",
+        "licenses": "node scripts/generate-licenses.mjs",
         "watch": "vite build --watch",
         "lint": "eslint --ext .js,.jsx,.ts,.tsx resources/js",
         "lint:fix": "eslint --ext .js,.jsx,.ts,.tsx resources/js --fix",
