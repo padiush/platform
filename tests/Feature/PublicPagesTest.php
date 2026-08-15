@@ -115,25 +115,63 @@ class PublicPagesTest extends TestCase
         );
     }
 
+    /**
+     * The legal documents are deployment configuration and the repository
+     * ships none, so these pages 404 on a clean checkout. Pointing at a
+     * fixture exercises the rendering either way, rather than passing only on
+     * a machine that happens to have documents installed.
+     */
+    private function installLegalDocument(): string
+    {
+        $dir = public_path('locales/legal-pages-fixture');
+
+        if (! is_dir($dir)) {
+            mkdir($dir, 0755, true);
+        }
+        file_put_contents($dir.'/es.json', '{}');
+
+        config(['padiush.legal_documents_path' => 'locales/legal-pages-fixture']);
+
+        return $dir;
+    }
+
+    private function removeLegalDocument(string $dir): void
+    {
+        @unlink($dir.'/es.json');
+        @rmdir($dir);
+    }
+
     public function test_privacy_page_renders()
     {
-        $response = $this->get(route('public.privacy'));
+        $dir = $this->installLegalDocument();
 
-        $response->assertOk();
-        // The document itself lives in the `legal` translation namespace so it
-        // follows the language toggle; the server only picks the page.
-        $response->assertInertia(
-            fn (Assert $page) => $page->component('Public/Privacy')->missing('pageContent')
-        );
+        try {
+            $response = $this->get(route('public.privacy'));
+
+            $response->assertOk();
+            // The document itself lives in the `legal` translation namespace so
+            // it follows the language toggle; the server only picks the page.
+            $response->assertInertia(
+                fn (Assert $page) => $page->component('Public/Privacy')->missing('pageContent')
+            );
+        } finally {
+            $this->removeLegalDocument($dir);
+        }
     }
 
     public function test_terms_page_renders()
     {
-        $response = $this->get(route('public.terms'));
+        $dir = $this->installLegalDocument();
 
-        $response->assertOk();
-        $response->assertInertia(
-            fn (Assert $page) => $page->component('Public/Terms')->missing('pageContent')
-        );
+        try {
+            $response = $this->get(route('public.terms'));
+
+            $response->assertOk();
+            $response->assertInertia(
+                fn (Assert $page) => $page->component('Public/Terms')->missing('pageContent')
+            );
+        } finally {
+            $this->removeLegalDocument($dir);
+        }
     }
 }
