@@ -22,6 +22,7 @@ yarn-error.log
 AGENTS.md
 CLAUDE.md
 PROJECT_ASSESSMENT.md
+/.claude/
 
 # The legal documents are deployment configuration, not source. They name a
 # specific operator and data controller, so shipping ours would have every
