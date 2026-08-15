@@ -4,6 +4,7 @@ namespace App\Http;
 
 use App\Http\Middleware\Authenticate;
 use App\Http\Middleware\EncryptCookies;
+use App\Http\Middleware\EnsurePublicSiteEnabled;
 use App\Http\Middleware\EnsureSystemAdmin;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\PreventRequestsDuringMaintenance;
@@ -94,6 +95,7 @@ class Kernel extends HttpKernel
         'throttle' => ThrottleRequests::class,
         'verified' => EnsureEmailIsVerified::class,
         'honeypot' => ProtectAgainstSpam::class,
+        'public_site' => EnsurePublicSiteEnabled::class,
         'system_admin' => EnsureSystemAdmin::class,
         'abilities' => CheckAbilities::class,
         'ability' => CheckForAnyAbility::class,

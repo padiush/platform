@@ -7,6 +7,7 @@ use App\Http\Controllers\InterviewInstancesController;
 use App\Http\Controllers\ProjectCatalogController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\PublicPageController;
+use App\Http\Controllers\SoftwareNoticeController;
 use App\Http\Controllers\SystemController;
 use App\Http\Controllers\WfoController;
 use Illuminate\Support\Facades\Route;
@@ -233,15 +234,29 @@ Route::post('/api/wfo-query', [WfoController::class, 'query'])
     ->middleware(['auth', 'throttle:api'])
     ->name('wfo.query');
 
-Route::controller(PublicPageController::class)->group(function () {
-    Route::get('/', 'index')->name('public.index');
-    Route::get('/acerca', 'about')->name('public.about');
-    Route::get('/contacto', 'contact')->name('public.contact');
-    Route::post('/contacto', 'handleContactRequest')
-        ->middleware(['honeypot'])
-        ->name('public.contact.handle');
-    Route::get('/privacidad', 'privacy')->name('public.privacy');
-    Route::get('/terminos', 'terms')->name('public.terms');
-});
+// AGPL section 13: whoever uses this over a network must be able to obtain its
+// source. Deliberately outside the public-site group — the offer has to stand
+// even on a deployment that publishes no marketing pages at all.
+Route::get('/software', [SoftwareNoticeController::class, 'show'])->name('software.notice');
+
+// The root stays ungated so that an installation with no marketing pages still
+// answers something useful there — it sends visitors to the application rather
+// than to a 404.
+Route::get('/', [PublicPageController::class, 'index'])->name('public.index');
+
+// The rest describe one deployment's operator and make legal claims on their
+// behalf, so they stay registered (route() must resolve for the links that
+// reference them) but answer 404 unless this installation opted in.
+Route::controller(PublicPageController::class)
+    ->middleware('public_site')
+    ->group(function () {
+        Route::get('/acerca', 'about')->name('public.about');
+        Route::get('/contacto', 'contact')->name('public.contact');
+        Route::post('/contacto', 'handleContactRequest')
+            ->middleware(['honeypot'])
+            ->name('public.contact.handle');
+        Route::get('/privacidad', 'privacy')->name('public.privacy');
+        Route::get('/terminos', 'terms')->name('public.terms');
+    });
 
 require __DIR__.'/auth.php';

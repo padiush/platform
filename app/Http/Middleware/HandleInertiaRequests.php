@@ -76,6 +76,13 @@ class HandleInertiaRequests extends Middleware
             // it is open and at the contact form when it is not, so the button
             // never promises a sign-up that would just bounce to login.
             'registrationEnabled' => (bool) config('padiush.registration_enabled'),
+            // The public pages are optional, so anything outside them that
+            // links back to the site — the sign-in screens, chiefly — has to
+            // know whether there is a site to link to.
+            'publicSiteEnabled' => (bool) config('padiush.public_site_enabled'),
+            // AGPL section 13. Shared everywhere because the offer of source
+            // has to hold on every page a user of the service can reach.
+            'sourceUrl' => config('padiush.source_url'),
         ];
     }
 }

@@ -14,6 +14,15 @@ class PublicPageController extends Controller
 {
     public function index()
     {
+        // Reached even when the marketing pages are off, because a bare 404 at
+        // the root of your own instance is a poor welcome. Send people to the
+        // application instead.
+        if (! config('padiush.public_site_enabled')) {
+            return redirect()->route(
+                auth()->check() ? 'dashboard' : 'login'
+            );
+        }
+
         SEOTools::setTitle('Padiush | Del cuaderno de campo a datos listos para publicar');
         SEOTools::setDescription('Plataforma de investigación etnobotánica: entrevistas en campo sin señal, reconciliación de nombres locales con taxones aceptados e índices cuantitativos con sus fórmulas citadas.');
         SEOTools::opengraph()->setUrl(config('app.url'));
@@ -67,8 +76,23 @@ class PublicPageController extends Controller
             ->with('message_type', 'success');
     }
 
+    /**
+     * A legal document is only servable if this deployment wrote one. They are
+     * deployment configuration, not source — the repository ships none, so
+     * without this guard a fork would render its own chrome around an empty
+     * body, and a privacy policy that says nothing is worse than an honest 404.
+     */
+    private function abortUnlessLegalDocumentsPublished(): void
+    {
+        $path = public_path(config('padiush.legal_documents_path'));
+
+        abort_if(glob($path.'/*.json') === [], 404);
+    }
+
     public function privacy()
     {
+        $this->abortUnlessLegalDocumentsPublished();
+
         SEOTools::setTitle('Política de Privacidad');
         SEOTools::setDescription('Conoce la Política de Privacidad de Padiush. Esta Política te explicará cómo recopilamos, usamos, protegemos y gestionamos tus datos.');
         SEOTools::opengraph()->setUrl(config('app.url').'/privacidad');
@@ -79,6 +103,8 @@ class PublicPageController extends Controller
 
     public function terms()
     {
+        $this->abortUnlessLegalDocumentsPublished();
+
         SEOTools::setTitle('Términos y Condiciones');
         SEOTools::setDescription('Conoce los Términos y Condiciones de Padiush. Estos Términos te explicarán cómo puedes usar nuestra plataforma.');
         SEOTools::opengraph()->setUrl(config('app.url').'/terminos');

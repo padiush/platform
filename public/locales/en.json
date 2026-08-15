@@ -717,5 +717,13 @@
             "hint_data": "You need a project where you can manage data or generate reports.",
             "cta": "Go to my projects"
         }
+    },
+    "software": {
+        "title": "About this software",
+        "free_software": "{{name}} is free software, released under the GNU Affero General Public License, version 3 or later.",
+        "offer_of_source": "You may use, study, modify and redistribute it. If you are using this instance over a network, you are entitled to the source of the version it is running.",
+        "get_the_source": "Get the source code",
+        "modified_notice": "If this instance runs a modified version, the link above must point to that modified source. Keeping it accurate is the operator’s responsibility.",
+        "back": "Back"
     }
 }

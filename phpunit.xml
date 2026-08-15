@@ -22,6 +22,15 @@
         <env name="BCRYPT_ROUNDS" value="4"/>
         <env name="CACHE_DRIVER" value="array"/>
         <!--
+            The public pages ship disabled, so a deployment never republishes
+            another operator's legal claims. The suite exercises them, and must
+            not depend on whether the developer running it happens to have
+            enabled them in .env — forced, so the result is the same on a clean
+            checkout and in CI. Tests that assert the disabled behaviour set the
+            config themselves.
+        -->
+        <server name="PUBLIC_SITE_ENABLED" value="true" force="true"/>
+        <!--
             DB_* are set as <server> (not just <env>) with force="true":
             container/CI environments inject DB_CONNECTION into $_SERVER, which
             Laravel's env() reads before $_ENV/getenv, so a plain <env> override

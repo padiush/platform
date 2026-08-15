@@ -4,7 +4,7 @@ import TranslationToggle from '@/Components/TranslationToggle';
 import { useFlashMessage } from '@/Hooks/useFlashMessage';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import { useTranslation } from 'react-i18next';
 
 /**
@@ -18,29 +18,38 @@ import { useTranslation } from 'react-i18next';
 export default function AuthLayout({ children, title, heading, description }) {
     const { t } = useTranslation();
     const { FlashAlert, flashShown } = useFlashMessage();
+    // A deployment can run without the public pages, and then there is no site
+    // to go back to — the invitation has to disappear with them.
+    const { publicSiteEnabled } = usePage().props;
 
     return (
         <div className="bg-base-100 text-base-content flex min-h-screen flex-col lg:flex-row">
             <Head title={title} />
 
             <aside className="from-primary to-primary/80 text-primary-content flex flex-col justify-between bg-gradient-to-br px-6 py-8 lg:w-2/5 lg:px-12 lg:py-16">
-                <Link
-                    href={route('public.index')}
-                    className="inline-block self-start"
-                    aria-label="Padiush"
-                >
-                    <ApplicationFullLogo className="h-9 w-auto fill-current lg:h-11" />
-                </Link>
+                {publicSiteEnabled ? (
+                    <Link
+                        href={route('public.index')}
+                        className="inline-block self-start"
+                        aria-label="Padiush"
+                    >
+                        <ApplicationFullLogo className="h-9 w-auto fill-current lg:h-11" />
+                    </Link>
+                ) : (
+                    <ApplicationFullLogo className="h-9 w-auto self-start fill-current lg:h-11" />
+                )}
                 <p className="hidden max-w-sm text-2xl leading-snug text-balance lg:block">
                     {t('public.tagline')}
                 </p>
-                <Link
-                    href={route('public.index')}
-                    className="text-primary-content/80 hover:text-primary-content hidden items-center gap-2 self-start text-sm lg:inline-flex"
-                >
-                    <FontAwesomeIcon icon={faArrowLeft} />
-                    {t('auth.back_to_site')}
-                </Link>
+                {publicSiteEnabled && (
+                    <Link
+                        href={route('public.index')}
+                        className="text-primary-content/80 hover:text-primary-content hidden items-center gap-2 self-start text-sm lg:inline-flex"
+                    >
+                        <FontAwesomeIcon icon={faArrowLeft} />
+                        {t('auth.back_to_site')}
+                    </Link>
+                )}
             </aside>
 
             <main className="flex flex-1 flex-col px-6 py-8 lg:px-12 lg:py-16">
@@ -66,13 +75,15 @@ export default function AuthLayout({ children, title, heading, description }) {
                     <div className="mt-8">{children}</div>
                 </div>
 
-                <Link
-                    href={route('public.index')}
-                    className="text-base-content/60 hover:text-base-content inline-flex items-center gap-2 self-start text-sm lg:hidden"
-                >
-                    <FontAwesomeIcon icon={faArrowLeft} />
-                    {t('auth.back_to_site')}
-                </Link>
+                {publicSiteEnabled && (
+                    <Link
+                        href={route('public.index')}
+                        className="text-base-content/60 hover:text-base-content inline-flex items-center gap-2 self-start text-sm lg:hidden"
+                    >
+                        <FontAwesomeIcon icon={faArrowLeft} />
+                        {t('auth.back_to_site')}
+                    </Link>
+                )}
             </main>
         </div>
     );

@@ -23,6 +23,12 @@ AGENTS.md
 CLAUDE.md
 PROJECT_ASSESSMENT.md
 
+# The legal documents are deployment configuration, not source. They name a
+# specific operator and data controller, so shipping ours would have every
+# installation republishing our claims as its own. Write your own and drop them
+# here — see docs/deployment/public-site.md.
+/public/locales/legal/
+
 # Research data never belongs in the repository. Interview records and species
 # lists are the researcher's, not ours, and an accidental `git add -A` is the
 # way they would end up published.

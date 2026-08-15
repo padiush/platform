@@ -175,6 +175,20 @@ export default function AuthenticatedLayout({
 
                 <ErrorBoundary>{children}</ErrorBoundary>
             </div>
+
+            {/*
+                AGPL section 13 requires that people using Padiush over a
+                network can obtain its source. This is that offer, so it sits
+                on every signed-in page rather than behind a menu.
+            */}
+            <footer className="bg-base-100 border-base-300 text-base-content/60 border-t px-4 py-2 text-center text-xs md:px-12">
+                <Link
+                    href={route('software.notice')}
+                    className="link link-hover"
+                >
+                    {t('software.title')}
+                </Link>
+            </footer>
         </div>
     );
 }

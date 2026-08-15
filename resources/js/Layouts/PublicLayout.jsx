@@ -166,6 +166,13 @@ export default function PublicLayout({ children, title }) {
                     >
                         {t('public.terms')}
                     </Link>
+                    {/* AGPL section 13 — the offer of source. */}
+                    <Link
+                        className="link link-hover"
+                        href={route('software.notice')}
+                    >
+                        {t('software.title')}
+                    </Link>
                 </div>
                 <div>
                     <span className="footer-title">{t('public.social')}</span>

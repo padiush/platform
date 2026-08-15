@@ -717,5 +717,13 @@
             "hint_data": "Necesitas un proyecto donde puedas administrar datos o generar reportes.",
             "cta": "Ir a mis proyectos"
         }
+    },
+    "software": {
+        "title": "Sobre este software",
+        "free_software": "{{name}} es software libre, publicado bajo la Licencia Pública General Affero de GNU, versión 3 o posterior.",
+        "offer_of_source": "Puedes usarlo, estudiarlo, modificarlo y redistribuirlo. Si usas esta instancia a través de la red, tienes derecho a obtener el código fuente de la versión que se está ejecutando.",
+        "get_the_source": "Obtener el código fuente",
+        "modified_notice": "Si esta instancia ejecuta una versión modificada, el enlace anterior debe apuntar a ese código modificado. Mantenerlo correcto es responsabilidad de quien la opera.",
+        "back": "Volver"
     }
 }
