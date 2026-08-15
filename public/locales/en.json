@@ -639,7 +639,8 @@
         "shot_reports_alt": "Table of ethnobiological indices calculated in the platform, with citations, RFC, UV and CI per species.",
         "shot_catalog_alt": "The project's species catalog, showing scientific name, authority and botanical family.",
         "shot_sankey_alt": "Flow diagram connecting each species to the use categories reported for it.",
-        "about_open_source": "Padiush is free software. You can read the code that handles your informants’ data, run your own instance, or adapt it to your study:"
+        "about_open_source": "Padiush is free software. You can read the code that handles your informants’ data, run your own instance, or adapt it to your study:",
+        "publications": "Publications"
     },
     "auth": {
         "login": "Sign in",

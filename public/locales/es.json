@@ -639,7 +639,8 @@
         "shot_reports_alt": "Tabla de índices etnobiológicos calculada en la plataforma, con citas, RFC, UV y CI por especie.",
         "shot_catalog_alt": "Catálogo de especies del proyecto, con nombre científico, autoría y familia botánica.",
         "shot_sankey_alt": "Diagrama de flujos que conecta cada especie con las categorías de uso reportadas.",
-        "about_open_source": "Padiush es software libre. Puedes leer el código que trata los datos de tus informantes, ejecutar tu propia instancia o adaptarlo a tu estudio:"
+        "about_open_source": "Padiush es software libre. Puedes leer el código que trata los datos de tus informantes, ejecutar tu propia instancia o adaptarlo a tu estudio:",
+        "publications": "Publicaciones"
     },
     "auth": {
         "login": "Iniciar sesión",

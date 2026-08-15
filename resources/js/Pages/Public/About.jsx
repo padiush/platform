@@ -1,6 +1,10 @@
 import PublicLayout from '@/Layouts/PublicLayout';
-import { faGithub, faLinkedin } from '@fortawesome/free-brands-svg-icons';
-import { faEnvelope } from '@fortawesome/free-solid-svg-icons';
+import {
+    faGithub,
+    faLinkedin,
+    faOrcid,
+} from '@fortawesome/free-brands-svg-icons';
+import { faBookOpen, faEnvelope } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link, usePage } from '@inertiajs/react';
 import { useTranslation } from 'react-i18next';
@@ -74,7 +78,9 @@ export default function About() {
                         image={images.mercedes}
                         name="Mercedes Menéndez"
                         title="Bióloga"
+                        orcid="https://orcid.org/0009-0007-8862-8618"
                         linkedin="https://www.linkedin.com/in/mercedes-men%C3%A9ndez-5209381b9/"
+                        publications="https://publicaciones.mercedesmenendez.com"
                         email="mercedes@padiushbio.com"
                     />
                     <Person
@@ -90,7 +96,18 @@ export default function About() {
     );
 }
 
-function Person({ image, name, title, linkedin, github, email }) {
+function Person({
+    image,
+    name,
+    title,
+    orcid,
+    linkedin,
+    github,
+    publications,
+    email,
+}) {
+    const { t } = useTranslation();
+
     return (
         <div className="flex flex-col items-center text-center">
             <img
@@ -104,6 +121,22 @@ function Person({ image, name, title, linkedin, github, email }) {
             </p>
             <p className="text-base-content/60">{title}</p>
             <div className="mt-3 flex gap-4 text-xl">
+                {/*
+                    First, because among these it is the one that identifies a
+                    researcher unambiguously — which is what a reader arriving
+                    from a paper is looking for.
+                */}
+                {orcid && (
+                    <a
+                        href={orcid}
+                        target="_blank"
+                        className="link link-hover text-base-content/70 hover:text-primary"
+                        rel="noreferrer"
+                        aria-label={`ORCID — ${name}`}
+                    >
+                        <FontAwesomeIcon icon={faOrcid} />
+                    </a>
+                )}
                 {linkedin && (
                     <a
                         href={linkedin}
@@ -124,6 +157,19 @@ function Person({ image, name, title, linkedin, github, email }) {
                         aria-label={`GitHub — ${name}`}
                     >
                         <FontAwesomeIcon icon={faGithub} />
+                    </a>
+                )}
+                {publications && (
+                    <a
+                        href={publications}
+                        target="_blank"
+                        className="link link-hover text-base-content/70 hover:text-primary"
+                        rel="noreferrer"
+                        // Unlike the others this is not a brand name, so the
+                        // label a screen reader announces has to be translated.
+                        aria-label={`${t('public.publications')} — ${name}`}
+                    >
+                        <FontAwesomeIcon icon={faBookOpen} />
                     </a>
                 )}
                 {email && (
