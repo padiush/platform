@@ -17,3 +17,19 @@ yarn-error.log
 /.idea
 /.vscode
 .DS_Store
+
+# Working notes and pre-decision analysis, kept out of the published history.
+AGENTS.md
+CLAUDE.md
+PROJECT_ASSESSMENT.md
+
+# Research data never belongs in the repository. Interview records and species
+# lists are the researcher's, not ours, and an accidental `git add -A` is the
+# way they would end up published.
+*.xlsx
+*.xls
+*.csv
+*.sql
+*.sqlite
+*.sqlite3
+*.db
