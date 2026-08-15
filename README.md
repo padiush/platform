@@ -1,5 +1,8 @@
 # Padiush
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21943747.svg)](https://doi.org/10.5281/zenodo.21943747)
+[![Licence: AGPL v3](https://img.shields.io/badge/licence-AGPL--3.0--or--later-blue.svg)](LICENSE)
+
 A hosted instance runs at **[padiushbio.com](https://padiushbio.com)**, with a
 companion field-capture app on [Android](https://github.com/padiush/companion).
 You are free to run your own instance instead — see [Licence](#licence).
@@ -176,4 +179,15 @@ it. It comes with **no support commitment** — see
 [CONTRIBUTING.md](CONTRIBUTING.md), which also covers the sign-off required on
 contributions.
 
-If you use it in published research, please cite it — see [CITATION.cff](CITATION.cff).
+## Citing
+
+If you use Padiush in published research, please cite it. The metadata is in
+[CITATION.cff](CITATION.cff), and GitHub will format a citation for you from the
+sidebar.
+
+Cite **[10.5281/zenodo.21943747](https://doi.org/10.5281/zenodo.21943747)** when
+you mean the software; it always resolves to the newest release. Cite the DOI of
+the specific version you ran when reproducibility depends on it — for 1.0.0 that
+is [10.5281/zenodo.21943748](https://doi.org/10.5281/zenodo.21943748).
+
+A methods paper is in preparation and will be linked here once published.
