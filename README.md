@@ -1,5 +1,9 @@
 # Padiush
 
+A hosted instance runs at **[padiushbio.com](https://padiushbio.com)**, with a
+companion field-capture app on [Android](https://github.com/padiush/companion).
+You are free to run your own instance instead — see [Licence](#licence).
+
 ## About the Project
 Padiush is a web-based bioinformatics tool designed to simplify the collection, processing, and export of data in ethnobotanical research. The system aims to streamline workflows, making data handling more efficient for researchers in this field.
 
