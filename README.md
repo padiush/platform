@@ -45,11 +45,11 @@ To set up the project locally, follow these steps:
 ### Installation
 1. Clone the repository:
     ```bash
-    git clone https://github.com/raarevalo96/padiush.git
+    git clone https://github.com/padiush/platform.git
     ```
 2. Navigate to the project directory:
     ```bash
-    cd padiush
+    cd platform
     ```
 3. Install dependencies:
     ```bash
@@ -100,3 +100,44 @@ docker compose exec node npm install ...     # node_modules lives in a container
 docker compose logs -f app node              # tail app and Vite logs
 docker compose down                          # stop; add -v to also drop the database
 ```
+
+## Documentation
+
+`docs/` records the contracts and the reasoning, not the code:
+
+- [docs/analysis/ethnobotany-indices.md](docs/analysis/ethnobotany-indices.md) — every quantitative index with its source, edge cases, and a worked example that doubles as the test fixture. If you are checking how a published number was computed, start here.
+- [docs/data-model.md](docs/data-model.md) — the domain map and the folk-name → taxon pipeline.
+- [docs/contracts/](docs/contracts/) and [docs/api/openapi.yaml](docs/api/openapi.yaml) — the `/api/v1` capture API and the offline sync protocol, used by the [companion app](https://github.com/padiush/companion).
+- [docs/decisions/](docs/decisions/) — architecture decisions, including what was rejected and why.
+
+## Provenance
+
+Padiush began as a system written for a single ethnobotanical thesis. It was
+rebuilt as a general tool once it was clear the same instrument served studies
+beyond that one; this repository is that second version. The architecture and
+the original implementation predate widely capable AI coding assistance.
+Development since 2026 has been AI-assisted, with the design decisions recorded
+in [docs/decisions/](docs/decisions/).
+
+## Licence
+
+Copyright © Mercedes Menéndez and Rodrigo Arévalo.
+
+Released under the **GNU Affero General Public License v3.0 or later** — see
+[LICENSE](LICENSE). You may use, study, modify and redistribute it, including
+running your own instance, so long as those you distribute it to receive the
+same freedoms and the source of your changes.
+
+Note section 13: **if you run a modified version of Padiush as a network
+service, you must offer its source to the people using it** — a link from the
+interface to an archive of your code satisfies this. That obligation is yours
+as the operator, and it applies whether or not you distribute the software any
+other way.
+
+This is research software, published so that researchers can verify how their
+data is handled and how the indices are computed rather than take our word for
+it. It comes with **no support commitment** — see
+[CONTRIBUTING.md](CONTRIBUTING.md), which also covers the sign-off required on
+contributions.
+
+If you use it in published research, please cite it — see [CITATION.cff](CITATION.cff).

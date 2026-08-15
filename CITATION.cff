@@ -1,0 +1,28 @@
+cff-version: 1.2.0
+message: If you use Padiush in your research, please cite it as below.
+title: "Padiush"
+abstract: >-
+  A platform for ethnobotanical and ethnobiological field research. It covers
+  instrument design, offline field capture, reconciliation of recorded folk
+  names against taxonomic backbones, the standard quantitative indices, and
+  export for further analysis.
+type: software
+authors:
+  - family-names: "Menéndez"
+    given-names: "Mercedes"
+    country: SV
+  - family-names: "Arévalo"
+    given-names: "Rodrigo"
+    country: SV
+license: AGPL-3.0-or-later
+repository-code: "https://github.com/padiush/platform"
+keywords:
+  - ethnobotany
+  - ethnobiology
+  - field research
+  - offline data capture
+  - quantitative ethnobotany
+  - traditional knowledge
+
+# When the methods paper is published, add a preferred-citation block here so
+# that citing the software resolves to the paper.
