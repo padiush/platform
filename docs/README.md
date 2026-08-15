@@ -6,7 +6,8 @@ documents **contracts** (interfaces multiple parties depend on) and **decisions*
 source of truth and changes weekly. Docs that merely restate volatile
 implementation are intentionally absent so nothing here rots into a lie.
 
-For coding standards, commits, and workflow, see [`../AGENTS.md`](../AGENTS.md).
+For coding standards, commits, and workflow, see
+[`../CONTRIBUTING.md`](../CONTRIBUTING.md).
 
 ## Contents
 
@@ -18,6 +19,7 @@ For coding standards, commits, and workflow, see [`../AGENTS.md`](../AGENTS.md).
 | [api/openapi.yaml](api/openapi.yaml) · [Postman](api/padiush-companion.postman_collection.json) | Machine-readable `/api/v1` spec and a runnable request collection | Generated contract |
 | [contracts/sync-protocol.md](contracts/sync-protocol.md) | How offline capture reconciles with the server | Contract (v1, built) |
 | [decisions/](decisions/) | Architecture Decision Records — the *why* behind the roadmap | Decisions |
+| [deployment/public-site.md](deployment/public-site.md) | Enabling the public pages and publishing your own legal documents, for anyone running their own instance | Operator guide |
 
 ## Roadmap at a glance
 
@@ -82,11 +84,15 @@ physical devices.
   [ADR 0004](decisions/0004-offline-sync-model.md) to **Accepted**
   ([sync protocol](contracts/sync-protocol.md#conflict-resolution--deliberately-simple)).
 
-### ⏳ Still open (documented with a proposed default; settle before the work)
-- *None blocking the roadmap.* The one remaining open point is contract-level:
-  whether `instances:sync` also pulls server-side changes (two-way) or stays
-  push-only (recommended: push-only) —
-  [companion API](contracts/companion-api.md#open-decisions).
+- **Companion scope and sync direction** *(confirmed 2026-08-14)* — the companion
+  captures only, and `instances:sync` is **push-only**; forms travel the other way
+  as a read-only pull. Built and released on this basis, which flips
+  [ADR 0003](decisions/0003-capture-only-companion-scope.md) to **Accepted**
+  ([companion API](contracts/companion-api.md#settled-decisions)).
+
+### ⏳ Still open
+- *Nothing.* Every decision recorded here is settled; what remains is
+  implementation, listed under **Progress** above.
 
 ## Maintaining these docs
 

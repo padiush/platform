@@ -234,11 +234,15 @@ its own contract; it does not bend the capture API.
 
 ## Open decisions
 
-- Whether `instances:sync` should also *pull* server-side changes to the same
-  instances (two-way) or stay push-only (recommended: push-only; the device owns
-  its captures until synced — [sync-protocol.md](sync-protocol.md)).
+*None.*
 
 ## Settled decisions
+
+- **`instances:sync` direction** *(accepted 2026-08-14)* — **push-only**. The
+  device owns its captures until they land, which is what keeps the sync design
+  free of three-way merges; forms travel the other way as a read-only pull. Built
+  and released on this basis ([sync-protocol.md](sync-protocol.md),
+  [ADR 0003](../decisions/0003-capture-only-companion-scope.md)).
 
 - **Token model** *(accepted 2026-07-12)* — single `capture` ability + policy
   gate, not per-project token scoping. See [Authentication](#authentication).

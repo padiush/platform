@@ -3,9 +3,9 @@
 This is a **scientific contract**. Researchers will publish numbers this platform
 computes; a subtly wrong formula that reaches three papers is a credibility
 failure that cannot be walked back. So every index here is defined with its
-source, its edge cases, and a worked example that **doubles as a test fixture**
-(per the AGENTS.md rule that features ship with regression tests — here the spec
-*is* the test oracle).
+source, its edge cases, and a worked example that **doubles as a test fixture** —
+changes ship with their tests throughout this project, and here the spec *is* the
+test oracle.
 
 > **Field-agnostic.** Despite the name, these indices are the standard toolkit of
 > quantitative *ethnobiology*, not just botany. An ethnozoology or ethnomycology

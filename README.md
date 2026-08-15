@@ -5,11 +5,43 @@ companion field-capture app on [Android](https://github.com/padiush/companion).
 You are free to run your own instance instead — see [Licence](#licence).
 
 ## About the Project
-Padiush is a web-based bioinformatics tool designed to simplify the collection, processing, and export of data in ethnobotanical research. The system aims to streamline workflows, making data handling more efficient for researchers in this field.
+
+Padiush carries an ethnobotanical study from the field to numbers you can
+publish: design the instrument, capture interviews offline on a phone, reconcile
+the names informants actually used against accepted taxonomy, and compute the
+standard quantitative indices with their formulas cited.
+
+It is built for ethnobotany today, and the analysis is field-agnostic — the same
+indices serve ethnozoology and ethnomycology, which is where it is headed
+([ADR 0006](docs/decisions/0006-multi-subfield-architecture.md)).
 
 ## Features
-- **Form Designer**: A feature that allows users to create and customize data collection forms.
-- **Cross-Platform Accessibility**: Accessible through any modern web browser.
+
+- **Instrument designer** — sections, repeatable sets, typed items with required
+  and range constraints, edited as a draft and published in one transaction.
+  Deleting an answered field asks before discarding its answers.
+- **Offline field capture** — the [companion app](https://github.com/padiush/companion)
+  records interviews with no signal at all: answers, audio, photographs and GPS,
+  in an encrypted on-device store, synced when connectivity returns.
+- **Species catalog with taxonomic reconciliation** — match recorded names
+  against [World Flora Online](https://www.worldfloraonline.org/), including
+  authorship and spelling variants, and adopt an accepted name in place. Native
+  and introduced ranges come from GBIF's WCVP index; iNaturalist reference photos
+  are proxied through this origin and never stored.
+- **Folk-name → taxon linking** — the recorded name is preserved as data; the
+  link to a taxon is a separate, reviewable act.
+- **Quantitative indices** — FC, NU, RFC, UV, CI, RI, CV, ICF and FL, each
+  defined against its source paper in the
+  [indices specification](docs/analysis/ethnobotany-indices.md), whose worked
+  examples are the test fixtures.
+- **Reports and export** — species-by-index charts, a species × use-category
+  heatmap and a species → use Sankey, downloadable as SVG or PNG; XLSX and CSV
+  exports, including a layout the R package `ethnobotanyR` reads directly. The
+  export cites the source paper for every index it contains.
+- **Per-project roles** — capabilities are granted per project, so a
+  collaborator on one study sees nothing of another.
+- **Trilingual throughout** — Spanish, English and Portuguese, including the
+  emails and the validation messages.
 
 ## Technologies
 The project utilizes the following technologies:
@@ -127,10 +159,10 @@ in [docs/decisions/](docs/decisions/).
 
 Copyright © Mercedes Menéndez and Rodrigo Arévalo.
 
-Released under the **GNU Affero General Public License v3.0 or later** — see
-[LICENSE](LICENSE). You may use, study, modify and redistribute it, including
-running your own instance, so long as those you distribute it to receive the
-same freedoms and the source of your changes.
+Released under the **GNU Affero General Public License v3.0 or later**
+(**AGPL-3.0-or-later**) — see [LICENSE](LICENSE). You may use, study, modify and
+redistribute it, including running your own instance, so long as those you
+distribute it to receive the same freedoms and the source of your changes.
 
 Note section 13: **if you run a modified version of Padiush as a network
 service, you must offer its source to the people using it** — a link from the

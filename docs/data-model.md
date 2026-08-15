@@ -82,8 +82,9 @@ future token-authenticated API — see
 
 ## Where the roadmap touches the model
 
-These are **not built yet**; they are the pencilled-in slots so the model can
-absorb them without a rewrite.
+These were pencilled-in slots so the model could absorb the roadmap without a
+rewrite. Most have since been built — each is marked below, and what is still
+pencilled in says so.
 
 - **`Project.subfield`** — a first-class attribute selecting the ethnobiology
   subfield (ethnobotany, ethnomycology, ethno-ornithology, …). Cheap to add now,
@@ -94,7 +95,8 @@ absorb them without a rewrite.
   marks the field whose answer is a use category, mirroring `link_to_species`
   (mutually exclusive with it). This supplies the *u* the indices need
   ([decisions/0007-use-category-as-item-role.md](decisions/0007-use-category-as-item-role.md)).
-  Remaining for the indices milestone: the computation itself.
+  The computation that consumes it (`EthnobiologyIndices`), the report page and
+  the export are built too.
 - **`InstanceAnswer` client UUID** — ✅ **built (2026-07-12).**
   `instance_answers.client_id` (uuid, nullable, unique) is the device-minted
   idempotency key; the server keeps its own integer PK. Offline capture mints it

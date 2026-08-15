@@ -1,6 +1,6 @@
 # 0003 — Scope the companion apps to field capture only
 
-- **Status:** Proposed
+- **Status:** Accepted (2026-08-14)
 - **Deciders:** Project owner
 
 ## Context
@@ -17,6 +17,9 @@ fully offline, syncing when connectivity allows. Form design, species linking,
 analysis, and export stay on the **web**.
 
 ## Consequences
+
+*Built and released on this basis: the companion app ships capture only, and
+`instances:sync` is push-only in both the contract and the implementation.*
 
 - **Sync becomes push-dominant and far simpler.** The device authors capture data
   and owns it until synced; forms are pulled read-only. This asymmetry is what
