@@ -1,4 +1,4 @@
-import { faMoon, faSunBright } from '@fortawesome/pro-regular-svg-icons';
+import { faMoon, faSun } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -48,7 +48,7 @@ export default function ThemeToggle({ className = '' }) {
                 isDark ? t('theme.switch_to_light') : t('theme.switch_to_dark')
             }
         >
-            <FontAwesomeIcon icon={isDark ? faSunBright : faMoon} />
+            <FontAwesomeIcon icon={isDark ? faSun : faMoon} />
         </button>
     );
 }

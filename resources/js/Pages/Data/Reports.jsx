@@ -3,7 +3,7 @@ import ChartCard from '@/Components/ChartCard';
 import EmptyState from '@/Components/EmptyState';
 import MetricCard from '@/Components/MetricCard';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { faArrowLeft, faDownload } from '@fortawesome/pro-regular-svg-icons';
+import { faArrowLeft, faDownload } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link } from '@inertiajs/react';
 import { useTranslation } from 'react-i18next';

@@ -1,5 +1,5 @@
 import Card from '@/Components/Card';
-import { faPlus, faTrash } from '@fortawesome/pro-regular-svg-icons';
+import { faPlus, faTrashCan } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { router } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
@@ -116,7 +116,7 @@ export default function SectionRender({
                                     onClick={() => handleRemove(i)}
                                 >
                                     <FontAwesomeIcon
-                                        icon={faTrash}
+                                        icon={faTrashCan}
                                         className="mr-2"
                                     />
                                     {t('interviews.remove_section')}

@@ -8,7 +8,7 @@ import {
     faArrowLeft,
     faChevronRight,
     faMagnifyingGlass,
-} from '@fortawesome/pro-regular-svg-icons';
+} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link, router } from '@inertiajs/react';
 import { useEffect, useMemo, useState } from 'react';

@@ -1,4 +1,4 @@
-import { faChevronRight } from '@fortawesome/pro-regular-svg-icons';
+import { faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link } from '@inertiajs/react';
 import { useTranslation } from 'react-i18next';

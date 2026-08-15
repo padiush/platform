@@ -1,4 +1,4 @@
-import { faGripVertical } from '@fortawesome/pro-regular-svg-icons';
+import { faGripVertical } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 /**

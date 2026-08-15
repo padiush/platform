@@ -1,5 +1,5 @@
 import Input from '@/Components/Input';
-import { faMagnifyingGlass } from '@fortawesome/pro-regular-svg-icons';
+import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useForm } from '@inertiajs/react';
 import axios from 'axios';

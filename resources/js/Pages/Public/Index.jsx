@@ -1,6 +1,6 @@
 import PublicLayout from '@/Layouts/PublicLayout';
 import { primaryCtaTarget } from '@/lib/publicCta';
-import { faCheck } from '@fortawesome/pro-regular-svg-icons';
+import { faCheck } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link, usePage } from '@inertiajs/react';
 import { useTranslation } from 'react-i18next';

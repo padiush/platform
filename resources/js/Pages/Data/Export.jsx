@@ -2,7 +2,7 @@ import Card from '@/Components/Card';
 import ExportFieldPicker from '@/Components/ExportFieldPicker';
 import Select from '@/Components/Select';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { faArrowLeft, faDownload } from '@fortawesome/pro-regular-svg-icons';
+import { faArrowLeft, faDownload } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link, usePage } from '@inertiajs/react';
 import axios from 'axios';

@@ -1,16 +1,16 @@
 import {
     faCalendarDay,
     faCircleDot,
-    faInputNumeric,
-    faInputText,
+    faFont,
+    faHashtag,
     faSquareCheck,
-} from '@fortawesome/pro-regular-svg-icons';
+} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useTranslation } from 'react-i18next';
 
 const TYPES = [
-    { type: 'text', icon: faInputText },
-    { type: 'number', icon: faInputNumeric },
+    { type: 'text', icon: faFont },
+    { type: 'number', icon: faHashtag },
     { type: 'date', icon: faCalendarDay },
     { type: 'multi', icon: faSquareCheck },
     { type: 'select', icon: faCircleDot },

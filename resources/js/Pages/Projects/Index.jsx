@@ -11,7 +11,7 @@ import {
     faPlus,
     faTrashCan,
     faUsers,
-} from '@fortawesome/pro-regular-svg-icons';
+} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link } from '@inertiajs/react';
 import { useRef, useState } from 'react';

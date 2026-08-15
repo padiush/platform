@@ -6,9 +6,9 @@ import useQueryModal from '@/Hooks/useQueryModal';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import {
     faArrowLeft,
-    faTrash,
+    faTrashCan,
     faUserPlus,
-} from '@fortawesome/pro-regular-svg-icons';
+} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link, router } from '@inertiajs/react';
 import { useState } from 'react';
@@ -172,7 +172,7 @@ export default function Accesses({
                                                             >
                                                                 <FontAwesomeIcon
                                                                     icon={
-                                                                        faTrash
+                                                                        faTrashCan
                                                                     }
                                                                     className="lg:mr-2"
                                                                 />

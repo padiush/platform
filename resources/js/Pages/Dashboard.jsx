@@ -5,7 +5,7 @@ import {
     faLeaf,
     faPenRuler,
     faTable,
-} from '@fortawesome/pro-regular-svg-icons';
+} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link, usePage } from '@inertiajs/react';
 import { useTranslation } from 'react-i18next';

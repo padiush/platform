@@ -1,6 +1,6 @@
 import Card from '@/Components/Card';
 import { downloadChartPng, downloadChartSvg } from '@/utils/chartExport';
-import { faDownload } from '@fortawesome/pro-regular-svg-icons';
+import { faDownload } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';

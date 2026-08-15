@@ -13,7 +13,7 @@ import {
     faLink,
     faMagnifyingGlass,
     faPen,
-} from '@fortawesome/pro-regular-svg-icons';
+} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link, router, usePage } from '@inertiajs/react';
 import axios from 'axios';

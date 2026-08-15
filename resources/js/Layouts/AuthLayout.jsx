@@ -2,7 +2,7 @@ import ApplicationFullLogo from '@/Components/ApplicationFullLogo';
 import ThemeToggle from '@/Components/ThemeToggle';
 import TranslationToggle from '@/Components/TranslationToggle';
 import { useFlashMessage } from '@/Hooks/useFlashMessage';
-import { faArrowLeft } from '@fortawesome/pro-regular-svg-icons';
+import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Head, Link } from '@inertiajs/react';
 import { useTranslation } from 'react-i18next';

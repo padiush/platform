@@ -2,7 +2,7 @@ import Input from '@/Components/Input';
 import { useDesignerDraft } from '@/Hooks/useDesignerDraft';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { createItem, createSection, moveItem } from '@/lib/designerDraft';
-import { faArrowLeft, faEye, faPlus } from '@fortawesome/pro-regular-svg-icons';
+import { faArrowLeft, faEye, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link } from '@inertiajs/react';
 import { useEffect, useRef, useState } from 'react';

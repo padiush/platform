@@ -11,9 +11,9 @@ import {
     faPenToSquare,
     faPlus,
     faPowerOff,
-    faTimes,
     faTrashCan,
-} from '@fortawesome/pro-regular-svg-icons';
+    faXmark,
+} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link } from '@inertiajs/react';
 import { useRef, useState } from 'react';
@@ -126,7 +126,7 @@ export default function DesignerIndex({ projects }) {
                                                                     icon={
                                                                         form.is_active
                                                                             ? faCheck
-                                                                            : faTimes
+                                                                            : faXmark
                                                                     }
                                                                 />
                                                             </td>

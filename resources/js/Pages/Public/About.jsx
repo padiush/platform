@@ -1,6 +1,6 @@
 import PublicLayout from '@/Layouts/PublicLayout';
 import { faGithub, faLinkedin } from '@fortawesome/free-brands-svg-icons';
-import { faEnvelope } from '@fortawesome/pro-regular-svg-icons';
+import { faEnvelope } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { usePage } from '@inertiajs/react';
 import { useTranslation } from 'react-i18next';

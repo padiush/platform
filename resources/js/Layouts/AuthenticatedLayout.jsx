@@ -4,7 +4,7 @@ import ErrorBoundary from '@/Components/ErrorBoundary';
 import ThemeToggle from '@/Components/ThemeToggle';
 import TranslationToggle from '@/Components/TranslationToggle';
 import { useFlashMessage } from '@/Hooks/useFlashMessage';
-import { faRightFromBracket } from '@fortawesome/pro-regular-svg-icons';
+import { faRightFromBracket } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Head, Link, usePage } from '@inertiajs/react';
 import { useTranslation } from 'react-i18next';

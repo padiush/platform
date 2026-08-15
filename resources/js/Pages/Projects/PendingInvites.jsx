@@ -4,7 +4,7 @@ import Input from '@/Components/Input';
 import Pagination from '@/Components/Pagination';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { formatRelativeTime } from '@/utils/datetime';
-import { faArrowLeft, faTrash } from '@fortawesome/pro-regular-svg-icons';
+import { faArrowLeft, faTrashCan } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link, router, useForm } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
@@ -148,7 +148,9 @@ export default function PendingInvites({ project, invites, filters }) {
                                                             }
                                                         >
                                                             <FontAwesomeIcon
-                                                                icon={faTrash}
+                                                                icon={
+                                                                    faTrashCan
+                                                                }
                                                                 className="lg:mr-2"
                                                             />
                                                             <span className="hidden lg:inline">

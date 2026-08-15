@@ -1,7 +1,7 @@
 import Card from '@/Components/Card';
 import EmptyState from '@/Components/EmptyState';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { faCircleInfo } from '@fortawesome/pro-regular-svg-icons';
+import { faCircleInfo } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link } from '@inertiajs/react';
 import { useTranslation } from 'react-i18next';

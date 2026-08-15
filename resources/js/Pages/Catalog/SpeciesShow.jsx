@@ -7,7 +7,7 @@ import {
     faArrowUpRightFromSquare,
     faCircleCheck,
     faTrashCan,
-} from '@fortawesome/pro-regular-svg-icons';
+} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link, router } from '@inertiajs/react';
 import axios from 'axios';

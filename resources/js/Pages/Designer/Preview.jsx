@@ -4,7 +4,7 @@ import {
     faArrowLeft,
     faPlus,
     faTrashCan,
-} from '@fortawesome/pro-regular-svg-icons';
+} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link } from '@inertiajs/react';
 import { useEffect, useRef, useState } from 'react';

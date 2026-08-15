@@ -1,4 +1,4 @@
-import { faXmark } from '@fortawesome/pro-regular-svg-icons';
+import { faXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';

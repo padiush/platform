@@ -1,7 +1,7 @@
 import DragHandle from '@/Components/DragHandle';
 import IconButton from '@/Components/IconButton';
 import PositionSelect from '@/Components/PositionSelect';
-import { faPlus, faTrashCan } from '@fortawesome/pro-regular-svg-icons';
+import { faPlus, faTrashCan } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';

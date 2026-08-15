@@ -1,5 +1,5 @@
 import i18n from '@/i18n';
-import { faExclamationTriangle } from '@fortawesome/pro-regular-svg-icons';
+import { faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
 
@@ -31,7 +31,7 @@ class ErrorBoundary extends React.Component {
             return (
                 <div className="flex flex-col items-center p-4">
                     <FontAwesomeIcon
-                        icon={faExclamationTriangle}
+                        icon={faTriangleExclamation}
                         className="text-5xl text-yellow-500"
                     />
                     <h1 className="mt-4 text-2xl font-semibold">

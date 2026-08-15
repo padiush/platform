@@ -7,7 +7,7 @@ import Pagination from '@/Components/Pagination';
 import Select from '@/Components/Select';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { formatDateTime } from '@/utils/datetime';
-import { faArrowLeft, faDownload } from '@fortawesome/pro-regular-svg-icons';
+import { faArrowLeft, faDownload } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link, router, usePage } from '@inertiajs/react';
 import axios from 'axios';
