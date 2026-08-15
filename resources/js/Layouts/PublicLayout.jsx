@@ -171,7 +171,7 @@ export default function PublicLayout({ children, title }) {
                         className="link link-hover"
                         href={route('software.notice')}
                     >
-                        {t('software.title')}
+                        {t('software.footer_link')}
                     </Link>
                 </div>
                 <div>

@@ -186,7 +186,7 @@ export default function AuthenticatedLayout({
                     href={route('software.notice')}
                     className="link link-hover"
                 >
-                    {t('software.title')}
+                    {t('software.footer_link')}
                 </Link>
             </footer>
         </div>

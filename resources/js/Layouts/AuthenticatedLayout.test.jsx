@@ -45,7 +45,7 @@ describe('AuthenticatedLayout', () => {
             </AuthenticatedLayout>,
         );
 
-        const link = screen.getByRole('link', { name: 'software.title' });
+        const link = screen.getByRole('link', { name: 'software.footer_link' });
 
         expect(link).toBeInTheDocument();
         expect(link).toHaveAttribute('href', '/software.notice');

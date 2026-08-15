@@ -2,7 +2,7 @@ import PublicLayout from '@/Layouts/PublicLayout';
 import { faGithub, faLinkedin } from '@fortawesome/free-brands-svg-icons';
 import { faEnvelope } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { usePage } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import { useTranslation } from 'react-i18next';
 
 export default function About() {
@@ -27,6 +27,21 @@ export default function About() {
                     <p>{t('public.about_p1')}</p>
                     <p>{t('public.about_p2')}</p>
                     <p>{t('public.about_p3')}</p>
+                    {/*
+                        Someone deciding whether to trust a tool with their
+                        informants' data can check this one rather than take it
+                        on faith, which is the point of saying so here.
+                    */}
+                    <p>
+                        {t('public.about_open_source')}{' '}
+                        <Link
+                            href={route('software.notice')}
+                            className="link link-primary"
+                        >
+                            {t('software.footer_link')}
+                        </Link>
+                        .
+                    </p>
                 </div>
             </section>
 

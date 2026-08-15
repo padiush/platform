@@ -638,7 +638,8 @@
         "preview_cat_ritual": "Ritual",
         "shot_reports_alt": "Table of ethnobiological indices calculated in the platform, with citations, RFC, UV and CI per species.",
         "shot_catalog_alt": "The project's species catalog, showing scientific name, authority and botanical family.",
-        "shot_sankey_alt": "Flow diagram connecting each species to the use categories reported for it."
+        "shot_sankey_alt": "Flow diagram connecting each species to the use categories reported for it.",
+        "about_open_source": "Padiush is free software. You can read the code that handles your informants’ data, run your own instance, or adapt it to your study:"
     },
     "auth": {
         "login": "Sign in",
@@ -729,6 +730,7 @@
         "licences_intro": "Padiush is built on {{count}} open-source packages that are sent to your browser. Their authors require the licence notices to travel with the copies, so here they are. Packages sharing an identical notice are grouped together.",
         "licences_no_notice": "No licence file of their own",
         "licences_no_notice_body": "These packages declare a licence in their metadata but ship no notice file. They are listed so the attribution is complete.",
-        "licences_link": "Dependency licences"
+        "licences_link": "Dependency licences",
+        "footer_link": "Free software · source code"
     }
 }

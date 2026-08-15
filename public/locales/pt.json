@@ -638,7 +638,8 @@
         "preview_cat_ritual": "Ritual",
         "shot_reports_alt": "Tabela de índices etnobiológicos calculada na plataforma, com citações, RFC, UV e CI por espécie.",
         "shot_catalog_alt": "Catálogo de espécies do projeto, com nome científico, autoria e família botânica.",
-        "shot_sankey_alt": "Diagrama de fluxos que conecta cada espécie às categorias de uso relatadas."
+        "shot_sankey_alt": "Diagrama de fluxos que conecta cada espécie às categorias de uso relatadas.",
+        "about_open_source": "O Padiush é software livre. Pode ler o código que trata os dados dos seus informantes, executar a sua própria instância ou adaptá-lo ao seu estudo:"
     },
     "auth": {
         "login": "Entrar",
@@ -729,6 +730,7 @@
         "licences_intro": "O Padiush apoia-se em {{count}} pacotes de código aberto enviados ao seu navegador. Os seus autores exigem que os avisos de licença acompanhem as cópias, por isso estão aqui. Pacotes com um aviso idêntico são agrupados.",
         "licences_no_notice": "Sem ficheiro de licença próprio",
         "licences_no_notice_body": "Estes pacotes declaram a licença nos seus metadados mas não incluem um ficheiro de aviso. São listados para que a atribuição fique completa.",
-        "licences_link": "Licenças das dependências"
+        "licences_link": "Licenças das dependências",
+        "footer_link": "Software livre · código-fonte"
     }
 }
