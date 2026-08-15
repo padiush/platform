@@ -81,7 +81,6 @@ export default function About() {
                         image={images.rodrigo}
                         name="Rodrigo Arévalo"
                         title="Desarrollador"
-                        linkedin="https://www.linkedin.com/in/raarevalo96/"
                         github="https://github.com/raarevalo96"
                         email="rodrigo@padiushbio.com"
                     />
