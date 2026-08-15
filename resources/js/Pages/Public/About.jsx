@@ -87,6 +87,7 @@ export default function About() {
                         image={images.rodrigo}
                         name="Rodrigo Arévalo"
                         title="Desarrollador"
+                        orcid="https://orcid.org/0009-0008-0614-1417"
                         github="https://github.com/raarevalo96"
                         email="rodrigo@padiushbio.com"
                     />
