@@ -7,6 +7,25 @@ A hosted instance runs at **[padiushbio.com](https://padiushbio.com)**, with a
 companion field-capture app on [Android](https://github.com/padiush/companion).
 You are free to run your own instance instead — see [Licence](#licence).
 
+## Try it
+
+```bash
+docker run --rm -p 8000:8000 ghcr.io/padiush/platform-demo
+```
+
+Then open <http://localhost:8000> and sign in as `demo@padiush.test` with the
+password `demo-screenshots`. A fictional study is already loaded — invented
+informants, real botanical names — so there is something to look at: a species
+catalog, recorded interviews, and the quantitative indices computed from them.
+
+One container, no configuration, nothing else to install. It keeps everything in
+SQLite inside the container, so removing it removes the data; mount a volume at
+`/var/www/html/database` if you want your poking around to survive a restart.
+
+**This image is for evaluation only.** It serves through a development server
+and ships a published password. For a real deployment see
+[docs/deployment/](docs/deployment/).
+
 ## About the Project
 
 Padiush carries an ethnobotanical study from the field to numbers you can

@@ -1,0 +1,56 @@
+# What must never reach a published image.
+#
+# The demo image copies the working tree, and this tree holds things that are
+# gitignored precisely because they are ours: real environment values, our legal
+# documents, working notes. Being absent from git does not make them absent from
+# a `docker build` context.
+
+# Secrets and environment
+.env
+.env.*
+!.env.example
+auth.json
+.npmrc
+
+# Our legal documents are deployment configuration naming us as the data
+# controller. An image that shipped them would have every demo republishing our
+# privacy policy as its own — the same reason they are gitignored.
+/public/locales/legal/
+
+# Working notes, kept out of the published repository and out of this too
+AGENTS.md
+CLAUDE.md
+PROJECT_ASSESSMENT.md
+/.claude/
+
+# Rebuilt inside the image by their own stages
+/node_modules/
+/vendor/
+/public/build/
+/public/hot
+
+# The host's package manifest lists dev providers that --no-dev never installs,
+# and Laravel loads this cache before anything can regenerate it — so the app
+# dies at boot looking for a class that was never shipped. Let the entrypoint
+# discover packages against what is actually there.
+/bootstrap/cache/*.php
+
+# History and local state
+.git
+.gitignore
+.gitattributes
+.github/
+/storage/logs/*
+/storage/framework/cache/data/*
+/storage/framework/sessions/*
+/storage/framework/views/*
+/database/*.sqlite
+/dist/
+.phpunit.result.cache
+
+# Development-only
+/tests/
+/screenshots/
+.idea/
+.vscode/
+.DS_Store
