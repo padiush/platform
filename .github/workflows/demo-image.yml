@@ -34,9 +34,13 @@ jobs:
           # Named -demo on purpose. There is no production image yet, and a
           # bare `platform` tag would be mistaken for one.
           images: ghcr.io/${{ github.repository_owner }}/platform-demo
+          # `latest` is unconditional so a manual run can publish something
+          # usable. Gating it on the release event left workflow_dispatch
+          # producing no tags at all, which fails the push rather than
+          # publishing an untagged image.
           tags: |
             type=semver,pattern={{version}}
-            type=raw,value=latest,enable=${{ github.event_name == 'release' }}
+            type=raw,value=latest
 
       - name: Build and push
         uses: docker/build-push-action@v6
