@@ -7,8 +7,9 @@ rather than editing the old one.
 
 These capture reasoning from the product/architecture discussions that shaped the
 current roadmap. All are **Accepted**; 0006 is accepted in principle with its
-implementation deferred. The status line on each is accurate, and the decisions
-register in [../README.md](../README.md) is where anything still open is surfaced.
+implementation deferred, and 0008 is accepted with its implementation in
+progress. The status line on each is accurate, and the decisions register in
+[../README.md](../README.md) is where anything still open is surfaced.
 
 ## Index
 
@@ -21,6 +22,7 @@ register in [../README.md](../README.md) is where anything still open is surface
 | [0005](0005-interview-transcription-whisper.md) | Transcribe interview audio with self-hosted Whisper | Accepted |
 | [0006](0006-multi-subfield-architecture.md) | Generalize to ethnobiology via subfield configuration | Accepted (impl. deferred) |
 | [0007](0007-use-category-as-item-role.md) | Model use-category as a form-item role | Accepted |
+| [0008](0008-specimens-and-determinations.md) | Model the specimen as its own entity, with a determination history | Accepted (impl. in progress) |
 
 ## Template
 

@@ -49,6 +49,12 @@ plumbing until a real queue and a self-hosted Whisper are provisioned, per
 [ADR 0005](decisions/0005-interview-transcription-whisper.md)), and testing on
 physical devices.
 
+One piece of new surface is in progress: **specimens and determinations**
+([ADR 0008](decisions/0008-specimens-and-determinations.md)). The catalog models
+a *taxon*, which is the end of identification; a specimen is a different thing,
+carries many determinations over time, and is what a voucher number identifies.
+Server-side this version — the companion keeps its interview-capture scope.
+
 ## Decisions register
 
 ### ✅ Settled
@@ -89,6 +95,12 @@ physical devices.
   as a read-only pull. Built and released on this basis, which flips
   [ADR 0003](decisions/0003-capture-only-companion-scope.md) to **Accepted**
   ([companion API](contracts/companion-api.md#settled-decisions)).
+- **Specimen as its own entity** *(accepted 2026-08-22)* — `specimens` and
+  `determinations` become their own tables rather than fields on
+  `catalog_species`, with a nullable taxon so `indet.` is representable, and
+  vouchers optional but reported as coverage. A project issues its own accession
+  numbers, which is what a herbarium with no curator needs
+  ([ADR 0008](decisions/0008-specimens-and-determinations.md)).
 
 ### ⏳ Still open
 - *Nothing.* Every decision recorded here is settled; what remains is
