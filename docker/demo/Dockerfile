@@ -1,6 +1,6 @@
 # A self-contained Padiush you can try in one command.
 #
-#   docker run --rm -p 8000:8000 ghcr.io/padiush/platform:demo
+#   docker run --rm -p 8000:8000 ghcr.io/padiush/platform-demo
 #
 # SQLite, local disk, no queue worker, no object storage, no mail server — the
 # application already defaults to all of those, and the test suite runs against
