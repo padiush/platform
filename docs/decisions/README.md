@@ -6,10 +6,11 @@ re-litigating a decision; if you do change one, add a new ADR that supersedes it
 rather than editing the old one.
 
 These capture reasoning from the product/architecture discussions that shaped the
-current roadmap. 0001–0008 are **Accepted** (0006 in principle with its
-implementation deferred, 0008 with its implementation in progress); 0009 is
-**Proposed** and awaiting sign-off. The status line on each is accurate, and the decisions register in
-[../README.md](../README.md) is where anything still open is surfaced.
+current roadmap. All are **Accepted**; 0006 alone is accepted in principle, with
+its implementation deferred. The status line on each is accurate, and the
+decisions register in [../README.md](../README.md) is where anything still open
+is surfaced — including work that follows from an accepted decision rather than
+qualifying it.
 
 ## Index
 
@@ -22,8 +23,8 @@ implementation deferred, 0008 with its implementation in progress); 0009 is
 | [0005](0005-interview-transcription-whisper.md) | Transcribe interview audio with self-hosted Whisper | Accepted |
 | [0006](0006-multi-subfield-architecture.md) | Generalize to ethnobiology via subfield configuration | Accepted (impl. deferred) |
 | [0007](0007-use-category-as-item-role.md) | Model use-category as a form-item role | Accepted |
-| [0008](0008-specimens-and-determinations.md) | Model the specimen as its own entity, with a determination history | Accepted (impl. in progress) |
-| [0009](0009-collecting-permits.md) | Record the permit a specimen was collected under | Proposed |
+| [0008](0008-specimens-and-determinations.md) | Model the specimen as its own entity, with a determination history | Accepted |
+| [0009](0009-collecting-permits.md) | Record the permit a specimen was collected under | Accepted |
 
 ## Template
 

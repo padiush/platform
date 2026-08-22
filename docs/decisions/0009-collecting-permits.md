@@ -1,6 +1,6 @@
 # 0009 — Record the permit a specimen was collected under
 
-- **Status:** Proposed
+- **Status:** Accepted
 - **Date:** 2026-08-22
 - **Deciders:** Project owner
 
