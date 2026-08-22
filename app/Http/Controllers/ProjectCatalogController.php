@@ -5,11 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\CatalogSpecies;
 use App\Models\InstanceAnswer;
 use App\Models\Project;
-use App\Models\Specimen;
-use App\Services\AccessionNumbers;
 use App\Services\CatalogSpeciesSearch;
 use App\Services\GbifDistribution;
 use App\Services\INaturalistPhoto;
+use App\Services\SpecimenPresenter;
 use App\Services\WfoNameResolver;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\JsonResponse;
@@ -411,16 +410,13 @@ class ProjectCatalogController extends Controller
             // it on demand when absent.
             'distribution' => $species->metadata['distribution'] ?? null,
             'specimens' => $this->specimensFor($species),
-            // What the project would issue next, so the form can show it before
-            // the researcher commits to it. Peeking does not consume a number.
-            'nextAccessionNumber' => app(AccessionNumbers::class)->peek($project),
         ]);
     }
 
     /**
      * The collections currently determined as this taxon, newest first.
      *
-     * Presented by SpecimenController so a specimen reads identically here and
+     * Presented by SpecimenPresenter so a specimen reads identically here and
      * on the project-wide list — one row per physical collection, with the
      * current opinion flattened onto it.
      *
@@ -428,14 +424,12 @@ class ProjectCatalogController extends Controller
      */
     private function specimensFor(CatalogSpecies $species): array
     {
-        $presenter = app(SpecimenController::class);
-
-        return $species->specimens()
-            ->with('currentDetermination.species')
-            ->orderByDesc('specimens.created_at')
-            ->get()
-            ->map(fn (Specimen $specimen) => $presenter->present($specimen))
-            ->all();
+        return app(SpecimenPresenter::class)->collection(
+            $species->specimens()
+                ->with('currentDetermination.species')
+                ->orderByDesc('specimens.created_at')
+                ->get()
+        );
     }
 
     /**

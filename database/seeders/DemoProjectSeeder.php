@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\CatalogSpecies;
+use App\Models\Determination;
 use App\Models\InstanceAnswer;
 use App\Models\InterviewForm;
 use App\Models\InterviewInstance;
@@ -11,6 +12,7 @@ use App\Models\InterviewSection;
 use App\Models\Project;
 use App\Models\ProjectAccess;
 use App\Models\ProjectCapability;
+use App\Models\Specimen;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -121,6 +123,7 @@ class DemoProjectSeeder extends Seeder
             [$form, $items, $sections] = $this->form($project);
 
             $this->interviews($form, $sections, $items, $species, $user);
+            $this->specimens($project, $species);
         });
 
         $this->command?->info('Demo project seeded: '.self::PROJECT_NAME);
@@ -155,6 +158,7 @@ class DemoProjectSeeder extends Seeder
             'institution' => 'Proyecto demostrativo',
             'author_email' => self::DEMO_EMAIL,
             'country' => 'El Salvador',
+            'accession_prefix' => 'DEMO',
             'finished' => false,
             'published' => false,
             'shared' => false,
@@ -169,6 +173,75 @@ class DemoProjectSeeder extends Seeder
         ]);
 
         return $project;
+    }
+
+    /**
+     * A few physical collections, in the three states a researcher actually
+     * has: identified and deposited, examined without a name being reached,
+     * and freshly collected with nothing said about it yet.
+     *
+     * Without these the demo shows a catalog of taxa and no evidence that
+     * anything was ever picked, which is the half of the work that happens
+     * first.
+     */
+    private function specimens(Project $project, array $species): void
+    {
+        $collector = 'A. Domínguez';
+
+        // Identified, deposited, voucher issued by the project itself — the
+        // community-herbarium case.
+        foreach (array_slice(array_keys($species), 0, 3) as $index => $local) {
+            $specimen = new Specimen([
+                'collection_number' => (string) (101 + $index),
+                'collector' => $collector,
+                'collected_on' => '2026-03-'.str_pad((string) (10 + $index), 2, '0', STR_PAD_LEFT),
+                'locality' => 'Cafetal de altura, cantón El Rosario',
+                'repository' => 'Herbario comunitario de El Rosario',
+                'accession_number' => 'DEMO-'.str_pad((string) ($index + 1), 4, '0', STR_PAD_LEFT),
+            ]);
+            $specimen->project_id = $project->id;
+            $specimen->save();
+
+            $determination = new Determination([
+                'catalog_species_id' => $species[$local]->id,
+                'determiner' => 'M. Alvarenga',
+                'determined_on' => '2026-04-02',
+                'is_current' => true,
+            ]);
+            $determination->specimen_id = $specimen->id;
+            $determination->save();
+        }
+
+        // Examined and not nameable: indet., which is a determination.
+        $indet = new Specimen([
+            'collection_number' => '104',
+            'collector' => $collector,
+            'collected_on' => '2026-03-14',
+            'locality' => 'Borde de quebrada, cantón El Rosario',
+        ]);
+        $indet->project_id = $project->id;
+        $indet->save();
+
+        $unnamed = new Determination([
+            'catalog_species_id' => null,
+            'determiner' => 'M. Alvarenga',
+            'determined_on' => '2026-04-02',
+            'is_current' => true,
+        ]);
+        $unnamed->specimen_id = $indet->id;
+        $unnamed->save();
+
+        // Collected, nobody has looked at it yet. Different from indet.
+        foreach (['105', '106'] as $offset => $number) {
+            $pending = new Specimen([
+                'collection_number' => $number,
+                'collector' => $collector,
+                'collected_on' => '2026-03-1'.(5 + $offset),
+                'locality' => 'Huerto familiar, cantón El Rosario',
+            ]);
+            $pending->project_id = $project->id;
+            $pending->save();
+        }
     }
 
     /** @return array<string, CatalogSpecies> keyed by local name */

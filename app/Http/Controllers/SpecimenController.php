@@ -7,6 +7,7 @@ use App\Models\Determination;
 use App\Models\Project;
 use App\Models\Specimen;
 use App\Services\AccessionNumbers;
+use App\Services\SpecimenPresenter;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -28,7 +29,10 @@ use Inertia\Response;
  */
 class SpecimenController extends Controller
 {
-    public function __construct(private readonly AccessionNumbers $accessions) {}
+    public function __construct(
+        private readonly AccessionNumbers $accessions,
+        private readonly SpecimenPresenter $presenter,
+    ) {}
 
     /** Every collection in the project, identified or not. */
     public function index(Request $request, Project $project): Response|RedirectResponse
@@ -49,7 +53,7 @@ class SpecimenController extends Controller
 
         return Inertia::render('Catalog/Specimens', [
             'project' => ['id' => $project->id, 'name' => $project->name],
-            'specimens' => $specimens->map(fn (Specimen $s) => $this->present($s))->all(),
+            'specimens' => $this->presenter->collection($specimens),
             'summary' => [
                 'total' => $specimens->count(),
                 'vouchered' => $specimens->filter->isVouchered()->count(),
@@ -270,40 +274,6 @@ class SpecimenController extends Controller
         return back()
             ->with('message', 'catalogs.specimens.deleted')
             ->with('message_type', 'success');
-    }
-
-    /**
-     * One row per physical collection, with the current opinion flattened onto
-     * it. `species` is null for anything not yet identified.
-     *
-     * @return array<string, mixed>
-     */
-    public function present(Specimen $specimen): array
-    {
-        $current = $specimen->currentDetermination;
-
-        return [
-            'id' => $specimen->id,
-            'accession_number' => $specimen->accession_number,
-            'collection_number' => $specimen->collection_number,
-            'collector' => $specimen->collector,
-            'collected_on' => $specimen->collected_on?->toDateString(),
-            'locality' => $specimen->locality,
-            'location_lat' => $specimen->location_lat,
-            'location_lng' => $specimen->location_lng,
-            'repository' => $specimen->repository,
-            'notes' => $specimen->notes,
-            'is_vouchered' => $specimen->isVouchered(),
-            'is_determined' => $current?->catalog_species_id !== null,
-            'species' => $current?->species === null ? null : [
-                'id' => $current->species->id,
-                'genus' => $current->species->genus,
-                'name' => $current->species->name,
-            ],
-            'determiner' => $current?->determiner,
-            'determined_on' => $current?->determined_on?->toDateString(),
-            'qualifier' => $current?->qualifier,
-        ];
     }
 
     /**

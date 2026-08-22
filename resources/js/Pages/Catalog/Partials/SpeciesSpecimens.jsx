@@ -35,6 +35,10 @@ export default function SpeciesSpecimens({
 
             <SpecimenTable
                 specimens={specimens}
+                // Read-only here on purpose: identifying and depositing act on
+                // a collection rather than on a taxon, so they live on the
+                // project list. Recording is the one exception, below, because
+                // knowing the taxon is the reason you are on this page.
                 canEdit={false}
                 showDetermination={false}
                 emptyTitle={t('catalogs.specimens.none_for_taxon_title')}

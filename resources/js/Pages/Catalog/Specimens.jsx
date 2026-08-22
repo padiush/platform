@@ -108,7 +108,12 @@ export default function Specimens({
                 },
                 {
                     label: project.name,
-                    href: route('catalogs.show', { project: project.id }),
+                    // Same reason the species tab is disabled when the catalog
+                    // is empty: catalogs.show bounces straight back.
+                    href:
+                        speciesCount === null || speciesCount > 0
+                            ? route('catalogs.show', { project: project.id })
+                            : undefined,
                 },
                 { label: t('catalogs.specimens.title') },
             ]}
