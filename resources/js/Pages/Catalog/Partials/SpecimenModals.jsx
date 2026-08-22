@@ -401,11 +401,15 @@ export function DepositModal({
                 <Field
                     label={t('catalogs.specimens.accession_number')}
                     hint={
-                        minting
-                            ? t('catalogs.specimens.will_be_issued', {
-                                  number: nextAccessionNumber,
-                              })
-                            : t('catalogs.specimens.accession_hint')
+                        // Nothing to advise when the field is disabled: the
+                        // note below already says why.
+                        alreadyVouchered
+                            ? null
+                            : minting
+                              ? t('catalogs.specimens.will_be_issued', {
+                                    number: nextAccessionNumber,
+                                })
+                              : t('catalogs.specimens.accession_hint')
                     }
                     error={errors.accession_number}
                 >
