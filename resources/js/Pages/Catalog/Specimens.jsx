@@ -154,15 +154,28 @@ export default function Specimens({
                                 ))}
                             </div>
 
-                            {canEdit && (
-                                <button
-                                    type="button"
-                                    className="btn btn-primary btn-sm"
-                                    onClick={() => setCollecting(true)}
-                                >
-                                    {t('catalogs.specimens.add')}
-                                </button>
-                            )}
+                            <div className="flex items-center gap-2">
+                                {specimens.length > 0 && (
+                                    <a
+                                        href={route(
+                                            'catalogs.specimens.export',
+                                            { project: project.id },
+                                        )}
+                                        className="btn btn-outline btn-sm"
+                                    >
+                                        {t('catalogs.specimens.export')}
+                                    </a>
+                                )}
+                                {canEdit && (
+                                    <button
+                                        type="button"
+                                        className="btn btn-primary btn-sm"
+                                        onClick={() => setCollecting(true)}
+                                    >
+                                        {t('catalogs.specimens.add')}
+                                    </button>
+                                )}
+                            </div>
                         </div>
 
                         <SpecimenTable

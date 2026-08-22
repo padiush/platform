@@ -99,6 +99,26 @@ describe('Specimens page', () => {
         expect(screen.getByText('043')).toBeInTheDocument();
     });
 
+    it('offers the export whenever there is something to export', () => {
+        renderPage({ canEdit: false });
+
+        expect(screen.getByText('catalogs.specimens.export')).toHaveAttribute(
+            'href',
+            '/catalogs.specimens.export',
+        );
+    });
+
+    it('offers no export when nothing has been collected', () => {
+        renderPage({
+            specimens: [],
+            summary: { total: 0, vouchered: 0, unidentified: 0 },
+        });
+
+        expect(
+            screen.queryByText('catalogs.specimens.export'),
+        ).not.toBeInTheDocument();
+    });
+
     it('offers no way to add a collection without the capability', () => {
         renderPage({ canEdit: false });
 

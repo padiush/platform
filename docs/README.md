@@ -53,11 +53,14 @@ One piece of new surface is in progress: **specimens and determinations**
 ([ADR 0008](decisions/0008-specimens-and-determinations.md)). The catalog models
 a *taxon*, which is the end of identification; a specimen is a different thing,
 carries many determinations over time, and is what a voucher number identifies.
-The **data layer and the catalog UI are built** — the two tables, per-project
-accession numbering, and a collections list that follows the field order:
-recorded first, identified later, deposited later still. The **export surface is
-not yet**. Server-side this version — the companion keeps its interview-capture
-scope.
+The **data layer, the catalog UI and the exports are built** — the two tables,
+per-project accession numbering, a collections list that follows the field order
+(recorded first, identified later, deposited later still), a `Voucher No.` and
+permit column on the species-indices export, a Darwin-Core-termed export of the
+collections themselves, and voucher and permit coverage stated on the report
+page beside the unlinked-citation figure. What remains is a **catalog UI for
+managing permits** ([ADR 0009](decisions/0009-collecting-permits.md)).
+Server-side this version — the companion keeps its interview-capture scope.
 
 ## Decisions register
 

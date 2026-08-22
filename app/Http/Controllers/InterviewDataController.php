@@ -21,6 +21,7 @@ use App\Services\EthnobiologyIndices;
 use App\Services\InterviewDataExport;
 use App\Services\InterviewDataTable;
 use App\Services\SpeciesLinkingList;
+use App\Services\SpecimenEvidence;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -440,7 +441,8 @@ class InterviewDataController extends Controller
 
     public function reports(
         Project $project,
-        EthnobiologyIndices $indices
+        EthnobiologyIndices $indices,
+        SpecimenEvidence $evidence
     ): Response|RedirectResponse {
         $this->checkPermission($project);
 
@@ -450,26 +452,35 @@ class InterviewDataController extends Controller
                 'name' => $project->name,
             ],
             'indices' => $indices->compute($project),
+            // Stated, not enforced — the same treatment unlinked citations get,
+            // so a researcher knows the denominator of what is documented.
+            'evidence' => $evidence->forProject($project)['coverage'],
         ]);
     }
 
     public function downloadReport(
         Project $project,
         Request $request,
-        EthnobiologyIndices $indices
+        EthnobiologyIndices $indices,
+        SpecimenEvidence $evidence
     ): BinaryFileResponse {
         $this->checkPermission($project);
 
         $format = $request->query('format') === 'csv' ? 'csv' : 'xlsx';
         $data = $indices->compute($project);
+        $byTaxon = $evidence->forProject($project)['by_taxon'];
 
-        // Literature-standard abbreviations — language-independent.
-        $headings = ['Family', 'Genus', 'Species', 'Authority', 'FC', 'NU', 'RFC', 'UV', 'CI', 'RI', 'CV'];
+        // Literature-standard abbreviations — language-independent. Voucher and
+        // permit sit with the taxonomy rather than the indices: they say what
+        // the row is evidenced by, not what was computed from it.
+        $headings = ['Family', 'Genus', 'Species', 'Authority', 'Voucher No.', 'Collecting permit', 'FC', 'NU', 'RFC', 'UV', 'CI', 'RI', 'CV'];
         $rows = array_map(fn ($species) => [
             $species['species']['family'],
             $species['species']['genus'],
             $species['species']['name'],
             $species['species']['authority'],
+            $byTaxon[$species['species']['id']]['vouchers'] ?? '',
+            $byTaxon[$species['species']['id']]['permits'] ?? '',
             $species['fc'],
             $species['nu'],
             round($species['rfc'], 4),

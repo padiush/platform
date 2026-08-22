@@ -419,6 +419,7 @@
             "determiner": "Determinado por",
             "edit": "Editar",
             "edit_collection": "Editar o exemplar",
+            "export": "Exportar",
             "filter_all": "Todos",
             "filter_undetermined": "Por identificar",
             "filter_unvouchered": "Sem voucher",
@@ -603,7 +604,11 @@
             "empty": {
                 "title": "Ainda não há índices",
                 "hint": "Vincule as citações das entrevistas a espécies do catálogo e marque um campo de categoria de uso no designer de formulários."
-            }
+            },
+            "voucher_coverage": "Táxones com voucher",
+            "of_total": "{{count}} de {{total}}",
+            "permit_coverage": "Permissões de colheita",
+            "permit_states": "{{under}} com permissão · {{exempt}} isentos · {{unrecorded}} por registar"
         }
     },
     "public": {

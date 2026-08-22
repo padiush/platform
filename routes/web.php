@@ -201,6 +201,10 @@ Route::middleware(['auth'])->group(function () {
             '/catalogs/{project}/specimens',
             'index'
         )->name('catalogs.specimens.index');
+        Route::get(
+            '/catalogs/{project}/specimens/export',
+            'export'
+        )->name('catalogs.specimens.export');
         Route::post(
             '/catalogs/{project}/specimens',
             'store'

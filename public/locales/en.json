@@ -419,6 +419,7 @@
             "determiner": "Determined by",
             "edit": "Edit",
             "edit_collection": "Edit the specimen",
+            "export": "Export",
             "filter_all": "All",
             "filter_undetermined": "Unidentified",
             "filter_unvouchered": "Unvouchered",
@@ -603,7 +604,11 @@
             "empty": {
                 "title": "No indices yet",
                 "hint": "Link interview citations to catalog species and mark a use-category field in the form designer."
-            }
+            },
+            "voucher_coverage": "Taxa with a voucher",
+            "of_total": "{{count}} of {{total}}",
+            "permit_coverage": "Collecting permits",
+            "permit_states": "{{under}} under permit · {{exempt}} exempt · {{unrecorded}} unrecorded"
         }
     },
     "public": {

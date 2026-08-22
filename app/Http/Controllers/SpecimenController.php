@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\SpecimensExport;
 use App\Models\CatalogSpecies;
 use App\Models\Determination;
 use App\Models\Project;
@@ -12,9 +13,12 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
+use Maatwebsite\Excel\Facades\Excel;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 /**
  * The physical collections a project has made.
@@ -79,6 +83,66 @@ class SpecimenController extends Controller
             // redirects away from an empty catalog.
             'speciesCount' => $project->catalogSpecies()->count(),
         ]);
+    }
+
+    /**
+     * The collection list as a spreadsheet.
+     *
+     * Gated on viewCatalog, the same capability that shows the page: a specimen
+     * record holds no informant response, so exporting it is not a wider
+     * disclosure than reading it on screen.
+     */
+    public function export(Request $request, Project $project): BinaryFileResponse|RedirectResponse
+    {
+        if (! Auth::user()->can('viewCatalog', $project)) {
+            return redirect()
+                ->route('catalogs.index')
+                ->with('message', 'catalogs.no_access')
+                ->with('message_type', 'error');
+        }
+
+        $format = $request->query('format') === 'xlsx' ? 'xlsx' : 'csv';
+
+        $rows = $project->specimens()
+            ->with(['currentDetermination.species', 'collectingPermit'])
+            ->orderBy('accession_number')
+            ->orderBy('collection_number')
+            ->get()
+            ->map(function (Specimen $specimen) {
+                $determination = $specimen->currentDetermination;
+                $species = $determination?->species;
+                $permit = $specimen->collectingPermit;
+
+                return [
+                    $specimen->accession_number,
+                    $specimen->collection_number,
+                    $specimen->collector,
+                    $specimen->collected_on?->toDateString(),
+                    $specimen->locality,
+                    $specimen->location_lat,
+                    $specimen->location_lng,
+                    $specimen->repository,
+                    $species?->family,
+                    $species?->genus,
+                    $species?->name,
+                    $determination?->qualifier,
+                    $determination?->determiner,
+                    $determination?->determined_on?->toDateString(),
+                    $permit?->authority,
+                    $permit?->reference,
+                    $specimen->permit_exemption,
+                    $specimen->notes,
+                ];
+            })
+            ->all();
+
+        $filename = Str::slug($project->name).'-specimens-'.now()->format('Y-m-d').".{$format}";
+
+        return Excel::download(
+            new SpecimensExport($rows),
+            $filename,
+            $format === 'csv' ? \Maatwebsite\Excel\Excel::CSV : null
+        );
     }
 
     /**

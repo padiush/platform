@@ -75,7 +75,7 @@ function ScientificName({ species }) {
     );
 }
 
-export default function Reports({ project, indices }) {
+export default function Reports({ project, indices, evidence = null }) {
     const { t } = useTranslation();
 
     const {
@@ -161,6 +161,44 @@ export default function Reports({ project, indices }) {
                             tone={unlinked > 0 ? 'warning' : 'default'}
                         />
                     </div>
+
+                    {/*
+                        Stated rather than enforced, like the unlinked count
+                        above: a species table is expected to name the voucher
+                        behind each taxon, so how much of that exists is a
+                        figure worth printing.
+                    */}
+                    {evidence && evidence.specimens_total > 0 && (
+                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                            <MetricCard
+                                label={t('data.reports.voucher_coverage')}
+                                value={t('data.reports.of_total', {
+                                    count: evidence.taxa_vouchered,
+                                    total: evidence.taxa_total,
+                                })}
+                                tone={
+                                    evidence.taxa_vouchered <
+                                    evidence.taxa_total
+                                        ? 'warning'
+                                        : 'default'
+                                }
+                            />
+                            <MetricCard
+                                label={t('data.reports.permit_coverage')}
+                                value={t('data.reports.permit_states', {
+                                    under: evidence.specimens_under_permit,
+                                    exempt: evidence.specimens_permit_exempt,
+                                    unrecorded:
+                                        evidence.specimens_permit_unrecorded,
+                                })}
+                                tone={
+                                    evidence.specimens_permit_unrecorded > 0
+                                        ? 'warning'
+                                        : 'default'
+                                }
+                            />
+                        </div>
+                    )}
 
                     {!hasData && (
                         <EmptyState

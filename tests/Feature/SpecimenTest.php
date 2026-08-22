@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\CatalogSpecies;
+use App\Models\CollectingPermit;
 use App\Models\Determination;
 use App\Models\Project;
 use App\Models\Specimen;
@@ -296,6 +297,88 @@ class SpecimenTest extends TestCase
             ->where('specimens.0.accession_number', 'MML-0009')
             ->where('specimens.0.is_determined', true)
         );
+    }
+
+    // ------------------------------------------------------------- export ---
+
+    public function test_the_export_carries_the_collection_its_name_and_its_permit()
+    {
+        $permit = CollectingPermit::factory()->create([
+            'project_id' => $this->project->id,
+            'authority' => 'MARN',
+            'reference' => 'RES-042-2026',
+        ]);
+
+        $specimen = $this->specimen([
+            'accession_number' => 'MML-0001',
+            'collection_number' => '042',
+            'collector' => 'M. Menéndez',
+            'collecting_permit_id' => $permit->id,
+        ]);
+        Determination::factory()->create([
+            'specimen_id' => $specimen->id,
+            'catalog_species_id' => $this->species->id,
+            'determiner' => 'A. Botanist',
+            'qualifier' => 'cf',
+            'is_current' => true,
+        ]);
+
+        $csv = $this->actingAs($this->editor())
+            ->get($this->url('catalogs.specimens.export'))
+            ->streamedContent();
+
+        // Darwin Core terms, so the sheet can be read or mapped by anyone who
+        // works with occurrence data.
+        $this->assertStringContainsString('catalogNumber', $csv);
+        $this->assertStringContainsString('identificationQualifier', $csv);
+
+        $this->assertStringContainsString('MML-0001', $csv);
+        $this->assertStringContainsString('M. Menéndez', $csv);
+        $this->assertStringContainsString($this->species->genus, $csv);
+        $this->assertStringContainsString('A. Botanist', $csv);
+        $this->assertStringContainsString('RES-042-2026', $csv);
+    }
+
+    public function test_the_export_includes_material_nobody_has_named()
+    {
+        $this->specimen(['collection_number' => '099', 'permit_exemption' => 'market']);
+
+        $csv = $this->actingAs($this->editor())
+            ->get($this->url('catalogs.specimens.export'))
+            ->streamedContent();
+
+        // A species table cannot show these; the collection list must.
+        $this->assertStringContainsString('099', $csv);
+        $this->assertStringContainsString('market', $csv);
+    }
+
+    public function test_a_viewer_may_export_but_a_stranger_may_not()
+    {
+        $this->specimen();
+
+        $this->actingAs($this->viewer())
+            ->get($this->url('catalogs.specimens.export'))
+            ->assertOk();
+
+        $this->actingAs($this->outsider())
+            ->get($this->url('catalogs.specimens.export'))
+            ->assertRedirect(route('catalogs.index'));
+    }
+
+    public function test_the_export_covers_only_this_project()
+    {
+        $this->specimen(['accession_number' => 'MINE-1']);
+        Specimen::factory()->create([
+            'project_id' => Project::factory()->create()->id,
+            'accession_number' => 'THEIRS-1',
+        ]);
+
+        $csv = $this->actingAs($this->editor())
+            ->get($this->url('catalogs.specimens.export'))
+            ->streamedContent();
+
+        $this->assertStringContainsString('MINE-1', $csv);
+        $this->assertStringNotContainsString('THEIRS-1', $csv);
     }
 
     // ------------------------------------------------------ authorization ---

@@ -419,6 +419,7 @@
             "determiner": "Determinado por",
             "edit": "Editar",
             "edit_collection": "Editar el ejemplar",
+            "export": "Exportar",
             "filter_all": "Todos",
             "filter_undetermined": "Sin identificar",
             "filter_unvouchered": "Sin voucher",
@@ -603,7 +604,11 @@
             "empty": {
                 "title": "Aún no hay índices",
                 "hint": "Vincula las citas de las entrevistas con especies del catálogo y marca un campo de categoría de uso en el diseñador de formularios."
-            }
+            },
+            "voucher_coverage": "Taxones con voucher",
+            "of_total": "{{count}} de {{total}}",
+            "permit_coverage": "Permisos de recolección",
+            "permit_states": "{{under}} con permiso · {{exempt}} exentos · {{unrecorded}} sin registrar"
         }
     },
     "public": {
