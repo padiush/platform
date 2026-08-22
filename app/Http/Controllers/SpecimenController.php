@@ -71,6 +71,9 @@ class SpecimenController extends Controller
                 ->all(),
             'canEdit' => (bool) $user->can('editCatalog', $project),
             'nextAccessionNumber' => $this->accessions->peek($project),
+            // The species tab is a dead end without one — catalogs.show
+            // redirects away from an empty catalog.
+            'speciesCount' => $project->catalogSpecies()->count(),
         ]);
     }
 

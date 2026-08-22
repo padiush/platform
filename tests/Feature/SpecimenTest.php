@@ -313,6 +313,24 @@ class SpecimenTest extends TestCase
         $this->assertSame(0, Specimen::count());
     }
 
+    public function test_the_project_list_offers_a_route_to_specimens_with_an_empty_catalog()
+    {
+        $emptyCatalog = Project::factory()->create();
+        $user = $this->userWithCapability($emptyCatalog, 'view_catalog');
+        Specimen::factory()->create(['project_id' => $emptyCatalog->id]);
+
+        // catalogs.show redirects away when no species exist, so the catalog
+        // index is the only page a brand-new project can reach — and that is
+        // precisely the project whose specimens come before its taxa.
+        $this->actingAs($user)
+            ->get(route('catalogs.index'))
+            ->assertInertia(fn (Assert $page) => $page
+                ->component('Catalog/Index')
+                ->where('projects.0.catalog_species_count', 0)
+                ->where('projects.0.specimen_count', 1)
+            );
+    }
+
     public function test_a_stranger_cannot_see_the_list_at_all()
     {
         $this->actingAs($this->outsider())

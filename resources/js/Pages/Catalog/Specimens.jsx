@@ -1,6 +1,7 @@
 import Card from '@/Components/Card';
 import ConfirmModal from '@/Components/ConfirmModal';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import CatalogTabs from '@/Pages/Catalog/Partials/CatalogTabs';
 import {
     CollectionModal,
     DepositModal,
@@ -67,6 +68,7 @@ export default function Specimens({
     catalog = [],
     canEdit = false,
     nextAccessionNumber = null,
+    speciesCount = null,
 }) {
     const { t } = useTranslation();
     const [filter, setFilter] = useState('all');
@@ -123,6 +125,12 @@ export default function Specimens({
         >
             <div className="p-4 md:pt-8 lg:pt-12">
                 <div className="mx-auto max-w-7xl space-y-4 sm:px-6 lg:px-8">
+                    <CatalogTabs
+                        project={project}
+                        active="specimens"
+                        speciesCount={speciesCount}
+                    />
+
                     <Summary summary={summary} />
 
                     <Card title={t('catalogs.specimens.all_collections')}>

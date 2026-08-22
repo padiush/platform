@@ -57,6 +57,10 @@ class ProjectCatalogController extends Controller
                     'linked_families_count' => $project
                         ->linkedFamilies()
                         ->count(),
+                    // Reachable even with an empty catalog: collections are
+                    // recorded before anything is identified, so this must not
+                    // depend on a taxon existing yet.
+                    'specimen_count' => $project->specimens()->count(),
                     'can_edit_catalog' => (bool) $access->capability->edit_catalog,
                     'can_view_catalog' => true, // already verified
                 ]);

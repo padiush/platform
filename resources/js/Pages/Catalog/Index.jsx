@@ -76,6 +76,19 @@ export default function CatalogOverview({ projects }) {
                                             </span>
                                         )}
 
+                                        <Link
+                                            href={route(
+                                                'catalogs.specimens.index',
+                                                { project: project.id },
+                                            )}
+                                            className="btn btn-outline btn-sm"
+                                        >
+                                            {t('catalogs.specimens.title')}
+                                            {project.specimen_count > 0
+                                                ? ` (${project.specimen_count})`
+                                                : ''}
+                                        </Link>
+
                                         {project.can_view_catalog &&
                                         project.catalog_species_count > 0 ? (
                                             <Link
