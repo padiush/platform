@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\CatalogSpecies;
+use App\Models\CollectingPermit;
 use App\Models\Determination;
 use App\Models\InstanceAnswer;
 use App\Models\InterviewForm;
@@ -188,6 +189,18 @@ class DemoProjectSeeder extends Seeder
     {
         $collector = 'A. Domínguez';
 
+        // Wild material is collected under a national authorisation. Invented,
+        // like everything else here.
+        $permit = new CollectingPermit([
+            'authority' => 'MARN',
+            'reference' => 'DEMO-RES-042-2026',
+            'issued_on' => '2026-01-15',
+            'expires_on' => '2027-01-14',
+            'notes' => 'Recolecta de material botánico con fines de investigación etnobotánica.',
+        ]);
+        $permit->project_id = $project->id;
+        $permit->save();
+
         // Identified, deposited, voucher issued by the project itself — the
         // community-herbarium case.
         foreach (array_slice(array_keys($species), 0, 3) as $index => $local) {
@@ -198,6 +211,7 @@ class DemoProjectSeeder extends Seeder
                 'locality' => 'Cafetal de altura, cantón El Rosario',
                 'repository' => 'Herbario comunitario de El Rosario',
                 'accession_number' => 'DEMO-'.str_pad((string) ($index + 1), 4, '0', STR_PAD_LEFT),
+                'collecting_permit_id' => $permit->id,
             ]);
             $specimen->project_id = $project->id;
             $specimen->save();
@@ -238,6 +252,9 @@ class DemoProjectSeeder extends Seeder
                 'collector' => $collector,
                 'collected_on' => '2026-03-1'.(5 + $offset),
                 'locality' => 'Huerto familiar, cantón El Rosario',
+                // Cultivated in a household garden: outside the permit regime,
+                // which is an answer rather than a blank.
+                'permit_exemption' => 'cultivated',
             ]);
             $pending->project_id = $project->id;
             $pending->save();

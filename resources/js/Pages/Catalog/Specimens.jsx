@@ -8,7 +8,7 @@ import {
     DetermineModal,
 } from '@/Pages/Catalog/Partials/SpecimenModals';
 import SpecimenTable from '@/Pages/Catalog/Partials/SpecimenTable';
-import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
+import { faArrowLeft, faDownload } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link, router } from '@inertiajs/react';
 import { useMemo, useState } from 'react';
@@ -69,6 +69,8 @@ export default function Specimens({
     canEdit = false,
     nextAccessionNumber = null,
     speciesCount = null,
+    permits = [],
+    exemptions = [],
 }) {
     const { t } = useTranslation();
     const [filter, setFilter] = useState('all');
@@ -154,15 +156,54 @@ export default function Specimens({
                                 ))}
                             </div>
 
-                            {canEdit && (
-                                <button
-                                    type="button"
-                                    className="btn btn-primary btn-sm"
-                                    onClick={() => setCollecting(true)}
-                                >
-                                    {t('catalogs.specimens.add')}
-                                </button>
-                            )}
+                            <div className="flex items-center gap-2">
+                                {specimens.length > 0 && (
+                                    <div className="dropdown dropdown-end">
+                                        <div
+                                            tabIndex={0}
+                                            role="button"
+                                            className="btn btn-outline btn-sm"
+                                        >
+                                            <FontAwesomeIcon
+                                                icon={faDownload}
+                                            />
+                                            {t('catalogs.specimens.export')}
+                                        </div>
+                                        <ul
+                                            tabIndex={0}
+                                            className="dropdown-content menu bg-base-200 rounded-box z-10 w-52 p-2 shadow"
+                                        >
+                                            {['xlsx', 'csv'].map((format) => (
+                                                <li key={format}>
+                                                    <a
+                                                        href={route(
+                                                            'catalogs.specimens.export',
+                                                            {
+                                                                project:
+                                                                    project.id,
+                                                                format,
+                                                            },
+                                                        )}
+                                                    >
+                                                        {t(
+                                                            `catalogs.specimens.format_${format}`,
+                                                        )}
+                                                    </a>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                )}
+                                {canEdit && (
+                                    <button
+                                        type="button"
+                                        className="btn btn-primary btn-sm"
+                                        onClick={() => setCollecting(true)}
+                                    >
+                                        {t('catalogs.specimens.add')}
+                                    </button>
+                                )}
+                            </div>
                         </div>
 
                         <SpecimenTable
@@ -187,6 +228,8 @@ export default function Specimens({
                 }}
                 project={project}
                 specimen={editing}
+                permits={permits}
+                exemptions={exemptions}
                 key={editing?.id ?? 'new'}
             />
 

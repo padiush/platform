@@ -129,7 +129,9 @@ in an ADR but not yet built, and unmarked for what is still only pencilled in.
   sequence) and coverage is reported rather than enforced. The catalog carries a
   project-level list of collections — a specimen is recorded before anything is
   known about its taxonomy, identified later, and deposited later still — with
-  a narrower view under each taxon. **The export surface is still to come.**
+  a narrower view under each taxon. The species-indices export carries a
+  `Voucher No.` column, the collection list exports on its own in Darwin Core
+  terms, and voucher coverage is stated on the report page.
   Still pencilled in beside it: (for zoology subfields) conservation status.
 - **Collecting permits** — ✅ **data layer built (2026-08-22)** as
   `collecting_permits`, per
@@ -139,5 +141,8 @@ in an ADR but not yet built, and unmarked for what is still only pencilled in.
   none was required (`private_land`·`cultivated`·`market`·`other`), never both —
   the two absences mean different things and coverage counts them separately. A
   reference record only: nothing validates that a permit is genuine, current, or
-  covers what was collected. **The catalog UI and the export column are still to
-  come.**
+  covers what was collected. Permits are managed under the catalog and chosen
+  when a collection is recorded — a permit is held before the fieldwork, so
+  unlike a voucher it is known at that moment. The species-indices export
+  carries the permit beside the voucher, and the report page states the three
+  permit states.

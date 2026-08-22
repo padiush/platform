@@ -3,11 +3,13 @@
 namespace Tests\Feature;
 
 use App\Models\CatalogSpecies;
+use App\Models\CollectingPermit;
 use App\Models\Determination;
 use App\Models\Project;
 use App\Models\Specimen;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia as Assert;
+use Maatwebsite\Excel\Excel;
 use Tests\Concerns\InteractsWithProjects;
 use Tests\TestCase;
 
@@ -296,6 +298,219 @@ class SpecimenTest extends TestCase
             ->where('specimens.0.accession_number', 'MML-0009')
             ->where('specimens.0.is_determined', true)
         );
+    }
+
+    // ---------------------------------------------------------- the permit ---
+
+    public function test_a_collection_can_be_recorded_under_a_permit()
+    {
+        $permit = CollectingPermit::factory()->create([
+            'project_id' => $this->project->id,
+        ]);
+
+        $this->actingAs($this->editor())->post($this->url('catalogs.specimens.store'), [
+            'collector' => 'M. Menéndez',
+            'collecting_permit_id' => $permit->id,
+        ])->assertSessionHasNoErrors();
+
+        $this->assertSame($permit->id, Specimen::sole()->collecting_permit_id);
+    }
+
+    public function test_a_collection_can_state_that_none_was_required()
+    {
+        $this->actingAs($this->editor())->post($this->url('catalogs.specimens.store'), [
+            'collector' => 'M. Menéndez',
+            'permit_exemption' => 'market',
+        ])->assertSessionHasNoErrors();
+
+        $this->assertSame('market', Specimen::sole()->permit_exemption);
+    }
+
+    public function test_a_permit_and_an_exemption_together_are_refused()
+    {
+        $permit = CollectingPermit::factory()->create([
+            'project_id' => $this->project->id,
+        ]);
+
+        $this->actingAs($this->editor())->post($this->url('catalogs.specimens.store'), [
+            'collecting_permit_id' => $permit->id,
+            'permit_exemption' => 'market',
+        ])->assertSessionHasErrors();
+
+        // The pairing has no meaning; recording it would make coverage a lie.
+        $this->assertSame(0, Specimen::count());
+    }
+
+    public function test_it_refuses_a_permit_belonging_to_another_project()
+    {
+        $foreign = CollectingPermit::factory()->create();
+
+        $this->actingAs($this->editor())->post($this->url('catalogs.specimens.store'), [
+            'collecting_permit_id' => $foreign->id,
+        ])->assertSessionHasErrors('collecting_permit_id');
+    }
+
+    public function test_it_refuses_an_exemption_outside_the_vocabulary()
+    {
+        $this->actingAs($this->editor())->post($this->url('catalogs.specimens.store'), [
+            'permit_exemption' => 'because-i-said-so',
+        ])->assertSessionHasErrors('permit_exemption');
+    }
+
+    public function test_the_list_offers_the_project_permits_to_choose_from()
+    {
+        CollectingPermit::factory()->create([
+            'project_id' => $this->project->id,
+            'authority' => 'MARN',
+            'reference' => 'RES-042-2026',
+        ]);
+        CollectingPermit::factory()->create(); // another project's
+
+        $this->actingAs($this->editor())
+            ->get($this->url('catalogs.specimens.index'))
+            ->assertInertia(fn (Assert $page) => $page
+                ->has('permits', 1)
+                ->where('permits.0.label', 'MARN · RES-042-2026')
+                ->has('exemptions', 4)
+            );
+    }
+
+    // ------------------------------------------------------------- export ---
+
+    public function test_the_export_carries_the_collection_its_name_and_its_permit()
+    {
+        $permit = CollectingPermit::factory()->create([
+            'project_id' => $this->project->id,
+            'authority' => 'MARN',
+            'reference' => 'RES-042-2026',
+        ]);
+
+        $specimen = $this->specimen([
+            'accession_number' => 'MML-0001',
+            'collection_number' => '042',
+            'collector' => 'M. Menéndez',
+            'collecting_permit_id' => $permit->id,
+        ]);
+        Determination::factory()->create([
+            'specimen_id' => $specimen->id,
+            'catalog_species_id' => $this->species->id,
+            'determiner' => 'A. Botanist',
+            'qualifier' => 'cf',
+            'is_current' => true,
+        ]);
+
+        $csv = $this->actingAs($this->editor())
+            ->get($this->url('catalogs.specimens.export').'?format=csv')
+            ->streamedContent();
+
+        // Darwin Core terms, so the sheet can be read or mapped by anyone who
+        // works with occurrence data.
+        $this->assertStringContainsString('catalogNumber', $csv);
+        $this->assertStringContainsString('identificationQualifier', $csv);
+
+        $this->assertStringContainsString('MML-0001', $csv);
+        $this->assertStringContainsString('M. Menéndez', $csv);
+        $this->assertStringContainsString($this->species->genus, $csv);
+        $this->assertStringContainsString('A. Botanist', $csv);
+        $this->assertStringContainsString('RES-042-2026', $csv);
+    }
+
+    public function test_it_offers_both_formats_and_defaults_to_xlsx()
+    {
+        $this->specimen(['accession_number' => 'MML-0001']);
+
+        $default = $this->actingAs($this->editor())
+            ->get($this->url('catalogs.specimens.export'));
+        $csv = $this->actingAs($this->editor())
+            ->get($this->url('catalogs.specimens.export').'?format=csv');
+        $xlsx = $this->actingAs($this->editor())
+            ->get($this->url('catalogs.specimens.export').'?format=xlsx');
+
+        foreach ([$default, $csv, $xlsx] as $response) {
+            $response->assertOk();
+            $this->assertStringContainsString(
+                'attachment',
+                (string) $response->headers->get('content-disposition')
+            );
+        }
+
+        // A bare link behaves like the indices download: xlsx.
+        $this->assertStringContainsString(
+            '.xlsx',
+            (string) $default->headers->get('content-disposition')
+        );
+        $this->assertStringContainsString(
+            '.csv',
+            (string) $csv->headers->get('content-disposition')
+        );
+    }
+
+    public function test_the_xlsx_is_a_readable_workbook()
+    {
+        $specimen = $this->specimen(['accession_number' => 'MML-0001', 'collector' => 'M. Menéndez']);
+        Determination::factory()->create([
+            'specimen_id' => $specimen->id,
+            'catalog_species_id' => $this->species->id,
+            'is_current' => true,
+        ]);
+
+        $path = tempnam(sys_get_temp_dir(), 'specimens').'.xlsx';
+        file_put_contents(
+            $path,
+            $this->actingAs($this->editor())
+                ->get($this->url('catalogs.specimens.export').'?format=xlsx')
+                ->streamedContent()
+        );
+
+        // Round-trip it: a download that opens is the claim being made.
+        $sheet = \Maatwebsite\Excel\Facades\Excel::toArray(new \stdClass, $path, null, Excel::XLSX)[0];
+        unlink($path);
+
+        $this->assertSame('catalogNumber', $sheet[0][0]);
+        $this->assertSame('MML-0001', $sheet[1][0]);
+        $this->assertContains('M. Menéndez', $sheet[1]);
+    }
+
+    public function test_the_export_includes_material_nobody_has_named()
+    {
+        $this->specimen(['collection_number' => '099', 'permit_exemption' => 'market']);
+
+        $csv = $this->actingAs($this->editor())
+            ->get($this->url('catalogs.specimens.export').'?format=csv')
+            ->streamedContent();
+
+        // A species table cannot show these; the collection list must.
+        $this->assertStringContainsString('099', $csv);
+        $this->assertStringContainsString('market', $csv);
+    }
+
+    public function test_a_viewer_may_export_but_a_stranger_may_not()
+    {
+        $this->specimen();
+
+        $this->actingAs($this->viewer())
+            ->get($this->url('catalogs.specimens.export'))
+            ->assertOk();
+
+        $this->actingAs($this->outsider())
+            ->get($this->url('catalogs.specimens.export'))
+            ->assertRedirect(route('catalogs.index'));
+    }
+
+    public function test_the_export_covers_only_this_project()
+    {
+        $this->specimen(['accession_number' => 'MINE-1']);
+        Specimen::factory()->create([
+            'project_id' => Project::factory()->create()->id,
+            'accession_number' => 'THEIRS-1',
+        ]);
+
+        $csv = $this->actingAs($this->editor())
+            ->get($this->url('catalogs.specimens.export').'?format=csv')
+            ->streamedContent();
+
+        $this->assertStringContainsString('MINE-1', $csv);
+        $this->assertStringNotContainsString('THEIRS-1', $csv);
     }
 
     // ------------------------------------------------------ authorization ---

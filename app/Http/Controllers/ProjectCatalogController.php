@@ -426,7 +426,7 @@ class ProjectCatalogController extends Controller
     {
         return app(SpecimenPresenter::class)->collection(
             $species->specimens()
-                ->with('currentDetermination.species')
+                ->with(['currentDetermination.species', 'collectingPermit'])
                 ->orderByDesc('specimens.created_at')
                 ->get()
         );

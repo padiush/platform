@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CollectingPermitController;
 use App\Http\Controllers\InterviewDataController;
 use App\Http\Controllers\InterviewDesignerController;
 use App\Http\Controllers\InterviewFormController;
@@ -192,6 +193,27 @@ Route::middleware(['auth'])->group(function () {
         )->name('catalogs.species.delete');
     });
 
+    // Collecting permits — the authorisations a project collects under.
+    // See docs/decisions/0009-collecting-permits.md.
+    Route::controller(CollectingPermitController::class)->group(function () {
+        Route::get(
+            '/catalogs/{project}/permits',
+            'index'
+        )->name('catalogs.permits.index');
+        Route::post(
+            '/catalogs/{project}/permits',
+            'store'
+        )->name('catalogs.permits.store');
+        Route::patch(
+            '/catalogs/{project}/permits/{permit}',
+            'update'
+        )->name('catalogs.permits.update');
+        Route::delete(
+            '/catalogs/{project}/permits/{permit}',
+            'destroy'
+        )->name('catalogs.permits.destroy');
+    });
+
     // Specimens — the physical collections a project has made. Collected and
     // recorded first, identified later, deposited later still, so determining
     // and depositing are their own routes rather than fields on a create form.
@@ -201,6 +223,10 @@ Route::middleware(['auth'])->group(function () {
             '/catalogs/{project}/specimens',
             'index'
         )->name('catalogs.specimens.index');
+        Route::get(
+            '/catalogs/{project}/specimens/export',
+            'export'
+        )->name('catalogs.specimens.export');
         Route::post(
             '/catalogs/{project}/specimens',
             'store'

@@ -5,12 +5,15 @@ namespace Tests\Feature;
 use App\Exports\IndicesReportExport;
 use App\Exports\ReferencesSheet;
 use App\Models\CatalogSpecies;
+use App\Models\CollectingPermit;
+use App\Models\Determination;
 use App\Models\InstanceAnswer;
 use App\Models\InterviewForm;
 use App\Models\InterviewInstance;
 use App\Models\InterviewItem;
 use App\Models\InterviewSection;
 use App\Models\Project;
+use App\Models\Specimen;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
 use Inertia\Testing\AssertableInertia as Assert;
@@ -77,6 +80,99 @@ class DataReportsTest extends TestCase
                 ->where('indices.species.0.species.name', 'edulis')
                 ->has('indices.use_categories', 1)
         );
+    }
+
+    /** Back a taxon with a collection, so the species table has evidence. */
+    private function voucher(
+        CatalogSpecies $species,
+        string $accession,
+        ?CollectingPermit $permit = null
+    ): Specimen {
+        $specimen = Specimen::factory()->create([
+            'project_id' => $this->project->id,
+            'accession_number' => $accession,
+            'collecting_permit_id' => $permit?->id,
+        ]);
+
+        Determination::factory()->create([
+            'specimen_id' => $specimen->id,
+            'catalog_species_id' => $species->id,
+            'is_current' => true,
+        ]);
+
+        return $specimen;
+    }
+
+    public function test_the_species_table_carries_the_voucher_and_the_permit()
+    {
+        $user = $this->userWithCapability($this->project, 'generate_reports');
+        $species = CatalogSpecies::factory()->create([
+            'project_id' => $this->project->id,
+            'name' => 'edulis',
+        ]);
+        $this->cite($this->interview(), 0, $species, 'food');
+
+        $permit = CollectingPermit::factory()->create([
+            'project_id' => $this->project->id,
+            'authority' => 'MARN',
+            'reference' => 'RES-042-2026',
+        ]);
+        $this->voucher($species, 'MML-0001', $permit);
+
+        $csv = $this->actingAs($user)->get(route('data.reports.download', [
+            'project' => $this->project,
+            'format' => 'csv',
+        ]))->streamedContent();
+
+        // The column a species table is expected to carry, and the authority
+        // the material was taken under.
+        $this->assertStringContainsString('Voucher No.', $csv);
+        $this->assertStringContainsString('MML-0001', $csv);
+        $this->assertStringContainsString('MARN · RES-042-2026', $csv);
+    }
+
+    public function test_a_taxon_with_no_collection_exports_an_empty_voucher_cell()
+    {
+        $user = $this->userWithCapability($this->project, 'generate_reports');
+        $species = CatalogSpecies::factory()->create([
+            'project_id' => $this->project->id,
+            'genus' => 'Inga',
+            'name' => 'edulis',
+        ]);
+        $this->cite($this->interview(), 0, $species, 'food');
+
+        $csv = $this->actingAs($user)->get(route('data.reports.download', [
+            'project' => $this->project,
+            'format' => 'csv',
+        ]))->streamedContent();
+
+        // Missing evidence must not drop the row or shift the columns.
+        $this->assertStringContainsString('Voucher No.', $csv);
+        $this->assertStringContainsString('Inga', $csv);
+    }
+
+    public function test_the_report_page_states_coverage()
+    {
+        $user = $this->userWithCapability($this->project, 'generate_reports');
+        $backed = CatalogSpecies::factory()->create(['project_id' => $this->project->id]);
+        CatalogSpecies::factory()->create(['project_id' => $this->project->id]);
+        $this->cite($this->interview(), 0, $backed, 'food');
+
+        $this->voucher($backed, 'MML-0001');
+        Specimen::factory()->create([
+            'project_id' => $this->project->id,
+            'permit_exemption' => 'market',
+        ]);
+
+        $this->actingAs($user)
+            ->get(route('data.reports', ['project' => $this->project]))
+            ->assertInertia(fn (Assert $page) => $page
+                ->where('evidence.taxa_total', 2)
+                ->where('evidence.taxa_vouchered', 1)
+                ->where('evidence.specimens_total', 2)
+                ->where('evidence.specimens_permit_exempt', 1)
+                ->where('evidence.specimens_permit_unrecorded', 1)
+            );
     }
 
     public function test_outsider_cannot_open_reports()

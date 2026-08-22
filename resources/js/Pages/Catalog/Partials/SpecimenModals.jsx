@@ -67,6 +67,8 @@ export function CollectionModal({
     project,
     species = null,
     specimen = null,
+    permits = [],
+    exemptions = [],
 }) {
     const { t } = useTranslation();
     const editing = specimen !== null;
@@ -76,6 +78,8 @@ export function CollectionModal({
         collector: specimen?.collector ?? '',
         collected_on: specimen?.collected_on ?? '',
         locality: specimen?.locality ?? '',
+        collecting_permit_id: specimen?.collecting_permit_id ?? '',
+        permit_exemption: specimen?.permit_exemption ?? '',
         notes: specimen?.notes ?? '',
         // Only the species-page shortcut carries these: there, the taxon is the
         // reason you are on the page.
@@ -180,6 +184,71 @@ export function CollectionModal({
                         onChange={(e) => setData('locality', e.target.value)}
                     />
                 </Field>
+
+                {/*
+                    A permit is held before the fieldwork, so unlike a voucher
+                    it is known when the collection is recorded. Choosing one
+                    clears the exemption and vice versa: the pair has no
+                    meaning together, and the server refuses it.
+                */}
+                <div className="grid gap-3 sm:grid-cols-2">
+                    <Field
+                        label={t('catalogs.specimens.permit')}
+                        hint={
+                            permits.length === 0
+                                ? t('catalogs.specimens.no_permits_yet')
+                                : null
+                        }
+                        error={errors.collecting_permit_id}
+                    >
+                        <select
+                            className="select select-bordered w-full"
+                            value={data.collecting_permit_id ?? ''}
+                            disabled={permits.length === 0}
+                            onChange={(e) => {
+                                setData('collecting_permit_id', e.target.value);
+                                if (e.target.value)
+                                    setData('permit_exemption', '');
+                            }}
+                        >
+                            <option value="">
+                                {t('catalogs.specimens.permit_none')}
+                            </option>
+                            {permits.map((permit) => (
+                                <option key={permit.id} value={permit.id}>
+                                    {permit.label}
+                                </option>
+                            ))}
+                        </select>
+                    </Field>
+
+                    <Field
+                        label={t('catalogs.specimens.permit_exemption')}
+                        hint={t('catalogs.specimens.permit_exemption_hint')}
+                        error={errors.permit_exemption}
+                    >
+                        <select
+                            className="select select-bordered w-full"
+                            value={data.permit_exemption ?? ''}
+                            onChange={(e) => {
+                                setData('permit_exemption', e.target.value);
+                                if (e.target.value)
+                                    setData('collecting_permit_id', '');
+                            }}
+                        >
+                            <option value="">
+                                {t('catalogs.specimens.exemption_none')}
+                            </option>
+                            {exemptions.map((reason) => (
+                                <option key={reason} value={reason}>
+                                    {t(
+                                        `catalogs.specimens.exemption_${reason}`,
+                                    )}
+                                </option>
+                            ))}
+                        </select>
+                    </Field>
+                </div>
 
                 <Field label={t('catalogs.specimens.notes')}>
                     <textarea

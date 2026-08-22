@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\SpecimensExport;
 use App\Models\CatalogSpecies;
 use App\Models\Determination;
 use App\Models\Project;
@@ -12,9 +13,12 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
+use Maatwebsite\Excel\Facades\Excel;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 /**
  * The physical collections a project has made.
@@ -29,6 +33,9 @@ use Inertia\Response;
  */
 class SpecimenController extends Controller
 {
+    /** Lawful collections that fall outside the permit regime. */
+    public const EXEMPTIONS = ['private_land', 'cultivated', 'market', 'other'];
+
     public function __construct(
         private readonly AccessionNumbers $accessions,
         private readonly SpecimenPresenter $presenter,
@@ -47,7 +54,7 @@ class SpecimenController extends Controller
         }
 
         $specimens = $project->specimens()
-            ->with('currentDetermination.species')
+            ->with(['currentDetermination.species', 'collectingPermit'])
             ->orderByDesc('created_at')
             ->get();
 
@@ -73,12 +80,84 @@ class SpecimenController extends Controller
                 ->orderBy('name')
                 ->get(['id', 'family', 'genus', 'name', 'authority'])
                 ->all(),
+            'permits' => $project->collectingPermits()
+                ->orderBy('authority')
+                ->orderBy('reference')
+                ->get()
+                ->map(fn ($permit) => [
+                    'id' => $permit->id,
+                    'label' => $permit->label(),
+                ])
+                ->all(),
+            'exemptions' => self::EXEMPTIONS,
             'canEdit' => (bool) $user->can('editCatalog', $project),
             'nextAccessionNumber' => $this->accessions->peek($project),
             // The species tab is a dead end without one — catalogs.show
             // redirects away from an empty catalog.
             'speciesCount' => $project->catalogSpecies()->count(),
         ]);
+    }
+
+    /**
+     * The collection list as a spreadsheet.
+     *
+     * Gated on viewCatalog, the same capability that shows the page: a specimen
+     * record holds no informant response, so exporting it is not a wider
+     * disclosure than reading it on screen.
+     */
+    public function export(Request $request, Project $project): BinaryFileResponse|RedirectResponse
+    {
+        if (! Auth::user()->can('viewCatalog', $project)) {
+            return redirect()
+                ->route('catalogs.index')
+                ->with('message', 'catalogs.no_access')
+                ->with('message_type', 'error');
+        }
+
+        // Defaults to xlsx, matching the indices download — a bare link from
+        // either place should behave the same way.
+        $format = $request->query('format') === 'csv' ? 'csv' : 'xlsx';
+
+        $rows = $project->specimens()
+            ->with(['currentDetermination.species', 'collectingPermit'])
+            ->orderBy('accession_number')
+            ->orderBy('collection_number')
+            ->get()
+            ->map(function (Specimen $specimen) {
+                $determination = $specimen->currentDetermination;
+                $species = $determination?->species;
+                $permit = $specimen->collectingPermit;
+
+                return [
+                    $specimen->accession_number,
+                    $specimen->collection_number,
+                    $specimen->collector,
+                    $specimen->collected_on?->toDateString(),
+                    $specimen->locality,
+                    $specimen->location_lat,
+                    $specimen->location_lng,
+                    $specimen->repository,
+                    $species?->family,
+                    $species?->genus,
+                    $species?->name,
+                    $determination?->qualifier,
+                    $determination?->determiner,
+                    $determination?->determined_on?->toDateString(),
+                    $permit?->authority,
+                    $permit?->reference,
+                    $specimen->permit_exemption,
+                    $specimen->notes,
+                ];
+            })
+            ->all();
+
+        $filename = Str::slug($project->name).'-specimens-'.now()->format('Y-m-d').".{$format}";
+
+        return Excel::download(
+            new SpecimensExport($rows),
+            $filename,
+            $format === 'csv' ? \Maatwebsite\Excel\Excel::CSV : null
+        );
     }
 
     /**
@@ -95,7 +174,7 @@ class SpecimenController extends Controller
             return $denied;
         }
 
-        $validated = $request->validate($this->collectionRules());
+        $validated = $request->validate($this->collectionRules($project));
 
         $specimen = new Specimen($validated);
         $specimen->project_id = $project->id;
@@ -123,7 +202,7 @@ class SpecimenController extends Controller
             return $this->speciesNotFound();
         }
 
-        $validated = $request->validate($this->collectionRules() + $this->determinationRules());
+        $validated = $request->validate($this->collectionRules($project) + $this->determinationRules());
 
         DB::transaction(function () use ($project, $species, $validated) {
             $specimen = new Specimen($validated);
@@ -152,7 +231,7 @@ class SpecimenController extends Controller
             return $this->specimenNotFound();
         }
 
-        $specimen->update($request->validate($this->collectionRules()));
+        $specimen->update($request->validate($this->collectionRules($project)));
 
         return back()
             ->with('message', 'catalogs.specimens.updated')
@@ -300,7 +379,7 @@ class SpecimenController extends Controller
      *
      * @return array<string, mixed>
      */
-    private function collectionRules(): array
+    private function collectionRules(Project $project): array
     {
         return [
             'collection_number' => 'nullable|string|max:255',
@@ -310,6 +389,21 @@ class SpecimenController extends Controller
             'location_lat' => 'nullable|numeric|between:-90,90',
             'location_lng' => 'nullable|numeric|between:-180,180',
             'notes' => 'nullable|string',
+            // A permit is held before the fieldwork, so it is known when the
+            // collection is recorded — unlike a voucher, which is not.
+            'collecting_permit_id' => [
+                'nullable',
+                'prohibits:permit_exemption',
+                Rule::exists('collecting_permits', 'id')
+                    ->where('project_id', $project->getKey()),
+            ],
+            // Or a stated reason none was needed. Never both: the pairing has
+            // no meaning.
+            'permit_exemption' => [
+                'nullable',
+                'prohibits:collecting_permit_id',
+                Rule::in(self::EXEMPTIONS),
+            ],
         ];
     }
 
