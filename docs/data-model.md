@@ -22,10 +22,12 @@ Project ─┬─ ProjectAccess ── ProjectCapability      (who can do what)
          │        └─ InterviewInstance ── InstanceAnswer ──┐
          ├─ CatalogSpecies ───────────────────────────────┘  (the link)
          │          └─ CatalogSpeciesPhoto                   (reference imagery)
-         └─ Specimen ── Determination → CatalogSpecies       (what was collected,
-                                                              and what it was
-                                                              identified as —
-                                                              nullable, `indet.`)
+         ├─ CollectingPermit                                 (authority to collect;
+         │                                                    one covers many)
+         └─ Specimen ─┬─ Determination → CatalogSpecies      (what it was identified
+                      │                                       as — nullable, `indet.`)
+                      └─ → CollectingPermit                  (or a stated reason
+                                                              none was required)
 ```
 
 ## Entity reference
@@ -46,7 +48,8 @@ Project ─┬─ ProjectAccess ── ProjectCapability      (who can do what)
 | `InstanceMedia` | Audio/photo capture artifact | `interview_instance_id` (uuid), `client_id` (device uuid), `kind` (audio·photo), `storage_disk`/`storage_key`, `content_type`, `byte_size?`, `duration_s?`, `status`, `transcription_status?`, `transcription_text?` (**encrypted**), `captured_at?` | int |
 | `CatalogSpecies` | A scientific taxon in the project catalog | `project_id`, `family`, `genus`, `name`, `authority`, optional `metadata` | int |
 | `CatalogSpeciesPhoto` | Reference image for a taxon | `catalog_species_id`, … | int |
-| `Specimen` | **One physical collection** — what was picked, pressed and deposited | `project_id`, `accession_number?` (the voucher, unique per project), `collection_number?` (the collector's field number), `collector?`, `collected_on?`, `locality?`, `location_lat?`/`location_lng?`, `repository?`, `notes?`, `instance_answer_id?` | int |
+| `Specimen` | **One physical collection** — what was picked, pressed and deposited | `project_id`, `accession_number?` (the voucher, unique per project), `collection_number?` (the collector's field number), `collector?`, `collected_on?`, `locality?`, `location_lat?`/`location_lng?`, `repository?`, `collecting_permit_id?` **or** `permit_exemption?` (never both), `notes?`, `instance_answer_id?` | int |
+| `CollectingPermit` | The authorisation material was collected under | `project_id`, `authority`, `reference` (**unique per project**), `issued_on?`, `expires_on?`, `notes?` | int |
 | `Determination` | What a specimen was identified as, by whom, when | `specimen_id`, `catalog_species_id?` (**null = `indet.`**), `determiner?`, `determined_on?`, `qualifier?` (`cf`·`aff`·`sp`), `is_current`, `notes?` | int |
 | `ChartPreference` | Persisted per-field chart choice (data viewer) | field key, chart type | int |
 
@@ -128,3 +131,13 @@ in an ADR but not yet built, and unmarked for what is still only pencilled in.
   known about its taxonomy, identified later, and deposited later still — with
   a narrower view under each taxon. **The export surface is still to come.**
   Still pencilled in beside it: (for zoology subfields) conservation status.
+- **Collecting permits** — ✅ **data layer built (2026-08-22)** as
+  `collecting_permits`, per
+  [decisions/0009-collecting-permits.md](decisions/0009-collecting-permits.md).
+  One permit covers many collections, so it is a table rather than a string
+  repeated on each specimen. A specimen carries a permit **or** a stated reason
+  none was required (`private_land`·`cultivated`·`market`·`other`), never both —
+  the two absences mean different things and coverage counts them separately. A
+  reference record only: nothing validates that a permit is genuine, current, or
+  covers what was collected. **The catalog UI and the export column are still to
+  come.**

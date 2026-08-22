@@ -70,6 +70,11 @@ class Project extends Model
         return $this->hasMany(Specimen::class);
     }
 
+    public function collectingPermits()
+    {
+        return $this->hasMany(CollectingPermit::class);
+    }
+
     public function activeInterviewForms()
     {
         return $this->hasMany(InterviewForm::class)->where('is_active', true);

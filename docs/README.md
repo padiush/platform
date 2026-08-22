@@ -107,8 +107,11 @@ scope.
   ([ADR 0008](decisions/0008-specimens-and-determinations.md)).
 
 ### ⏳ Still open
-- *Nothing.* Every decision recorded here is settled; what remains is
-  implementation, listed under **Progress** above.
+- **Collecting permits** *(proposed 2026-08-22)* — a `collecting_permits` table
+  per project, with a specimen carrying either a permit or a stated reason none
+  was required. Collecting wild material is regulated almost everywhere, and one
+  permit covers many collections, so it is not a field on the specimen. Awaiting
+  sign-off ([ADR 0009](decisions/0009-collecting-permits.md)).
 
 ## Maintaining these docs
 

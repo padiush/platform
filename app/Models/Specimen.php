@@ -28,6 +28,8 @@ class Specimen extends Model
         'location_lat',
         'location_lng',
         'repository',
+        'collecting_permit_id',
+        'permit_exemption',
         'notes',
         'instance_answer_id',
     ];
@@ -67,5 +69,29 @@ class Specimen extends Model
     public function isVouchered(): bool
     {
         return filled($this->accession_number);
+    }
+
+    /** The authorisation this was collected under, when one was needed. */
+    public function collectingPermit()
+    {
+        return $this->belongsTo(CollectingPermit::class);
+    }
+
+    /**
+     * Whether the legal basis for this collection has been accounted for —
+     * either a permit, or a stated reason none was required.
+     *
+     * The two are different answers and both are complete ones; only the
+     * absence of either means "not recorded yet".
+     */
+    public function permitIsAccountedFor(): bool
+    {
+        return $this->collecting_permit_id !== null
+            || filled($this->permit_exemption);
+    }
+
+    public function isPermitExempt(): bool
+    {
+        return filled($this->permit_exemption);
     }
 }
