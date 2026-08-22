@@ -15,12 +15,24 @@ class Project extends Model
         'institution',
         'author_email',
         'country',
+        // The sequence counter beside this is deliberately NOT fillable: it is
+        // internal state that only AccessionNumbers may advance.
+        'accession_prefix',
         'finished',
         'published',
         'shared',
     ];
 
+    /**
+     * Mirrors the column default, so a project that has not been reloaded from
+     * the database still reports the number it would issue next rather than 0.
+     */
+    protected $attributes = [
+        'next_accession_number' => 1,
+    ];
+
     protected $casts = [
+        'next_accession_number' => 'integer',
         'finished' => 'boolean',
         'published' => 'boolean',
         'shared' => 'boolean',
@@ -51,6 +63,11 @@ class Project extends Model
     public function interviewForms()
     {
         return $this->hasMany(InterviewForm::class);
+    }
+
+    public function specimens()
+    {
+        return $this->hasMany(Specimen::class);
     }
 
     public function activeInterviewForms()

@@ -20,8 +20,12 @@ Project ─┬─ ProjectAccess ── ProjectCapability      (who can do what)
          ├─ ProjectInvite                            (pending access grants)
          ├─ InterviewForm ── InterviewSection ── InterviewItem
          │        └─ InterviewInstance ── InstanceAnswer ──┐
-         └─ CatalogSpecies ───────────────────────────────┘  (the link)
-                    └─ CatalogSpeciesPhoto
+         ├─ CatalogSpecies ───────────────────────────────┘  (the link)
+         │          └─ CatalogSpeciesPhoto                   (reference imagery)
+         └─ Specimen ── Determination → CatalogSpecies       (what was collected,
+                                                              and what it was
+                                                              identified as —
+                                                              nullable, `indet.`)
 ```
 
 ## Entity reference
@@ -42,6 +46,8 @@ Project ─┬─ ProjectAccess ── ProjectCapability      (who can do what)
 | `InstanceMedia` | Audio/photo capture artifact | `interview_instance_id` (uuid), `client_id` (device uuid), `kind` (audio·photo), `storage_disk`/`storage_key`, `content_type`, `byte_size?`, `duration_s?`, `status`, `transcription_status?`, `transcription_text?` (**encrypted**), `captured_at?` | int |
 | `CatalogSpecies` | A scientific taxon in the project catalog | `project_id`, `family`, `genus`, `name`, `authority`, optional `metadata` | int |
 | `CatalogSpeciesPhoto` | Reference image for a taxon | `catalog_species_id`, … | int |
+| `Specimen` | **One physical collection** — what was picked, pressed and deposited | `project_id`, `accession_number?` (the voucher, unique per project), `collection_number?` (the collector's field number), `collector?`, `collected_on?`, `locality?`, `location_lat?`/`location_lng?`, `repository?`, `notes?`, `instance_answer_id?` | int |
+| `Determination` | What a specimen was identified as, by whom, when | `specimen_id`, `catalog_species_id?` (**null = `indet.`**), `determiner?`, `determined_on?`, `qualifier?` (`cf`·`aff`·`sp`), `is_current`, `notes?` | int |
 | `ChartPreference` | Persisted per-field chart choice (data viewer) | field key, chart type | int |
 
 ### Item types
@@ -110,10 +116,13 @@ in an ADR but not yet built, and unmarked for what is still only pencilled in.
   (kind, storage key, upload status, and audio transcription status/text);
   `interview_instances` gained `captured_at` and a GPS location. See
   [contracts/companion-api.md](contracts/companion-api.md).
-- **Specimens and determinations** — 📐 **decided, not yet built.** The
-  voucher/specimen slot pencilled in here is now
-  [decisions/0008-specimens-and-determinations.md](decisions/0008-specimens-and-determinations.md):
-  `specimens` and `determinations` become their own tables, because a specimen is
-  not a taxon and one specimen carries many determinations over time. Vouchers
-  stay optional and are reported as coverage. Still pencilled in beside it: (for
+- **Specimens and determinations** — ✅ **data layer built (2026-08-22)** as
+  `specimens` and `determinations`, per
+  [decisions/0008-specimens-and-determinations.md](decisions/0008-specimens-and-determinations.md).
+  A specimen is not a taxon, and one specimen carries many determinations over
+  time; the taxon on a determination is **nullable**, because `indet.` is a real
+  state. A voucher is never required — a project mints its own accession numbers
+  (`App\Services\AccessionNumbers`, a configurable prefix over a per-project
+  sequence) and coverage is reported rather than enforced. **The catalog UI and
+  the export surface are still to come.** Still pencilled in beside it: (for
   zoology subfields) conservation status.
