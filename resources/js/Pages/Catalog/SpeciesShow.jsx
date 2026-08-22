@@ -2,6 +2,7 @@ import Card from '@/Components/Card';
 import DeletionModal from '@/Components/DeletionModal';
 import EmptyState from '@/Components/EmptyState';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import Specimens from '@/Pages/Catalog/Partials/Specimens';
 import {
     faArrowLeft,
     faArrowUpRightFromSquare,
@@ -470,6 +471,8 @@ export default function SpeciesShow({
     linkedRecords = null,
     canEdit = false,
     distribution = null,
+    specimens = [],
+    nextAccessionNumber = null,
 }) {
     const { t } = useTranslation();
     const deletionModalRef = useRef();
@@ -744,6 +747,19 @@ export default function SpeciesShow({
                         loading={distLoading}
                         error={distError}
                         onRefresh={refreshDistribution}
+                    />
+                </Card>
+
+                <Card>
+                    <h2 className="card-title">
+                        {t('catalogs.specimens.title')}
+                    </h2>
+                    <Specimens
+                        project={project}
+                        species={species}
+                        specimens={specimens}
+                        canEdit={canEdit}
+                        nextAccessionNumber={nextAccessionNumber}
                     />
                 </Card>
 

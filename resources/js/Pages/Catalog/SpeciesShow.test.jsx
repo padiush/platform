@@ -8,6 +8,17 @@ vi.mock('axios', () => ({
 vi.mock('@inertiajs/react', () => ({
     Link: ({ children, ...props }) => <a {...props}>{children}</a>,
     router: { patch: vi.fn() },
+    // The specimens section on this page drives its form through useForm.
+    useForm: (initial = {}) => ({
+        data: initial,
+        setData: vi.fn(),
+        post: vi.fn(),
+        patch: vi.fn(),
+        delete: vi.fn(),
+        reset: vi.fn(),
+        processing: false,
+        errors: {},
+    }),
 }));
 
 vi.mock('@/Layouts/AuthenticatedLayout', () => ({

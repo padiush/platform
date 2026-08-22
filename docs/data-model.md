@@ -123,6 +123,8 @@ in an ADR but not yet built, and unmarked for what is still only pencilled in.
   time; the taxon on a determination is **nullable**, because `indet.` is a real
   state. A voucher is never required — a project mints its own accession numbers
   (`App\Services\AccessionNumbers`, a configurable prefix over a per-project
-  sequence) and coverage is reported rather than enforced. **The catalog UI and
-  the export surface are still to come.** Still pencilled in beside it: (for
-  zoology subfields) conservation status.
+  sequence) and coverage is reported rather than enforced. Recorded from the
+  species page in the catalog; **the export surface is still to come**, as is a
+  project-level list (a specimen whose taxon is deleted keeps its record but is
+  currently reachable from nowhere). Still pencilled in beside it: (for zoology
+  subfields) conservation status.

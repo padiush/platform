@@ -8,6 +8,7 @@ use App\Http\Controllers\ProjectCatalogController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\PublicPageController;
 use App\Http\Controllers\SoftwareNoticeController;
+use App\Http\Controllers\SpecimenController;
 use App\Http\Controllers\SystemController;
 use App\Http\Controllers\WfoController;
 use Illuminate\Support\Facades\Route;
@@ -189,6 +190,23 @@ Route::middleware(['auth'])->group(function () {
             '/catalogs/{project}/species/{species}/delete',
             'destroySpecies'
         )->name('catalogs.species.delete');
+    });
+
+    // Specimens — the physical collections behind a taxon.
+    // See docs/decisions/0008-specimens-and-determinations.md.
+    Route::controller(SpecimenController::class)->group(function () {
+        Route::post(
+            '/catalogs/{project}/species/{species}/specimens',
+            'store'
+        )->name('catalogs.specimens.store');
+        Route::patch(
+            '/catalogs/{project}/specimens/{specimen}',
+            'update'
+        )->name('catalogs.specimens.update');
+        Route::delete(
+            '/catalogs/{project}/specimens/{specimen}',
+            'destroy'
+        )->name('catalogs.specimens.destroy');
     });
 
     Route::controller(InterviewDataController::class)->group(function () {

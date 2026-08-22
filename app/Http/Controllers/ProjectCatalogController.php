@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\CatalogSpecies;
 use App\Models\InstanceAnswer;
 use App\Models\Project;
+use App\Models\Specimen;
+use App\Services\AccessionNumbers;
 use App\Services\CatalogSpeciesSearch;
 use App\Services\GbifDistribution;
 use App\Services\INaturalistPhoto;
@@ -404,7 +406,45 @@ class ProjectCatalogController extends Controller
             // Cached range only (no external call on page load); the page fetches
             // it on demand when absent.
             'distribution' => $species->metadata['distribution'] ?? null,
+            'specimens' => $this->specimensFor($species),
+            // What the project would issue next, so the form can show it before
+            // the researcher commits to it. Peeking does not consume a number.
+            'nextAccessionNumber' => app(AccessionNumbers::class)->peek($project),
         ]);
+    }
+
+    /**
+     * The collections currently determined as this taxon, newest first.
+     *
+     * The determiner and qualifier live on the determination rather than the
+     * specimen, so they are flattened here — the page shows one row per
+     * physical collection, not per opinion about it.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private function specimensFor(CatalogSpecies $species): array
+    {
+        return $species->specimens()
+            ->with('currentDetermination')
+            ->orderByDesc('specimens.created_at')
+            ->get()
+            ->map(fn (Specimen $specimen) => [
+                'id' => $specimen->id,
+                'accession_number' => $specimen->accession_number,
+                'collection_number' => $specimen->collection_number,
+                'collector' => $specimen->collector,
+                'collected_on' => $specimen->collected_on?->toDateString(),
+                'locality' => $specimen->locality,
+                'location_lat' => $specimen->location_lat,
+                'location_lng' => $specimen->location_lng,
+                'repository' => $specimen->repository,
+                'notes' => $specimen->notes,
+                'is_vouchered' => $specimen->isVouchered(),
+                'determiner' => $specimen->currentDetermination?->determiner,
+                'determined_on' => $specimen->currentDetermination?->determined_on?->toDateString(),
+                'qualifier' => $specimen->currentDetermination?->qualifier,
+            ])
+            ->all();
     }
 
     /**
