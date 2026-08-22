@@ -9,6 +9,7 @@ use App\Models\Project;
 use App\Models\Specimen;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia as Assert;
+use Maatwebsite\Excel\Excel;
 use Tests\Concerns\InteractsWithProjects;
 use Tests\TestCase;
 
@@ -324,7 +325,7 @@ class SpecimenTest extends TestCase
         ]);
 
         $csv = $this->actingAs($this->editor())
-            ->get($this->url('catalogs.specimens.export'))
+            ->get($this->url('catalogs.specimens.export').'?format=csv')
             ->streamedContent();
 
         // Darwin Core terms, so the sheet can be read or mapped by anyone who
@@ -339,12 +340,68 @@ class SpecimenTest extends TestCase
         $this->assertStringContainsString('RES-042-2026', $csv);
     }
 
+    public function test_it_offers_both_formats_and_defaults_to_xlsx()
+    {
+        $this->specimen(['accession_number' => 'MML-0001']);
+
+        $default = $this->actingAs($this->editor())
+            ->get($this->url('catalogs.specimens.export'));
+        $csv = $this->actingAs($this->editor())
+            ->get($this->url('catalogs.specimens.export').'?format=csv');
+        $xlsx = $this->actingAs($this->editor())
+            ->get($this->url('catalogs.specimens.export').'?format=xlsx');
+
+        foreach ([$default, $csv, $xlsx] as $response) {
+            $response->assertOk();
+            $this->assertStringContainsString(
+                'attachment',
+                (string) $response->headers->get('content-disposition')
+            );
+        }
+
+        // A bare link behaves like the indices download: xlsx.
+        $this->assertStringContainsString(
+            '.xlsx',
+            (string) $default->headers->get('content-disposition')
+        );
+        $this->assertStringContainsString(
+            '.csv',
+            (string) $csv->headers->get('content-disposition')
+        );
+    }
+
+    public function test_the_xlsx_is_a_readable_workbook()
+    {
+        $specimen = $this->specimen(['accession_number' => 'MML-0001', 'collector' => 'M. Menéndez']);
+        Determination::factory()->create([
+            'specimen_id' => $specimen->id,
+            'catalog_species_id' => $this->species->id,
+            'is_current' => true,
+        ]);
+
+        $path = tempnam(sys_get_temp_dir(), 'specimens').'.xlsx';
+        file_put_contents(
+            $path,
+            $this->actingAs($this->editor())
+                ->get($this->url('catalogs.specimens.export').'?format=xlsx')
+                ->streamedContent()
+        );
+
+        // Round-trip it: a download that opens is the claim being made.
+        $sheet = \Maatwebsite\Excel\Facades\Excel::toArray(new \stdClass, $path, null, Excel::XLSX)[0];
+        unlink($path);
+
+        $this->assertSame('catalogNumber', $sheet[0][0]);
+        $this->assertSame('MML-0001', $sheet[1][0]);
+        $this->assertContains('M. Menéndez', $sheet[1]);
+    }
+
     public function test_the_export_includes_material_nobody_has_named()
     {
         $this->specimen(['collection_number' => '099', 'permit_exemption' => 'market']);
 
         $csv = $this->actingAs($this->editor())
-            ->get($this->url('catalogs.specimens.export'))
+            ->get($this->url('catalogs.specimens.export').'?format=csv')
             ->streamedContent();
 
         // A species table cannot show these; the collection list must.
@@ -374,7 +431,7 @@ class SpecimenTest extends TestCase
         ]);
 
         $csv = $this->actingAs($this->editor())
-            ->get($this->url('catalogs.specimens.export'))
+            ->get($this->url('catalogs.specimens.export').'?format=csv')
             ->streamedContent();
 
         $this->assertStringContainsString('MINE-1', $csv);

@@ -27,6 +27,19 @@ class CollectingPermitTest extends TestCase
         $this->project = Project::factory()->create();
     }
 
+    /**
+     * Frozen time must be released even when a test fails part-way. Resetting
+     * at the end of the test body means a failure leaks 2026-06-01 into every
+     * later test in the process, and the resulting failures point nowhere near
+     * the cause.
+     */
+    protected function tearDown(): void
+    {
+        Carbon::setTestNow();
+
+        parent::tearDown();
+    }
+
     private function permit(array $attributes = []): CollectingPermit
     {
         return CollectingPermit::factory()->create(
@@ -120,8 +133,6 @@ class CollectingPermitTest extends TestCase
         // No expiry recorded is not the same as still valid, so it is neither
         // true nor false.
         $this->assertNull($this->permit(['expires_on' => null])->hasExpired());
-
-        Carbon::setTestNow();
     }
 
     public function test_it_reads_as_authority_and_reference()

@@ -423,6 +423,8 @@
             "filter_all": "All",
             "filter_undetermined": "Unidentified",
             "filter_unvouchered": "Unvouchered",
+            "format_csv": "CSV (.csv)",
+            "format_xlsx": "Excel (.xlsx)",
             "identify": "Identify",
             "indet": "indet.",
             "locality": "Locality",

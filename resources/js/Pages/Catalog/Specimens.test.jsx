@@ -99,13 +99,19 @@ describe('Specimens page', () => {
         expect(screen.getByText('043')).toBeInTheDocument();
     });
 
-    it('offers the export whenever there is something to export', () => {
+    it('offers both formats whenever there is something to export', () => {
         renderPage({ canEdit: false });
 
-        expect(screen.getByText('catalogs.specimens.export')).toHaveAttribute(
-            'href',
-            '/catalogs.specimens.export',
-        );
+        // Reading the list is enough to export it, so no capability gate here.
+        expect(
+            screen.getByText('catalogs.specimens.export'),
+        ).toBeInTheDocument();
+
+        for (const format of ['xlsx', 'csv']) {
+            expect(
+                screen.getByText(`catalogs.specimens.format_${format}`),
+            ).toHaveAttribute('href', '/catalogs.specimens.export');
+        }
     });
 
     it('offers no export when nothing has been collected', () => {

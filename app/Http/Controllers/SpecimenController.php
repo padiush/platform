@@ -101,7 +101,9 @@ class SpecimenController extends Controller
                 ->with('message_type', 'error');
         }
 
-        $format = $request->query('format') === 'xlsx' ? 'xlsx' : 'csv';
+        // Defaults to xlsx, matching the indices download — a bare link from
+        // either place should behave the same way.
+        $format = $request->query('format') === 'csv' ? 'csv' : 'xlsx';
 
         $rows = $project->specimens()
             ->with(['currentDetermination.species', 'collectingPermit'])

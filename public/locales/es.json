@@ -423,6 +423,8 @@
             "filter_all": "Todos",
             "filter_undetermined": "Sin identificar",
             "filter_unvouchered": "Sin voucher",
+            "format_csv": "CSV (.csv)",
+            "format_xlsx": "Excel (.xlsx)",
             "identify": "Identificar",
             "indet": "indet.",
             "locality": "Localidad",
