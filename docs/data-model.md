@@ -83,8 +83,8 @@ future token-authenticated API — see
 ## Where the roadmap touches the model
 
 These were pencilled-in slots so the model could absorb the roadmap without a
-rewrite. Most have since been built — each is marked below, and what is still
-pencilled in says so.
+rewrite. Most have since been built. Each is marked below: ✅ built, 📐 decided
+in an ADR but not yet built, and unmarked for what is still only pencilled in.
 
 - **`Project.subfield`** — a first-class attribute selecting the ethnobiology
   subfield (ethnobotany, ethnomycology, ethno-ornithology, …). Cheap to add now,
@@ -108,6 +108,12 @@ pencilled in says so.
   Web answer saves stamp `edited_at` too, so corrections take part in the policy.
 - **Capture artifacts** — ✅ **audio + photo built (2026-07-12)** as `instance_media`
   (kind, storage key, upload status, and audio transcription status/text);
-  `interview_instances` gained `captured_at` and a GPS location. Still pencilled in:
-  voucher/specimen metadata and (for zoology subfields) conservation status. See
+  `interview_instances` gained `captured_at` and a GPS location. See
   [contracts/companion-api.md](contracts/companion-api.md).
+- **Specimens and determinations** — 📐 **decided, not yet built.** The
+  voucher/specimen slot pencilled in here is now
+  [decisions/0008-specimens-and-determinations.md](decisions/0008-specimens-and-determinations.md):
+  `specimens` and `determinations` become their own tables, because a specimen is
+  not a taxon and one specimen carries many determinations over time. Vouchers
+  stay optional and are reported as coverage. Still pencilled in beside it: (for
+  zoology subfields) conservation status.
