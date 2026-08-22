@@ -12,7 +12,8 @@ use Tests\Concerns\InteractsWithProjects;
 use Tests\TestCase;
 
 /**
- * Recording the physical collection behind a taxon.
+ * The order here follows the field: collected and recorded first, identified
+ * later, deposited later still.
  * See docs/decisions/0008-specimens-and-determinations.md.
  */
 class SpecimenTest extends TestCase
@@ -33,240 +34,331 @@ class SpecimenTest extends TestCase
         ]);
     }
 
-    private function storeRoute(): string
+    private function editor()
     {
-        return route('catalogs.specimens.store', [
-            'project' => $this->project->id,
-            'species' => $this->species->id,
-        ]);
+        return $this->userWithCapability($this->project, 'edit_catalog');
     }
 
-    public function test_an_editor_can_register_a_collection_against_a_taxon()
+    /**
+     * The first seeded role carrying view_catalog is the project administrator,
+     * which also edits — so a read-only user must be asked for by the flag that
+     * has to be false, or the test quietly checks an admin.
+     */
+    private function viewer()
     {
-        $user = $this->userWithCapability($this->project, 'edit_catalog');
+        return $this->userWithCapability($this->project, 'edit_catalog', false);
+    }
 
-        $this->actingAs($user)->post($this->storeRoute(), [
+    private function specimen(array $attributes = []): Specimen
+    {
+        return Specimen::factory()->create(
+            array_merge(['project_id' => $this->project->id], $attributes)
+        );
+    }
+
+    private function url(string $name, array $extra = []): string
+    {
+        return route($name, array_merge(['project' => $this->project->id], $extra));
+    }
+
+    // ---------------------------------------------------------- collecting ---
+
+    public function test_a_collection_can_be_recorded_before_anyone_identifies_it()
+    {
+        $this->actingAs($this->editor())->post($this->url('catalogs.specimens.store'), [
             'collection_number' => '042',
             'collector' => 'M. Menéndez',
             'collected_on' => '2026-03-14',
             'locality' => 'Cafetal above the school',
-            'repository' => 'Community herbarium',
-            'determiner' => 'M. Menéndez',
         ])->assertRedirect();
 
         $specimen = Specimen::sole();
 
-        $this->assertSame($this->project->id, $specimen->project_id);
         $this->assertSame('042', $specimen->collection_number);
-        $this->assertSame('Community herbarium', $specimen->repository);
-
-        // Registering against a taxon asserts a determination, current by
-        // definition — it is the only one there is.
-        $this->assertSame($this->species->id, $specimen->currentDetermination->catalog_species_id);
-        $this->assertSame('M. Menéndez', $specimen->currentDetermination->determiner);
+        // No determination at all: nobody has looked at it yet, and an empty
+        // determination would assert that someone had and failed.
+        $this->assertSame(0, $specimen->determinations()->count());
+        $this->assertNull($specimen->currentDetermination);
     }
 
-    public function test_it_can_mint_an_accession_number_from_the_project_sequence()
+    public function test_recording_a_collection_asks_for_nothing_about_the_taxon()
     {
-        $user = $this->userWithCapability($this->project, 'edit_catalog');
-
-        $this->actingAs($user)->post($this->storeRoute(), [
-            'collector' => 'M. Menéndez',
-            'mint_accession' => true,
-        ])->assertRedirect();
-
-        $this->assertSame('MML-0001', Specimen::sole()->accession_number);
-    }
-
-    public function test_a_number_the_researcher_types_is_kept_as_typed()
-    {
-        $user = $this->userWithCapability($this->project, 'edit_catalog');
-
-        $this->actingAs($user)->post($this->storeRoute(), [
-            'accession_number' => 'EXISTING-77',
-        ])->assertRedirect();
-
-        $this->assertSame('EXISTING-77', Specimen::sole()->accession_number);
-    }
-
-    public function test_a_collection_may_be_registered_without_a_voucher()
-    {
-        $user = $this->userWithCapability($this->project, 'edit_catalog');
-
-        $this->actingAs($user)->post($this->storeRoute(), [
-            'collector' => 'M. Menéndez',
-        ])->assertRedirect();
-
-        // Capture never blocks: market surveys and observation are legitimately
-        // unvouchered, and the absence is reported rather than refused.
-        $this->assertFalse(Specimen::sole()->isVouchered());
-    }
-
-    public function test_an_accession_number_cannot_repeat_within_a_project()
-    {
-        $user = $this->userWithCapability($this->project, 'edit_catalog');
-
-        Specimen::factory()->create([
-            'project_id' => $this->project->id,
-            'accession_number' => 'MML-0001',
-        ]);
-
-        $this->actingAs($user)
-            ->post($this->storeRoute(), ['accession_number' => 'MML-0001'])
-            ->assertSessionHasErrors('accession_number');
+        $this->actingAs($this->editor())
+            ->post($this->url('catalogs.specimens.store'), ['collector' => 'M. Menéndez'])
+            ->assertSessionHasNoErrors();
 
         $this->assertSame(1, Specimen::count());
     }
 
-    public function test_the_same_number_may_be_used_by_a_different_project()
+    public function test_the_species_page_shortcut_records_the_identification_too()
     {
-        $other = Project::factory()->create();
-        Specimen::factory()->create([
-            'project_id' => $other->id,
-            'accession_number' => 'MML-0001',
-        ]);
+        $this->actingAs($this->editor())->post(
+            $this->url('catalogs.specimens.store-for-species', ['species' => $this->species->id]),
+            ['collector' => 'M. Menéndez', 'determiner' => 'M. Menéndez']
+        )->assertRedirect();
 
-        $user = $this->userWithCapability($this->project, 'edit_catalog');
+        $specimen = Specimen::sole();
 
-        $this->actingAs($user)
-            ->post($this->storeRoute(), ['accession_number' => 'MML-0001'])
-            ->assertSessionHasNoErrors();
-
-        $this->assertSame(2, Specimen::count());
+        $this->assertSame($this->species->id, $specimen->currentDetermination->catalog_species_id);
+        $this->assertSame('M. Menéndez', $specimen->currentDetermination->determiner);
     }
 
-    public function test_a_viewer_without_edit_catalog_cannot_register_one()
+    // --------------------------------------------------------- identifying ---
+
+    public function test_a_collection_can_be_identified_later()
     {
-        // Asked for by the flag that must be FALSE: the first role carrying
-        // view_catalog is the project administrator, which also edits, so
-        // selecting on view_catalog would quietly test an admin.
-        $user = $this->userWithCapability($this->project, 'edit_catalog', false);
+        $specimen = $this->specimen();
 
-        $this->actingAs($user)
-            ->post($this->storeRoute(), ['collector' => 'Someone'])
-            ->assertRedirect(route('catalogs.index'));
+        $this->actingAs($this->editor())->post(
+            $this->url('catalogs.specimens.determine', ['specimen' => $specimen->id]),
+            [
+                'catalog_species_id' => $this->species->id,
+                'determiner' => 'A. Botanist',
+                'determined_on' => '2026-06-01',
+                'qualifier' => 'cf',
+            ]
+        )->assertRedirect();
 
-        $this->assertSame(0, Specimen::count());
+        $current = $specimen->fresh()->currentDetermination;
+
+        $this->assertSame($this->species->id, $current->catalog_species_id);
+        $this->assertSame('A. Botanist', $current->determiner);
+        $this->assertSame('cf', $current->qualifier);
     }
 
-    public function test_a_stranger_to_the_project_cannot_register_one()
+    public function test_revising_an_identification_supersedes_rather_than_replaces()
     {
-        $this->actingAs($this->outsider())
-            ->post($this->storeRoute(), ['collector' => 'Someone'])
-            ->assertRedirect(route('catalogs.index'));
+        $specimen = $this->specimen();
+        $wasThought = CatalogSpecies::factory()->create(['project_id' => $this->project->id]);
 
-        $this->assertSame(0, Specimen::count());
-    }
-
-    public function test_it_refuses_a_taxon_from_another_project()
-    {
-        $user = $this->userWithCapability($this->project, 'edit_catalog');
-        $foreign = CatalogSpecies::factory()->create();
-
-        $this->actingAs($user)->post(route('catalogs.specimens.store', [
-            'project' => $this->project->id,
-            'species' => $foreign->id,
-        ]), ['collector' => 'Someone'])->assertRedirect(route('catalogs.index'));
-
-        $this->assertSame(0, Specimen::count());
-    }
-
-    public function test_an_editor_can_correct_a_collection()
-    {
-        $user = $this->userWithCapability($this->project, 'edit_catalog');
-        $specimen = Specimen::factory()->create(['project_id' => $this->project->id]);
         Determination::factory()->create([
             'specimen_id' => $specimen->id,
-            'catalog_species_id' => $this->species->id,
-            'determiner' => 'Typo',
+            'catalog_species_id' => $wasThought->id,
+            'determiner' => 'First opinion',
         ]);
 
-        $this->actingAs($user)->patch(
-            route('catalogs.specimens.update', [
-                'project' => $this->project->id,
-                'specimen' => $specimen->id,
-            ]),
-            ['collector' => 'Corrected', 'determiner' => 'Also corrected']
+        $this->actingAs($this->editor())->post(
+            $this->url('catalogs.specimens.determine', ['specimen' => $specimen->id]),
+            ['catalog_species_id' => $this->species->id, 'determiner' => 'Second opinion']
         )->assertRedirect();
 
-        $this->assertSame('Corrected', $specimen->fresh()->collector);
-        $this->assertSame('Also corrected', $specimen->fresh()->currentDetermination->determiner);
+        // What was thought before is part of the record.
+        $this->assertSame(2, $specimen->determinations()->count());
+        $this->assertSame('Second opinion', $specimen->fresh()->currentDetermination->determiner);
+        $this->assertSame(
+            $wasThought->id,
+            $specimen->determinations()->where('is_current', false)->sole()->catalog_species_id
+        );
     }
 
-    public function test_minting_never_overwrites_a_number_the_specimen_already_has()
+    public function test_examined_but_unnameable_is_recordable_as_a_determination()
     {
-        $user = $this->userWithCapability($this->project, 'edit_catalog');
-        $specimen = Specimen::factory()->create([
-            'project_id' => $this->project->id,
-            'accession_number' => 'ALREADY-1',
-        ]);
+        $specimen = $this->specimen();
 
-        $this->actingAs($user)->patch(
-            route('catalogs.specimens.update', [
-                'project' => $this->project->id,
-                'specimen' => $specimen->id,
-            ]),
-            ['accession_number' => 'ALREADY-1', 'mint_accession' => true]
+        $this->actingAs($this->editor())->post(
+            $this->url('catalogs.specimens.determine', ['specimen' => $specimen->id]),
+            ['catalog_species_id' => null, 'determiner' => 'A. Botanist']
         )->assertRedirect();
 
-        // A number already written on a label and cited elsewhere is not ours
-        // to change.
+        $current = $specimen->fresh()->currentDetermination;
+
+        // Different from nobody having looked: someone examined it and could
+        // not name it, and said so.
+        $this->assertNotNull($current);
+        $this->assertNull($current->catalog_species_id);
+        $this->assertSame('A. Botanist', $current->determiner);
+    }
+
+    public function test_it_refuses_a_taxon_belonging_to_another_project()
+    {
+        $specimen = $this->specimen();
+        $foreign = CatalogSpecies::factory()->create();
+
+        $this->actingAs($this->editor())->post(
+            $this->url('catalogs.specimens.determine', ['specimen' => $specimen->id]),
+            ['catalog_species_id' => $foreign->id]
+        )->assertSessionHasErrors('catalog_species_id');
+    }
+
+    // ---------------------------------------------------------- depositing ---
+
+    public function test_depositing_records_the_repository_and_mints_a_number()
+    {
+        $specimen = $this->specimen();
+
+        $this->actingAs($this->editor())->post(
+            $this->url('catalogs.specimens.deposit', ['specimen' => $specimen->id]),
+            ['repository' => 'Community herbarium', 'mint_accession' => true]
+        )->assertRedirect();
+
+        $this->assertSame('MML-0001', $specimen->fresh()->accession_number);
+        $this->assertSame('Community herbarium', $specimen->fresh()->repository);
+    }
+
+    public function test_a_number_the_researcher_types_is_kept_as_typed()
+    {
+        $specimen = $this->specimen();
+
+        $this->actingAs($this->editor())->post(
+            $this->url('catalogs.specimens.deposit', ['specimen' => $specimen->id]),
+            ['accession_number' => 'EXISTING-77']
+        )->assertRedirect();
+
+        $this->assertSame('EXISTING-77', $specimen->fresh()->accession_number);
+    }
+
+    public function test_minting_never_overwrites_a_number_already_carried()
+    {
+        $specimen = $this->specimen(['accession_number' => 'ALREADY-1']);
+
+        $this->actingAs($this->editor())->post(
+            $this->url('catalogs.specimens.deposit', ['specimen' => $specimen->id]),
+            ['mint_accession' => true]
+        )->assertRedirect();
+
+        // Written on a label and cited elsewhere; not ours to change.
         $this->assertSame('ALREADY-1', $specimen->fresh()->accession_number);
     }
 
-    public function test_an_editor_can_delete_a_collection_and_its_determinations()
+    public function test_an_accession_number_cannot_repeat_within_a_project()
     {
-        $user = $this->userWithCapability($this->project, 'edit_catalog');
-        $specimen = Specimen::factory()->create(['project_id' => $this->project->id]);
-        $determination = Determination::factory()->create(['specimen_id' => $specimen->id]);
+        $this->specimen(['accession_number' => 'MML-0001']);
+        $another = $this->specimen();
 
-        $this->actingAs($user)->delete(route('catalogs.specimens.destroy', [
+        $this->actingAs($this->editor())->post(
+            $this->url('catalogs.specimens.deposit', ['specimen' => $another->id]),
+            ['accession_number' => 'MML-0001']
+        )->assertSessionHasErrors('accession_number');
+    }
+
+    public function test_the_same_number_may_be_used_by_a_different_project()
+    {
+        Specimen::factory()->create([
+            'project_id' => Project::factory()->create()->id,
+            'accession_number' => 'MML-0001',
+        ]);
+        $mine = $this->specimen();
+
+        $this->actingAs($this->editor())->post(
+            $this->url('catalogs.specimens.deposit', ['specimen' => $mine->id]),
+            ['accession_number' => 'MML-0001']
+        )->assertSessionHasNoErrors();
+
+        $this->assertSame('MML-0001', $mine->fresh()->accession_number);
+    }
+
+    // ------------------------------------------------------- the two lists ---
+
+    public function test_the_project_list_counts_what_is_still_unidentified()
+    {
+        $identified = $this->specimen();
+        Determination::factory()->create([
+            'specimen_id' => $identified->id,
+            'catalog_species_id' => $this->species->id,
+        ]);
+
+        $examinedButUnnameable = $this->specimen();
+        Determination::factory()->indeterminate()->create([
+            'specimen_id' => $examinedButUnnameable->id,
+        ]);
+
+        $this->specimen(['accession_number' => 'MML-0003']);
+
+        $this->actingAs($this->editor())
+            ->get($this->url('catalogs.specimens.index'))
+            ->assertInertia(fn (Assert $page) => $page
+                ->component('Catalog/Specimens')
+                ->has('specimens', 3)
+                ->where('summary.total', 3)
+                ->where('summary.vouchered', 1)
+                ->where('summary.unidentified', 2)
+                ->has('catalog', 1)
+                ->where('nextAccessionNumber', 'MML-0001')
+            );
+    }
+
+    public function test_the_species_page_shows_only_what_is_determined_as_that_taxon()
+    {
+        $determined = $this->specimen(['accession_number' => 'MML-0009']);
+        Determination::factory()->create([
+            'specimen_id' => $determined->id,
+            'catalog_species_id' => $this->species->id,
+        ]);
+
+        // Unidentified material belongs to the project, not to any taxon.
+        $this->specimen();
+
+        $this->actingAs($this->editor())->get(route('catalogs.species.show', [
             'project' => $this->project->id,
-            'specimen' => $specimen->id,
-        ]))->assertRedirect();
+            'species' => $this->species->id,
+        ]))->assertInertia(fn (Assert $page) => $page
+            ->has('specimens', 1)
+            ->where('specimens.0.accession_number', 'MML-0009')
+            ->where('specimens.0.is_determined', true)
+        );
+    }
 
-        $this->assertNull($specimen->fresh());
-        $this->assertNull($determination->fresh());
+    // ------------------------------------------------------ authorization ---
+
+    public function test_a_viewer_can_read_the_list_but_not_add_to_it()
+    {
+        $this->actingAs($this->viewer())
+            ->get($this->url('catalogs.specimens.index'))
+            ->assertInertia(fn (Assert $page) => $page->where('canEdit', false));
+
+        $this->actingAs($this->viewer())
+            ->post($this->url('catalogs.specimens.store'), ['collector' => 'Someone'])
+            ->assertRedirect(route('catalogs.index'));
+
+        $this->assertSame(0, Specimen::count());
+    }
+
+    public function test_a_stranger_cannot_see_the_list_at_all()
+    {
+        $this->actingAs($this->outsider())
+            ->get($this->url('catalogs.specimens.index'))
+            ->assertRedirect(route('catalogs.index'));
     }
 
     public function test_a_specimen_from_another_project_cannot_be_touched()
     {
-        $user = $this->userWithCapability($this->project, 'edit_catalog');
         $foreign = Specimen::factory()->create();
 
-        $this->actingAs($user)->delete(route('catalogs.specimens.destroy', [
-            'project' => $this->project->id,
-            'specimen' => $foreign->id,
-        ]))->assertRedirect(route('catalogs.index'));
+        foreach (['catalogs.specimens.determine', 'catalogs.specimens.deposit'] as $action) {
+            $this->actingAs($this->editor())
+                ->post($this->url($action, ['specimen' => $foreign->id]), [])
+                ->assertRedirect(route('catalogs.index'));
+        }
+
+        $this->actingAs($this->editor())
+            ->delete($this->url('catalogs.specimens.destroy', ['specimen' => $foreign->id]))
+            ->assertRedirect(route('catalogs.index'));
 
         $this->assertNotNull($foreign->fresh());
     }
 
-    public function test_the_species_page_lists_the_collections_and_the_next_number()
+    public function test_an_editor_can_correct_the_collection_itself()
     {
-        $user = $this->userWithCapability($this->project, 'edit_catalog');
-        $specimen = Specimen::factory()->create([
-            'project_id' => $this->project->id,
-            'accession_number' => 'MML-0009',
-            'collector' => 'M. Menéndez',
-        ]);
-        Determination::factory()->create([
-            'specimen_id' => $specimen->id,
-            'catalog_species_id' => $this->species->id,
-            'determiner' => 'A determiner',
-        ]);
+        $specimen = $this->specimen(['collector' => 'Typo']);
 
-        $this->actingAs($user)->get(route('catalogs.species.show', [
-            'project' => $this->project->id,
-            'species' => $this->species->id,
-        ]))->assertInertia(fn (Assert $page) => $page
-            ->component('Catalog/SpeciesShow')
-            ->has('specimens', 1)
-            ->where('specimens.0.accession_number', 'MML-0009')
-            ->where('specimens.0.collector', 'M. Menéndez')
-            ->where('specimens.0.determiner', 'A determiner')
-            ->where('specimens.0.is_vouchered', true)
-            ->where('nextAccessionNumber', 'MML-0001')
-        );
+        $this->actingAs($this->editor())->patch(
+            $this->url('catalogs.specimens.update', ['specimen' => $specimen->id]),
+            ['collector' => 'Corrected']
+        )->assertRedirect();
+
+        $this->assertSame('Corrected', $specimen->fresh()->collector);
+    }
+
+    public function test_deleting_a_collection_takes_its_determinations_with_it()
+    {
+        $specimen = $this->specimen();
+        $determination = Determination::factory()->create(['specimen_id' => $specimen->id]);
+
+        $this->actingAs($this->editor())
+            ->delete($this->url('catalogs.specimens.destroy', ['specimen' => $specimen->id]))
+            ->assertRedirect();
+
+        $this->assertNull($specimen->fresh());
+        $this->assertNull($determination->fresh());
     }
 }

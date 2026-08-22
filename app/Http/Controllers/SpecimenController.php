@@ -12,27 +12,98 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
+use Inertia\Inertia;
+use Inertia\Response;
 
 /**
- * Specimens recorded against a taxon in the project catalog.
+ * The physical collections a project has made.
  *
- * A specimen is the physical collection; the taxon is what it was identified
- * as. Creating one here also records the determination that says so, because a
- * specimen registered on a species page has, by that act, been determined as
- * that species. See docs/decisions/0008-specimens-and-determinations.md.
+ * The order here follows the field, not the database: a specimen is collected
+ * and recorded first, identified later — often by someone else — and deposited
+ * against a voucher later still. So a specimen is created carrying no
+ * determination at all, and `determine()` and `deposit()` are separate acts
+ * performed when there is something to say.
+ *
+ * See docs/decisions/0008-specimens-and-determinations.md.
  */
 class SpecimenController extends Controller
 {
     public function __construct(private readonly AccessionNumbers $accessions) {}
 
+    /** Every collection in the project, identified or not. */
+    public function index(Request $request, Project $project): Response|RedirectResponse
+    {
+        $user = Auth::user();
+
+        if (! $user->can('viewCatalog', $project)) {
+            return redirect()
+                ->route('catalogs.index')
+                ->with('message', 'catalogs.no_access')
+                ->with('message_type', 'error');
+        }
+
+        $specimens = $project->specimens()
+            ->with('currentDetermination.species')
+            ->orderByDesc('created_at')
+            ->get();
+
+        return Inertia::render('Catalog/Specimens', [
+            'project' => ['id' => $project->id, 'name' => $project->name],
+            'specimens' => $specimens->map(fn (Specimen $s) => $this->present($s))->all(),
+            'summary' => [
+                'total' => $specimens->count(),
+                'vouchered' => $specimens->filter->isVouchered()->count(),
+                // Everything still lacking a taxon: never examined, and
+                // examined without a name reached. The table keeps those two
+                // apart — they mean different things — but as a work queue
+                // they are one number, and it matches the list's filter.
+                'unidentified' => $specimens->filter(
+                    fn (Specimen $s) => $s->currentDetermination?->species === null
+                )->count(),
+            ],
+            // The catalog to identify against. Small enough to send whole, and
+            // sending it avoids leaning on the data-linking search endpoint,
+            // which is gated on a different capability.
+            'catalog' => $project->catalogSpecies()
+                ->orderBy('genus')
+                ->orderBy('name')
+                ->get(['id', 'family', 'genus', 'name', 'authority'])
+                ->all(),
+            'canEdit' => (bool) $user->can('editCatalog', $project),
+            'nextAccessionNumber' => $this->accessions->peek($project),
+        ]);
+    }
+
     /**
-     * Register a collection against a taxon.
+     * Record a collection, with no claim about what it is.
      *
-     * The accession number is either minted from the project's sequence or
-     * typed in — never both. A study that already numbers its own specimens
-     * enters those; one that does not lets the project issue them.
+     * No determination row is written: nobody has looked at it yet, and an
+     * empty determination would assert that someone had and failed. The
+     * specimen simply has no current determination until `determine()` says
+     * otherwise.
      */
-    public function store(
+    public function store(Request $request, Project $project): RedirectResponse
+    {
+        if ($denied = $this->denyUnlessEditable($project)) {
+            return $denied;
+        }
+
+        $validated = $request->validate($this->collectionRules());
+
+        $specimen = new Specimen($validated);
+        $specimen->project_id = $project->id;
+        $specimen->save();
+
+        return back()
+            ->with('message', 'catalogs.specimens.registered')
+            ->with('message_type', 'success');
+    }
+
+    /**
+     * Record a collection already known to be a given taxon — the shortcut from
+     * a species page, where the identification is the reason you are there.
+     */
+    public function storeForSpecies(
         Request $request,
         Project $project,
         CatalogSpecies $species
@@ -45,29 +116,14 @@ class SpecimenController extends Controller
             return $this->speciesNotFound();
         }
 
-        $validated = $request->validate($this->rules($project));
+        $validated = $request->validate($this->collectionRules() + $this->determinationRules());
 
-        DB::transaction(function () use ($request, $project, $species, $validated) {
-            $specimen = new Specimen($this->specimenAttributes($validated));
+        DB::transaction(function () use ($project, $species, $validated) {
+            $specimen = new Specimen($validated);
             $specimen->project_id = $project->id;
-
-            if ($request->boolean('mint_accession')) {
-                $specimen->accession_number = $this->accessions->mint($project);
-            }
-
             $specimen->save();
 
-            // The determination this registration asserts. Current by
-            // definition — it is the only one there is.
-            $determination = new Determination([
-                'catalog_species_id' => $species->id,
-                'determiner' => $validated['determiner'] ?? null,
-                'determined_on' => $validated['determined_on'] ?? null,
-                'qualifier' => $validated['qualifier'] ?? null,
-                'is_current' => true,
-            ]);
-            $determination->specimen_id = $specimen->id;
-            $determination->save();
+            $this->recordDetermination($specimen, $species->id, $validated);
         });
 
         return back()
@@ -75,6 +131,7 @@ class SpecimenController extends Controller
             ->with('message_type', 'success');
     }
 
+    /** Correct the collection itself — who collected it, where, and when. */
     public function update(
         Request $request,
         Project $project,
@@ -88,36 +145,110 @@ class SpecimenController extends Controller
             return $this->specimenNotFound();
         }
 
-        $validated = $request->validate($this->rules($project, $specimen));
-
-        DB::transaction(function () use ($request, $project, $specimen, $validated) {
-            $specimen->fill($this->specimenAttributes($validated));
-
-            // Minting is additive: it never overwrites a number the specimen
-            // already carries, because an accession number that has been
-            // written on a label and cited elsewhere is not ours to change.
-            if ($request->boolean('mint_accession') && ! $specimen->isVouchered()) {
-                $specimen->accession_number = $this->accessions->mint($project);
-            }
-
-            $specimen->save();
-
-            // The determiner and the date belong to the determination, not the
-            // collection — correcting them here amends the current opinion
-            // rather than recording a new one.
-            $current = $specimen->currentDetermination;
-
-            if ($current !== null) {
-                $current->update([
-                    'determiner' => $validated['determiner'] ?? null,
-                    'determined_on' => $validated['determined_on'] ?? null,
-                    'qualifier' => $validated['qualifier'] ?? null,
-                ]);
-            }
-        });
+        $specimen->update($request->validate($this->collectionRules()));
 
         return back()
             ->with('message', 'catalogs.specimens.updated')
+            ->with('message_type', 'success');
+    }
+
+    /**
+     * Identify the specimen, or revise an existing identification.
+     *
+     * The previous determination is superseded rather than replaced — the whole
+     * reason determinations are a table is that what was thought before is part
+     * of the record. A null taxon is legitimate: it says someone examined this
+     * and could not name it, which is different from nobody having looked.
+     */
+    public function determine(
+        Request $request,
+        Project $project,
+        Specimen $specimen
+    ): RedirectResponse {
+        if ($denied = $this->denyUnlessEditable($project)) {
+            return $denied;
+        }
+
+        if ($specimen->project_id !== $project->id) {
+            return $this->specimenNotFound();
+        }
+
+        $validated = $request->validate(
+            $this->determinationRules() + [
+                'catalog_species_id' => [
+                    'nullable',
+                    Rule::exists('catalog_species', 'id')
+                        ->where('project_id', $project->id),
+                ],
+            ]
+        );
+
+        DB::transaction(function () use ($specimen, $validated) {
+            $specimen->determinations()
+                ->where('is_current', true)
+                ->update(['is_current' => false]);
+
+            $this->recordDetermination(
+                $specimen,
+                $validated['catalog_species_id'] ?? null,
+                $validated
+            );
+        });
+
+        return back()
+            ->with('message', 'catalogs.specimens.determined')
+            ->with('message_type', 'success');
+    }
+
+    /**
+     * Record the deposit: where the specimen went and under what number.
+     *
+     * Separate from collection because it happens later, and often not at all.
+     * The number is either issued from the project's sequence or typed in —
+     * a study with its own numbering keeps it.
+     */
+    public function deposit(
+        Request $request,
+        Project $project,
+        Specimen $specimen
+    ): RedirectResponse {
+        if ($denied = $this->denyUnlessEditable($project)) {
+            return $denied;
+        }
+
+        if ($specimen->project_id !== $project->id) {
+            return $this->specimenNotFound();
+        }
+
+        $validated = $request->validate([
+            'accession_number' => [
+                'nullable',
+                'string',
+                'max:255',
+                Rule::unique('specimens', 'accession_number')
+                    ->where('project_id', $project->id)
+                    ->ignore($specimen->getKey()),
+            ],
+            'mint_accession' => 'boolean',
+            'repository' => 'nullable|string|max:255',
+        ]);
+
+        DB::transaction(function () use ($request, $project, $specimen, $validated) {
+            $specimen->repository = $validated['repository'] ?? null;
+
+            // Minting is additive. An accession number already written on a
+            // label and cited elsewhere is not ours to change.
+            if ($request->boolean('mint_accession') && ! $specimen->isVouchered()) {
+                $specimen->accession_number = $this->accessions->mint($project);
+            } elseif (! $request->boolean('mint_accession')) {
+                $specimen->accession_number = $validated['accession_number'] ?? null;
+            }
+
+            $specimen->save();
+        });
+
+        return back()
+            ->with('message', 'catalogs.specimens.deposited')
             ->with('message_type', 'success');
     }
 
@@ -131,9 +262,6 @@ class SpecimenController extends Controller
             return $this->specimenNotFound();
         }
 
-        // Determinations go with it (cascade); the interview answer it came
-        // from does not, since deleting a specimen is not a statement about
-        // what an informant said.
         $specimen->delete();
 
         return back()
@@ -142,30 +270,82 @@ class SpecimenController extends Controller
     }
 
     /**
+     * One row per physical collection, with the current opinion flattened onto
+     * it. `species` is null for anything not yet identified.
+     *
      * @return array<string, mixed>
      */
-    private function rules(Project $project, ?Specimen $specimen = null): array
+    public function present(Specimen $specimen): array
+    {
+        $current = $specimen->currentDetermination;
+
+        return [
+            'id' => $specimen->id,
+            'accession_number' => $specimen->accession_number,
+            'collection_number' => $specimen->collection_number,
+            'collector' => $specimen->collector,
+            'collected_on' => $specimen->collected_on?->toDateString(),
+            'locality' => $specimen->locality,
+            'location_lat' => $specimen->location_lat,
+            'location_lng' => $specimen->location_lng,
+            'repository' => $specimen->repository,
+            'notes' => $specimen->notes,
+            'is_vouchered' => $specimen->isVouchered(),
+            'is_determined' => $current?->catalog_species_id !== null,
+            'species' => $current?->species === null ? null : [
+                'id' => $current->species->id,
+                'genus' => $current->species->genus,
+                'name' => $current->species->name,
+            ],
+            'determiner' => $current?->determiner,
+            'determined_on' => $current?->determined_on?->toDateString(),
+            'qualifier' => $current?->qualifier,
+        ];
+    }
+
+    /**
+     * @param  array<string, mixed>  $validated
+     */
+    private function recordDetermination(
+        Specimen $specimen,
+        ?int $speciesId,
+        array $validated
+    ): void {
+        $determination = new Determination([
+            'catalog_species_id' => $speciesId,
+            'determiner' => $validated['determiner'] ?? null,
+            'determined_on' => $validated['determined_on'] ?? null,
+            'qualifier' => $validated['qualifier'] ?? null,
+            'is_current' => true,
+        ]);
+        $determination->specimen_id = $specimen->id;
+        $determination->save();
+    }
+
+    /**
+     * What is known at collection time, and nothing else.
+     *
+     * @return array<string, mixed>
+     */
+    private function collectionRules(): array
     {
         return [
-            'accession_number' => [
-                'nullable',
-                'string',
-                'max:255',
-                // Unique per project, not globally — two studies on one
-                // instance issue their own series.
-                Rule::unique('specimens', 'accession_number')
-                    ->where('project_id', $project->id)
-                    ->ignore($specimen?->getKey()),
-            ],
-            'mint_accession' => 'boolean',
             'collection_number' => 'nullable|string|max:255',
             'collector' => 'nullable|string|max:255',
             'collected_on' => 'nullable|date',
             'locality' => 'nullable|string|max:255',
             'location_lat' => 'nullable|numeric|between:-90,90',
             'location_lng' => 'nullable|numeric|between:-180,180',
-            'repository' => 'nullable|string|max:255',
             'notes' => 'nullable|string',
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function determinationRules(): array
+    {
+        return [
             'determiner' => 'nullable|string|max:255',
             'determined_on' => 'nullable|date',
             'qualifier' => [
@@ -176,25 +356,6 @@ class SpecimenController extends Controller
                     Determination::QUALIFIER_SP,
                 ]),
             ],
-        ];
-    }
-
-    /**
-     * @param  array<string, mixed>  $validated
-     * @return array<string, mixed>
-     */
-    private function specimenAttributes(array $validated): array
-    {
-        return [
-            'accession_number' => $validated['accession_number'] ?? null,
-            'collection_number' => $validated['collection_number'] ?? null,
-            'collector' => $validated['collector'] ?? null,
-            'collected_on' => $validated['collected_on'] ?? null,
-            'locality' => $validated['locality'] ?? null,
-            'location_lat' => $validated['location_lat'] ?? null,
-            'location_lng' => $validated['location_lng'] ?? null,
-            'repository' => $validated['repository'] ?? null,
-            'notes' => $validated['notes'] ?? null,
         ];
     }
 

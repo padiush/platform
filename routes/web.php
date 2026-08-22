@@ -192,17 +192,36 @@ Route::middleware(['auth'])->group(function () {
         )->name('catalogs.species.delete');
     });
 
-    // Specimens — the physical collections behind a taxon.
+    // Specimens — the physical collections a project has made. Collected and
+    // recorded first, identified later, deposited later still, so determining
+    // and depositing are their own routes rather than fields on a create form.
     // See docs/decisions/0008-specimens-and-determinations.md.
     Route::controller(SpecimenController::class)->group(function () {
+        Route::get(
+            '/catalogs/{project}/specimens',
+            'index'
+        )->name('catalogs.specimens.index');
         Route::post(
-            '/catalogs/{project}/species/{species}/specimens',
+            '/catalogs/{project}/specimens',
             'store'
         )->name('catalogs.specimens.store');
+        // Shortcut from a species page, where the identification is already known.
+        Route::post(
+            '/catalogs/{project}/species/{species}/specimens',
+            'storeForSpecies'
+        )->name('catalogs.specimens.store-for-species');
         Route::patch(
             '/catalogs/{project}/specimens/{specimen}',
             'update'
         )->name('catalogs.specimens.update');
+        Route::post(
+            '/catalogs/{project}/specimens/{specimen}/determine',
+            'determine'
+        )->name('catalogs.specimens.determine');
+        Route::post(
+            '/catalogs/{project}/specimens/{specimen}/deposit',
+            'deposit'
+        )->name('catalogs.specimens.deposit');
         Route::delete(
             '/catalogs/{project}/specimens/{specimen}',
             'destroy'

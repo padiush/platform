@@ -416,34 +416,21 @@ class ProjectCatalogController extends Controller
     /**
      * The collections currently determined as this taxon, newest first.
      *
-     * The determiner and qualifier live on the determination rather than the
-     * specimen, so they are flattened here — the page shows one row per
-     * physical collection, not per opinion about it.
+     * Presented by SpecimenController so a specimen reads identically here and
+     * on the project-wide list — one row per physical collection, with the
+     * current opinion flattened onto it.
      *
      * @return array<int, array<string, mixed>>
      */
     private function specimensFor(CatalogSpecies $species): array
     {
+        $presenter = app(SpecimenController::class);
+
         return $species->specimens()
-            ->with('currentDetermination')
+            ->with('currentDetermination.species')
             ->orderByDesc('specimens.created_at')
             ->get()
-            ->map(fn (Specimen $specimen) => [
-                'id' => $specimen->id,
-                'accession_number' => $specimen->accession_number,
-                'collection_number' => $specimen->collection_number,
-                'collector' => $specimen->collector,
-                'collected_on' => $specimen->collected_on?->toDateString(),
-                'locality' => $specimen->locality,
-                'location_lat' => $specimen->location_lat,
-                'location_lng' => $specimen->location_lng,
-                'repository' => $specimen->repository,
-                'notes' => $specimen->notes,
-                'is_vouchered' => $specimen->isVouchered(),
-                'determiner' => $specimen->currentDetermination?->determiner,
-                'determined_on' => $specimen->currentDetermination?->determined_on?->toDateString(),
-                'qualifier' => $specimen->currentDetermination?->qualifier,
-            ])
+            ->map(fn (Specimen $specimen) => $presenter->present($specimen))
             ->all();
     }
 

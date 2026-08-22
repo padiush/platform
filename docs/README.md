@@ -54,9 +54,10 @@ One piece of new surface is in progress: **specimens and determinations**
 a *taxon*, which is the end of identification; a specimen is a different thing,
 carries many determinations over time, and is what a voucher number identifies.
 The **data layer and the catalog UI are built** — the two tables, per-project
-accession numbering, and recording collections against a taxon; the **export
-surface is not yet**, nor is revising a determination through the interface.
-Server-side this version — the companion keeps its interview-capture scope.
+accession numbering, and a collections list that follows the field order:
+recorded first, identified later, deposited later still. The **export surface is
+not yet**. Server-side this version — the companion keeps its interview-capture
+scope.
 
 ## Decisions register
 
