@@ -8,6 +8,7 @@ use App\Models\Project;
 use App\Services\CatalogSpeciesSearch;
 use App\Services\GbifDistribution;
 use App\Services\INaturalistPhoto;
+use App\Services\SpecimenPresenter;
 use App\Services\WfoNameResolver;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\JsonResponse;
@@ -55,6 +56,10 @@ class ProjectCatalogController extends Controller
                     'linked_families_count' => $project
                         ->linkedFamilies()
                         ->count(),
+                    // Reachable even with an empty catalog: collections are
+                    // recorded before anything is identified, so this must not
+                    // depend on a taxon existing yet.
+                    'specimen_count' => $project->specimens()->count(),
                     'can_edit_catalog' => (bool) $access->capability->edit_catalog,
                     'can_view_catalog' => true, // already verified
                 ]);
@@ -404,7 +409,27 @@ class ProjectCatalogController extends Controller
             // Cached range only (no external call on page load); the page fetches
             // it on demand when absent.
             'distribution' => $species->metadata['distribution'] ?? null,
+            'specimens' => $this->specimensFor($species),
         ]);
+    }
+
+    /**
+     * The collections currently determined as this taxon, newest first.
+     *
+     * Presented by SpecimenPresenter so a specimen reads identically here and
+     * on the project-wide list — one row per physical collection, with the
+     * current opinion flattened onto it.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private function specimensFor(CatalogSpecies $species): array
+    {
+        return app(SpecimenPresenter::class)->collection(
+            $species->specimens()
+                ->with('currentDetermination.species')
+                ->orderByDesc('specimens.created_at')
+                ->get()
+        );
     }
 
     /**

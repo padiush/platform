@@ -4,6 +4,7 @@ import Input from '@/Components/Input';
 import Pagination from '@/Components/Pagination';
 import Select from '@/Components/Select';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import CatalogTabs from '@/Pages/Catalog/Partials/CatalogTabs';
 import {
     faArrowLeft,
     faChevronRight,
@@ -121,6 +122,8 @@ export default function CatalogSpeciesIndex({
         >
             <div className="p-4 md:pt-8 lg:pt-12">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
+                    <CatalogTabs project={project} active="species" />
+
                     <Card title={t('catalogs.species_list')}>
                         <div className="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
                             <div className="sm:col-span-2 lg:col-span-4">
