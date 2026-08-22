@@ -300,6 +300,81 @@ class SpecimenTest extends TestCase
         );
     }
 
+    // ---------------------------------------------------------- the permit ---
+
+    public function test_a_collection_can_be_recorded_under_a_permit()
+    {
+        $permit = CollectingPermit::factory()->create([
+            'project_id' => $this->project->id,
+        ]);
+
+        $this->actingAs($this->editor())->post($this->url('catalogs.specimens.store'), [
+            'collector' => 'M. Menéndez',
+            'collecting_permit_id' => $permit->id,
+        ])->assertSessionHasNoErrors();
+
+        $this->assertSame($permit->id, Specimen::sole()->collecting_permit_id);
+    }
+
+    public function test_a_collection_can_state_that_none_was_required()
+    {
+        $this->actingAs($this->editor())->post($this->url('catalogs.specimens.store'), [
+            'collector' => 'M. Menéndez',
+            'permit_exemption' => 'market',
+        ])->assertSessionHasNoErrors();
+
+        $this->assertSame('market', Specimen::sole()->permit_exemption);
+    }
+
+    public function test_a_permit_and_an_exemption_together_are_refused()
+    {
+        $permit = CollectingPermit::factory()->create([
+            'project_id' => $this->project->id,
+        ]);
+
+        $this->actingAs($this->editor())->post($this->url('catalogs.specimens.store'), [
+            'collecting_permit_id' => $permit->id,
+            'permit_exemption' => 'market',
+        ])->assertSessionHasErrors();
+
+        // The pairing has no meaning; recording it would make coverage a lie.
+        $this->assertSame(0, Specimen::count());
+    }
+
+    public function test_it_refuses_a_permit_belonging_to_another_project()
+    {
+        $foreign = CollectingPermit::factory()->create();
+
+        $this->actingAs($this->editor())->post($this->url('catalogs.specimens.store'), [
+            'collecting_permit_id' => $foreign->id,
+        ])->assertSessionHasErrors('collecting_permit_id');
+    }
+
+    public function test_it_refuses_an_exemption_outside_the_vocabulary()
+    {
+        $this->actingAs($this->editor())->post($this->url('catalogs.specimens.store'), [
+            'permit_exemption' => 'because-i-said-so',
+        ])->assertSessionHasErrors('permit_exemption');
+    }
+
+    public function test_the_list_offers_the_project_permits_to_choose_from()
+    {
+        CollectingPermit::factory()->create([
+            'project_id' => $this->project->id,
+            'authority' => 'MARN',
+            'reference' => 'RES-042-2026',
+        ]);
+        CollectingPermit::factory()->create(); // another project's
+
+        $this->actingAs($this->editor())
+            ->get($this->url('catalogs.specimens.index'))
+            ->assertInertia(fn (Assert $page) => $page
+                ->has('permits', 1)
+                ->where('permits.0.label', 'MARN · RES-042-2026')
+                ->has('exemptions', 4)
+            );
+    }
+
     // ------------------------------------------------------------- export ---
 
     public function test_the_export_carries_the_collection_its_name_and_its_permit()

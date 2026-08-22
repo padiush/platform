@@ -58,9 +58,11 @@ per-project accession numbering, a collections list that follows the field order
 (recorded first, identified later, deposited later still), a `Voucher No.` and
 permit column on the species-indices export, a Darwin-Core-termed export of the
 collections themselves, and voucher and permit coverage stated on the report
-page beside the unlinked-citation figure. What remains is a **catalog UI for
-managing permits** ([ADR 0009](decisions/0009-collecting-permits.md)).
-Server-side this version — the companion keeps its interview-capture scope.
+page beside the unlinked-citation figure. Collecting permits are managed under
+the catalog and chosen when a collection is recorded
+([ADR 0009](decisions/0009-collecting-permits.md)), so the permit column in the
+export is one a researcher can actually fill. Server-side this version — the
+companion keeps its interview-capture scope.
 
 ## Decisions register
 

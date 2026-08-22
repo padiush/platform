@@ -28,6 +28,11 @@ export default function CatalogTabs({ project, active, speciesCount = null }) {
             label: t('catalogs.specimens.title'),
             href: route('catalogs.specimens.index', { project: project.id }),
         },
+        {
+            key: 'permits',
+            label: t('catalogs.permits.title'),
+            href: route('catalogs.permits.index', { project: project.id }),
+        },
     ];
 
     return (

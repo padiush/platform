@@ -69,6 +69,8 @@ export default function Specimens({
     canEdit = false,
     nextAccessionNumber = null,
     speciesCount = null,
+    permits = [],
+    exemptions = [],
 }) {
     const { t } = useTranslation();
     const [filter, setFilter] = useState('all');
@@ -226,6 +228,8 @@ export default function Specimens({
                 }}
                 project={project}
                 specimen={editing}
+                permits={permits}
+                exemptions={exemptions}
                 key={editing?.id ?? 'new'}
             />
 

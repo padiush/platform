@@ -83,6 +83,7 @@ export default function SpecimenTable({
                             <th>{t('catalogs.specimens.determination')}</th>
                         )}
                         <th>{t('catalogs.specimens.repository')}</th>
+                        <th>{t('catalogs.specimens.permit')}</th>
                         {canEdit && <th />}
                     </tr>
                 </thead>
@@ -101,6 +102,18 @@ export default function SpecimenTable({
                                 </td>
                             )}
                             <td>{specimen.repository ?? '—'}</td>
+                            <td>
+                                {specimen.permit ??
+                                    (specimen.permit_exemption ? (
+                                        <span className="badge badge-ghost badge-sm">
+                                            {t(
+                                                `catalogs.specimens.exemption_${specimen.permit_exemption}`,
+                                            )}
+                                        </span>
+                                    ) : (
+                                        '—'
+                                    ))}
+                            </td>
                             {canEdit && (
                                 <td className="text-right whitespace-nowrap">
                                     <button

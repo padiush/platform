@@ -33,6 +33,9 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
  */
 class SpecimenController extends Controller
 {
+    /** Lawful collections that fall outside the permit regime. */
+    public const EXEMPTIONS = ['private_land', 'cultivated', 'market', 'other'];
+
     public function __construct(
         private readonly AccessionNumbers $accessions,
         private readonly SpecimenPresenter $presenter,
@@ -51,7 +54,7 @@ class SpecimenController extends Controller
         }
 
         $specimens = $project->specimens()
-            ->with('currentDetermination.species')
+            ->with(['currentDetermination.species', 'collectingPermit'])
             ->orderByDesc('created_at')
             ->get();
 
@@ -77,6 +80,16 @@ class SpecimenController extends Controller
                 ->orderBy('name')
                 ->get(['id', 'family', 'genus', 'name', 'authority'])
                 ->all(),
+            'permits' => $project->collectingPermits()
+                ->orderBy('authority')
+                ->orderBy('reference')
+                ->get()
+                ->map(fn ($permit) => [
+                    'id' => $permit->id,
+                    'label' => $permit->label(),
+                ])
+                ->all(),
+            'exemptions' => self::EXEMPTIONS,
             'canEdit' => (bool) $user->can('editCatalog', $project),
             'nextAccessionNumber' => $this->accessions->peek($project),
             // The species tab is a dead end without one — catalogs.show
@@ -161,7 +174,7 @@ class SpecimenController extends Controller
             return $denied;
         }
 
-        $validated = $request->validate($this->collectionRules());
+        $validated = $request->validate($this->collectionRules($project));
 
         $specimen = new Specimen($validated);
         $specimen->project_id = $project->id;
@@ -189,7 +202,7 @@ class SpecimenController extends Controller
             return $this->speciesNotFound();
         }
 
-        $validated = $request->validate($this->collectionRules() + $this->determinationRules());
+        $validated = $request->validate($this->collectionRules($project) + $this->determinationRules());
 
         DB::transaction(function () use ($project, $species, $validated) {
             $specimen = new Specimen($validated);
@@ -218,7 +231,7 @@ class SpecimenController extends Controller
             return $this->specimenNotFound();
         }
 
-        $specimen->update($request->validate($this->collectionRules()));
+        $specimen->update($request->validate($this->collectionRules($project)));
 
         return back()
             ->with('message', 'catalogs.specimens.updated')
@@ -366,7 +379,7 @@ class SpecimenController extends Controller
      *
      * @return array<string, mixed>
      */
-    private function collectionRules(): array
+    private function collectionRules(Project $project): array
     {
         return [
             'collection_number' => 'nullable|string|max:255',
@@ -376,6 +389,21 @@ class SpecimenController extends Controller
             'location_lat' => 'nullable|numeric|between:-90,90',
             'location_lng' => 'nullable|numeric|between:-180,180',
             'notes' => 'nullable|string',
+            // A permit is held before the fieldwork, so it is known when the
+            // collection is recorded — unlike a voucher, which is not.
+            'collecting_permit_id' => [
+                'nullable',
+                'prohibits:permit_exemption',
+                Rule::exists('collecting_permits', 'id')
+                    ->where('project_id', $project->getKey()),
+            ],
+            // Or a stated reason none was needed. Never both: the pairing has
+            // no meaning.
+            'permit_exemption' => [
+                'nullable',
+                'prohibits:collecting_permit_id',
+                Rule::in(self::EXEMPTIONS),
+            ],
         ];
     }
 
