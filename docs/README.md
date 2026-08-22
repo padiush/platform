@@ -99,6 +99,12 @@ scope.
   as a read-only pull. Built and released on this basis, which flips
   [ADR 0003](decisions/0003-capture-only-companion-scope.md) to **Accepted**
   ([companion API](contracts/companion-api.md#settled-decisions)).
+- **Collecting permits** *(accepted 2026-08-22)* — a `collecting_permits` table
+  per project; a specimen carries either a permit or a stated reason none was
+  required, never both, so coverage can tell a lawful exemption from a missing
+  record. A reference record only — nothing validates that a permit is genuine,
+  current, or covers what was collected
+  ([ADR 0009](decisions/0009-collecting-permits.md)).
 - **Specimen as its own entity** *(accepted 2026-08-22)* — `specimens` and
   `determinations` become their own tables rather than fields on
   `catalog_species`, with a nullable taxon so `indet.` is representable, and
