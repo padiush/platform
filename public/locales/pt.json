@@ -676,6 +676,14 @@
             "of_total": "{{count}} de {{total}}",
             "permit_coverage": "Permissões de colheita",
             "permit_states": "{{under}} com permissão · {{exempt}} isentos · {{unrecorded}} por registar"
+        },
+        "media": {
+            "failed": "Não foi possível carregar a evidência.",
+            "loading": "A carregar…",
+            "none": "Esta entrevista não tem fotografias nem áudio.",
+            "photo_alt": "Fotografia da entrevista",
+            "title": "Evidência",
+            "transcript": "Transcrição"
         }
     },
     "public": {

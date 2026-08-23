@@ -676,6 +676,14 @@
             "of_total": "{{count}} de {{total}}",
             "permit_coverage": "Permisos de recolección",
             "permit_states": "{{under}} con permiso · {{exempt}} exentos · {{unrecorded}} sin registrar"
+        },
+        "media": {
+            "failed": "No se pudo cargar la evidencia.",
+            "loading": "Cargando…",
+            "none": "Esta entrevista no tiene fotos ni audio.",
+            "photo_alt": "Fotografía de la entrevista",
+            "title": "Evidencia",
+            "transcript": "Transcripción"
         }
     },
     "public": {

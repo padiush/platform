@@ -676,6 +676,14 @@
             "of_total": "{{count}} of {{total}}",
             "permit_coverage": "Collecting permits",
             "permit_states": "{{under}} under permit · {{exempt}} exempt · {{unrecorded}} unrecorded"
+        },
+        "media": {
+            "failed": "The evidence could not be loaded.",
+            "loading": "Loading…",
+            "none": "This interview has no photographs or audio.",
+            "photo_alt": "Photograph from the interview",
+            "title": "Evidence",
+            "transcript": "Transcript"
         }
     },
     "public": {
