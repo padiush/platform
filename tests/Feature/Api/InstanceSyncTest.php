@@ -188,19 +188,60 @@ class InstanceSyncTest extends TestCase
         $instanceId = (string) Str::uuid();
         $answerClientId = (string) Str::uuid();
 
+        // Pin `captured_at` across both pushes. It defaults to `now()` at
+        // second precision, so rebuilding the payload lets the two sends
+        // straddle a second boundary — the instance is then genuinely dirty and
+        // correctly reports "updated", failing an assertion that is about the
+        // answer. A device re-sending an instance does not move its capture
+        // time; only the answer differs here, which is what this test is about.
+        $capturedAt = now()->toIso8601String();
+
         $this->postJson($this->syncUrl(), ['instances' => [
             $this->instancePayload($instanceId, [
                 $this->answerPayload($answerClientId, 'current', now()->subMinutes(1)->toIso8601String()),
-            ]),
+            ], ['captured_at' => $capturedAt]),
         ]])->assertOk();
 
         $response = $this->postJson($this->syncUrl(), ['instances' => [
             $this->instancePayload($instanceId, [
                 $this->answerPayload($answerClientId, 'stale', now()->subMinutes(30)->toIso8601String()),
-            ]),
+            ], ['captured_at' => $capturedAt]),
         ]]);
 
         $response->assertJsonPath('results.0.status', 'unchanged');
+        $this->assertSame('current', InstanceAnswer::where('client_id', $answerClientId)->first()->answer);
+        $this->assertSame(0, InstanceAnswerRevision::count());
+    }
+
+    /**
+     * The other half of the test above: "unchanged" is about the whole
+     * instance, not the answers alone. A device that moves its capture time has
+     * changed the instance even when every answer it sends is stale, and saying
+     * "unchanged" there would under-report a real edit. Pinned so the fix for
+     * the clock flake above is not later "simplified" into ignoring the field.
+     */
+    public function test_a_moved_capture_time_updates_the_instance_even_when_the_answers_are_stale(): void
+    {
+        $this->actingAsRecorder();
+
+        $instanceId = (string) Str::uuid();
+        $answerClientId = (string) Str::uuid();
+        $capturedAt = now()->subMinutes(10);
+
+        $this->postJson($this->syncUrl(), ['instances' => [
+            $this->instancePayload($instanceId, [
+                $this->answerPayload($answerClientId, 'current', now()->subMinutes(1)->toIso8601String()),
+            ], ['captured_at' => $capturedAt->toIso8601String()]),
+        ]])->assertOk();
+
+        $response = $this->postJson($this->syncUrl(), ['instances' => [
+            $this->instancePayload($instanceId, [
+                $this->answerPayload($answerClientId, 'stale', now()->subMinutes(30)->toIso8601String()),
+            ], ['captured_at' => $capturedAt->copy()->addMinutes(5)->toIso8601String()]),
+        ]]);
+
+        $response->assertJsonPath('results.0.status', 'updated');
+        // The stale answer is still refused; only the instance field moved.
         $this->assertSame('current', InstanceAnswer::where('client_id', $answerClientId)->first()->answer);
         $this->assertSame(0, InstanceAnswerRevision::count());
     }
