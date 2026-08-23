@@ -2,10 +2,12 @@ import Card from '@/Components/Card';
 import ChartTypeChooser from '@/Components/ChartTypeChooser';
 import EmptyState from '@/Components/EmptyState';
 import FieldSummaryChart from '@/Components/FieldSummaryChart';
+import FormModal from '@/Components/FormModal';
 import Input from '@/Components/Input';
 import Pagination from '@/Components/Pagination';
 import Select from '@/Components/Select';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import InterviewMedia from '@/Pages/Data/Partials/InterviewMedia';
 import { formatDateTime } from '@/utils/datetime';
 import { faArrowLeft, faDownload } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -47,6 +49,7 @@ export default function DataView({
     interviewers,
     summary,
 }) {
+    const [mediaFor, setMediaFor] = useState(null);
     const { t, i18n } = useTranslation();
     const { csrf_token } = usePage().props;
 
@@ -359,6 +362,37 @@ export default function DataView({
                                                                 {row.interview
                                                                     .recorder ??
                                                                     '—'}
+                                                                {/*
+                                                                    The
+                                                                    companion
+                                                                    captures
+                                                                    photos and
+                                                                    audio; until
+                                                                    now nothing
+                                                                    here could
+                                                                    show them.
+                                                                */}
+                                                                {row.media_count >
+                                                                    0 && (
+                                                                    <button
+                                                                        type="button"
+                                                                        className="btn btn-ghost btn-xs ml-2"
+                                                                        onClick={() =>
+                                                                            setMediaFor(
+                                                                                row.instance_id,
+                                                                            )
+                                                                        }
+                                                                    >
+                                                                        {t(
+                                                                            'data.media.title',
+                                                                        )}{' '}
+                                                                        (
+                                                                        {
+                                                                            row.media_count
+                                                                        }
+                                                                        )
+                                                                    </button>
+                                                                )}
                                                             </td>
                                                             {section.repeatable && (
                                                                 <td className="tabular-nums">
@@ -439,6 +473,16 @@ export default function DataView({
                     </Card>
                 </div>
             </div>
+
+            {mediaFor && (
+                <FormModal
+                    open
+                    onClose={() => setMediaFor(null)}
+                    title={t('data.media.title')}
+                >
+                    <InterviewMedia project={project} instanceId={mediaFor} />
+                </FormModal>
+            )}
         </AuthenticatedLayout>
     );
 }

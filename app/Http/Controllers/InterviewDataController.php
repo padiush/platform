@@ -7,6 +7,7 @@ use App\Exports\EthnobotanyRExport;
 use App\Exports\IndicesExport;
 use App\Exports\IndicesReportExport;
 use App\Exports\ReferencesSheet;
+use App\Http\Controllers\Concerns\ChecksProjectDataAccess;
 use App\Models\CatalogSpecies;
 use App\Models\ChartPreference;
 use App\Models\InstanceAnswer;
@@ -22,7 +23,6 @@ use App\Services\FieldRecordEvidence;
 use App\Services\InterviewDataExport;
 use App\Services\InterviewDataTable;
 use App\Services\SpeciesLinkingList;
-use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -37,6 +37,8 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class InterviewDataController extends Controller
 {
+    use ChecksProjectDataAccess;
+
     public function index(): Response|RedirectResponse
     {
         $accesses = Auth::user()
@@ -722,39 +724,5 @@ class InterviewDataController extends Controller
     private function exportWriter(string $format): ?string
     {
         return $format === 'csv' ? \Maatwebsite\Excel\Excel::CSV : null;
-    }
-
-    /**
-     * Aborts the request (403 JSON or redirect with a flash) unless the user
-     * has manage_data or generate_reports on the project.
-     */
-    private function checkPermission(Project $project, $json = false): void
-    {
-        $user = Auth::user();
-
-        if (! $user->can('view', $project)) {
-            $this->deny('No tienes acceso a este proyecto.', $json);
-        }
-
-        if (
-            ! $user->can('manageData', $project) &&
-            ! $user->can('generateReports', $project)
-        ) {
-            $this->deny(
-                'No tienes permisos para acceder a los datos de este proyecto.',
-                $json
-            );
-        }
-    }
-
-    private function deny(string $message, bool $json): never
-    {
-        throw new HttpResponseException(
-            $json || request()->expectsJson()
-                ? response()->json(['error' => $message], 403)
-                : redirect()
-                    ->route('projects.index')
-                    ->with('error', $message)
-        );
     }
 }

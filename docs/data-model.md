@@ -119,7 +119,11 @@ in an ADR but not yet built, and unmarked for what is still only pencilled in.
   `instance_media`, renamed to `media` on 2026-08-23 when it stopped belonging
   only to interviews
   (kind, storage key, upload status, and audio transcription status/text);
-  `interview_instances` gained `captured_at` and a GPS location. See
+  `interview_instances` gained `captured_at` and a GPS location. **Viewable on
+  the web since 2026-08-23** — the companion had been syncing photographs and
+  audio that nothing in the interface could show, and a transcript appears
+  beside the audio once one exists. Read-only: the device authors this material
+  and owns its lifecycle. See
   [contracts/companion-api.md](contracts/companion-api.md).
 - **Field records and determinations** — ✅ **built (2026-08-22)** as
   `field_records` and `determinations`, per

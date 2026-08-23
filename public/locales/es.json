@@ -447,10 +447,13 @@
             "media": {
                 "add": "Añadir foto o audio",
                 "added": "Archivo añadido.",
+                "confirm_delete": "Se eliminará definitivamente. ¿Continuar?",
+                "confirm_delete_only_evidence": "Aquí no se recolectó nada, así que este archivo puede ser la única evidencia del registro. Se eliminará definitivamente. ¿Continuar?",
+                "confirm_delete_title": "Eliminar el archivo",
                 "none": "Sin fotos ni audio.",
-                "none_observation": "No se recolectó nada, así que la fotografía es el registro. Añade al menos una.",
+                "none_observation": "No se recolectó nada, así que la foto será lo único con lo que identificarlo después.",
                 "photo_alt": "Fotografía del registro",
-                "remove": "Quitar",
+                "remove": "Eliminar",
                 "removed": "Archivo eliminado.",
                 "title": "Evidencia"
             },
@@ -676,6 +679,14 @@
             "of_total": "{{count}} de {{total}}",
             "permit_coverage": "Permisos de recolección",
             "permit_states": "{{under}} con permiso · {{exempt}} exentos · {{unrecorded}} sin registrar"
+        },
+        "media": {
+            "failed": "No se pudo cargar la evidencia.",
+            "loading": "Cargando…",
+            "none": "Esta entrevista no tiene fotos ni audio.",
+            "photo_alt": "Fotografía de la entrevista",
+            "title": "Evidencia",
+            "transcript": "Transcripción"
         }
     },
     "public": {

@@ -7,6 +7,7 @@ use App\Http\Controllers\InterviewDataController;
 use App\Http\Controllers\InterviewDesignerController;
 use App\Http\Controllers\InterviewFormController;
 use App\Http\Controllers\InterviewInstancesController;
+use App\Http\Controllers\InterviewMediaController;
 use App\Http\Controllers\ProjectCatalogController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\PublicPageController;
@@ -275,6 +276,22 @@ Route::middleware(['auth'])->group(function () {
     Route::controller(InterviewDataController::class)->group(function () {
         Route::get('/data', 'index')->name('data.index');
         Route::get('/data/{project}/view', 'viewData')->name('data.view');
+    });
+
+    // What the companion captured, finally visible. Read-only: the device
+    // authors this material and owns its lifecycle.
+    Route::controller(InterviewMediaController::class)->group(function () {
+        Route::get(
+            '/data/{project}/interviews/{instance}/media',
+            'index'
+        )->name('data.media.index');
+        Route::get(
+            '/data/{project}/interviews/{instance}/media/{medium}',
+            'show'
+        )->name('data.media.show');
+    });
+
+    Route::controller(InterviewDataController::class)->group(function () {
         Route::post(
             '/data/{project}/chart-preference',
             'saveChartPreference'

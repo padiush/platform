@@ -8,10 +8,12 @@ use App\Models\InterviewForm;
 use App\Models\InterviewInstance;
 use App\Models\InterviewItem;
 use App\Models\InterviewSection;
+use App\Models\Media;
 use App\Models\Project;
 use App\Models\User;
 use App\Services\InterviewDataTable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Str;
 use Tests\TestCase;
 
 class InterviewDataTableTest extends TestCase
@@ -319,5 +321,30 @@ class InterviewDataTableTest extends TestCase
             ['guaba' => 2, 'guama' => 1],
             collect($summary['data'])->pluck('count', 'label')->all(),
         );
+    }
+
+    public function test_a_row_says_how_much_media_its_interview_carries()
+    {
+        $section = $this->section();
+        $item = $this->item($section);
+        $instance = $this->interview();
+        $this->answer($instance, $section, $item, 'algo');
+
+        Media::create([
+            'interview_instance_id' => $instance->id,
+            'client_id' => (string) Str::uuid(),
+            'kind' => Media::KIND_PHOTO,
+            'storage_disk' => 's3',
+            'storage_key' => 'k.jpg',
+            'content_type' => 'image/jpeg',
+            'status' => Media::STATUS_STORED,
+        ]);
+
+        $rows = $this->table->rows($this->form, $section, [], 1)->items();
+
+        // Read off a grouped count rather than a query per row. The closure
+        // has to capture that map — `?? 0` would otherwise hide its absence,
+        // which is exactly how this shipped as zero once.
+        $this->assertSame(1, $rows[0]['media_count']);
     }
 }

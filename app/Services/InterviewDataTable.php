@@ -7,6 +7,7 @@ use App\Models\InterviewForm;
 use App\Models\InterviewInstance;
 use App\Models\InterviewItem;
 use App\Models\InterviewSection;
+use App\Models\Media;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\LengthAwarePaginator as Paginator;
 use Illuminate\Support\Carbon;
@@ -174,9 +175,19 @@ class InterviewDataTable
             return [];
         }
 
+        $instanceIds = $records->pluck('instance.id')->unique();
+
+        // One grouped count for the page rather than a query per row.
+        $mediaCounts = Media::query()
+            ->whereIn('interview_instance_id', $instanceIds)
+            ->selectRaw('interview_instance_id, count(*) as aggregate')
+            ->groupBy('interview_instance_id')
+            ->pluck('aggregate', 'interview_instance_id')
+            ->all();
+
         $answers = InstanceAnswer::query()
             ->where('interview_section_id', $section->id)
-            ->whereIn('interview_instance_id', $records->pluck('instance.id')->unique())
+            ->whereIn('interview_instance_id', $instanceIds)
             ->with('species')
             ->get();
 
@@ -186,7 +197,7 @@ class InterviewDataTable
             $byKey["{$answer->interview_instance_id}|{$index}|{$answer->interview_item_id}"] = $answer;
         }
 
-        return $records->map(function (array $record) use ($items, $byKey) {
+        return $records->map(function (array $record) use ($items, $byKey, $mediaCounts) {
             $instance = $record['instance'];
             $index = $record['index'];
 
@@ -199,6 +210,9 @@ class InterviewDataTable
             return [
                 'key' => "{$instance->id}-".($index ?? ''),
                 'instance_id' => $instance->id,
+                // So the viewer can offer the photographs and audio the
+                // companion captured, without a query per row.
+                'media_count' => $mediaCounts[$instance->id] ?? 0,
                 'record_index' => $index,
                 'interview' => [
                     'recorded_at' => $instance->created_at?->toIso8601String(),
