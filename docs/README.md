@@ -39,30 +39,37 @@ auth, offline pull (`me`, project `bundle`), idempotent interview sync with
 last-writer-wins, and audio/photo media with transcription plumbing (gated on
 ADR 0005). The **mobile companion app** is built too, in its own repository
 (`padiush-companion`): Expo / React Native, an encrypted offline store, capture
-of answers, GPS, audio and photos, and the full sync loop against this API.
+of answers, GPS, audio and photos, and the full sync loop against this API. The
+photographs and audio it syncs are viewable on the web as well, read-only — the
+device owns that lifecycle.
 
-That completes the ethnobotany vertical's moving parts. What remains before
-field deployment for sensitive studies is hardening rather than new surface —
-tracked as: **resumable media upload** (single PUT today, so a long recording
-restarts from the beginning on a lost connection), **transcription** (null-bound
-plumbing until a real queue and a self-hosted Whisper are provisioned, per
+That completes the ethnobotany vertical's moving parts. One further piece of
+surface has been added since, and it is built too: **field records**
+([ADR 0008](decisions/0008-specimens-and-determinations.md),
+[0009](decisions/0009-collecting-permits.md),
+[0010](decisions/0010-field-records-and-basis.md)). The catalog models a *taxon*,
+which is the end of identification; what fieldwork produces is a documented
+encounter, which carries many determinations over time and is what a voucher
+number identifies. `basis_of_record` keeps a pressed specimen and something only
+seen in one table without pretending they are the same thing — much of what a
+study documents is never collected, and a record that could never carry a
+voucher is not a gap in the evidence. Built: the two tables and per-project
+accession numbering, a records list that follows the field order (recorded
+first, identified later, deposited later still), collecting permits managed
+under the catalog and chosen when a record is made, photographs and audio on a
+record as well as on an interview, a `Voucher No.` and permit column on the
+species-indices export, a Darwin-Core-termed export of the records themselves,
+and voucher, permit and observation coverage stated on the report page beside
+the unlinked-citation figure. Server-side this version — the companion keeps its
+interview-capture scope.
+
+What remains before field deployment for sensitive studies is hardening rather
+than new surface — tracked as: **resumable media upload** (single PUT today, so
+a long recording restarts from the beginning on a lost connection),
+**transcription** (null-bound plumbing until a real queue and a self-hosted
+Whisper are provisioned, per
 [ADR 0005](decisions/0005-interview-transcription-whisper.md)), and testing on
 physical devices.
-
-One piece of new surface is in progress: **specimens and determinations**
-([ADR 0008](decisions/0008-specimens-and-determinations.md)). The catalog models
-a *taxon*, which is the end of identification; a specimen is a different thing,
-carries many determinations over time, and is what a voucher number identifies.
-The **data layer, the catalog UI and the exports are built** — the two tables,
-per-project accession numbering, a collections list that follows the field order
-(recorded first, identified later, deposited later still), a `Voucher No.` and
-permit column on the species-indices export, a Darwin-Core-termed export of the
-collections themselves, and voucher and permit coverage stated on the report
-page beside the unlinked-citation figure. Collecting permits are managed under
-the catalog and chosen when a collection is recorded
-([ADR 0009](decisions/0009-collecting-permits.md)), so the permit column in the
-export is one a researcher can actually fill. Server-side this version — the
-companion keeps its interview-capture scope.
 
 ## Decisions register
 
@@ -104,12 +111,12 @@ companion keeps its interview-capture scope.
   as a read-only pull. Built and released on this basis, which flips
   [ADR 0003](decisions/0003-capture-only-companion-scope.md) to **Accepted**
   ([companion API](contracts/companion-api.md#settled-decisions)).
-- **Field records and basis** *(accepted 2026-08-22, media added 2026-08-23)* — `specimens` becomes
-  `field_records`, and `basis_of_record` distinguishes a pressed specimen from
-  something only seen. Much of what a study documents is never collected, and a
-  record that could never carry a voucher is not a gap in the evidence, so
-  observations are counted beside voucher coverage rather than inside it. The
-  vernacular name is encrypted, as an interview answer is
+- **Field records and basis** *(accepted 2026-08-22, media added the same day)*
+  — `specimens` becomes `field_records`, and `basis_of_record` distinguishes a
+  pressed specimen from something only seen. Much of what a study documents is
+  never collected, and a record that could never carry a voucher is not a gap in
+  the evidence, so observations are counted beside voucher coverage rather than
+  inside it. The vernacular name is encrypted, as an interview answer is
   ([ADR 0010](decisions/0010-field-records-and-basis.md)).
 - **Collecting permits** *(accepted 2026-08-22)* — a `collecting_permits` table
   per project; a specimen carries either a permit or a stated reason none was
