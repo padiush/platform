@@ -7,13 +7,13 @@ use App\Exports\ReferencesSheet;
 use App\Models\CatalogSpecies;
 use App\Models\CollectingPermit;
 use App\Models\Determination;
+use App\Models\FieldRecord;
 use App\Models\InstanceAnswer;
 use App\Models\InterviewForm;
 use App\Models\InterviewInstance;
 use App\Models\InterviewItem;
 use App\Models\InterviewSection;
 use App\Models\Project;
-use App\Models\Specimen;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
 use Inertia\Testing\AssertableInertia as Assert;
@@ -87,20 +87,20 @@ class DataReportsTest extends TestCase
         CatalogSpecies $species,
         string $accession,
         ?CollectingPermit $permit = null
-    ): Specimen {
-        $specimen = Specimen::factory()->create([
+    ): FieldRecord {
+        $fieldRecord = FieldRecord::factory()->create([
             'project_id' => $this->project->id,
             'accession_number' => $accession,
             'collecting_permit_id' => $permit?->id,
         ]);
 
         Determination::factory()->create([
-            'specimen_id' => $specimen->id,
+            'field_record_id' => $fieldRecord->id,
             'catalog_species_id' => $species->id,
             'is_current' => true,
         ]);
 
-        return $specimen;
+        return $fieldRecord;
     }
 
     public function test_the_species_table_carries_the_voucher_and_the_permit()
@@ -159,7 +159,7 @@ class DataReportsTest extends TestCase
         $this->cite($this->interview(), 0, $backed, 'food');
 
         $this->voucher($backed, 'MML-0001');
-        Specimen::factory()->create([
+        FieldRecord::factory()->create([
             'project_id' => $this->project->id,
             'permit_exemption' => 'market',
         ]);
@@ -169,9 +169,9 @@ class DataReportsTest extends TestCase
             ->assertInertia(fn (Assert $page) => $page
                 ->where('evidence.taxa_total', 2)
                 ->where('evidence.taxa_vouchered', 1)
-                ->where('evidence.specimens_total', 2)
-                ->where('evidence.specimens_permit_exempt', 1)
-                ->where('evidence.specimens_permit_unrecorded', 1)
+                ->where('evidence.records_total', 2)
+                ->where('evidence.records_permit_exempt', 1)
+                ->where('evidence.records_permit_unrecorded', 1)
             );
     }
 

@@ -13,17 +13,17 @@ import CatalogTabs from './CatalogTabs';
 const project = { id: 7, name: 'A study' };
 
 describe('CatalogTabs', () => {
-    it('reaches specimens without going through a taxon', () => {
+    it('reaches fieldRecords without going through a taxon', () => {
         render(<CatalogTabs project={project} active="species" />);
 
         // The whole point: collections are peers of taxa, not nested under one.
         expect(
-            screen.getByRole('tab', { name: 'catalogs.specimens.title' }),
-        ).toHaveAttribute('href', '/catalogs.specimens.index?project=7');
+            screen.getByRole('tab', { name: 'catalogs.fieldRecords.title' }),
+        ).toHaveAttribute('href', '/catalogs.fieldRecords.index?project=7');
     });
 
-    it('reaches the species list back from specimens', () => {
-        render(<CatalogTabs project={project} active="specimens" />);
+    it('reaches the species list back from fieldRecords', () => {
+        render(<CatalogTabs project={project} active="fieldRecords" />);
 
         expect(
             screen.getByRole('tab', { name: 'catalogs.species_list' }),
@@ -34,13 +34,13 @@ describe('CatalogTabs', () => {
         render(
             <CatalogTabs
                 project={project}
-                active="specimens"
+                active="fieldRecords"
                 speciesCount={0}
             />,
         );
 
         // catalogs.show redirects away from an empty catalog, so a link there
-        // would bounce — most visibly on the project that has specimens first.
+        // would bounce — most visibly on the project that has fieldRecords first.
         const species = screen.getByRole('tab', {
             name: 'catalogs.species_list',
         });
@@ -53,7 +53,7 @@ describe('CatalogTabs', () => {
         render(
             <CatalogTabs
                 project={project}
-                active="specimens"
+                active="fieldRecords"
                 speciesCount={1}
             />,
         );
@@ -64,10 +64,10 @@ describe('CatalogTabs', () => {
     });
 
     it('marks the current tab and does not link it to itself', () => {
-        render(<CatalogTabs project={project} active="specimens" />);
+        render(<CatalogTabs project={project} active="fieldRecords" />);
 
         const current = screen.getByRole('tab', {
-            name: 'catalogs.specimens.title',
+            name: 'catalogs.fieldRecords.title',
         });
 
         expect(current).toHaveAttribute('aria-current', 'page');

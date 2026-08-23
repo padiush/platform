@@ -43,14 +43,14 @@ function Actions({ onClose, processing }) {
                 className="btn btn-ghost btn-sm"
                 onClick={onClose}
             >
-                {t('catalogs.specimens.cancel')}
+                {t('catalogs.fieldRecords.cancel')}
             </button>
             <button
                 type="submit"
                 className="btn btn-primary btn-sm"
                 disabled={processing}
             >
-                {t('catalogs.specimens.save')}
+                {t('catalogs.fieldRecords.save')}
             </button>
         </div>
     );
@@ -66,21 +66,24 @@ export function CollectionModal({
     onClose,
     project,
     species = null,
-    specimen = null,
+    fieldRecord = null,
     permits = [],
     exemptions = [],
+    bases = [],
 }) {
     const { t } = useTranslation();
-    const editing = specimen !== null;
+    const editing = fieldRecord !== null;
 
     const { data, setData, post, patch, processing, errors, reset } = useForm({
-        collection_number: specimen?.collection_number ?? '',
-        collector: specimen?.collector ?? '',
-        collected_on: specimen?.collected_on ?? '',
-        locality: specimen?.locality ?? '',
-        collecting_permit_id: specimen?.collecting_permit_id ?? '',
-        permit_exemption: specimen?.permit_exemption ?? '',
-        notes: specimen?.notes ?? '',
+        basis_of_record: fieldRecord?.basis_of_record ?? 'preserved_specimen',
+        vernacular_name: fieldRecord?.vernacular_name ?? '',
+        collection_number: fieldRecord?.collection_number ?? '',
+        collector: fieldRecord?.collector ?? '',
+        collected_on: fieldRecord?.collected_on ?? '',
+        locality: fieldRecord?.locality ?? '',
+        collecting_permit_id: fieldRecord?.collecting_permit_id ?? '',
+        permit_exemption: fieldRecord?.permit_exemption ?? '',
+        notes: fieldRecord?.notes ?? '',
         // Only the species-page shortcut carries these: there, the taxon is the
         // reason you are on the page.
         ...(species && !editing
@@ -102,15 +105,15 @@ export function CollectionModal({
 
         if (editing) {
             patch(
-                route('catalogs.specimens.update', {
+                route('catalogs.fieldRecords.update', {
                     project: project.id,
-                    specimen: specimen.id,
+                    fieldRecord: fieldRecord.id,
                 }),
                 options,
             );
         } else if (species) {
             post(
-                route('catalogs.specimens.store-for-species', {
+                route('catalogs.fieldRecords.store-for-species', {
                     project: project.id,
                     species: species.id,
                 }),
@@ -118,7 +121,7 @@ export function CollectionModal({
             );
         } else {
             post(
-                route('catalogs.specimens.store', { project: project.id }),
+                route('catalogs.fieldRecords.store', { project: project.id }),
                 options,
             );
         }
@@ -130,8 +133,8 @@ export function CollectionModal({
             onClose={onClose}
             title={
                 editing
-                    ? t('catalogs.specimens.edit_collection')
-                    : t('catalogs.specimens.add')
+                    ? t('catalogs.fieldRecords.edit_collection')
+                    : t('catalogs.fieldRecords.add')
             }
         >
             <form
@@ -139,10 +142,51 @@ export function CollectionModal({
                 className="space-y-2"
                 data-testid="collection-form"
             >
+                {/*
+                    Whether anything was taken. A walk with an informant
+                    produces real records with nothing collected, and those can
+                    never carry a voucher — so the form asks first, and the
+                    collection number stops being the obvious next question.
+                */}
+                <Field
+                    label={t('catalogs.fieldRecords.basis')}
+                    hint={t(
+                        `catalogs.fieldRecords.basis_hint_${data.basis_of_record}`,
+                    )}
+                >
+                    <select
+                        className="select select-bordered w-full"
+                        value={data.basis_of_record}
+                        onChange={(e) =>
+                            setData('basis_of_record', e.target.value)
+                        }
+                    >
+                        {bases.map((basis) => (
+                            <option key={basis} value={basis}>
+                                {t(`catalogs.fieldRecords.basis_${basis}`)}
+                            </option>
+                        ))}
+                    </select>
+                </Field>
+
+                <Field
+                    label={t('catalogs.fieldRecords.vernacular_name')}
+                    hint={t('catalogs.fieldRecords.vernacular_name_hint')}
+                >
+                    <input
+                        type="text"
+                        className="input input-bordered w-full"
+                        value={data.vernacular_name}
+                        onChange={(e) =>
+                            setData('vernacular_name', e.target.value)
+                        }
+                    />
+                </Field>
+
                 <div className="grid gap-3 sm:grid-cols-2">
                     <Field
-                        label={t('catalogs.specimens.collection_number')}
-                        hint={t('catalogs.specimens.collection_number_hint')}
+                        label={t('catalogs.fieldRecords.collection_number')}
+                        hint={t('catalogs.fieldRecords.collection_number_hint')}
                     >
                         <input
                             type="text"
@@ -153,7 +197,7 @@ export function CollectionModal({
                             }
                         />
                     </Field>
-                    <Field label={t('catalogs.specimens.collector')}>
+                    <Field label={t('catalogs.fieldRecords.collector')}>
                         <input
                             type="text"
                             className="input input-bordered w-full"
@@ -165,7 +209,7 @@ export function CollectionModal({
                     </Field>
                 </div>
 
-                <Field label={t('catalogs.specimens.collected_on')}>
+                <Field label={t('catalogs.fieldRecords.collected_on')}>
                     <input
                         type="date"
                         className="input input-bordered w-full"
@@ -176,7 +220,7 @@ export function CollectionModal({
                     />
                 </Field>
 
-                <Field label={t('catalogs.specimens.locality')}>
+                <Field label={t('catalogs.fieldRecords.locality')}>
                     <input
                         type="text"
                         className="input input-bordered w-full"
@@ -193,10 +237,10 @@ export function CollectionModal({
                 */}
                 <div className="grid gap-3 sm:grid-cols-2">
                     <Field
-                        label={t('catalogs.specimens.permit')}
+                        label={t('catalogs.fieldRecords.permit')}
                         hint={
                             permits.length === 0
-                                ? t('catalogs.specimens.no_permits_yet')
+                                ? t('catalogs.fieldRecords.no_permits_yet')
                                 : null
                         }
                         error={errors.collecting_permit_id}
@@ -212,7 +256,7 @@ export function CollectionModal({
                             }}
                         >
                             <option value="">
-                                {t('catalogs.specimens.permit_none')}
+                                {t('catalogs.fieldRecords.permit_none')}
                             </option>
                             {permits.map((permit) => (
                                 <option key={permit.id} value={permit.id}>
@@ -223,8 +267,8 @@ export function CollectionModal({
                     </Field>
 
                     <Field
-                        label={t('catalogs.specimens.permit_exemption')}
-                        hint={t('catalogs.specimens.permit_exemption_hint')}
+                        label={t('catalogs.fieldRecords.permit_exemption')}
+                        hint={t('catalogs.fieldRecords.permit_exemption_hint')}
                         error={errors.permit_exemption}
                     >
                         <select
@@ -237,12 +281,12 @@ export function CollectionModal({
                             }}
                         >
                             <option value="">
-                                {t('catalogs.specimens.exemption_none')}
+                                {t('catalogs.fieldRecords.exemption_none')}
                             </option>
                             {exemptions.map((reason) => (
                                 <option key={reason} value={reason}>
                                     {t(
-                                        `catalogs.specimens.exemption_${reason}`,
+                                        `catalogs.fieldRecords.exemption_${reason}`,
                                     )}
                                 </option>
                             ))}
@@ -250,7 +294,7 @@ export function CollectionModal({
                     </Field>
                 </div>
 
-                <Field label={t('catalogs.specimens.notes')}>
+                <Field label={t('catalogs.fieldRecords.notes')}>
                     <textarea
                         className="textarea textarea-bordered w-full"
                         rows={2}
@@ -260,7 +304,7 @@ export function CollectionModal({
                 </Field>
 
                 {species && !editing && (
-                    <Field label={t('catalogs.specimens.determiner')}>
+                    <Field label={t('catalogs.fieldRecords.determiner')}>
                         <input
                             type="text"
                             className="input input-bordered w-full"
@@ -289,23 +333,29 @@ export function CollectionModal({
  * empty is a real answer — it records that someone examined this and could not
  * name it, which is not the same as nobody having looked.
  */
-export function DetermineModal({ open, onClose, project, specimen, catalog }) {
+export function DetermineModal({
+    open,
+    onClose,
+    project,
+    fieldRecord,
+    catalog,
+}) {
     const { t } = useTranslation();
 
     const { data, setData, post, processing, errors, reset } = useForm({
-        catalog_species_id: specimen?.species?.id ?? '',
-        determiner: specimen?.determiner ?? '',
-        determined_on: specimen?.determined_on ?? '',
-        qualifier: specimen?.qualifier ?? '',
+        catalog_species_id: fieldRecord?.species?.id ?? '',
+        determiner: fieldRecord?.determiner ?? '',
+        determined_on: fieldRecord?.determined_on ?? '',
+        qualifier: fieldRecord?.qualifier ?? '',
     });
 
     function submit(event) {
         event.preventDefault();
 
         post(
-            route('catalogs.specimens.determine', {
+            route('catalogs.fieldRecords.determine', {
                 project: project.id,
-                specimen: specimen.id,
+                fieldRecord: fieldRecord.id,
             }),
             {
                 preserveScroll: true,
@@ -322,7 +372,7 @@ export function DetermineModal({ open, onClose, project, specimen, catalog }) {
         <FormModal
             open={open}
             onClose={onClose}
-            title={t('catalogs.specimens.identify')}
+            title={t('catalogs.fieldRecords.identify')}
         >
             <form
                 onSubmit={submit}
@@ -330,8 +380,8 @@ export function DetermineModal({ open, onClose, project, specimen, catalog }) {
                 data-testid="determine-form"
             >
                 <Field
-                    label={t('catalogs.specimens.taxon')}
-                    hint={t('catalogs.specimens.taxon_hint')}
+                    label={t('catalogs.fieldRecords.taxon')}
+                    hint={t('catalogs.fieldRecords.taxon_hint')}
                     error={errors.catalog_species_id}
                 >
                     <select
@@ -342,7 +392,7 @@ export function DetermineModal({ open, onClose, project, specimen, catalog }) {
                         }
                     >
                         <option value="">
-                            {t('catalogs.specimens.indet')}
+                            {t('catalogs.fieldRecords.indet')}
                         </option>
                         {catalog.map((sp) => (
                             <option key={sp.id} value={sp.id}>
@@ -354,7 +404,7 @@ export function DetermineModal({ open, onClose, project, specimen, catalog }) {
                 </Field>
 
                 <div className="grid gap-3 sm:grid-cols-2">
-                    <Field label={t('catalogs.specimens.determiner')}>
+                    <Field label={t('catalogs.fieldRecords.determiner')}>
                         <input
                             type="text"
                             className="input input-bordered w-full"
@@ -364,7 +414,7 @@ export function DetermineModal({ open, onClose, project, specimen, catalog }) {
                             }
                         />
                     </Field>
-                    <Field label={t('catalogs.specimens.determined_on')}>
+                    <Field label={t('catalogs.fieldRecords.determined_on')}>
                         <input
                             type="date"
                             className="input input-bordered w-full"
@@ -377,8 +427,8 @@ export function DetermineModal({ open, onClose, project, specimen, catalog }) {
                 </div>
 
                 <Field
-                    label={t('catalogs.specimens.qualifier')}
-                    hint={t('catalogs.specimens.qualifier_hint')}
+                    label={t('catalogs.fieldRecords.qualifier')}
+                    hint={t('catalogs.fieldRecords.qualifier_hint')}
                 >
                     <select
                         className="select select-bordered w-full"
@@ -386,18 +436,18 @@ export function DetermineModal({ open, onClose, project, specimen, catalog }) {
                         onChange={(e) => setData('qualifier', e.target.value)}
                     >
                         <option value="">
-                            {t('catalogs.specimens.qualifier_none')}
+                            {t('catalogs.fieldRecords.qualifier_none')}
                         </option>
                         {QUALIFIERS.map((q) => (
                             <option key={q} value={q}>
-                                {t(`catalogs.specimens.qualifier_${q}`)}
+                                {t(`catalogs.fieldRecords.qualifier_${q}`)}
                             </option>
                         ))}
                     </select>
                 </Field>
 
                 <p className="text-base-content/60 text-xs">
-                    {t('catalogs.specimens.supersedes_note')}
+                    {t('catalogs.fieldRecords.supersedes_note')}
                 </p>
 
                 <Actions onClose={onClose} processing={processing} />
@@ -406,20 +456,20 @@ export function DetermineModal({ open, onClose, project, specimen, catalog }) {
     );
 }
 
-/** Where the specimen went, and under what number. */
+/** Where the fieldRecord went, and under what number. */
 export function DepositModal({
     open,
     onClose,
     project,
-    specimen,
+    fieldRecord,
     nextAccessionNumber,
 }) {
     const { t } = useTranslation();
-    const alreadyVouchered = specimen?.is_vouchered ?? false;
+    const alreadyVouchered = fieldRecord?.is_vouchered ?? false;
 
     const { data, setData, post, processing, errors, reset } = useForm({
-        accession_number: specimen?.accession_number ?? '',
-        repository: specimen?.repository ?? '',
+        accession_number: fieldRecord?.accession_number ?? '',
+        repository: fieldRecord?.repository ?? '',
         mint_accession: false,
     });
 
@@ -427,9 +477,9 @@ export function DepositModal({
         event.preventDefault();
 
         post(
-            route('catalogs.specimens.deposit', {
+            route('catalogs.fieldRecords.deposit', {
                 project: project.id,
-                specimen: specimen.id,
+                fieldRecord: fieldRecord.id,
             }),
             {
                 preserveScroll: true,
@@ -448,7 +498,7 @@ export function DepositModal({
         <FormModal
             open={open}
             onClose={onClose}
-            title={t('catalogs.specimens.deposit')}
+            title={t('catalogs.fieldRecords.deposit')}
         >
             <form
                 onSubmit={submit}
@@ -456,8 +506,8 @@ export function DepositModal({
                 data-testid="deposit-form"
             >
                 <Field
-                    label={t('catalogs.specimens.repository')}
-                    hint={t('catalogs.specimens.repository_hint')}
+                    label={t('catalogs.fieldRecords.repository')}
+                    hint={t('catalogs.fieldRecords.repository_hint')}
                 >
                     <input
                         type="text"
@@ -468,17 +518,17 @@ export function DepositModal({
                 </Field>
 
                 <Field
-                    label={t('catalogs.specimens.accession_number')}
+                    label={t('catalogs.fieldRecords.accession_number')}
                     hint={
                         // Nothing to advise when the field is disabled: the
                         // note below already says why.
                         alreadyVouchered
                             ? null
                             : minting
-                              ? t('catalogs.specimens.will_be_issued', {
+                              ? t('catalogs.fieldRecords.will_be_issued', {
                                     number: nextAccessionNumber,
                                 })
-                              : t('catalogs.specimens.accession_hint')
+                              : t('catalogs.fieldRecords.accession_hint')
                     }
                     error={errors.accession_number}
                 >
@@ -504,14 +554,14 @@ export function DepositModal({
                             }
                         />
                         <span className="label-text">
-                            {t('catalogs.specimens.mint')}
+                            {t('catalogs.fieldRecords.mint')}
                         </span>
                     </label>
                 )}
 
                 {alreadyVouchered && (
                     <p className="text-base-content/60 text-xs">
-                        {t('catalogs.specimens.already_vouchered_note')}
+                        {t('catalogs.fieldRecords.already_vouchered_note')}
                     </p>
                 )}
 

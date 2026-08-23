@@ -6,15 +6,15 @@ import {
     CollectionModal,
     DepositModal,
     DetermineModal,
-} from '@/Pages/Catalog/Partials/SpecimenModals';
-import SpecimenTable from '@/Pages/Catalog/Partials/SpecimenTable';
+} from '@/Pages/Catalog/Partials/FieldRecordModals';
+import FieldRecordTable from '@/Pages/Catalog/Partials/FieldRecordTable';
 import { faArrowLeft, faDownload } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link, router } from '@inertiajs/react';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-const FILTERS = ['all', 'undetermined', 'unvouchered'];
+const FILTERS = ['all', 'undetermined', 'unvouchered', 'observed'];
 
 function Summary({ summary }) {
     const { t } = useTranslation();
@@ -23,17 +23,17 @@ function Summary({ summary }) {
         <div className="stats stats-vertical sm:stats-horizontal bg-base-200/40 w-full">
             <div className="stat">
                 <div className="stat-title">
-                    {t('catalogs.specimens.stat_total')}
+                    {t('catalogs.fieldRecords.stat_total')}
                 </div>
                 <div className="stat-value text-2xl">{summary.total}</div>
             </div>
             <div className="stat">
                 <div className="stat-title">
-                    {t('catalogs.specimens.stat_vouchered')}
+                    {t('catalogs.fieldRecords.stat_vouchered')}
                 </div>
                 <div className="stat-value text-2xl">{summary.vouchered}</div>
                 <div className="stat-desc">
-                    {t('catalogs.specimens.coverage', {
+                    {t('catalogs.fieldRecords.coverage', {
                         vouchered: summary.vouchered,
                         total: summary.total,
                     })}
@@ -41,13 +41,22 @@ function Summary({ summary }) {
             </div>
             <div className="stat">
                 <div className="stat-title">
-                    {t('catalogs.specimens.stat_unidentified')}
+                    {t('catalogs.fieldRecords.stat_observed')}
+                </div>
+                <div className="stat-value text-2xl">{summary.observed}</div>
+                <div className="stat-desc">
+                    {t('catalogs.fieldRecords.stat_observed_hint')}
+                </div>
+            </div>
+            <div className="stat">
+                <div className="stat-title">
+                    {t('catalogs.fieldRecords.stat_unidentified')}
                 </div>
                 <div className="stat-value text-2xl">
                     {summary.unidentified}
                 </div>
                 <div className="stat-desc">
-                    {t('catalogs.specimens.stat_unidentified_hint')}
+                    {t('catalogs.fieldRecords.stat_unidentified_hint')}
                 </div>
             </div>
         </div>
@@ -57,13 +66,13 @@ function Summary({ summary }) {
 /**
  * Every collection the project has made, identified or not.
  *
- * This is the primary way in: fieldwork records a specimen long before anyone
+ * This is the primary way in: fieldwork records a fieldRecord long before anyone
  * names it, so the list is not scoped to a taxon and creating one asks nothing
  * about taxonomy. See docs/decisions/0008-specimens-and-determinations.md.
  */
-export default function Specimens({
+export default function FieldRecords({
     project,
-    specimens = [],
+    fieldRecords = [],
     summary,
     catalog = [],
     canEdit = false,
@@ -82,19 +91,29 @@ export default function Specimens({
 
     const shown = useMemo(() => {
         if (filter === 'undetermined') {
-            return specimens.filter((s) => !s.species);
+            return fieldRecords.filter((s) => !s.species);
         }
         if (filter === 'unvouchered') {
-            return specimens.filter((s) => !s.is_vouchered);
+            // Only what was collected can lack a voucher; an observation was
+            // never going to carry one.
+            return fieldRecords.filter(
+                (record) =>
+                    record.was_collected !== false && !record.is_vouchered,
+            );
         }
-        return specimens;
-    }, [specimens, filter]);
+        if (filter === 'observed') {
+            return fieldRecords.filter(
+                (record) => record.was_collected === false,
+            );
+        }
+        return fieldRecords;
+    }, [fieldRecords, filter]);
 
     function doDelete() {
         router.delete(
-            route('catalogs.specimens.destroy', {
+            route('catalogs.fieldRecords.destroy', {
                 project: project.id,
-                specimen: pendingDelete.id,
+                fieldRecord: pendingDelete.id,
             }),
             { preserveScroll: true, onFinish: () => setPendingDelete(null) },
         );
@@ -102,7 +121,7 @@ export default function Specimens({
 
     return (
         <AuthenticatedLayout
-            title={t('catalogs.specimens.title')}
+            title={t('catalogs.fieldRecords.title')}
             breadcrumbs={[
                 {
                     label: t('navigation.catalogs'),
@@ -117,7 +136,7 @@ export default function Specimens({
                             ? route('catalogs.show', { project: project.id })
                             : undefined,
                 },
-                { label: t('catalogs.specimens.title') },
+                { label: t('catalogs.fieldRecords.title') },
             ]}
             subtitle={project.name}
             action={
@@ -134,13 +153,13 @@ export default function Specimens({
                 <div className="mx-auto max-w-7xl space-y-4 sm:px-6 lg:px-8">
                     <CatalogTabs
                         project={project}
-                        active="specimens"
+                        active="fieldRecords"
                         speciesCount={speciesCount}
                     />
 
                     <Summary summary={summary} />
 
-                    <Card title={t('catalogs.specimens.all_collections')}>
+                    <Card title={t('catalogs.fieldRecords.all_collections')}>
                         <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
                             <div role="tablist" className="tabs tabs-box">
                                 {FILTERS.map((key) => (
@@ -151,13 +170,15 @@ export default function Specimens({
                                         className={`tab ${filter === key ? 'tab-active' : ''}`}
                                         onClick={() => setFilter(key)}
                                     >
-                                        {t(`catalogs.specimens.filter_${key}`)}
+                                        {t(
+                                            `catalogs.fieldRecords.filter_${key}`,
+                                        )}
                                     </button>
                                 ))}
                             </div>
 
                             <div className="flex items-center gap-2">
-                                {specimens.length > 0 && (
+                                {fieldRecords.length > 0 && (
                                     <div className="dropdown dropdown-end">
                                         <div
                                             tabIndex={0}
@@ -167,7 +188,7 @@ export default function Specimens({
                                             <FontAwesomeIcon
                                                 icon={faDownload}
                                             />
-                                            {t('catalogs.specimens.export')}
+                                            {t('catalogs.fieldRecords.export')}
                                         </div>
                                         <ul
                                             tabIndex={0}
@@ -177,7 +198,7 @@ export default function Specimens({
                                                 <li key={format}>
                                                     <a
                                                         href={route(
-                                                            'catalogs.specimens.export',
+                                                            'catalogs.fieldRecords.export',
                                                             {
                                                                 project:
                                                                     project.id,
@@ -186,7 +207,7 @@ export default function Specimens({
                                                         )}
                                                     >
                                                         {t(
-                                                            `catalogs.specimens.format_${format}`,
+                                                            `catalogs.fieldRecords.format_${format}`,
                                                         )}
                                                     </a>
                                                 </li>
@@ -200,21 +221,21 @@ export default function Specimens({
                                         className="btn btn-primary btn-sm"
                                         onClick={() => setCollecting(true)}
                                     >
-                                        {t('catalogs.specimens.add')}
+                                        {t('catalogs.fieldRecords.add')}
                                     </button>
                                 )}
                             </div>
                         </div>
 
-                        <SpecimenTable
-                            specimens={shown}
+                        <FieldRecordTable
+                            fieldRecords={shown}
                             canEdit={canEdit}
                             onEdit={setEditing}
                             onDetermine={setDetermining}
                             onDeposit={setDepositing}
                             onDelete={setPendingDelete}
-                            emptyTitle={t('catalogs.specimens.none_title')}
-                            emptyHint={t('catalogs.specimens.none_hint')}
+                            emptyTitle={t('catalogs.fieldRecords.none_title')}
+                            emptyHint={t('catalogs.fieldRecords.none_hint')}
                         />
                     </Card>
                 </div>
@@ -227,7 +248,7 @@ export default function Specimens({
                     setEditing(null);
                 }}
                 project={project}
-                specimen={editing}
+                fieldRecord={editing}
                 permits={permits}
                 exemptions={exemptions}
                 key={editing?.id ?? 'new'}
@@ -238,7 +259,7 @@ export default function Specimens({
                     open
                     onClose={() => setDetermining(null)}
                     project={project}
-                    specimen={determining}
+                    fieldRecord={determining}
                     catalog={catalog}
                 />
             )}
@@ -248,15 +269,15 @@ export default function Specimens({
                     open
                     onClose={() => setDepositing(null)}
                     project={project}
-                    specimen={depositing}
+                    fieldRecord={depositing}
                     nextAccessionNumber={nextAccessionNumber}
                 />
             )}
 
             <ConfirmModal
                 open={pendingDelete !== null}
-                title={t('catalogs.specimens.confirm_delete_title')}
-                message={t('catalogs.specimens.confirm_delete')}
+                title={t('catalogs.fieldRecords.confirm_delete_title')}
+                message={t('catalogs.fieldRecords.confirm_delete')}
                 onConfirm={doDelete}
                 onClose={() => setPendingDelete(null)}
             />

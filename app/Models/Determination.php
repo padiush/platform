@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * What a specimen was identified as, by whom, and when. Kept as history: a
+ * What a fieldRecord was identified as, by whom, and when. Kept as history: a
  * determination is an opinion, and revising it must not erase what was thought
  * before. See docs/decisions/0008-specimens-and-determinations.md.
  */
@@ -37,12 +37,12 @@ class Determination extends Model
         'is_current' => 'boolean',
     ];
 
-    public function specimen()
+    public function fieldRecord()
     {
-        return $this->belongsTo(Specimen::class);
+        return $this->belongsTo(FieldRecord::class);
     }
 
-    /** Null when the specimen is `indet.` — collected but not yet identified. */
+    /** Null when the fieldRecord is `indet.` — collected but not yet identified. */
     public function species()
     {
         return $this->belongsTo(CatalogSpecies::class, 'catalog_species_id');

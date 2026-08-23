@@ -24,9 +24,9 @@ Project ─┬─ ProjectAccess ── ProjectCapability      (who can do what)
          │          └─ CatalogSpeciesPhoto                   (reference imagery)
          ├─ CollectingPermit                                 (authority to collect;
          │                                                    one covers many)
-         └─ Specimen ─┬─ Determination → CatalogSpecies      (what it was identified
-                      │                                       as — nullable, `indet.`)
-                      └─ → CollectingPermit                  (or a stated reason
+         └─ FieldRecord ─┬─ Determination → CatalogSpecies   (what it was identified
+                         │                                    as — nullable, `indet.`)
+                         └─ → CollectingPermit               (or a stated reason
                                                               none was required)
 ```
 
@@ -48,9 +48,9 @@ Project ─┬─ ProjectAccess ── ProjectCapability      (who can do what)
 | `InstanceMedia` | Audio/photo capture artifact | `interview_instance_id` (uuid), `client_id` (device uuid), `kind` (audio·photo), `storage_disk`/`storage_key`, `content_type`, `byte_size?`, `duration_s?`, `status`, `transcription_status?`, `transcription_text?` (**encrypted**), `captured_at?` | int |
 | `CatalogSpecies` | A scientific taxon in the project catalog | `project_id`, `family`, `genus`, `name`, `authority`, optional `metadata` | int |
 | `CatalogSpeciesPhoto` | Reference image for a taxon | `catalog_species_id`, … | int |
-| `Specimen` | **One physical collection** — what was picked, pressed and deposited | `project_id`, `accession_number?` (the voucher, unique per project), `collection_number?` (the collector's field number), `collector?`, `collected_on?`, `locality?`, `location_lat?`/`location_lng?`, `repository?`, `collecting_permit_id?` **or** `permit_exemption?` (never both), `notes?`, `instance_answer_id?` | int |
+| `FieldRecord` | **One documented encounter** — collected, or only seen (`basis_of_record`) | `project_id`, `basis_of_record` (Darwin Core: `preserved_specimen`·`human_observation`·`living_specimen`·`material_sample`), `vernacular_name?` (**encrypted**), `accession_number?` (the voucher, unique per project), `collection_number?` (the collector's field number), `collector?`, `collected_on?`, `locality?`, `location_lat?`/`location_lng?`, `repository?`, `collecting_permit_id?` **or** `permit_exemption?` (never both), `notes?`, `instance_answer_id?` | int |
 | `CollectingPermit` | The authorisation material was collected under | `project_id`, `authority`, `reference` (**unique per project**), `issued_on?`, `expires_on?`, `notes?` | int |
-| `Determination` | What a specimen was identified as, by whom, when | `specimen_id`, `catalog_species_id?` (**null = `indet.`**), `determiner?`, `determined_on?`, `qualifier?` (`cf`·`aff`·`sp`), `is_current`, `notes?` | int |
+| `Determination` | What a record was identified as, by whom, when | `field_record_id`, `catalog_species_id?` (**null = `indet.`**), `determiner?`, `determined_on?`, `qualifier?` (`cf`·`aff`·`sp`), `is_current`, `notes?` | int |
 | `ChartPreference` | Persisted per-field chart choice (data viewer) | field key, chart type | int |
 
 ### Item types
@@ -119,8 +119,8 @@ in an ADR but not yet built, and unmarked for what is still only pencilled in.
   (kind, storage key, upload status, and audio transcription status/text);
   `interview_instances` gained `captured_at` and a GPS location. See
   [contracts/companion-api.md](contracts/companion-api.md).
-- **Specimens and determinations** — ✅ **data layer built (2026-08-22)** as
-  `specimens` and `determinations`, per
+- **Field records and determinations** — ✅ **built (2026-08-22)** as
+  `field_records` and `determinations`, per
   [decisions/0008-specimens-and-determinations.md](decisions/0008-specimens-and-determinations.md).
   A specimen is not a taxon, and one specimen carries many determinations over
   time; the taxon on a determination is **nullable**, because `indet.` is a real
@@ -129,9 +129,15 @@ in an ADR but not yet built, and unmarked for what is still only pencilled in.
   sequence) and coverage is reported rather than enforced. The catalog carries a
   project-level list of collections — a specimen is recorded before anything is
   known about its taxonomy, identified later, and deposited later still — with
-  a narrower view under each taxon. The species-indices export carries a
-  `Voucher No.` column, the collection list exports on its own in Darwin Core
-  terms, and voucher coverage is stated on the report page.
+  a narrower view under each taxon. **A record need not have been collected**
+  ([decisions/0010-field-records-and-basis.md](decisions/0010-field-records-and-basis.md)):
+  `basis_of_record` distinguishes a pressed specimen from something only seen,
+  observations are counted apart from voucher coverage rather than inside it,
+  and `vernacular_name` is encrypted like an interview answer. The
+  species-indices export carries a `Voucher No.` column, the record list exports
+  on its own in Darwin Core terms, and coverage is stated on the report page.
+  **Media on a record does not exist yet, so the observation case is
+  half-built** — for an observation the photograph is the record.
   Still pencilled in beside it: (for zoology subfields) conservation status.
 - **Collecting permits** — ✅ **data layer built (2026-08-22)** as
   `collecting_permits`, per

@@ -33,7 +33,7 @@ const current = {
     issued_on: '2026-01-15',
     expires_on: '2027-01-14',
     has_expired: false,
-    specimens_count: 3,
+    field_records_count: 3,
 };
 
 const lapsed = {
@@ -42,7 +42,7 @@ const lapsed = {
     reference: 'RES-001-2024',
     expires_on: '2025-01-14',
     has_expired: true,
-    specimens_count: 0,
+    field_records_count: 0,
 };
 
 function renderPage(props = {}) {

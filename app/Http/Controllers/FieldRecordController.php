@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Exports\SpecimensExport;
+use App\Exports\FieldRecordsExport;
 use App\Models\CatalogSpecies;
 use App\Models\Determination;
+use App\Models\FieldRecord;
 use App\Models\Project;
-use App\Models\Specimen;
 use App\Services\AccessionNumbers;
-use App\Services\SpecimenPresenter;
+use App\Services\FieldRecordPresenter;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -23,22 +23,22 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 /**
  * The physical collections a project has made.
  *
- * The order here follows the field, not the database: a specimen is collected
+ * The order here follows the field, not the database: a fieldRecord is collected
  * and recorded first, identified later — often by someone else — and deposited
- * against a voucher later still. So a specimen is created carrying no
+ * against a voucher later still. So a fieldRecord is created carrying no
  * determination at all, and `determine()` and `deposit()` are separate acts
  * performed when there is something to say.
  *
  * See docs/decisions/0008-specimens-and-determinations.md.
  */
-class SpecimenController extends Controller
+class FieldRecordController extends Controller
 {
     /** Lawful collections that fall outside the permit regime. */
     public const EXEMPTIONS = ['private_land', 'cultivated', 'market', 'other'];
 
     public function __construct(
         private readonly AccessionNumbers $accessions,
-        private readonly SpecimenPresenter $presenter,
+        private readonly FieldRecordPresenter $presenter,
     ) {}
 
     /** Every collection in the project, identified or not. */
@@ -53,23 +53,26 @@ class SpecimenController extends Controller
                 ->with('message_type', 'error');
         }
 
-        $specimens = $project->specimens()
+        $fieldRecords = $project->fieldRecords()
             ->with(['currentDetermination.species', 'collectingPermit'])
             ->orderByDesc('created_at')
             ->get();
 
-        return Inertia::render('Catalog/Specimens', [
+        return Inertia::render('Catalog/FieldRecords', [
             'project' => ['id' => $project->id, 'name' => $project->name],
-            'specimens' => $this->presenter->collection($specimens),
+            'fieldRecords' => $this->presenter->collection($fieldRecords),
             'summary' => [
-                'total' => $specimens->count(),
-                'vouchered' => $specimens->filter->isVouchered()->count(),
+                'total' => $fieldRecords->count(),
+                'vouchered' => $fieldRecords->filter->isVouchered()->count(),
                 // Everything still lacking a taxon: never examined, and
                 // examined without a name reached. The table keeps those two
                 // apart — they mean different things — but as a work queue
                 // they are one number, and it matches the list's filter.
-                'unidentified' => $specimens->filter(
-                    fn (Specimen $s) => $s->currentDetermination?->species === null
+                // Documented without anything being taken. Counted so an
+                // inventory walk does not read as missing vouchers.
+                'observed' => $fieldRecords->reject->wasCollected()->count(),
+                'unidentified' => $fieldRecords->filter(
+                    fn (FieldRecord $s) => $s->currentDetermination?->species === null
                 )->count(),
             ],
             // The catalog to identify against. Small enough to send whole, and
@@ -90,6 +93,7 @@ class SpecimenController extends Controller
                 ])
                 ->all(),
             'exemptions' => self::EXEMPTIONS,
+            'bases' => FieldRecord::BASES,
             'canEdit' => (bool) $user->can('editCatalog', $project),
             'nextAccessionNumber' => $this->accessions->peek($project),
             // The species tab is a dead end without one — catalogs.show
@@ -101,7 +105,7 @@ class SpecimenController extends Controller
     /**
      * The collection list as a spreadsheet.
      *
-     * Gated on viewCatalog, the same capability that shows the page: a specimen
+     * Gated on viewCatalog, the same capability that shows the page: a fieldRecord
      * record holds no informant response, so exporting it is not a wider
      * disclosure than reading it on screen.
      */
@@ -118,25 +122,25 @@ class SpecimenController extends Controller
         // either place should behave the same way.
         $format = $request->query('format') === 'csv' ? 'csv' : 'xlsx';
 
-        $rows = $project->specimens()
+        $rows = $project->fieldRecords()
             ->with(['currentDetermination.species', 'collectingPermit'])
             ->orderBy('accession_number')
             ->orderBy('collection_number')
             ->get()
-            ->map(function (Specimen $specimen) {
-                $determination = $specimen->currentDetermination;
+            ->map(function (FieldRecord $fieldRecord) {
+                $determination = $fieldRecord->currentDetermination;
                 $species = $determination?->species;
-                $permit = $specimen->collectingPermit;
+                $permit = $fieldRecord->collectingPermit;
 
                 return [
-                    $specimen->accession_number,
-                    $specimen->collection_number,
-                    $specimen->collector,
-                    $specimen->collected_on?->toDateString(),
-                    $specimen->locality,
-                    $specimen->location_lat,
-                    $specimen->location_lng,
-                    $specimen->repository,
+                    $fieldRecord->accession_number,
+                    $fieldRecord->collection_number,
+                    $fieldRecord->collector,
+                    $fieldRecord->collected_on?->toDateString(),
+                    $fieldRecord->locality,
+                    $fieldRecord->location_lat,
+                    $fieldRecord->location_lng,
+                    $fieldRecord->repository,
                     $species?->family,
                     $species?->genus,
                     $species?->name,
@@ -145,16 +149,16 @@ class SpecimenController extends Controller
                     $determination?->determined_on?->toDateString(),
                     $permit?->authority,
                     $permit?->reference,
-                    $specimen->permit_exemption,
-                    $specimen->notes,
+                    $fieldRecord->permit_exemption,
+                    $fieldRecord->notes,
                 ];
             })
             ->all();
 
-        $filename = Str::slug($project->name).'-specimens-'.now()->format('Y-m-d').".{$format}";
+        $filename = Str::slug($project->name).'-fieldRecords-'.now()->format('Y-m-d').".{$format}";
 
         return Excel::download(
-            new SpecimensExport($rows),
+            new FieldRecordsExport($rows),
             $filename,
             $format === 'csv' ? \Maatwebsite\Excel\Excel::CSV : null
         );
@@ -165,7 +169,7 @@ class SpecimenController extends Controller
      *
      * No determination row is written: nobody has looked at it yet, and an
      * empty determination would assert that someone had and failed. The
-     * specimen simply has no current determination until `determine()` says
+     * fieldRecord simply has no current determination until `determine()` says
      * otherwise.
      */
     public function store(Request $request, Project $project): RedirectResponse
@@ -176,12 +180,12 @@ class SpecimenController extends Controller
 
         $validated = $request->validate($this->collectionRules($project));
 
-        $specimen = new Specimen($validated);
-        $specimen->project_id = $project->id;
-        $specimen->save();
+        $fieldRecord = new FieldRecord($validated);
+        $fieldRecord->project_id = $project->id;
+        $fieldRecord->save();
 
         return back()
-            ->with('message', 'catalogs.specimens.registered')
+            ->with('message', 'catalogs.fieldRecords.registered')
             ->with('message_type', 'success');
     }
 
@@ -205,15 +209,15 @@ class SpecimenController extends Controller
         $validated = $request->validate($this->collectionRules($project) + $this->determinationRules());
 
         DB::transaction(function () use ($project, $species, $validated) {
-            $specimen = new Specimen($validated);
-            $specimen->project_id = $project->id;
-            $specimen->save();
+            $fieldRecord = new FieldRecord($validated);
+            $fieldRecord->project_id = $project->id;
+            $fieldRecord->save();
 
-            $this->recordDetermination($specimen, $species->id, $validated);
+            $this->recordDetermination($fieldRecord, $species->id, $validated);
         });
 
         return back()
-            ->with('message', 'catalogs.specimens.registered')
+            ->with('message', 'catalogs.fieldRecords.registered')
             ->with('message_type', 'success');
     }
 
@@ -221,25 +225,25 @@ class SpecimenController extends Controller
     public function update(
         Request $request,
         Project $project,
-        Specimen $specimen
+        FieldRecord $fieldRecord
     ): RedirectResponse {
         if ($denied = $this->denyUnlessEditable($project)) {
             return $denied;
         }
 
-        if ($specimen->project_id !== $project->id) {
-            return $this->specimenNotFound();
+        if ($fieldRecord->project_id !== $project->id) {
+            return $this->fieldRecordNotFound();
         }
 
-        $specimen->update($request->validate($this->collectionRules($project)));
+        $fieldRecord->update($request->validate($this->collectionRules($project)));
 
         return back()
-            ->with('message', 'catalogs.specimens.updated')
+            ->with('message', 'catalogs.fieldRecords.updated')
             ->with('message_type', 'success');
     }
 
     /**
-     * Identify the specimen, or revise an existing identification.
+     * Identify the fieldRecord, or revise an existing identification.
      *
      * The previous determination is superseded rather than replaced — the whole
      * reason determinations are a table is that what was thought before is part
@@ -249,14 +253,14 @@ class SpecimenController extends Controller
     public function determine(
         Request $request,
         Project $project,
-        Specimen $specimen
+        FieldRecord $fieldRecord
     ): RedirectResponse {
         if ($denied = $this->denyUnlessEditable($project)) {
             return $denied;
         }
 
-        if ($specimen->project_id !== $project->id) {
-            return $this->specimenNotFound();
+        if ($fieldRecord->project_id !== $project->id) {
+            return $this->fieldRecordNotFound();
         }
 
         $validated = $request->validate(
@@ -269,25 +273,25 @@ class SpecimenController extends Controller
             ]
         );
 
-        DB::transaction(function () use ($specimen, $validated) {
-            $specimen->determinations()
+        DB::transaction(function () use ($fieldRecord, $validated) {
+            $fieldRecord->determinations()
                 ->where('is_current', true)
                 ->update(['is_current' => false]);
 
             $this->recordDetermination(
-                $specimen,
+                $fieldRecord,
                 $validated['catalog_species_id'] ?? null,
                 $validated
             );
         });
 
         return back()
-            ->with('message', 'catalogs.specimens.determined')
+            ->with('message', 'catalogs.fieldRecords.determined')
             ->with('message_type', 'success');
     }
 
     /**
-     * Record the deposit: where the specimen went and under what number.
+     * Record the deposit: where the fieldRecord went and under what number.
      *
      * Separate from collection because it happens later, and often not at all.
      * The number is either issued from the project's sequence or typed in —
@@ -296,14 +300,20 @@ class SpecimenController extends Controller
     public function deposit(
         Request $request,
         Project $project,
-        Specimen $specimen
+        FieldRecord $fieldRecord
     ): RedirectResponse {
         if ($denied = $this->denyUnlessEditable($project)) {
             return $denied;
         }
 
-        if ($specimen->project_id !== $project->id) {
-            return $this->specimenNotFound();
+        if ($fieldRecord->project_id !== $project->id) {
+            return $this->fieldRecordNotFound();
+        }
+
+        if ($fieldRecord->basis_of_record === FieldRecord::BASIS_OBSERVATION) {
+            return back()
+                ->with('message', 'catalogs.fieldRecords.cannot_deposit_observation')
+                ->with('message_type', 'error');
         }
 
         $validated = $request->validate([
@@ -311,47 +321,47 @@ class SpecimenController extends Controller
                 'nullable',
                 'string',
                 'max:255',
-                Rule::unique('specimens', 'accession_number')
+                Rule::unique('field_records', 'accession_number')
                     ->where('project_id', $project->id)
-                    ->ignore($specimen->getKey()),
+                    ->ignore($fieldRecord->getKey()),
             ],
             'mint_accession' => 'boolean',
             'repository' => 'nullable|string|max:255',
         ]);
 
-        DB::transaction(function () use ($request, $project, $specimen, $validated) {
-            $specimen->repository = $validated['repository'] ?? null;
+        DB::transaction(function () use ($request, $project, $fieldRecord, $validated) {
+            $fieldRecord->repository = $validated['repository'] ?? null;
 
             // Minting is additive. An accession number already written on a
             // label and cited elsewhere is not ours to change.
-            if ($request->boolean('mint_accession') && ! $specimen->isVouchered()) {
-                $specimen->accession_number = $this->accessions->mint($project);
+            if ($request->boolean('mint_accession') && ! $fieldRecord->isVouchered()) {
+                $fieldRecord->accession_number = $this->accessions->mint($project);
             } elseif (! $request->boolean('mint_accession')) {
-                $specimen->accession_number = $validated['accession_number'] ?? null;
+                $fieldRecord->accession_number = $validated['accession_number'] ?? null;
             }
 
-            $specimen->save();
+            $fieldRecord->save();
         });
 
         return back()
-            ->with('message', 'catalogs.specimens.deposited')
+            ->with('message', 'catalogs.fieldRecords.deposited')
             ->with('message_type', 'success');
     }
 
-    public function destroy(Project $project, Specimen $specimen): RedirectResponse
+    public function destroy(Project $project, FieldRecord $fieldRecord): RedirectResponse
     {
         if ($denied = $this->denyUnlessEditable($project)) {
             return $denied;
         }
 
-        if ($specimen->project_id !== $project->id) {
-            return $this->specimenNotFound();
+        if ($fieldRecord->project_id !== $project->id) {
+            return $this->fieldRecordNotFound();
         }
 
-        $specimen->delete();
+        $fieldRecord->delete();
 
         return back()
-            ->with('message', 'catalogs.specimens.deleted')
+            ->with('message', 'catalogs.fieldRecords.deleted')
             ->with('message_type', 'success');
     }
 
@@ -359,7 +369,7 @@ class SpecimenController extends Controller
      * @param  array<string, mixed>  $validated
      */
     private function recordDetermination(
-        Specimen $specimen,
+        FieldRecord $fieldRecord,
         ?int $speciesId,
         array $validated
     ): void {
@@ -370,7 +380,7 @@ class SpecimenController extends Controller
             'qualifier' => $validated['qualifier'] ?? null,
             'is_current' => true,
         ]);
-        $determination->specimen_id = $specimen->id;
+        $determination->field_record_id = $fieldRecord->id;
         $determination->save();
     }
 
@@ -382,6 +392,11 @@ class SpecimenController extends Controller
     private function collectionRules(Project $project): array
     {
         return [
+            // What kind of encounter this was. Defaults to a collection, which
+            // is what everything recorded before this existed.
+            'basis_of_record' => ['nullable', Rule::in(FieldRecord::BASES)],
+            // What an informant called it. Encrypted at rest by the model.
+            'vernacular_name' => 'nullable|string|max:255',
             'collection_number' => 'nullable|string|max:255',
             'collector' => 'nullable|string|max:255',
             'collected_on' => 'nullable|date',
@@ -446,11 +461,11 @@ class SpecimenController extends Controller
             ->with('message_type', 'error');
     }
 
-    private function specimenNotFound(): RedirectResponse
+    private function fieldRecordNotFound(): RedirectResponse
     {
         return redirect()
             ->route('catalogs.index')
-            ->with('message', 'catalogs.specimens.not_found')
+            ->with('message', 'catalogs.fieldRecords.not_found')
             ->with('message_type', 'error');
     }
 }

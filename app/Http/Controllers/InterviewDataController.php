@@ -18,10 +18,10 @@ use App\Models\Project;
 use App\Models\User;
 use App\Services\CatalogSpeciesSearch;
 use App\Services\EthnobiologyIndices;
+use App\Services\FieldRecordEvidence;
 use App\Services\InterviewDataExport;
 use App\Services\InterviewDataTable;
 use App\Services\SpeciesLinkingList;
-use App\Services\SpecimenEvidence;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -442,7 +442,7 @@ class InterviewDataController extends Controller
     public function reports(
         Project $project,
         EthnobiologyIndices $indices,
-        SpecimenEvidence $evidence
+        FieldRecordEvidence $evidence
     ): Response|RedirectResponse {
         $this->checkPermission($project);
 
@@ -462,7 +462,7 @@ class InterviewDataController extends Controller
         Project $project,
         Request $request,
         EthnobiologyIndices $indices,
-        SpecimenEvidence $evidence
+        FieldRecordEvidence $evidence
     ): BinaryFileResponse {
         $this->checkPermission($project);
 

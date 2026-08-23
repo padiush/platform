@@ -3,8 +3,8 @@
 namespace Tests\Feature;
 
 use App\Models\CollectingPermit;
+use App\Models\FieldRecord;
 use App\Models\Project;
-use App\Models\Specimen;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia as Assert;
 use Tests\Concerns\InteractsWithProjects;
@@ -99,7 +99,7 @@ class CollectingPermitCrudTest extends TestCase
     public function test_deleting_a_permit_keeps_the_collections_taken_under_it()
     {
         $permit = $this->permit();
-        $specimen = Specimen::factory()->create([
+        $fieldRecord = FieldRecord::factory()->create([
             'project_id' => $this->project->id,
             'collecting_permit_id' => $permit->id,
         ]);
@@ -109,14 +109,14 @@ class CollectingPermitCrudTest extends TestCase
             ->assertRedirect();
 
         // The physical record outlives the paperwork.
-        $this->assertNotNull($specimen->fresh());
-        $this->assertNull($specimen->fresh()->collecting_permit_id);
+        $this->assertNotNull($fieldRecord->fresh());
+        $this->assertNull($fieldRecord->fresh()->collecting_permit_id);
     }
 
     public function test_the_page_reports_how_many_collections_a_permit_covers()
     {
         $permit = $this->permit(['expires_on' => '2020-01-01']);
-        Specimen::factory()->count(2)->create([
+        FieldRecord::factory()->count(2)->create([
             'project_id' => $this->project->id,
             'collecting_permit_id' => $permit->id,
         ]);
@@ -126,7 +126,7 @@ class CollectingPermitCrudTest extends TestCase
             ->assertInertia(fn (Assert $page) => $page
                 ->component('Catalog/Permits')
                 ->has('permits', 1)
-                ->where('permits.0.specimens_count', 2)
+                ->where('permits.0.field_records_count', 2)
                 // Read from the date on the permit, not a ruling about it.
                 ->where('permits.0.has_expired', true)
             );

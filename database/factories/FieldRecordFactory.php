@@ -2,18 +2,18 @@
 
 namespace Database\Factories;
 
+use App\Models\FieldRecord;
 use App\Models\Project;
-use App\Models\Specimen;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends Factory<Specimen>
+ * @extends Factory<FieldRecord>
  */
-class SpecimenFactory extends Factory
+class FieldRecordFactory extends Factory
 {
     /**
      * Unvouchered by default, because that is the ordinary case in the field:
-     * a specimen is collected long before anything accessions it.
+     * a fieldRecord is collected long before anything accessions it.
      *
      * @return array<string, mixed>
      */

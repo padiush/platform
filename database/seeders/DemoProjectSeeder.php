@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\CatalogSpecies;
 use App\Models\CollectingPermit;
 use App\Models\Determination;
+use App\Models\FieldRecord;
 use App\Models\InstanceAnswer;
 use App\Models\InterviewForm;
 use App\Models\InterviewInstance;
@@ -13,7 +14,6 @@ use App\Models\InterviewSection;
 use App\Models\Project;
 use App\Models\ProjectAccess;
 use App\Models\ProjectCapability;
-use App\Models\Specimen;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -124,7 +124,7 @@ class DemoProjectSeeder extends Seeder
             [$form, $items, $sections] = $this->form($project);
 
             $this->interviews($form, $sections, $items, $species, $user);
-            $this->specimens($project, $species);
+            $this->fieldRecords($project, $species);
         });
 
         $this->command?->info('Demo project seeded: '.self::PROJECT_NAME);
@@ -185,7 +185,7 @@ class DemoProjectSeeder extends Seeder
      * anything was ever picked, which is the half of the work that happens
      * first.
      */
-    private function specimens(Project $project, array $species): void
+    private function fieldRecords(Project $project, array $species): void
     {
         $collector = 'A. Domínguez';
 
@@ -204,7 +204,7 @@ class DemoProjectSeeder extends Seeder
         // Identified, deposited, voucher issued by the project itself — the
         // community-herbarium case.
         foreach (array_slice(array_keys($species), 0, 3) as $index => $local) {
-            $specimen = new Specimen([
+            $fieldRecord = new FieldRecord([
                 'collection_number' => (string) (101 + $index),
                 'collector' => $collector,
                 'collected_on' => '2026-03-'.str_pad((string) (10 + $index), 2, '0', STR_PAD_LEFT),
@@ -213,8 +213,8 @@ class DemoProjectSeeder extends Seeder
                 'accession_number' => 'DEMO-'.str_pad((string) ($index + 1), 4, '0', STR_PAD_LEFT),
                 'collecting_permit_id' => $permit->id,
             ]);
-            $specimen->project_id = $project->id;
-            $specimen->save();
+            $fieldRecord->project_id = $project->id;
+            $fieldRecord->save();
 
             $determination = new Determination([
                 'catalog_species_id' => $species[$local]->id,
@@ -222,12 +222,12 @@ class DemoProjectSeeder extends Seeder
                 'determined_on' => '2026-04-02',
                 'is_current' => true,
             ]);
-            $determination->specimen_id = $specimen->id;
+            $determination->field_record_id = $fieldRecord->id;
             $determination->save();
         }
 
         // Examined and not nameable: indet., which is a determination.
-        $indet = new Specimen([
+        $indet = new FieldRecord([
             'collection_number' => '104',
             'collector' => $collector,
             'collected_on' => '2026-03-14',
@@ -242,12 +242,26 @@ class DemoProjectSeeder extends Seeder
             'determined_on' => '2026-04-02',
             'is_current' => true,
         ]);
-        $unnamed->specimen_id = $indet->id;
+        $unnamed->field_record_id = $indet->id;
         $unnamed->save();
+
+        // A guided walk with a key informant: named on the spot, nothing
+        // taken. No permit covers it and none is needed, because nothing was
+        // collected — the record is the photograph and what was said.
+        $observed = new FieldRecord([
+            'basis_of_record' => FieldRecord::BASIS_OBSERVATION,
+            'collector' => $collector,
+            'collected_on' => '2026-03-18',
+            'locality' => 'Sendero al mirador, cantón El Rosario',
+            'vernacular_name' => 'cortez blanco',
+            'notes' => 'Árbol en pie, señalado durante el recorrido. No se recolectó.',
+        ]);
+        $observed->project_id = $project->id;
+        $observed->save();
 
         // Collected, nobody has looked at it yet. Different from indet.
         foreach (['105', '106'] as $offset => $number) {
-            $pending = new Specimen([
+            $pending = new FieldRecord([
                 'collection_number' => $number,
                 'collector' => $collector,
                 'collected_on' => '2026-03-1'.(5 + $offset),

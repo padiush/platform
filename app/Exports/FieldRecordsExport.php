@@ -18,7 +18,7 @@ use Maatwebsite\Excel\Concerns\WithTitle;
  *
  * See docs/decisions/0008-specimens-and-determinations.md.
  */
-class SpecimensExport implements FromArray, WithHeadings, WithTitle
+class FieldRecordsExport implements FromArray, WithHeadings, WithTitle
 {
     /**
      * @param  list<list<string|int|float|null>>  $rows
@@ -56,6 +56,6 @@ class SpecimensExport implements FromArray, WithHeadings, WithTitle
 
     public function title(): string
     {
-        return 'Specimens';
+        return 'FieldRecords';
     }
 }

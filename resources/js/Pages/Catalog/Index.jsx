@@ -78,14 +78,14 @@ export default function CatalogOverview({ projects }) {
 
                                         <Link
                                             href={route(
-                                                'catalogs.specimens.index',
+                                                'catalogs.fieldRecords.index',
                                                 { project: project.id },
                                             )}
                                             className="btn btn-outline btn-sm"
                                         >
-                                            {t('catalogs.specimens.title')}
-                                            {project.specimen_count > 0
-                                                ? ` (${project.specimen_count})`
+                                            {t('catalogs.fieldRecords.title')}
+                                            {project.field_record_count > 0
+                                                ? ` (${project.field_record_count})`
                                                 : ''}
                                         </Link>
 
