@@ -2,7 +2,7 @@
 
 namespace App\Jobs;
 
-use App\Models\InstanceMedia;
+use App\Models\Media;
 use App\Services\Transcription\Transcriber;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -24,7 +24,7 @@ class TranscribeAudio implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public function __construct(public InstanceMedia $media) {}
+    public function __construct(public Media $media) {}
 
     public function handle(Transcriber $transcriber): void
     {

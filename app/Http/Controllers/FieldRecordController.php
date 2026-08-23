@@ -54,7 +54,7 @@ class FieldRecordController extends Controller
         }
 
         $fieldRecords = $project->fieldRecords()
-            ->with(['currentDetermination.species', 'collectingPermit'])
+            ->with(['currentDetermination.species', 'collectingPermit', 'media'])
             ->orderByDesc('created_at')
             ->get();
 
@@ -123,7 +123,7 @@ class FieldRecordController extends Controller
         $format = $request->query('format') === 'csv' ? 'csv' : 'xlsx';
 
         $rows = $project->fieldRecords()
-            ->with(['currentDetermination.species', 'collectingPermit'])
+            ->with(['currentDetermination.species', 'collectingPermit', 'media'])
             ->orderBy('accession_number')
             ->orderBy('collection_number')
             ->get()

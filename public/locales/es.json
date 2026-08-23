@@ -444,6 +444,16 @@
             "identify": "Identificar",
             "indet": "indet.",
             "locality": "Localidad",
+            "media": {
+                "add": "Añadir foto o audio",
+                "added": "Archivo añadido.",
+                "none": "Sin fotos ni audio.",
+                "none_observation": "No se recolectó nada, así que la fotografía es el registro. Añade al menos una.",
+                "photo_alt": "Fotografía del registro",
+                "remove": "Quitar",
+                "removed": "Archivo eliminado.",
+                "title": "Evidencia"
+            },
             "mint": "Emitir el siguiente número del proyecto",
             "no_permits_yet": "Registra un permiso en la pestaña Permisos para poder elegirlo aquí.",
             "no_species_yet": "Este proyecto aún no tiene especies registradas.",

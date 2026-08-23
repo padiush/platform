@@ -3,9 +3,9 @@
 namespace Tests\Feature\Api;
 
 use App\Jobs\TranscribeAudio;
-use App\Models\InstanceMedia;
 use App\Models\InterviewForm;
 use App\Models\InterviewInstance;
+use App\Models\Media;
 use App\Models\Project;
 use App\Models\User;
 use App\Services\Transcription\Transcriber;
@@ -17,7 +17,7 @@ class TranscribeAudioTest extends TestCase
 {
     use RefreshDatabase;
 
-    private function audioMedia(): InstanceMedia
+    private function audioMedia(): Media
     {
         $project = Project::factory()->create();
         $form = InterviewForm::factory()->create(['project_id' => $project->id]);
@@ -29,7 +29,7 @@ class TranscribeAudioTest extends TestCase
         $instance->user_id = $user->id;
         $instance->save();
 
-        return InstanceMedia::create([
+        return Media::create([
             'interview_instance_id' => $instance->id,
             'client_id' => (string) Str::uuid(),
             'kind' => 'audio',
@@ -45,7 +45,7 @@ class TranscribeAudioTest extends TestCase
     {
         $this->app->instance(Transcriber::class, new class implements Transcriber
         {
-            public function transcribe(InstanceMedia $media): string
+            public function transcribe(Media $media): string
             {
                 return 'transcribed text';
             }

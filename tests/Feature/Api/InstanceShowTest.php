@@ -2,9 +2,9 @@
 
 namespace Tests\Feature\Api;
 
-use App\Models\InstanceMedia;
 use App\Models\InterviewForm;
 use App\Models\InterviewInstance;
+use App\Models\Media;
 use App\Models\Project;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -40,7 +40,7 @@ class InstanceShowTest extends TestCase
         $this->instance->location_accuracy_m = 8.0;
         $this->instance->save();
 
-        InstanceMedia::create([
+        Media::create([
             'interview_instance_id' => $this->instance->id,
             'client_id' => (string) Str::uuid(),
             'kind' => 'audio',
@@ -51,7 +51,7 @@ class InstanceShowTest extends TestCase
             'transcription_status' => 'done',
             'transcription_text' => 'la guaba se usa para la fiebre',
         ]);
-        InstanceMedia::create([
+        Media::create([
             'interview_instance_id' => $this->instance->id,
             'client_id' => (string) Str::uuid(),
             'kind' => 'photo',
@@ -83,7 +83,7 @@ class InstanceShowTest extends TestCase
 
     public function test_transcription_text_is_withheld_until_done(): void
     {
-        InstanceMedia::where('interview_instance_id', $this->instance->id)
+        Media::where('interview_instance_id', $this->instance->id)
             ->where('kind', 'audio')
             ->update(['transcription_status' => 'processing']);
 

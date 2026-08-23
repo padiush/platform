@@ -444,6 +444,16 @@
             "identify": "Identify",
             "indet": "indet.",
             "locality": "Locality",
+            "media": {
+                "add": "Add a photo or audio",
+                "added": "File added.",
+                "none": "No photographs or audio.",
+                "none_observation": "Nothing was collected, so the photograph is the record. Add at least one.",
+                "photo_alt": "Photograph of the record",
+                "remove": "Remove",
+                "removed": "File removed.",
+                "title": "Evidence"
+            },
             "mint": "Issue the project's next number",
             "no_permits_yet": "Record a permit under the Permits tab to choose one here.",
             "no_species_yet": "This project has no species recorded yet.",

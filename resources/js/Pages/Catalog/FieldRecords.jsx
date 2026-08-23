@@ -1,5 +1,6 @@
 import Card from '@/Components/Card';
 import ConfirmModal from '@/Components/ConfirmModal';
+import FormModal from '@/Components/FormModal';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import CatalogTabs from '@/Pages/Catalog/Partials/CatalogTabs';
 import {
@@ -8,6 +9,7 @@ import {
     DetermineModal,
 } from '@/Pages/Catalog/Partials/FieldRecordModals';
 import FieldRecordTable from '@/Pages/Catalog/Partials/FieldRecordTable';
+import RecordMedia from '@/Pages/Catalog/Partials/RecordMedia';
 import { faArrowLeft, faDownload } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link, router } from '@inertiajs/react';
@@ -87,6 +89,7 @@ export default function FieldRecords({
     const [editing, setEditing] = useState(null);
     const [determining, setDetermining] = useState(null);
     const [depositing, setDepositing] = useState(null);
+    const [showingMedia, setShowingMedia] = useState(null);
     const [pendingDelete, setPendingDelete] = useState(null);
 
     const shown = useMemo(() => {
@@ -233,6 +236,7 @@ export default function FieldRecords({
                             onEdit={setEditing}
                             onDetermine={setDetermining}
                             onDeposit={setDepositing}
+                            onMedia={setShowingMedia}
                             onDelete={setPendingDelete}
                             emptyTitle={t('catalogs.fieldRecords.none_title')}
                             emptyHint={t('catalogs.fieldRecords.none_hint')}
@@ -272,6 +276,24 @@ export default function FieldRecords({
                     fieldRecord={depositing}
                     nextAccessionNumber={nextAccessionNumber}
                 />
+            )}
+
+            {showingMedia && (
+                <FormModal
+                    open
+                    onClose={() => setShowingMedia(null)}
+                    title={t('catalogs.fieldRecords.media.title')}
+                >
+                    <RecordMedia
+                        project={project}
+                        fieldRecord={
+                            fieldRecords.find(
+                                (r) => r.id === showingMedia.id,
+                            ) ?? showingMedia
+                        }
+                        canEdit={canEdit}
+                    />
+                </FormModal>
             )}
 
             <ConfirmModal

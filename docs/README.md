@@ -104,7 +104,7 @@ companion keeps its interview-capture scope.
   as a read-only pull. Built and released on this basis, which flips
   [ADR 0003](decisions/0003-capture-only-companion-scope.md) to **Accepted**
   ([companion API](contracts/companion-api.md#settled-decisions)).
-- **Field records and basis** *(accepted 2026-08-22)* — `specimens` becomes
+- **Field records and basis** *(accepted 2026-08-22, media added 2026-08-23)* — `specimens` becomes
   `field_records`, and `basis_of_record` distinguishes a pressed specimen from
   something only seen. Much of what a study documents is never collected, and a
   record that could never carry a voucher is not a gap in the evidence, so

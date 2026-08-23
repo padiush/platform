@@ -5,8 +5,8 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Requests\Api\CompleteMediaRequest;
 use App\Http\Requests\Api\StoreMediaIntentRequest;
 use App\Jobs\TranscribeAudio;
-use App\Models\InstanceMedia;
 use App\Models\InterviewInstance;
+use App\Models\Media;
 use App\Services\Media\StoredObjectInspector;
 use App\Services\Media\UploadUrlFactory;
 use Illuminate\Http\JsonResponse;
@@ -37,7 +37,7 @@ class MediaController extends ApiController
         $contentType = $request->input('content_type');
         $this->assertContentTypeMatchesKind($kind, $contentType);
 
-        $media = InstanceMedia::firstOrNew(['client_id' => $clientId]);
+        $media = Media::firstOrNew(['client_id' => $clientId]);
 
         // A client_id already used on another instance is a conflict.
         if ($media->exists && $media->interview_instance_id !== $instance->id) {
@@ -54,7 +54,7 @@ class MediaController extends ApiController
             'storage_key' => $key,
             'content_type' => $contentType,
             'byte_size' => $request->integer('byte_size'),
-            'status' => InstanceMedia::STATUS_PENDING,
+            'status' => Media::STATUS_PENDING,
         ])->save();
 
         $presigned = $urls->create(self::DISK, $key, $contentType, self::UPLOAD_TTL_MINUTES);
@@ -75,7 +75,7 @@ class MediaController extends ApiController
         $project = $this->projectForInstance($instance);
         $this->requireCapability($request->user(), $project, 'record_data');
 
-        $media = InstanceMedia::where('client_id', $request->input('client_id'))
+        $media = Media::where('client_id', $request->input('client_id'))
             ->where('interview_instance_id', $instance->id)
             ->first();
 
@@ -105,7 +105,7 @@ class MediaController extends ApiController
             $this->fail('api.media.content_type_mismatch', 422);
         }
 
-        $media->status = InstanceMedia::STATUS_STORED;
+        $media->status = Media::STATUS_STORED;
 
         if ($request->filled('duration_s')) {
             $media->duration_s = $request->integer('duration_s');
@@ -134,7 +134,7 @@ class MediaController extends ApiController
 
     private function assertContentTypeMatchesKind(string $kind, string $contentType): void
     {
-        $prefix = $kind === InstanceMedia::KIND_AUDIO ? 'audio/' : 'image/';
+        $prefix = $kind === Media::KIND_AUDIO ? 'audio/' : 'image/';
 
         if (! str_starts_with($contentType, $prefix)) {
             $this->fail('api.validation_failed', 422, [
