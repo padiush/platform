@@ -104,7 +104,7 @@ describe('RecordMedia', () => {
         ).not.toBeInTheDocument();
     });
 
-    it('removes through its own route', () => {
+    it('asks before destroying the only evidence a record has', () => {
         render(
             <RecordMedia
                 project={project}
@@ -115,9 +115,29 @@ describe('RecordMedia', () => {
 
         fireEvent.click(screen.getByText('catalogs.fieldRecords.media.remove'));
 
-        expect(destroy).toHaveBeenCalledWith(
-            '/catalogs.fieldRecords.media.destroy',
-            expect.objectContaining({ preserveScroll: true }),
+        // The bytes go with the row, and nothing was collected — so it warns
+        // rather than deleting on the click.
+        expect(destroy).not.toHaveBeenCalled();
+        expect(
+            screen.getByText(
+                'catalogs.fieldRecords.media.confirm_delete_only_evidence',
+            ),
+        ).toBeInTheDocument();
+    });
+
+    it('warns more plainly where material was collected', () => {
+        render(
+            <RecordMedia
+                project={project}
+                fieldRecord={{ id: 1, was_collected: true, media: [photo] }}
+                canEdit
+            />,
         );
+
+        fireEvent.click(screen.getByText('catalogs.fieldRecords.media.remove'));
+
+        expect(
+            screen.getByText('catalogs.fieldRecords.media.confirm_delete'),
+        ).toBeInTheDocument();
     });
 });

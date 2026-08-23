@@ -447,10 +447,13 @@
             "media": {
                 "add": "Add a photo or audio",
                 "added": "File added.",
+                "confirm_delete": "It will be deleted for good. Continue?",
+                "confirm_delete_only_evidence": "Nothing was collected here, so this file may be the record's only evidence. It will be deleted for good. Continue?",
+                "confirm_delete_title": "Delete the file",
                 "none": "No photographs or audio.",
-                "none_observation": "Nothing was collected, so the photograph is the record. Add at least one.",
+                "none_observation": "Nothing was collected, so a photo will be the only way to identify this later.",
                 "photo_alt": "Photograph of the record",
-                "remove": "Remove",
+                "remove": "Delete",
                 "removed": "File removed.",
                 "title": "Evidence"
             },

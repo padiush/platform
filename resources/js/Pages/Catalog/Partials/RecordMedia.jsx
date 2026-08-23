@@ -1,5 +1,6 @@
+import ConfirmModal from '@/Components/ConfirmModal';
 import { router, useForm } from '@inertiajs/react';
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 /**
@@ -13,6 +14,7 @@ import { useTranslation } from 'react-i18next';
 export default function RecordMedia({ project, fieldRecord, canEdit = false }) {
     const { t } = useTranslation();
     const fileRef = useRef(null);
+    const [pendingDelete, setPendingDelete] = useState(null);
     const media = fieldRecord.media ?? [];
 
     const { setData, post, processing, errors, reset } = useForm({
@@ -42,14 +44,16 @@ export default function RecordMedia({ project, fieldRecord, canEdit = false }) {
         );
     }
 
-    function remove(medium) {
+    // The bytes go with the row, so this is not a detach — and where nothing
+    // was collected it may be the only evidence the record has.
+    function remove() {
         router.delete(
             route('catalogs.fieldRecords.media.destroy', {
                 project: project.id,
                 fieldRecord: fieldRecord.id,
-                medium: medium.id,
+                medium: pendingDelete.id,
             }),
-            { preserveScroll: true },
+            { preserveScroll: true, onFinish: () => setPendingDelete(null) },
         );
     }
 
@@ -90,7 +94,7 @@ export default function RecordMedia({ project, fieldRecord, canEdit = false }) {
                                     <button
                                         type="button"
                                         className="btn btn-ghost btn-xs text-error"
-                                        onClick={() => remove(medium)}
+                                        onClick={() => setPendingDelete(medium)}
                                     >
                                         {t(
                                             'catalogs.fieldRecords.media.remove',
@@ -104,6 +108,20 @@ export default function RecordMedia({ project, fieldRecord, canEdit = false }) {
             )}
 
             {errors.file && <p className="text-error text-sm">{errors.file}</p>}
+
+            <ConfirmModal
+                open={pendingDelete !== null}
+                title={t('catalogs.fieldRecords.media.confirm_delete_title')}
+                message={
+                    fieldRecord.was_collected === false
+                        ? t(
+                              'catalogs.fieldRecords.media.confirm_delete_only_evidence',
+                          )
+                        : t('catalogs.fieldRecords.media.confirm_delete')
+                }
+                onConfirm={remove}
+                onClose={() => setPendingDelete(null)}
+            />
 
             {canEdit && (
                 <label className="btn btn-outline btn-sm">

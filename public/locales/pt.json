@@ -447,10 +447,13 @@
             "media": {
                 "add": "Adicionar foto ou áudio",
                 "added": "Ficheiro adicionado.",
+                "confirm_delete": "Será eliminado definitivamente. Continuar?",
+                "confirm_delete_only_evidence": "Aqui não foi colhido nada, por isso este ficheiro pode ser a única evidência do registo. Será eliminado definitivamente. Continuar?",
+                "confirm_delete_title": "Eliminar o ficheiro",
                 "none": "Sem fotografias nem áudio.",
-                "none_observation": "Nada foi colhido, por isso a fotografia é o registo. Adiciona pelo menos uma.",
+                "none_observation": "Nada foi colhido, por isso a foto será a única forma de identificar isto mais tarde.",
                 "photo_alt": "Fotografia do registo",
-                "remove": "Remover",
+                "remove": "Eliminar",
                 "removed": "Ficheiro removido.",
                 "title": "Evidência"
             },
