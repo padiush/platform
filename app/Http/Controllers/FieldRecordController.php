@@ -33,9 +33,6 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
  */
 class FieldRecordController extends Controller
 {
-    /** Lawful collections that fall outside the permit regime. */
-    public const EXEMPTIONS = ['private_land', 'cultivated', 'market', 'other'];
-
     public function __construct(
         private readonly AccessionNumbers $accessions,
         private readonly FieldRecordPresenter $presenter,
@@ -92,7 +89,7 @@ class FieldRecordController extends Controller
                     'label' => $permit->label(),
                 ])
                 ->all(),
-            'exemptions' => self::EXEMPTIONS,
+            'exemptions' => FieldRecord::EXEMPTIONS,
             'bases' => FieldRecord::BASES,
             'canEdit' => (bool) $user->can('editCatalog', $project),
             'nextAccessionNumber' => $this->accessions->peek($project),
@@ -417,7 +414,7 @@ class FieldRecordController extends Controller
             'permit_exemption' => [
                 'nullable',
                 'prohibits:collecting_permit_id',
-                Rule::in(self::EXEMPTIONS),
+                Rule::in(FieldRecord::EXEMPTIONS),
             ],
         ];
     }

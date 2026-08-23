@@ -15,6 +15,8 @@ use Illuminate\Http\Request;
  * with no connectivity. `?since` makes it incremental (only forms whose
  * structure changed after the cursor). The device does NOT pull the species
  * catalog — linking is a web-side task (ADR 0003); it captures the raw folk name.
+ * It does pull the project's collecting permits, which a field record made on
+ * the device has to choose among (ADR 0011).
  *
  * form_version_cursor is the latest structure-change time across the project's
  * active forms; the device stores it, passes it back as `since`, and stamps it
@@ -65,8 +67,40 @@ class BundleController extends ApiController
             // accepting interviews on every device that already cached it.
             'active_form_ids' => $forms->pluck('id')->values(),
             'forms' => $payload,
+            // The permits the project holds, so a record made in the field can
+            // name the one it was collected under
+            // (docs/decisions/0011-companion-field-records.md). Read-only: a
+            // permit is obtained before the fieldwork and nobody issues one in
+            // a forest, so the device chooses among these exactly as it renders
+            // forms it did not design.
+            //
+            // Always the full set, never a delta. There are a handful per
+            // project, and a delta cannot express a removal — the same trap
+            // `active_form_ids` exists to avoid.
+            'collecting_permits' => $this->permitsPayload($project),
             'server_time' => now()->toIso8601String(),
         ]);
+    }
+
+    /**
+     * Structured rather than a pre-formatted label: the device localizes, and a
+     * label composed here would arrive in the server's language.
+     */
+    private function permitsPayload(Project $project): array
+    {
+        return $project->collectingPermits()
+            ->orderBy('authority')
+            ->orderBy('reference')
+            ->get()
+            ->map(fn ($permit) => [
+                'id' => $permit->id,
+                'authority' => $permit->authority,
+                'reference' => $permit->reference,
+                'issued_on' => $permit->issued_on?->toDateString(),
+                'expires_on' => $permit->expires_on?->toDateString(),
+            ])
+            ->values()
+            ->all();
     }
 
     private function parseSince(?string $value): ?Carbon

@@ -71,7 +71,8 @@ what the user can't do.
 
 ```
 GET /api/v1/projects/{project}/bundle?since=<iso8601>
-  → { form_version_cursor, active_form_ids: [ id ], forms: [ Form ], server_time }
+  → { form_version_cursor, active_form_ids: [ id ], forms: [ Form ],
+      collecting_permits: [ Permit ], server_time }
 ```
 The offline capture bundle: every **active** form's full structure. `?since`
 makes it incremental (return only forms changed after the cursor). `Form` =
@@ -90,6 +91,14 @@ Retire a cached form that is missing from the set — but a form a local intervi
 still references should be **deactivated in place rather than deleted**. Its
 structure is what renders that interview and what its unsent answers are pushed
 against; deleting it strands them.
+
+`Permit` = `{ id, authority, reference, issued_on, expires_on }` — the permits
+the project holds, so a field record made on the device can name the one it was
+collected under ([0011](../decisions/0011-companion-field-records.md)).
+**Read-only, and always the full set**, never a delta: a permit is obtained
+before the fieldwork and nobody issues one in a forest, and a delta could not
+express a revocation any more than it can express a retired form. Structured
+rather than a formatted label, because the device localizes.
 
 > The device does **not** pull the species catalog — linking is a web-side task
 > ([0003](../decisions/0003-capture-only-companion-scope.md)). It captures the
@@ -168,6 +177,77 @@ capture client, because an unanswered question sends no row at all — absence i
 not something a push can carry. Range travels with the value, so range is checked
 here.
 
+## Push — sync field records
+
+The second push, and the same shape as the first. A field record is captured in
+the field — coordinates from the device, photographs from its camera, the
+collection number written on the tag at that moment — so the device authors it
+([0011](../decisions/0011-companion-field-records.md)).
+
+**Push interviews before records.** A record that names the answer it came out of
+is refused while that answer is unknown here, so the link survives instead of
+being dropped to let the record through.
+
+```
+POST /api/v1/projects/{project}/records:sync
+  headers: Idempotency-Key: <uuid>            (optional, for the whole batch)
+  body: {
+    records: [
+      {
+        client_id: <uuid>,                    // minted on device; the upsert key
+        basis_of_record?, vernacular_name?, collection_number?, collector?,
+        collected_on?, locality?, notes?,
+        location?: { lat, lng },
+        collecting_permit_id? | permit_exemption?,   // never both
+        answer_client_id?,                    // the answer this came out of
+        edited_at?
+      }
+    ]
+  }
+  → 200 {
+      results: [ { client_id, id?, status: "created"|"updated"|"unchanged"|"rejected",
+                   errors? } ]
+    }
+```
+
+- **Results are keyed by `client_id`, and carry the server `id`.** A record
+  created offline has no server id until this call answers with one — unlike an
+  interview, whose id the device mints itself. That `id` is what later addresses
+  the record's media.
+- **Upsert semantics:** match on `client_id`; create if absent, otherwise
+  last-writer-wins on `edited_at`. Retrying a batch is a no-op (`unchanged`), and
+  so is a push that changes nothing even when stamped later.
+- `edited_at` in the future is **clamped to now**, so a device with a fast clock
+  cannot win every conflict for as long as its clock stays wrong.
+- `vernacular_name` is plaintext over the wire (TLS) and **encrypted at rest** by
+  the server, exactly as an interview answer is.
+- `collecting_permit_id` and `permit_exemption` are **mutually exclusive** and
+  applied as a unit: sending either one clears the other, so a record cannot end
+  up carrying both ([0009](../decisions/0009-collecting-permits.md)).
+
+### What a device may not say
+
+The recorded stage is device-authored; identification and deposit are not. These
+fields are **refused with 422**, not ignored — a device that believed it had
+deposited something would otherwise display a voucher number that exists nowhere.
+
+| Field | Key |
+|---|---|
+| `accession_number`, `repository` | `api.records.deposit_is_web_side` |
+| `determination` | `api.records.identification_is_web_side` |
+
+Accession numbers are issued from a per-project sequence inside a locked
+transaction; a disconnected device cannot draw from it without risking a
+collision, and never needs to.
+
+### Rejection keys
+
+| Key | Cause |
+|---|---|
+| `api.sync.client_id_conflict` | that `client_id` already names a record in another project |
+| `api.sync.permit_not_in_project` | the permit belongs to another project, or does not exist |
+| `api.sync.answer_not_found` | the named answer is unknown here — push interviews first, then retry |
+
 ## Media — audio & photos (offload to object storage)
 
 Large files over field connectivity should not stream through the app server.
@@ -229,8 +309,12 @@ POST /api/v1/diagnostics
 ## Not in this API
 
 Form design, species linking, index computation, export, user/role management —
-all web-only. If a future milestone needs programmatic access to those, it gets
-its own contract; it does not bend the capture API.
+all web-only. **Identifying a field record and depositing it against a voucher
+belong to that list too**, which is why `records:sync` refuses those fields
+rather than ignoring them
+([0011](../decisions/0011-companion-field-records.md)). If a future milestone
+needs programmatic access to any of it, it gets its own contract; it does not
+bend the capture API.
 
 ## Open decisions
 
@@ -243,6 +327,12 @@ its own contract; it does not bend the capture API.
   free of three-way merges; forms travel the other way as a read-only pull. Built
   and released on this basis ([sync-protocol.md](sync-protocol.md),
   [ADR 0003](../decisions/0003-capture-only-companion-scope.md)).
+
+- **Field records are device-authored, recorded stage only**
+  *(accepted 2026-08-23)* — `records:sync` is push-only like `instances:sync`,
+  and the device writes only what is known in the field. Determination and
+  deposit stay on the web, so the two sides never write the same fields and a
+  record needs no merge ([0011](../decisions/0011-companion-field-records.md)).
 
 - **Token model** *(accepted 2026-07-12)* — single `capture` ability + policy
   gate, not per-project token scoping. See [Authentication](#authentication).

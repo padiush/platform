@@ -13,13 +13,22 @@ the tricky cases are spelled out rather than left to discover in the field.
 Because the mobile app only *captures* ([0003](../decisions/0003-capture-only-companion-scope.md)),
 data flows almost entirely one way:
 
-- **Pull (read-only on device):** form structures. The device never edits a form,
-  so there is no conflict to resolve on the pulled side — it's a cache refresh.
-- **Push (device-owned):** interviews, answers, media, GPS. The device is the
-  sole author of these until they land on the server.
+- **Pull (read-only on device):** form structures, and the project's collecting
+  permits. The device never edits either, so there is no conflict to resolve on
+  the pulled side — it's a cache refresh.
+- **Push (device-owned):** interviews, answers, media, GPS, and **field
+  records**. The device is the sole author of these until they land on the
+  server.
 
 This asymmetry is deliberate and is what lets us avoid CRDTs or three-way merges.
 See [0004 — offline sync model](../decisions/0004-offline-sync-model.md).
+
+**A field record is a stronger case than an interview**, not a weaker one. The
+device authors only its *recorded* stage; identification and deposit are written
+on the web ([0011](../decisions/0011-companion-field-records.md)). The two sides
+never write the same fields, so a record cannot produce the conflict that
+last-writer-wins exists to settle — the asymmetry is structural rather than a
+policy applied afterwards.
 
 ## Identity: client-generated UUIDs
 
@@ -28,9 +37,16 @@ Offline-created records need identifiers before the server ever sees them.
 - **Instances** are already UUID-keyed server-side (`InterviewInstance` uses
   `HasUuids`) — the device mints the instance `id`.
 - **Answers** are integer-PK today (`instance_answers`). Offline creation needs a
-  device-minted `client_id` (uuid) on each answer — **the one schema change this
-  protocol requires** *(✅ built 2026-07-12)*. Server keeps its own PK; `client_id`
+  device-minted `client_id` (uuid) on each answer — the schema change this
+  protocol required *(✅ built 2026-07-12)*. Server keeps its own PK; `client_id`
   is the idempotency key and the device's stable reference.
+- **Field records** are integer-PK too, and took the same pair for the same
+  reason *(✅ built 2026-08-23)*: a `client_id` to be upserted on, and an
+  `edited_at` for last-writer-wins. The server's `updated_at` cannot stand in for
+  the latter — it moves when the web adds a determination, which is not an edit
+  to anything the device authored, and would make every later device push look
+  stale. Because a record has no device-side id, **the sync result carries the
+  server `id` back**, which is what later addresses its media.
 
 ## The loop
 
@@ -40,9 +56,16 @@ Offline-created records need identifiers before the server ever sees them.
 3. CAPTURE     record interviews offline into local store (SQLite)
                each instance + answer gets a client uuid at creation
 4. PUSH        when online: POST /projects/{p}/instances:sync  (idempotent batch)
+               then:      POST /projects/{p}/records:sync    (idempotent batch)
 5. RECONCILE   apply per-item results; mark local records synced; advance cursor
 6. MEDIA       upload audio/photos via presigned URLs; poll for transcripts
 ```
+
+**Interviews before records, and the order is load-bearing.** A field record may
+name the answer it came out of, by that answer's `client_id` — offline, the only
+id it knows. A record naming an answer the server has not seen is `rejected`
+rather than accepted without the link, because accepting it would lose the
+connection permanently while a refusal only costs a retry.
 
 Steps 3–4 decouple fully: capture never blocks on connectivity, push never blocks
 capture.

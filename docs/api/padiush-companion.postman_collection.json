@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "Padiush Companion API (v1)",
-    "description": "Field-capture API for the Padiush mobile companion apps. Set {{base_url}}, then run Auth > Create token \u2014 its test script saves the bearer token to the collection so every other request is authenticated. See docs/api/openapi.yaml for the full contract.",
+    "description": "Field-capture API for the Padiush mobile companion apps. Set {{base_url}}, then run Auth > Create token — its test script saves the bearer token to the collection so every other request is authenticated. See docs/api/openapi.yaml for the full contract.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "auth": {
@@ -100,7 +100,7 @@
                 "current"
               ]
             },
-            "description": "Sign this device out \u2014 revokes the token this request authenticates with."
+            "description": "Sign this device out — revokes the token this request authenticates with."
           }
         }
       ]
@@ -187,6 +187,44 @@
             "body": {
               "mode": "raw",
               "raw": "{\n  \"instances\": [\n    {\n      \"id\": \"{{$guid}}\",\n      \"interview_form_id\": 1,\n      \"captured_at\": \"2026-07-12T15:04:05Z\",\n      \"location\": {\n        \"lat\": -12.05,\n        \"lng\": -77.04,\n        \"accuracy_m\": 8.5\n      },\n      \"answers\": [\n        {\n          \"client_id\": \"{{$guid}}\",\n          \"interview_section_id\": 1,\n          \"interview_item_id\": 1,\n          \"repeatable_index\": 0,\n          \"value\": \"guaba\",\n          \"edited_at\": \"2026-07-12T15:04:05Z\"\n        }\n      ]\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Sync records",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/projects/{{project_id}}/records:sync",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "projects",
+                "{{project_id}}",
+                "records:sync"
+              ]
+            },
+            "description": "Idempotent batch upsert of field records. The device authors the recorded stage only — accession_number, repository and determination are refused with 422 (ADR 0011). Send collecting_permit_id OR permit_exemption, never both. Run Sync instances first if a record names answer_client_id.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"records\": [\n    {\n      \"client_id\": \"{{$guid}}\",\n      \"basis_of_record\": \"human_observation\",\n      \"vernacular_name\": \"guaba\",\n      \"collection_number\": \"RA-014\",\n      \"collector\": \"R. Arévalo\",\n      \"collected_on\": \"2026-08-20\",\n      \"locality\": \"cafetal above the school\",\n      \"location\": {\n        \"lat\": 13.7,\n        \"lng\": -89.2\n      },\n      \"permit_exemption\": \"cultivated\",\n      \"notes\": \"flowering\",\n      \"edited_at\": \"2026-08-20T15:04:05Z\"\n    }\n  ]\n}",
               "options": {
                 "raw": {
                   "language": "json"

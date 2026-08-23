@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Api;
 
+use App\Models\CollectingPermit;
 use App\Models\InterviewForm;
 use App\Models\InterviewItem;
 use App\Models\InterviewSection;
@@ -160,6 +161,48 @@ class BundleTest extends TestCase
 
         $response->assertOk();
         $this->assertSame([], $response->json('active_form_ids'));
+    }
+
+    public function test_it_carries_the_projects_collecting_permits(): void
+    {
+        $this->actingAsRecorder();
+
+        $permit = CollectingPermit::factory()->create([
+            'project_id' => $this->project->id,
+            'authority' => 'MARN',
+            'reference' => 'RES-021-2026',
+        ]);
+        // Another study's permit must not travel with this bundle.
+        CollectingPermit::factory()->create(['authority' => 'CONAP']);
+
+        $response = $this->getJson("/api/v1/projects/{$this->project->id}/bundle");
+
+        $response->assertOk()
+            ->assertJsonCount(1, 'collecting_permits')
+            ->assertJsonPath('collecting_permits.0.id', $permit->id)
+            ->assertJsonPath('collecting_permits.0.authority', 'MARN')
+            ->assertJsonPath('collecting_permits.0.reference', 'RES-021-2026')
+            ->assertJsonPath('collecting_permits.0.issued_on', '2026-01-15');
+    }
+
+    /**
+     * The permits are the full set every time. A delta cannot express a
+     * removal, and a device holding a revoked permit would go on offering it —
+     * the same trap `active_form_ids` exists to avoid.
+     */
+    public function test_permits_are_sent_in_full_even_when_the_form_delta_is_empty(): void
+    {
+        $this->actingAsRecorder();
+
+        CollectingPermit::factory()->create(['project_id' => $this->project->id]);
+
+        $response = $this->getJson(
+            "/api/v1/projects/{$this->project->id}/bundle?since=".now()->addDay()->toIso8601String()
+        );
+
+        $response->assertOk()
+            ->assertJsonCount(0, 'forms')
+            ->assertJsonCount(1, 'collecting_permits');
     }
 
     public function test_invalid_since_is_rejected(): void

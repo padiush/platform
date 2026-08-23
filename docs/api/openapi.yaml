@@ -179,6 +179,53 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/Error' }
+  /projects/{project}/records:sync:
+    post:
+      tags: [Push]
+      summary: Sync field records (idempotent batch upsert)
+      description: >
+        One idempotent, batched upsert keyed on the device-minted `client_id` —
+        safe to retry. The device authors only the *recorded* stage of a field
+        record; identification and deposit are web-side, so `accession_number`,
+        `repository` and `determination` are refused with 422 rather than
+        ignored (ADR 0011). Conflicts resolve by last-writer-wins on the device
+        `edited_at`, clamped against future clocks. Push interviews BEFORE
+        records: a record naming an answer the server has not seen is rejected,
+        so the link survives rather than being dropped.
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - name: Idempotency-Key
+          in: header
+          required: false
+          schema: { type: string }
+          description: Optional; dedupes an entire batch within a short window.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/RecordSyncRequest' }
+      responses:
+        '200':
+          description: Per-record results
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  results:
+                    type: array
+                    items: { $ref: '#/components/schemas/RecordSyncResult' }
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          description: Validation error, including a web-side field the device may not set
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
   /instances/{instance}:
     get:
       tags: [Push]
@@ -405,6 +452,23 @@ components:
         forms:
           type: array
           items: { $ref: '#/components/schemas/Form' }
+        collecting_permits:
+          type: array
+          description: >
+            The permits the project holds, so a field record made on the device
+            can name the one it was collected under (ADR 0011). Read-only, and
+            always the full set rather than a delta — a permit is obtained
+            before the fieldwork, and a delta could not express a revocation any
+            more than it can express a retired form.
+          items: { $ref: '#/components/schemas/Permit' }
+    Permit:
+      type: object
+      properties:
+        id: { type: integer }
+        authority: { type: string, nullable: true }
+        reference: { type: string, nullable: true }
+        issued_on: { type: string, format: date, nullable: true }
+        expires_on: { type: string, format: date, nullable: true }
     Form:
       type: object
       properties:
@@ -530,6 +594,85 @@ components:
             - api.sync.below_min
             - api.sync.above_max
             - api.sync.off_step
+    RecordSyncRequest:
+      type: object
+      required: [records]
+      properties:
+        records:
+          type: array
+          maxItems: 100
+          items: { $ref: '#/components/schemas/FieldRecordPush' }
+    FieldRecordPush:
+      type: object
+      required: [client_id]
+      description: >
+        The recorded stage only. `collecting_permit_id` and `permit_exemption`
+        are mutually exclusive and applied as a unit — sending either clears the
+        other, so a record cannot carry both (ADR 0009).
+      properties:
+        client_id:
+          type: string
+          format: uuid
+          description: Minted on the device; the upsert key.
+        basis_of_record:
+          type: string
+          enum: [preserved_specimen, human_observation, living_specimen, material_sample]
+        vernacular_name:
+          type: string
+          nullable: true
+          description: Plaintext over TLS; encrypted at rest by the server.
+        collection_number: { type: string, nullable: true }
+        collector: { type: string, nullable: true }
+        collected_on: { type: string, format: date, nullable: true }
+        locality: { type: string, nullable: true }
+        notes: { type: string, nullable: true }
+        location: { $ref: '#/components/schemas/RecordLocation' }
+        collecting_permit_id: { type: integer, nullable: true }
+        permit_exemption:
+          type: string
+          nullable: true
+          enum: [private_land, cultivated, market, other]
+        answer_client_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: >
+            The answer this record came out of, named by the client_id the
+            device minted for it. Rejected if the server has not seen it yet.
+        edited_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: Device edit time; the last-writer-wins key. Future values are clamped to now.
+    RecordLocation:
+      type: object
+      required: [lat, lng]
+      properties:
+        lat: { type: number, minimum: -90, maximum: 90 }
+        lng: { type: number, minimum: -180, maximum: 180 }
+    RecordSyncResult:
+      type: object
+      properties:
+        client_id: { type: string, format: uuid }
+        id:
+          type: integer
+          nullable: true
+          description: >
+            The server id, absent on a rejection. The device has no other way to
+            learn it, and it is what later addresses the record's media.
+        status:
+          type: string
+          enum: [created, updated, unchanged, rejected]
+        errors:
+          type: object
+          nullable: true
+          description: >
+            Field-keyed message keys the client localizes —
+            `api.sync.client_id_conflict`, `api.sync.permit_not_in_project`,
+            `api.sync.answer_not_found`.
+          additionalProperties:
+            type: array
+            items: { type: string }
     InstanceDetail:
       type: object
       properties:
