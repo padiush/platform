@@ -60,8 +60,15 @@ under the catalog and chosen when a record is made, photographs and audio on a
 record as well as on an interview, a `Voucher No.` and permit column on the
 species-indices export, a Darwin-Core-termed export of the records themselves,
 and voucher, permit and observation coverage stated on the report page beside
-the unlinked-citation figure. Server-side this version — the companion keeps its
-interview-capture scope.
+the unlinked-citation figure.
+
+Field records were built on the web first, which was a sequencing choice rather
+than a judgment about where a record belongs. **The companion is where the next
+piece goes** ([ADR 0011](decisions/0011-companion-field-records.md)): recording
+is a field act, and one of its moments — an informant naming a plant during an
+interview — the web cannot reach at all. Decided and **not yet built**; the
+device will author the recorded stage only, with identification and deposit
+staying here.
 
 What remains before field deployment for sensitive studies is hardening rather
 than new surface — tracked as: **resumable media upload** (single PUT today, so
@@ -111,6 +118,13 @@ physical devices.
   as a read-only pull. Built and released on this basis, which flips
   [ADR 0003](decisions/0003-capture-only-companion-scope.md) to **Accepted**
   ([companion API](contracts/companion-api.md#settled-decisions)).
+- **Field records on the companion** *(accepted 2026-08-23)* — recording a
+  field record is a field act, so the device authors it: basis, vernacular name,
+  collection number, coordinates, photographs and the permit, including from
+  inside an interview. Identification and deposit stay on the web, which keeps
+  `records:sync` push-only and extends
+  [ADR 0003](decisions/0003-capture-only-companion-scope.md) rather than
+  reversing it ([ADR 0011](decisions/0011-companion-field-records.md)).
 - **Field records and basis** *(accepted 2026-08-22, media added the same day)*
   — `specimens` becomes `field_records`, and `basis_of_record` distinguishes a
   pressed specimen from something only seen. Much of what a study documents is
