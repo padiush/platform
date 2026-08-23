@@ -1,6 +1,6 @@
 # 0010 — Record what was observed, not only what was collected
 
-- **Status:** Proposed
+- **Status:** Accepted
 - **Date:** 2026-08-22
 - **Deciders:** Project owner
 - **Extends:** [0008](0008-specimens-and-determinations.md) — its substance stands;

@@ -104,6 +104,13 @@ companion keeps its interview-capture scope.
   as a read-only pull. Built and released on this basis, which flips
   [ADR 0003](decisions/0003-capture-only-companion-scope.md) to **Accepted**
   ([companion API](contracts/companion-api.md#settled-decisions)).
+- **Field records and basis** *(accepted 2026-08-22)* — `specimens` becomes
+  `field_records`, and `basis_of_record` distinguishes a pressed specimen from
+  something only seen. Much of what a study documents is never collected, and a
+  record that could never carry a voucher is not a gap in the evidence, so
+  observations are counted beside voucher coverage rather than inside it. The
+  vernacular name is encrypted, as an interview answer is
+  ([ADR 0010](decisions/0010-field-records-and-basis.md)).
 - **Collecting permits** *(accepted 2026-08-22)* — a `collecting_permits` table
   per project; a specimen carries either a permit or a stated reason none was
   required, never both, so coverage can tell a lawful exemption from a missing
@@ -118,11 +125,8 @@ companion keeps its interview-capture scope.
   ([ADR 0008](decisions/0008-specimens-and-determinations.md)).
 
 ### ⏳ Still open
-- **Field records and basis** *(proposed 2026-08-22)* — rename `specimens` to
-  `field_records` and give each one a `basis_of_record`, so a study can document
-  what it saw and did not collect: a guided walk with an informant, or an
-  inventory made before interviews begin. Awaiting sign-off
-  ([ADR 0010](decisions/0010-field-records-and-basis.md)).
+- *Nothing.* Every decision recorded here is settled; what remains is
+  implementation, listed under **Progress** above.
 
 ## Maintaining these docs
 
