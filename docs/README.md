@@ -66,9 +66,18 @@ Field records were built on the web first, which was a sequencing choice rather
 than a judgment about where a record belongs. **The companion is where the next
 piece goes** ([ADR 0011](decisions/0011-companion-field-records.md)): recording
 is a field act, and one of its moments — an informant naming a plant during an
-interview — the web cannot reach at all. Decided and **not yet built**; the
-device will author the recorded stage only, with identification and deposit
-staying here.
+interview — the web cannot reach at all. The device authors the recorded stage
+only; identification and deposit stay here.
+
+**The server side of that is built**: `records:sync`, an idempotent batch upsert
+keyed on a device-minted `client_id` and resolved by last-writer-wins on the
+device's `edited_at`, refusing the deposit and identification fields rather than
+ignoring them; and the project's collecting permits now travel read-only in the
+capture bundle, so a record made offline can name the permit it was collected
+under. Both are in [companion-api.md](contracts/companion-api.md) and
+[sync-protocol.md](contracts/sync-protocol.md). **The companion does not use any
+of it yet** — the local store, the capture screen and the media path are the
+remaining work.
 
 What remains before field deployment for sensitive studies is hardening rather
 than new surface — tracked as: **resumable media upload** (single PUT today, so

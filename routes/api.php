@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\V1\BundleController;
 use App\Http\Controllers\Api\V1\DiagnosticsController;
+use App\Http\Controllers\Api\V1\FieldRecordSyncController;
 use App\Http\Controllers\Api\V1\InstanceController;
 use App\Http\Controllers\Api\V1\InstanceSyncController;
 use App\Http\Controllers\Api\V1\MeController;
@@ -44,6 +45,12 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
         // Push — sync captured interviews (idempotent batch upsert).
         Route::post('projects/{project}/instances:sync', [InstanceSyncController::class, 'sync'])
             ->name('projects.instances.sync');
+
+        // Push — sync field records (idempotent batch upsert). Interviews
+        // first: a record that names the answer it came out of is refused
+        // while that answer is unknown here.
+        Route::post('projects/{project}/records:sync', [FieldRecordSyncController::class, 'sync'])
+            ->name('projects.records.sync');
 
         // A captured interview after the fact — media and transcription status.
         Route::get('instances/{instance}', [InstanceController::class, 'show'])

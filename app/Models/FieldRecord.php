@@ -38,7 +38,16 @@ class FieldRecord extends Model
         self::BASIS_SAMPLE,
     ];
 
+    /**
+     * The stated reasons a collection needed no permit. Domain vocabulary, so
+     * it lives beside BASES rather than on whichever controller first needed it
+     * — the web and the companion sync both validate against it now.
+     * See docs/decisions/0009-collecting-permits.md.
+     */
+    public const EXEMPTIONS = ['private_land', 'cultivated', 'market', 'other'];
+
     protected $fillable = [
+        'client_id',
         'basis_of_record',
         'vernacular_name',
         'accession_number',
@@ -53,6 +62,7 @@ class FieldRecord extends Model
         'permit_exemption',
         'notes',
         'instance_answer_id',
+        'edited_at',
     ];
 
     /**
@@ -71,6 +81,8 @@ class FieldRecord extends Model
         'collected_on' => 'date',
         'location_lat' => 'float',
         'location_lng' => 'float',
+        // The device's own edit time, which last-writer-wins compares against.
+        'edited_at' => 'datetime',
     ];
 
     public function project()
