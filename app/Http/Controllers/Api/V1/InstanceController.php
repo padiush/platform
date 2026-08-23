@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Models\InstanceMedia;
 use App\Models\InterviewInstance;
+use App\Models\Media;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -46,7 +46,7 @@ class InstanceController extends ApiController
         ];
     }
 
-    private function mediaPayload(InstanceMedia $media): array
+    private function mediaPayload(Media $media): array
     {
         return [
             'id' => $media->id,

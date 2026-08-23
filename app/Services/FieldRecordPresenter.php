@@ -29,6 +29,19 @@ class FieldRecordPresenter
             'basis_of_record' => $fieldRecord->basis_of_record,
             'was_collected' => $fieldRecord->wasCollected(),
             'vernacular_name' => $fieldRecord->vernacular_name,
+            // Streamed through an authorized route rather than a public or
+            // signed URL, so losing access to the project loses access to the
+            // photographs at the same moment.
+            'media' => $fieldRecord->media->map(fn ($medium) => [
+                'id' => $medium->id,
+                'kind' => $medium->kind,
+                'content_type' => $medium->content_type,
+                'url' => route('catalogs.fieldRecords.media.show', [
+                    'project' => $fieldRecord->project_id,
+                    'fieldRecord' => $fieldRecord->id,
+                    'medium' => $medium->id,
+                ]),
+            ])->all(),
             'accession_number' => $fieldRecord->accession_number,
             'collection_number' => $fieldRecord->collection_number,
             'collector' => $fieldRecord->collector,

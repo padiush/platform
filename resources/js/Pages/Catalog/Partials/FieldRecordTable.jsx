@@ -74,6 +74,7 @@ export default function FieldRecordTable({
     onEdit = () => {},
     onDetermine = () => {},
     onDeposit = () => {},
+    onMedia = () => {},
     onDelete = () => {},
     emptyTitle,
     emptyHint,
@@ -145,6 +146,16 @@ export default function FieldRecordTable({
                                         onClick={() => onDeposit(fieldRecord)}
                                     >
                                         {t('catalogs.fieldRecords.deposit')}
+                                    </button>
+                                    <button
+                                        type="button"
+                                        className="btn btn-ghost btn-xs"
+                                        onClick={() => onMedia(fieldRecord)}
+                                    >
+                                        {t('catalogs.fieldRecords.media.title')}
+                                        {fieldRecord.media?.length
+                                            ? ` (${fieldRecord.media.length})`
+                                            : ''}
                                     </button>
                                     <button
                                         type="button"

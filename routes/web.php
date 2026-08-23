@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CollectingPermitController;
 use App\Http\Controllers\FieldRecordController;
+use App\Http\Controllers\FieldRecordMediaController;
 use App\Http\Controllers\InterviewDataController;
 use App\Http\Controllers\InterviewDesignerController;
 use App\Http\Controllers\InterviewFormController;
@@ -252,6 +253,23 @@ Route::middleware(['auth'])->group(function () {
             '/catalogs/{project}/records/{fieldRecord}',
             'destroy'
         )->name('catalogs.fieldRecords.destroy');
+    });
+
+    // Photographs and audio on a field record. Posted from the browser rather
+    // than handshaked like the companion's device uploads.
+    Route::controller(FieldRecordMediaController::class)->group(function () {
+        Route::post(
+            '/catalogs/{project}/records/{fieldRecord}/media',
+            'store'
+        )->name('catalogs.fieldRecords.media.store');
+        Route::get(
+            '/catalogs/{project}/records/{fieldRecord}/media/{medium}',
+            'show'
+        )->name('catalogs.fieldRecords.media.show');
+        Route::delete(
+            '/catalogs/{project}/records/{fieldRecord}/media/{medium}',
+            'destroy'
+        )->name('catalogs.fieldRecords.media.destroy');
     });
 
     Route::controller(InterviewDataController::class)->group(function () {

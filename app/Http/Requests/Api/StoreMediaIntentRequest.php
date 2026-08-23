@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests\Api;
 
-use App\Models\InstanceMedia;
+use App\Models\Media;
 use Illuminate\Validation\Rule;
 
 class StoreMediaIntentRequest extends ApiFormRequest
@@ -11,7 +11,7 @@ class StoreMediaIntentRequest extends ApiFormRequest
     {
         return [
             'client_id' => ['required', 'uuid'],
-            'kind' => ['required', Rule::in([InstanceMedia::KIND_AUDIO, InstanceMedia::KIND_PHOTO])],
+            'kind' => ['required', Rule::in([Media::KIND_AUDIO, Media::KIND_PHOTO])],
             'content_type' => ['required', 'string', 'max:255'],
             // Guardrail on absurd sizes; ~500 MB ceiling.
             'byte_size' => ['required', 'integer', 'min:1', 'max:524288000'],

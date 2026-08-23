@@ -2,7 +2,7 @@
 
 namespace App\Services\Transcription;
 
-use App\Models\InstanceMedia;
+use App\Models\Media;
 
 /**
  * The default transcriber: none is provisioned. Bound until a real Whisper
@@ -12,7 +12,7 @@ use App\Models\InstanceMedia;
  */
 class NullTranscriber implements Transcriber
 {
-    public function transcribe(InstanceMedia $media): string
+    public function transcribe(Media $media): string
     {
         throw new TranscriptionUnavailableException(
             'No transcription driver is configured.'

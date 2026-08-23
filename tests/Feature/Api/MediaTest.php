@@ -3,9 +3,9 @@
 namespace Tests\Feature\Api;
 
 use App\Jobs\TranscribeAudio;
-use App\Models\InstanceMedia;
 use App\Models\InterviewForm;
 use App\Models\InterviewInstance;
+use App\Models\Media;
 use App\Models\Project;
 use App\Models\User;
 use App\Services\Media\StoredObjectInspector;
@@ -101,7 +101,7 @@ class MediaTest extends TestCase
         $response->assertOk()
             ->assertJsonStructure(['upload_url', 'headers', 'storage_key', 'expires_at']);
 
-        $this->assertDatabaseHas('instance_media', [
+        $this->assertDatabaseHas('media', [
             'client_id' => $clientId,
             'kind' => 'audio',
             'status' => 'pending',
@@ -126,7 +126,7 @@ class MediaTest extends TestCase
         $this->actingAsRecorder();
         $clientId = (string) Str::uuid();
 
-        $media = InstanceMedia::create([
+        $media = Media::create([
             'interview_instance_id' => $this->instance->id,
             'client_id' => $clientId,
             'kind' => 'photo',
@@ -161,7 +161,7 @@ class MediaTest extends TestCase
         $this->actingAsRecorder();
         $clientId = (string) Str::uuid();
 
-        InstanceMedia::create([
+        Media::create([
             'interview_instance_id' => $this->instance->id,
             'client_id' => $clientId,
             'kind' => 'audio',
@@ -196,7 +196,7 @@ class MediaTest extends TestCase
         $this->actingAsRecorder();
         $clientId = (string) Str::uuid();
 
-        $media = InstanceMedia::create([
+        $media = Media::create([
             'interview_instance_id' => $this->instance->id,
             'client_id' => $clientId,
             'kind' => 'audio',
@@ -230,7 +230,7 @@ class MediaTest extends TestCase
         $this->actingAsRecorder();
         $clientId = (string) Str::uuid();
 
-        InstanceMedia::create([
+        Media::create([
             'interview_instance_id' => $this->instance->id,
             'client_id' => $clientId,
             'kind' => 'photo',
@@ -252,7 +252,7 @@ class MediaTest extends TestCase
         $this->actingAsRecorder();
         $clientId = (string) Str::uuid();
 
-        $media = InstanceMedia::create([
+        $media = Media::create([
             'interview_instance_id' => $this->instance->id,
             'client_id' => $clientId,
             'kind' => 'photo',
@@ -279,7 +279,7 @@ class MediaTest extends TestCase
         $this->actingAsRecorder();
         $clientId = (string) Str::uuid();
 
-        $media = InstanceMedia::create([
+        $media = Media::create([
             'interview_instance_id' => $this->instance->id,
             'client_id' => $clientId,
             'kind' => 'audio',
@@ -309,7 +309,7 @@ class MediaTest extends TestCase
         $this->actingAsRecorder();
         $clientId = (string) Str::uuid();
 
-        $media = InstanceMedia::create([
+        $media = Media::create([
             'interview_instance_id' => $this->instance->id,
             'client_id' => $clientId,
             'kind' => 'photo',
@@ -339,7 +339,7 @@ class MediaTest extends TestCase
         $this->actingAsRecorder();
         $clientId = (string) Str::uuid();
 
-        $media = InstanceMedia::create([
+        $media = Media::create([
             'interview_instance_id' => $this->instance->id,
             'client_id' => $clientId,
             'kind' => 'photo',

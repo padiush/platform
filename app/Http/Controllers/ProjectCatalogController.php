@@ -426,7 +426,7 @@ class ProjectCatalogController extends Controller
     {
         return app(FieldRecordPresenter::class)->collection(
             $species->fieldRecords()
-                ->with(['currentDetermination.species', 'collectingPermit'])
+                ->with(['currentDetermination.species', 'collectingPermit', 'media'])
                 ->orderByDesc('field_records.created_at')
                 ->get()
         );

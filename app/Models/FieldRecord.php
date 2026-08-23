@@ -114,6 +114,15 @@ class FieldRecord extends Model
         return $this->basis_of_record !== self::BASIS_OBSERVATION;
     }
 
+    /**
+     * Photographs and audio. For an observation these are the whole of the
+     * evidence — there is no pressed material behind them.
+     */
+    public function media()
+    {
+        return $this->hasMany(Media::class);
+    }
+
     /** The authorisation this was collected under, when one was needed. */
     public function collectingPermit()
     {

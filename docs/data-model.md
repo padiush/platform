@@ -45,7 +45,7 @@ Project ─┬─ ProjectAccess ── ProjectCapability      (who can do what)
 | `InterviewInstance` | **One completed interview** | `interview_form_id`, `user_id` (recorder), `captured_at?`, `location_lat?`/`location_lng?`/`location_accuracy_m?`/`location_captured_at?` (GPS) | **uuid** |
 | `InstanceAnswer` | One informant response to one item | `interview_instance_id` (uuid), `interview_section_id`, `interview_item_id`, `repeatable_index`, `answer` (**encrypted**), `catalog_species_id?`, `client_id?` (device uuid), `edited_at?` (LWW key) | int |
 | `InstanceAnswerRevision` | Overwrite audit trail for last-writer-wins | `instance_answer_id`, `answer` (**encrypted**), `catalog_species_id?`, `edited_at?`, `source` — immutable | int |
-| `InstanceMedia` | Audio/photo capture artifact | `interview_instance_id` (uuid), `client_id` (device uuid), `kind` (audio·photo), `storage_disk`/`storage_key`, `content_type`, `byte_size?`, `duration_s?`, `status`, `transcription_status?`, `transcription_text?` (**encrypted**), `captured_at?` | int |
+| `Media` | Audio/photo capture artifact, on an interview **or** a field record (never both) | `interview_instance_id?` (uuid), `field_record_id?`, `client_id` (device uuid), `kind` (audio·photo), `storage_disk`/`storage_key`, `content_type`, `byte_size?`, `duration_s?`, `status`, `transcription_status?`, `transcription_text?` (**encrypted**), `captured_at?` | int |
 | `CatalogSpecies` | A scientific taxon in the project catalog | `project_id`, `family`, `genus`, `name`, `authority`, optional `metadata` | int |
 | `CatalogSpeciesPhoto` | Reference image for a taxon | `catalog_species_id`, … | int |
 | `FieldRecord` | **One documented encounter** — collected, or only seen (`basis_of_record`) | `project_id`, `basis_of_record` (Darwin Core: `preserved_specimen`·`human_observation`·`living_specimen`·`material_sample`), `vernacular_name?` (**encrypted**), `accession_number?` (the voucher, unique per project), `collection_number?` (the collector's field number), `collector?`, `collected_on?`, `locality?`, `location_lat?`/`location_lng?`, `repository?`, `collecting_permit_id?` **or** `permit_exemption?` (never both), `notes?`, `instance_answer_id?` | int |
@@ -115,7 +115,9 @@ in an ADR but not yet built, and unmarked for what is still only pencilled in.
   is the overwrite audit trail retaining clobbered values
   ([decisions/0004-offline-sync-model.md](decisions/0004-offline-sync-model.md)).
   Web answer saves stamp `edited_at` too, so corrections take part in the policy.
-- **Capture artifacts** — ✅ **audio + photo built (2026-07-12)** as `instance_media`
+- **Capture artifacts** — ✅ **audio + photo built (2026-07-12)** as
+  `instance_media`, renamed to `media` on 2026-08-23 when it stopped belonging
+  only to interviews
   (kind, storage key, upload status, and audio transcription status/text);
   `interview_instances` gained `captured_at` and a GPS location. See
   [contracts/companion-api.md](contracts/companion-api.md).
@@ -136,8 +138,13 @@ in an ADR but not yet built, and unmarked for what is still only pencilled in.
   and `vernacular_name` is encrypted like an interview answer. The
   species-indices export carries a `Voucher No.` column, the record list exports
   on its own in Darwin Core terms, and coverage is stated on the report page.
-  **Media on a record does not exist yet, so the observation case is
-  half-built** — for an observation the photograph is the record.
+  A record carries **photographs and audio** (`media`, renamed from
+  `instance_media` when it stopped belonging only to interviews) — for an
+  observation those are the whole of the evidence, since no material survives
+  to re-examine. Uploaded from the browser as a plain post rather than the
+  companion's presigned handshake, and served through an authorized route so
+  losing access to a project loses access to its photographs at the same
+  moment.
   Still pencilled in beside it: (for zoology subfields) conservation status.
 - **Collecting permits** — ✅ **data layer built (2026-08-22)** as
   `collecting_permits`, per

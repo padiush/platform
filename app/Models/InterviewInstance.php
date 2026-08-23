@@ -47,6 +47,6 @@ class InterviewInstance extends Model
 
     public function media()
     {
-        return $this->hasMany(InstanceMedia::class, 'interview_instance_id');
+        return $this->hasMany(Media::class, 'interview_instance_id');
     }
 }

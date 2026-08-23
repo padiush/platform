@@ -2,7 +2,7 @@
 
 namespace App\Services\Transcription;
 
-use App\Models\InstanceMedia;
+use App\Models\Media;
 
 /**
  * Turns a stored audio recording into text. The production implementation is
@@ -12,5 +12,5 @@ use App\Models\InstanceMedia;
  */
 interface Transcriber
 {
-    public function transcribe(InstanceMedia $media): string;
+    public function transcribe(Media $media): string;
 }
