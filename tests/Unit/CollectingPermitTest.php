@@ -3,8 +3,8 @@
 namespace Tests\Unit;
 
 use App\Models\CollectingPermit;
+use App\Models\FieldRecord;
 use App\Models\Project;
-use App\Models\Specimen;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
@@ -47,9 +47,9 @@ class CollectingPermitTest extends TestCase
         );
     }
 
-    private function specimen(array $attributes = []): Specimen
+    private function fieldRecord(array $attributes = []): FieldRecord
     {
-        return Specimen::factory()->create(
+        return FieldRecord::factory()->create(
             array_merge(['project_id' => $this->project->id], $attributes)
         );
     }
@@ -59,23 +59,23 @@ class CollectingPermitTest extends TestCase
         $permit = $this->permit();
 
         foreach (range(1, 3) as $ignored) {
-            $this->specimen(['collecting_permit_id' => $permit->id]);
+            $this->fieldRecord(['collecting_permit_id' => $permit->id]);
         }
 
         // The question a herbarium or an authority actually asks.
-        $this->assertCount(3, $permit->specimens);
+        $this->assertCount(3, $permit->fieldRecords);
     }
 
     public function test_deleting_a_permit_leaves_the_collections_standing()
     {
         $permit = $this->permit();
-        $specimen = $this->specimen(['collecting_permit_id' => $permit->id]);
+        $fieldRecord = $this->fieldRecord(['collecting_permit_id' => $permit->id]);
 
         $permit->delete();
 
         // The physical record outlives the paperwork, as it outlives a taxon.
-        $this->assertNotNull($specimen->fresh());
-        $this->assertNull($specimen->fresh()->collecting_permit_id);
+        $this->assertNotNull($fieldRecord->fresh());
+        $this->assertNull($fieldRecord->fresh()->collecting_permit_id);
     }
 
     public function test_a_reference_cannot_repeat_within_a_project()
@@ -101,11 +101,11 @@ class CollectingPermitTest extends TestCase
 
     public function test_a_permit_and_an_exemption_are_both_complete_answers()
     {
-        $underPermit = $this->specimen([
+        $underPermit = $this->fieldRecord([
             'collecting_permit_id' => $this->permit()->id,
         ]);
-        $exempt = $this->specimen(['permit_exemption' => 'market']);
-        $unrecorded = $this->specimen();
+        $exempt = $this->fieldRecord(['permit_exemption' => 'market']);
+        $unrecorded = $this->fieldRecord();
 
         $this->assertTrue($underPermit->permitIsAccountedFor());
         $this->assertTrue($exempt->permitIsAccountedFor());
@@ -115,8 +115,8 @@ class CollectingPermitTest extends TestCase
 
     public function test_exemption_is_distinguishable_from_being_under_a_permit()
     {
-        $this->assertTrue($this->specimen(['permit_exemption' => 'cultivated'])->isPermitExempt());
-        $this->assertFalse($this->specimen()->isPermitExempt());
+        $this->assertTrue($this->fieldRecord(['permit_exemption' => 'cultivated'])->isPermitExempt());
+        $this->assertFalse($this->fieldRecord()->isPermitExempt());
     }
 
     public function test_expiry_reads_the_recorded_date_and_nothing_more()

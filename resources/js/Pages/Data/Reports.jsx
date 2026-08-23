@@ -168,7 +168,7 @@ export default function Reports({ project, indices, evidence = null }) {
                         behind each taxon, so how much of that exists is a
                         figure worth printing.
                     */}
-                    {evidence && evidence.specimens_total > 0 && (
+                    {evidence && evidence.records_total > 0 && (
                         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                             <MetricCard
                                 label={t('data.reports.voucher_coverage')}
@@ -186,13 +186,13 @@ export default function Reports({ project, indices, evidence = null }) {
                             <MetricCard
                                 label={t('data.reports.permit_coverage')}
                                 value={t('data.reports.permit_states', {
-                                    under: evidence.specimens_under_permit,
-                                    exempt: evidence.specimens_permit_exempt,
+                                    under: evidence.records_under_permit,
+                                    exempt: evidence.records_permit_exempt,
                                     unrecorded:
-                                        evidence.specimens_permit_unrecorded,
+                                        evidence.records_permit_unrecorded,
                                 })}
                                 tone={
-                                    evidence.specimens_permit_unrecorded > 0
+                                    evidence.records_permit_unrecorded > 0
                                         ? 'warning'
                                         : 'default'
                                 }

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CollectingPermitController;
+use App\Http\Controllers\FieldRecordController;
 use App\Http\Controllers\InterviewDataController;
 use App\Http\Controllers\InterviewDesignerController;
 use App\Http\Controllers\InterviewFormController;
@@ -9,7 +10,6 @@ use App\Http\Controllers\ProjectCatalogController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\PublicPageController;
 use App\Http\Controllers\SoftwareNoticeController;
-use App\Http\Controllers\SpecimenController;
 use App\Http\Controllers\SystemController;
 use App\Http\Controllers\WfoController;
 use Illuminate\Support\Facades\Route;
@@ -214,44 +214,44 @@ Route::middleware(['auth'])->group(function () {
         )->name('catalogs.permits.destroy');
     });
 
-    // Specimens — the physical collections a project has made. Collected and
+    // FieldRecords — the physical collections a project has made. Collected and
     // recorded first, identified later, deposited later still, so determining
     // and depositing are their own routes rather than fields on a create form.
     // See docs/decisions/0008-specimens-and-determinations.md.
-    Route::controller(SpecimenController::class)->group(function () {
+    Route::controller(FieldRecordController::class)->group(function () {
         Route::get(
-            '/catalogs/{project}/specimens',
+            '/catalogs/{project}/records',
             'index'
-        )->name('catalogs.specimens.index');
+        )->name('catalogs.fieldRecords.index');
         Route::get(
-            '/catalogs/{project}/specimens/export',
+            '/catalogs/{project}/records/export',
             'export'
-        )->name('catalogs.specimens.export');
+        )->name('catalogs.fieldRecords.export');
         Route::post(
-            '/catalogs/{project}/specimens',
+            '/catalogs/{project}/records',
             'store'
-        )->name('catalogs.specimens.store');
+        )->name('catalogs.fieldRecords.store');
         // Shortcut from a species page, where the identification is already known.
         Route::post(
-            '/catalogs/{project}/species/{species}/specimens',
+            '/catalogs/{project}/species/{species}/records',
             'storeForSpecies'
-        )->name('catalogs.specimens.store-for-species');
+        )->name('catalogs.fieldRecords.store-for-species');
         Route::patch(
-            '/catalogs/{project}/specimens/{specimen}',
+            '/catalogs/{project}/records/{fieldRecord}',
             'update'
-        )->name('catalogs.specimens.update');
+        )->name('catalogs.fieldRecords.update');
         Route::post(
-            '/catalogs/{project}/specimens/{specimen}/determine',
+            '/catalogs/{project}/records/{fieldRecord}/determine',
             'determine'
-        )->name('catalogs.specimens.determine');
+        )->name('catalogs.fieldRecords.determine');
         Route::post(
-            '/catalogs/{project}/specimens/{specimen}/deposit',
+            '/catalogs/{project}/records/{fieldRecord}/deposit',
             'deposit'
-        )->name('catalogs.specimens.deposit');
+        )->name('catalogs.fieldRecords.deposit');
         Route::delete(
-            '/catalogs/{project}/specimens/{specimen}',
+            '/catalogs/{project}/records/{fieldRecord}',
             'destroy'
-        )->name('catalogs.specimens.destroy');
+        )->name('catalogs.fieldRecords.destroy');
     });
 
     Route::controller(InterviewDataController::class)->group(function () {

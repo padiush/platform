@@ -118,8 +118,11 @@ companion keeps its interview-capture scope.
   ([ADR 0008](decisions/0008-specimens-and-determinations.md)).
 
 ### ⏳ Still open
-- *Nothing.* Every decision recorded here is settled; what remains is
-  implementation, listed under **Progress** above.
+- **Field records and basis** *(proposed 2026-08-22)* — rename `specimens` to
+  `field_records` and give each one a `basis_of_record`, so a study can document
+  what it saw and did not collect: a guided walk with an informant, or an
+  inventory made before interviews begin. Awaiting sign-off
+  ([ADR 0010](decisions/0010-field-records-and-basis.md)).
 
 ## Maintaining these docs
 

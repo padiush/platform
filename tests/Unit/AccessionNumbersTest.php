@@ -2,8 +2,8 @@
 
 namespace Tests\Unit;
 
+use App\Models\FieldRecord;
 use App\Models\Project;
-use App\Models\Specimen;
 use App\Services\AccessionNumbers;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -80,9 +80,9 @@ class AccessionNumbersTest extends TestCase
     {
         $project = $this->project(['accession_prefix' => 'MML']);
 
-        // A study that already numbers its own specimens enters them directly;
+        // A study that already numbers its own fieldRecords enters them directly;
         // the sequence must not then hand out a duplicate.
-        Specimen::factory()->create([
+        FieldRecord::factory()->create([
             'project_id' => $project->id,
             'accession_number' => 'MML-0001',
         ]);

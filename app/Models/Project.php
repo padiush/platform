@@ -65,9 +65,9 @@ class Project extends Model
         return $this->hasMany(InterviewForm::class);
     }
 
-    public function specimens()
+    public function fieldRecords()
     {
-        return $this->hasMany(Specimen::class);
+        return $this->hasMany(FieldRecord::class);
     }
 
     public function collectingPermits()

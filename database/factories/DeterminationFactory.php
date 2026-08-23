@@ -4,7 +4,7 @@ namespace Database\Factories;
 
 use App\Models\CatalogSpecies;
 use App\Models\Determination;
-use App\Models\Specimen;
+use App\Models\FieldRecord;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -18,7 +18,7 @@ class DeterminationFactory extends Factory
     public function definition()
     {
         return [
-            'specimen_id' => Specimen::factory(),
+            'field_record_id' => FieldRecord::factory(),
             'catalog_species_id' => CatalogSpecies::factory(),
             'determiner' => fake()->name(),
             'determined_on' => fake()->date(),

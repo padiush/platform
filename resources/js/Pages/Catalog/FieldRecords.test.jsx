@@ -22,7 +22,7 @@ vi.mock('@/Layouts/AuthenticatedLayout', () => ({
 
 globalThis.route = (name) => `/${name}`;
 
-import Specimens from './Specimens';
+import FieldRecords from './FieldRecords';
 
 const project = { id: 1, name: 'A study' };
 
@@ -54,9 +54,9 @@ const unidentified = {
 
 function renderPage(props = {}) {
     return render(
-        <Specimens
+        <FieldRecords
             project={project}
-            specimens={[vouchered, unidentified]}
+            fieldRecords={[vouchered, unidentified]}
             summary={{ total: 2, vouchered: 1, unidentified: 0 }}
             catalog={[{ id: 9, genus: 'Justicia', name: 'carthagenensis' }]}
             nextAccessionNumber="MML-0002"
@@ -65,7 +65,7 @@ function renderPage(props = {}) {
     );
 }
 
-describe('Specimens page', () => {
+describe('FieldRecords page', () => {
     it('lists collections that have never been identified', () => {
         renderPage();
 
@@ -73,7 +73,7 @@ describe('Specimens page', () => {
         // where a taxon-scoped view could never show it.
         expect(screen.getByText('043')).toBeInTheDocument();
         expect(
-            screen.getByText('catalogs.specimens.undetermined'),
+            screen.getByText('catalogs.fieldRecords.undetermined'),
         ).toBeInTheDocument();
     });
 
@@ -81,7 +81,7 @@ describe('Specimens page', () => {
         renderPage();
 
         fireEvent.click(
-            screen.getByText('catalogs.specimens.filter_undetermined'),
+            screen.getByText('catalogs.fieldRecords.filter_undetermined'),
         );
 
         expect(screen.getByText('043')).toBeInTheDocument();
@@ -92,7 +92,7 @@ describe('Specimens page', () => {
         renderPage();
 
         fireEvent.click(
-            screen.getByText('catalogs.specimens.filter_unvouchered'),
+            screen.getByText('catalogs.fieldRecords.filter_unvouchered'),
         );
 
         expect(screen.queryByText('MML-0001')).not.toBeInTheDocument();
@@ -104,24 +104,24 @@ describe('Specimens page', () => {
 
         // Reading the list is enough to export it, so no capability gate here.
         expect(
-            screen.getByText('catalogs.specimens.export'),
+            screen.getByText('catalogs.fieldRecords.export'),
         ).toBeInTheDocument();
 
         for (const format of ['xlsx', 'csv']) {
             expect(
-                screen.getByText(`catalogs.specimens.format_${format}`),
-            ).toHaveAttribute('href', '/catalogs.specimens.export');
+                screen.getByText(`catalogs.fieldRecords.format_${format}`),
+            ).toHaveAttribute('href', '/catalogs.fieldRecords.export');
         }
     });
 
     it('offers no export when nothing has been collected', () => {
         renderPage({
-            specimens: [],
+            fieldRecords: [],
             summary: { total: 0, vouchered: 0, unidentified: 0 },
         });
 
         expect(
-            screen.queryByText('catalogs.specimens.export'),
+            screen.queryByText('catalogs.fieldRecords.export'),
         ).not.toBeInTheDocument();
     });
 
@@ -129,7 +129,7 @@ describe('Specimens page', () => {
         renderPage({ canEdit: false });
 
         expect(
-            screen.queryByRole('button', { name: 'catalogs.specimens.add' }),
+            screen.queryByRole('button', { name: 'catalogs.fieldRecords.add' }),
         ).not.toBeInTheDocument();
     });
 
@@ -138,7 +138,7 @@ describe('Specimens page', () => {
 
         // The modal's own title reuses this key, so ask for the button.
         fireEvent.click(
-            screen.getByRole('button', { name: 'catalogs.specimens.add' }),
+            screen.getByRole('button', { name: 'catalogs.fieldRecords.add' }),
         );
 
         const form = within(screen.getByTestId('collection-form'));
@@ -147,49 +147,57 @@ describe('Specimens page', () => {
         // time, and identification usually happens later. Scoped to the form —
         // the table behind the modal has its own accession column.
         expect(
-            form.getByText('catalogs.specimens.collector'),
+            form.getByText('catalogs.fieldRecords.collector'),
         ).toBeInTheDocument();
         expect(
-            form.queryByText('catalogs.specimens.accession_number'),
+            form.queryByText('catalogs.fieldRecords.accession_number'),
         ).not.toBeInTheDocument();
         expect(
-            form.queryByText('catalogs.specimens.repository'),
+            form.queryByText('catalogs.fieldRecords.repository'),
         ).not.toBeInTheDocument();
         expect(
-            form.queryByText('catalogs.specimens.taxon'),
+            form.queryByText('catalogs.fieldRecords.taxon'),
         ).not.toBeInTheDocument();
     });
 
     it('identifies through its own modal', () => {
         renderPage({ canEdit: true });
 
-        fireEvent.click(screen.getAllByText('catalogs.specimens.identify')[1]);
+        fireEvent.click(
+            screen.getAllByText('catalogs.fieldRecords.identify')[1],
+        );
 
         expect(screen.getByTestId('determine-form')).toBeInTheDocument();
         expect(
-            screen.getByText('catalogs.specimens.supersedes_note'),
+            screen.getByText('catalogs.fieldRecords.supersedes_note'),
         ).toBeInTheDocument();
     });
 
     it('deposits through its own modal', () => {
         renderPage({ canEdit: true });
 
-        fireEvent.click(screen.getAllByText('catalogs.specimens.deposit')[1]);
+        fireEvent.click(
+            screen.getAllByText('catalogs.fieldRecords.deposit')[1],
+        );
 
         expect(screen.getByTestId('deposit-form')).toBeInTheDocument();
-        expect(screen.getByText('catalogs.specimens.mint')).toBeInTheDocument();
+        expect(
+            screen.getByText('catalogs.fieldRecords.mint'),
+        ).toBeInTheDocument();
     });
 
-    it('does not offer to mint for an already vouchered specimen', () => {
+    it('does not offer to mint for an already vouchered fieldRecord', () => {
         renderPage({ canEdit: true });
 
-        fireEvent.click(screen.getAllByText('catalogs.specimens.deposit')[0]);
+        fireEvent.click(
+            screen.getAllByText('catalogs.fieldRecords.deposit')[0],
+        );
 
         expect(
-            screen.queryByText('catalogs.specimens.mint'),
+            screen.queryByText('catalogs.fieldRecords.mint'),
         ).not.toBeInTheDocument();
         expect(
-            screen.getByText('catalogs.specimens.already_vouchered_note'),
+            screen.getByText('catalogs.fieldRecords.already_vouchered_note'),
         ).toBeInTheDocument();
     });
 });

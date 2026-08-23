@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
-import SpecimenTable from './SpecimenTable';
+import FieldRecordTable from './FieldRecordTable';
 
 const determined = {
     id: 1,
@@ -11,6 +11,7 @@ const determined = {
     collected_on: '2026-03-14',
     repository: 'Community herbarium',
     is_vouchered: true,
+    was_collected: true,
     species: { id: 9, genus: 'Justicia', name: 'carthagenensis' },
     determiner: 'A. Botanist',
     qualifier: 'cf',
@@ -25,6 +26,7 @@ const indet = {
     collected_on: null,
     repository: null,
     is_vouchered: false,
+    was_collected: true,
     species: null,
     determiner: 'A. Botanist',
     qualifier: null,
@@ -39,16 +41,17 @@ const untouched = {
     collected_on: null,
     repository: null,
     is_vouchered: false,
+    was_collected: true,
     species: null,
     determiner: null,
     qualifier: null,
 };
 
-describe('SpecimenTable', () => {
+describe('FieldRecordTable', () => {
     it('shows an empty state when nothing has been collected', () => {
         render(
-            <SpecimenTable
-                specimens={[]}
+            <FieldRecordTable
+                fieldRecords={[]}
                 emptyTitle="nothing yet"
                 emptyHint="go collect"
             />,
@@ -58,57 +61,59 @@ describe('SpecimenTable', () => {
     });
 
     it('labels an unvouchered collection rather than leaving it blank', () => {
-        render(<SpecimenTable specimens={[determined, indet]} />);
+        render(<FieldRecordTable fieldRecords={[determined, indet]} />);
 
         expect(screen.getByText('MML-0001')).toBeInTheDocument();
         expect(
-            screen.getByText('catalogs.specimens.unvouchered'),
+            screen.getByText('catalogs.fieldRecords.unvouchered'),
         ).toBeInTheDocument();
     });
 
     it('distinguishes examined-but-unnameable from nobody-has-looked', () => {
-        render(<SpecimenTable specimens={[indet, untouched]} />);
+        render(<FieldRecordTable fieldRecords={[indet, untouched]} />);
 
         // Two different absences, and the table must not collapse them.
         expect(
-            screen.getByText('catalogs.specimens.indet'),
+            screen.getByText('catalogs.fieldRecords.indet'),
         ).toBeInTheDocument();
         expect(
-            screen.getByText('catalogs.specimens.undetermined'),
+            screen.getByText('catalogs.fieldRecords.undetermined'),
         ).toBeInTheDocument();
     });
 
     it('renders the current determination with its qualifier', () => {
-        render(<SpecimenTable specimens={[determined]} />);
+        render(<FieldRecordTable fieldRecords={[determined]} />);
 
         expect(
             screen.getByText(
-                /catalogs\.specimens\.qualifier_cf Justicia carthagenensis/,
+                /catalogs\.fieldRecords\.qualifier_cf Justicia carthagenensis/,
             ),
         ).toBeInTheDocument();
     });
 
     it('drops the determination column where it would repeat the page', () => {
         render(
-            <SpecimenTable
-                specimens={[determined]}
+            <FieldRecordTable
+                fieldRecords={[determined]}
                 showDetermination={false}
             />,
         );
 
         expect(
-            screen.queryByText('catalogs.specimens.determination'),
+            screen.queryByText('catalogs.fieldRecords.determination'),
         ).not.toBeInTheDocument();
     });
 
     it('offers no actions without the capability', () => {
-        render(<SpecimenTable specimens={[determined]} canEdit={false} />);
+        render(
+            <FieldRecordTable fieldRecords={[determined]} canEdit={false} />,
+        );
 
         expect(
-            screen.queryByText('catalogs.specimens.identify'),
+            screen.queryByText('catalogs.fieldRecords.identify'),
         ).not.toBeInTheDocument();
         expect(
-            screen.queryByText('catalogs.specimens.deposit'),
+            screen.queryByText('catalogs.fieldRecords.deposit'),
         ).not.toBeInTheDocument();
     });
 
@@ -117,16 +122,16 @@ describe('SpecimenTable', () => {
         const onDeposit = vi.fn();
 
         render(
-            <SpecimenTable
-                specimens={[determined]}
+            <FieldRecordTable
+                fieldRecords={[determined]}
                 canEdit
                 onDetermine={onDetermine}
                 onDeposit={onDeposit}
             />,
         );
 
-        fireEvent.click(screen.getByText('catalogs.specimens.identify'));
-        fireEvent.click(screen.getByText('catalogs.specimens.deposit'));
+        fireEvent.click(screen.getByText('catalogs.fieldRecords.identify'));
+        fireEvent.click(screen.getByText('catalogs.fieldRecords.deposit'));
 
         expect(onDetermine).toHaveBeenCalledWith(determined);
         expect(onDeposit).toHaveBeenCalledWith(determined);

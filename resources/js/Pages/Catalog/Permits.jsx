@@ -75,7 +75,7 @@ export default function Permits({
             subtitle={project.name}
             action={
                 <Link
-                    href={route('catalogs.specimens.index', {
+                    href={route('catalogs.fieldRecords.index', {
                         project: project.id,
                     })}
                     className="btn btn-ghost btn-circle"
@@ -130,7 +130,7 @@ export default function Permits({
                                             </th>
                                             <th>
                                                 {t(
-                                                    'catalogs.permits.specimens',
+                                                    'catalogs.permits.fieldRecords',
                                                 )}
                                             </th>
                                             {canEdit && <th />}
@@ -150,7 +150,7 @@ export default function Permits({
                                                     <Expiry permit={permit} />
                                                 </td>
                                                 <td>
-                                                    {permit.specimens_count}
+                                                    {permit.field_records_count}
                                                 </td>
                                                 {canEdit && (
                                                     <td className="text-right whitespace-nowrap">
@@ -219,9 +219,9 @@ export default function Permits({
                 open={pendingDelete !== null}
                 title={t('catalogs.permits.confirm_delete_title')}
                 message={
-                    pendingDelete?.specimens_count
+                    pendingDelete?.field_records_count
                         ? t('catalogs.permits.confirm_delete_with_specimens', {
-                              count: pendingDelete.specimens_count,
+                              count: pendingDelete.field_records_count,
                           })
                         : t('catalogs.permits.confirm_delete')
                 }

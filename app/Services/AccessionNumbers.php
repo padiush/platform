@@ -2,8 +2,8 @@
 
 namespace App\Services;
 
+use App\Models\FieldRecord;
 use App\Models\Project;
-use App\Models\Specimen;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;
 
@@ -11,12 +11,12 @@ use RuntimeException;
  * Issues accession numbers on a project's behalf.
  *
  * An institutional herbarium has a curator and a registry to hand these out. A
- * community herbarium has neither, which is why specimens deposited with a
+ * community herbarium has neither, which is why fieldRecords deposited with a
  * community end up unvouchered — so the project becomes its own issuing
  * authority. See docs/decisions/0008-specimens-and-determinations.md.
  *
  * The format is a configurable prefix and a zero-padded sequence, per project:
- * `MML-0001`, or `0001` when no prefix is set. Nothing forces a specimen to use
+ * `MML-0001`, or `0001` when no prefix is set. Nothing forces a fieldRecord to use
  * it — `accession_number` is a plain string, so a study that already has its own
  * numbering can enter those instead and the sequence simply steps around them.
  */
@@ -29,7 +29,7 @@ class AccessionNumbers
      * Take the next free number for this project and advance the sequence.
      *
      * The read and the increment are one locked transaction, so two researchers
-     * registering a specimen at the same moment cannot be handed the same
+     * registering a fieldRecord at the same moment cannot be handed the same
      * number. (`lockForUpdate` is a no-op on SQLite, which the test suite uses —
      * harmless there, since the tests are single-threaded.)
      */
@@ -85,7 +85,7 @@ class AccessionNumbers
 
     private function isTaken(Project $project, string $accessionNumber): bool
     {
-        return Specimen::query()
+        return FieldRecord::query()
             ->where('project_id', $project->getKey())
             ->where('accession_number', $accessionNumber)
             ->exists();

@@ -34,7 +34,7 @@ class CatalogSpecies extends Model
 
     /**
      * Reference imagery for the taxon — not photographs of a collection, which
-     * belong to the specimen. See docs/decisions/0008-specimens-and-determinations.md.
+     * belong to the fieldRecord. See docs/decisions/0008-specimens-and-determinations.md.
      */
     public function photos()
     {
@@ -47,16 +47,16 @@ class CatalogSpecies extends Model
         return $this->hasMany(Determination::class);
     }
 
-    /** The specimens currently determined as this taxon. */
-    public function specimens()
+    /** The fieldRecords currently determined as this taxon. */
+    public function fieldRecords()
     {
         return $this->hasManyThrough(
-            Specimen::class,
+            FieldRecord::class,
             Determination::class,
             'catalog_species_id',
             'id',
             'id',
-            'specimen_id',
+            'field_record_id',
         )->where('determinations.is_current', true);
     }
 }

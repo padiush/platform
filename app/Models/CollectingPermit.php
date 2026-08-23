@@ -18,7 +18,7 @@ class CollectingPermit extends Model
     use HasFactory;
 
     /**
-     * `project_id` is deliberately absent, as on Specimen: which study a permit
+     * `project_id` is deliberately absent, as on FieldRecord: which study a permit
      * belongs to is not something a request body gets to say.
      */
     protected $fillable = [
@@ -39,9 +39,9 @@ class CollectingPermit extends Model
         return $this->belongsTo(Project::class);
     }
 
-    public function specimens()
+    public function fieldRecords()
     {
-        return $this->hasMany(Specimen::class);
+        return $this->hasMany(FieldRecord::class);
     }
 
     /**

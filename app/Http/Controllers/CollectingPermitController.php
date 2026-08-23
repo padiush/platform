@@ -30,7 +30,7 @@ class CollectingPermitController extends Controller
         }
 
         $permits = $project->collectingPermits()
-            ->withCount('specimens')
+            ->withCount('fieldRecords')
             ->orderByDesc('issued_on')
             ->orderBy('reference')
             ->get();
@@ -47,7 +47,7 @@ class CollectingPermitController extends Controller
                 'has_expired' => $permit->hasExpired(),
                 // Deleting one leaves its collections standing, so the count
                 // is what a confirmation needs to say out loud.
-                'specimens_count' => $permit->specimens_count,
+                'field_records_count' => $permit->field_records_count,
             ])->all(),
             'canEdit' => (bool) $user->can('editCatalog', $project),
             'speciesCount' => $project->catalogSpecies()->count(),
@@ -100,7 +100,7 @@ class CollectingPermitController extends Controller
         }
 
         // The collections taken under it survive with a null reference: a
-        // specimen outlives the paperwork, as it outlives a taxon.
+        // fieldRecord outlives the paperwork, as it outlives a taxon.
         $permit->delete();
 
         return back()

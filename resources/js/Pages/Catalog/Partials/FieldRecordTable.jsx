@@ -6,16 +6,30 @@ import { useTranslation } from 'react-i18next';
  * than showing an empty cell — the absence is a data-quality fact, not a blank
  * to overlook.
  */
-function AccessionCell({ specimen }) {
+function AccessionCell({ fieldRecord }) {
     const { t } = useTranslation();
 
-    if (specimen.is_vouchered) {
-        return <span className="font-mono">{specimen.accession_number}</span>;
+    // Nothing was taken, so there is nothing to accession. Saying "unvouchered"
+    // here would read as a gap rather than a different kind of record.
+    // Explicitly false, not merely absent: a record is a collection unless it
+    // says otherwise, which is the default the model carries too.
+    if (fieldRecord.was_collected === false) {
+        return (
+            <span className="badge badge-outline badge-sm">
+                {t('catalogs.fieldRecords.basis_human_observation')}
+            </span>
+        );
+    }
+
+    if (fieldRecord.is_vouchered) {
+        return (
+            <span className="font-mono">{fieldRecord.accession_number}</span>
+        );
     }
 
     return (
         <span className="badge badge-ghost badge-sm">
-            {t('catalogs.specimens.unvouchered')}
+            {t('catalogs.fieldRecords.unvouchered')}
         </span>
     );
 }
@@ -24,27 +38,27 @@ function AccessionCell({ specimen }) {
  * The current opinion about what this is. Two different absences, kept
  * distinct: nobody has looked yet, or someone looked and could not name it.
  */
-function DeterminationCell({ specimen }) {
+function DeterminationCell({ fieldRecord }) {
     const { t } = useTranslation();
 
-    if (!specimen.species) {
+    if (!fieldRecord.species) {
         return (
             <span className="badge badge-outline badge-sm">
-                {specimen.determiner
-                    ? t('catalogs.specimens.indet')
-                    : t('catalogs.specimens.undetermined')}
+                {fieldRecord.determiner
+                    ? t('catalogs.fieldRecords.indet')
+                    : t('catalogs.fieldRecords.undetermined')}
             </span>
         );
     }
 
-    const qualifier = specimen.qualifier
-        ? `${t(`catalogs.specimens.qualifier_${specimen.qualifier}`)} `
+    const qualifier = fieldRecord.qualifier
+        ? `${t(`catalogs.fieldRecords.qualifier_${fieldRecord.qualifier}`)} `
         : '';
 
     return (
         <span className="italic">
             {qualifier}
-            {specimen.species.genus} {specimen.species.name}
+            {fieldRecord.species.genus} {fieldRecord.species.name}
         </span>
     );
 }
@@ -53,8 +67,8 @@ function DeterminationCell({ specimen }) {
  * One row per physical collection. `columns` lets the species page drop the
  * determination column, which would repeat the taxon you are already looking at.
  */
-export default function SpecimenTable({
-    specimens,
+export default function FieldRecordTable({
+    fieldRecords,
     canEdit = false,
     showDetermination = true,
     onEdit = () => {},
@@ -66,7 +80,7 @@ export default function SpecimenTable({
 }) {
     const { t } = useTranslation();
 
-    if (specimens.length === 0) {
+    if (fieldRecords.length === 0) {
         return <EmptyState title={emptyTitle} hint={emptyHint} />;
     }
 
@@ -75,39 +89,41 @@ export default function SpecimenTable({
             <table className="table-sm table">
                 <thead>
                     <tr>
-                        <th>{t('catalogs.specimens.accession_number')}</th>
-                        <th>{t('catalogs.specimens.collection_number')}</th>
-                        <th>{t('catalogs.specimens.collector')}</th>
-                        <th>{t('catalogs.specimens.collected_on')}</th>
+                        <th>{t('catalogs.fieldRecords.accession_number')}</th>
+                        <th>{t('catalogs.fieldRecords.collection_number')}</th>
+                        <th>{t('catalogs.fieldRecords.collector')}</th>
+                        <th>{t('catalogs.fieldRecords.collected_on')}</th>
                         {showDetermination && (
-                            <th>{t('catalogs.specimens.determination')}</th>
+                            <th>{t('catalogs.fieldRecords.determination')}</th>
                         )}
-                        <th>{t('catalogs.specimens.repository')}</th>
-                        <th>{t('catalogs.specimens.permit')}</th>
+                        <th>{t('catalogs.fieldRecords.repository')}</th>
+                        <th>{t('catalogs.fieldRecords.permit')}</th>
                         {canEdit && <th />}
                     </tr>
                 </thead>
                 <tbody>
-                    {specimens.map((specimen) => (
-                        <tr key={specimen.id}>
+                    {fieldRecords.map((fieldRecord) => (
+                        <tr key={fieldRecord.id}>
                             <td>
-                                <AccessionCell specimen={specimen} />
+                                <AccessionCell fieldRecord={fieldRecord} />
                             </td>
-                            <td>{specimen.collection_number ?? '—'}</td>
-                            <td>{specimen.collector ?? '—'}</td>
-                            <td>{specimen.collected_on ?? '—'}</td>
+                            <td>{fieldRecord.collection_number ?? '—'}</td>
+                            <td>{fieldRecord.collector ?? '—'}</td>
+                            <td>{fieldRecord.collected_on ?? '—'}</td>
                             {showDetermination && (
                                 <td>
-                                    <DeterminationCell specimen={specimen} />
+                                    <DeterminationCell
+                                        fieldRecord={fieldRecord}
+                                    />
                                 </td>
                             )}
-                            <td>{specimen.repository ?? '—'}</td>
+                            <td>{fieldRecord.repository ?? '—'}</td>
                             <td>
-                                {specimen.permit ??
-                                    (specimen.permit_exemption ? (
+                                {fieldRecord.permit ??
+                                    (fieldRecord.permit_exemption ? (
                                         <span className="badge badge-ghost badge-sm">
                                             {t(
-                                                `catalogs.specimens.exemption_${specimen.permit_exemption}`,
+                                                `catalogs.fieldRecords.exemption_${fieldRecord.permit_exemption}`,
                                             )}
                                         </span>
                                     ) : (
@@ -119,30 +135,30 @@ export default function SpecimenTable({
                                     <button
                                         type="button"
                                         className="btn btn-ghost btn-xs"
-                                        onClick={() => onDetermine(specimen)}
+                                        onClick={() => onDetermine(fieldRecord)}
                                     >
-                                        {t('catalogs.specimens.identify')}
+                                        {t('catalogs.fieldRecords.identify')}
                                     </button>
                                     <button
                                         type="button"
                                         className="btn btn-ghost btn-xs"
-                                        onClick={() => onDeposit(specimen)}
+                                        onClick={() => onDeposit(fieldRecord)}
                                     >
-                                        {t('catalogs.specimens.deposit')}
+                                        {t('catalogs.fieldRecords.deposit')}
                                     </button>
                                     <button
                                         type="button"
                                         className="btn btn-ghost btn-xs"
-                                        onClick={() => onEdit(specimen)}
+                                        onClick={() => onEdit(fieldRecord)}
                                     >
-                                        {t('catalogs.specimens.edit')}
+                                        {t('catalogs.fieldRecords.edit')}
                                     </button>
                                     <button
                                         type="button"
                                         className="btn btn-ghost btn-xs text-error"
-                                        onClick={() => onDelete(specimen)}
+                                        onClick={() => onDelete(fieldRecord)}
                                     >
-                                        {t('catalogs.specimens.delete')}
+                                        {t('catalogs.fieldRecords.delete')}
                                     </button>
                                 </td>
                             )}
