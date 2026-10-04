@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\FieldRecord;
+use App\Models\Media;
 
 /**
  * How a fieldRecord reads in the interface: one row per physical collection, with
@@ -32,16 +33,23 @@ class FieldRecordPresenter
             // Streamed through an authorized route rather than a public or
             // signed URL, so losing access to the project loses access to the
             // photographs at the same moment.
-            'media' => $fieldRecord->media->map(fn ($medium) => [
-                'id' => $medium->id,
-                'kind' => $medium->kind,
-                'content_type' => $medium->content_type,
-                'url' => route('catalogs.fieldRecords.media.show', [
-                    'project' => $fieldRecord->project_id,
-                    'fieldRecord' => $fieldRecord->id,
-                    'medium' => $medium->id,
-                ]),
-            ])->all(),
+            //
+            // Stored files only. A device registers an upload before sending
+            // the bytes, and one interrupted in between leaves a pending row
+            // with nothing behind it — shown, it would be a broken tile.
+            'media' => $fieldRecord->media
+                ->where('status', Media::STATUS_STORED)
+                ->values()
+                ->map(fn ($medium) => [
+                    'id' => $medium->id,
+                    'kind' => $medium->kind,
+                    'content_type' => $medium->content_type,
+                    'url' => route('catalogs.fieldRecords.media.show', [
+                        'project' => $fieldRecord->project_id,
+                        'fieldRecord' => $fieldRecord->id,
+                        'medium' => $medium->id,
+                    ]),
+                ])->all(),
             'accession_number' => $fieldRecord->accession_number,
             'collection_number' => $fieldRecord->collection_number,
             'collector' => $fieldRecord->collector,
