@@ -1,9 +1,9 @@
 <?php
 
 // Generates placeholder images for every S3 object key the app references,
-// so the local MinIO bucket can serve the public/auth pages.
+// so the local S3 bucket can serve the public/auth pages.
 // Run inside the app container:
-//   docker compose exec app php docker/minio/generate-seed-images.php
+//   docker compose exec app php docker/s3/generate-seed-images.php
 
 $keys = [
     'hero.jpg' => [1200, 675],

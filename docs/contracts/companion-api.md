@@ -251,7 +251,7 @@ collision, and never needs to.
 ## Media — audio & photos (offload to object storage)
 
 Large files over field connectivity should not stream through the app server.
-Use a presigned direct-to-storage flow against the existing S3/MinIO bucket.
+Use a presigned direct-to-storage flow against the existing S3 bucket.
 
 ```
 POST /api/v1/instances/{instance}/media/intent

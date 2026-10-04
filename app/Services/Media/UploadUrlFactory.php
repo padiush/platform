@@ -4,7 +4,7 @@ namespace App\Services\Media;
 
 /**
  * Issues a presigned direct-to-storage upload URL. Abstracted so the media
- * endpoints don't depend on a live S3/MinIO connection (and so tests can bind a
+ * endpoints don't depend on a live S3 connection (and so tests can bind a
  * deterministic fake). See docs/contracts/companion-api.md — large files are
  * PUT straight to object storage, never through the app server.
  */
