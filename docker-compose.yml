@@ -21,11 +21,11 @@ services:
             MAIL_MAILER: smtp
             MAIL_HOST: mailpit
             MAIL_PORT: 1025
-            # MinIO stands in for S3. The endpoint is localhost:9000 (MinIO's
+            # SeaweedFS stands in for S3. The endpoint is localhost:9000 (its
             # published port) so the presigned URLs the app generates are
             # fetchable from the host browser. The app also calls S3 itself
             # (checking an upload landed, storing and serving media), and
-            # inside this container localhost is not MinIO, so the command
+            # inside this container localhost is not SeaweedFS, so the command
             # below forwards the container's own localhost:9000 to it. One
             # endpoint then works from both sides, and presigned URLs stay
             # signed for the host the browser actually uses.
@@ -37,9 +37,9 @@ services:
             AWS_USE_PATH_STYLE_ENDPOINT: 'true'
         # --no-reload is required: without it, artisan serve strips container
         # env vars from the web process (only a small passthrough list
-        # survives), so the DB/MinIO overrides above would never apply.
+        # survives), so the DB/S3 overrides above would never apply.
         # Trade-off: after editing .env, run `docker compose restart app`.
-        command: sh -c "socat TCP-LISTEN:9000,bind=127.0.0.1,fork,reuseaddr TCP:minio:9000 & composer install --no-interaction && php artisan serve --host=0.0.0.0 --port=8000 --no-reload"
+        command: sh -c "socat TCP-LISTEN:9000,bind=127.0.0.1,fork,reuseaddr TCP:seaweedfs:9000 & composer install --no-interaction && php artisan serve --host=0.0.0.0 --port=8000 --no-reload"
         depends_on:
             mariadb:
                 condition: service_healthy
@@ -80,44 +80,47 @@ services:
         ports:
             - '8025:8025'
 
-    minio:
-        image: minio/minio
-        command: server /data --console-address ':9001'
+    # SeaweedFS stands in for S3: MinIO's open-source edition is archived and
+    # its images are no longer published. `weed mini` runs the whole store in
+    # one process; the AWS_* variables become its admin identity, so the app's
+    # credentials below are the ones it accepts, and -bucket creates the
+    # bucket on first start. The other components it can run are switched off.
+    seaweedfs:
+        image: chrislusf/seaweedfs:4.48
+        command: >
+            mini -dir=/data -s3.port=9000 -bucket=padiush
+            -admin.ui=false -webdav=false -s3.port.iceberg=0 -s3.port.lance=0
         environment:
-            MINIO_ROOT_USER: padiush
-            MINIO_ROOT_PASSWORD: padiush-secret
+            AWS_ACCESS_KEY_ID: padiush
+            AWS_SECRET_ACCESS_KEY: padiush-secret
         ports:
             - '9000:9000'
-            - '9001:9001'
         volumes:
-            - minio_data:/data
+            - seaweedfs_data:/data
         healthcheck:
-            test:
-                [
-                    'CMD',
-                    'curl',
-                    '-f',
-                    'http://localhost:9000/minio/health/live',
-                ]
+            test: ['CMD', 'curl', '-fs', 'http://localhost:9000/healthz']
             interval: 5s
             timeout: 5s
             retries: 12
 
-    # One-shot: creates the bucket and uploads the placeholder images the
-    # public/auth pages expect. Safe to re-run; exits when done.
-    minio-setup:
-        image: minio/mc
+    # One-shot: uploads the placeholder images the public/auth pages expect.
+    # Safe to re-run; exits when done.
+    s3-setup:
+        image: amazon/aws-cli
         depends_on:
-            minio:
+            seaweedfs:
                 condition: service_healthy
+        environment:
+            AWS_ACCESS_KEY_ID: padiush
+            AWS_SECRET_ACCESS_KEY: padiush-secret
+            AWS_DEFAULT_REGION: us-east-1
         volumes:
-            - ./docker/minio/seed:/seed:ro
-        entrypoint: >
-            sh -c "mc alias set local http://minio:9000 padiush padiush-secret
-            && mc mb --ignore-existing local/padiush
-            && mc cp --recursive /seed/ local/padiush/"
+            - ./docker/s3/seed:/seed:ro
+        command: >
+            --endpoint-url http://seaweedfs:9000
+            s3 cp --recursive --only-show-errors /seed/ s3://padiush/
 
 volumes:
     mariadb_data:
-    minio_data:
+    seaweedfs_data:
     node_modules:
