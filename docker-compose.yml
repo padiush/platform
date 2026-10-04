@@ -23,10 +23,12 @@ services:
             MAIL_PORT: 1025
             # MinIO stands in for S3. The endpoint is localhost:9000 (MinIO's
             # published port) so the presigned URLs the app generates are
-            # fetchable from the host browser. Caveat: server-side S3 API
-            # calls would need http://minio:9000 instead — nothing does those
-            # today (the app only generates presigned GET URLs, which is an
-            # offline operation).
+            # fetchable from the host browser. The app also calls S3 itself
+            # (checking an upload landed, storing and serving media), and
+            # inside this container localhost is not MinIO, so the command
+            # below forwards the container's own localhost:9000 to it. One
+            # endpoint then works from both sides, and presigned URLs stay
+            # signed for the host the browser actually uses.
             AWS_ACCESS_KEY_ID: padiush
             AWS_SECRET_ACCESS_KEY: padiush-secret
             AWS_DEFAULT_REGION: us-east-1
@@ -37,7 +39,7 @@ services:
         # env vars from the web process (only a small passthrough list
         # survives), so the DB/MinIO overrides above would never apply.
         # Trade-off: after editing .env, run `docker compose restart app`.
-        command: sh -c "composer install --no-interaction && php artisan serve --host=0.0.0.0 --port=8000 --no-reload"
+        command: sh -c "socat TCP-LISTEN:9000,bind=127.0.0.1,fork,reuseaddr TCP:minio:9000 & composer install --no-interaction && php artisan serve --host=0.0.0.0 --port=8000 --no-reload"
         depends_on:
             mariadb:
                 condition: service_healthy
