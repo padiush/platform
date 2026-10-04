@@ -5,7 +5,7 @@ namespace App\Services\Media;
 use Illuminate\Support\Facades\Storage;
 
 /**
- * Presigned uploads backed by the S3/MinIO disk. The device PUTs the file
+ * Presigned uploads backed by the S3 disk. The device PUTs the file
  * directly to the returned URL (resumable/chunked), independent of the JSON sync.
  */
 class S3UploadUrlFactory implements UploadUrlFactory

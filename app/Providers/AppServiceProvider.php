@@ -20,7 +20,7 @@ class AppServiceProvider extends ServiceProvider
     public function register()
     {
         // Companion media: presigned uploads and stored-object inspection via
-        // S3/MinIO, plus a transcriber that is a no-op until Whisper is
+        // S3, plus a transcriber that is a no-op until Whisper is
         // provisioned (ADR 0005). All are swappable in tests.
         $this->app->bind(UploadUrlFactory::class, S3UploadUrlFactory::class);
         $this->app->bind(StoredObjectInspector::class, FilesystemStoredObjectInspector::class);
