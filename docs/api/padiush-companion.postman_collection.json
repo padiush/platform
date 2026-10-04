@@ -30,6 +30,10 @@
     {
       "key": "instance_id",
       "value": ""
+    },
+    {
+      "key": "record_id",
+      "value": ""
     }
   ],
   "item": [
@@ -313,6 +317,74 @@
               ]
             },
             "description": "Mark the uploaded file stored. For audio, enqueues transcription when enabled.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"client_id\": \"PASTE_INTENT_CLIENT_ID\",\n  \"storage_key\": \"PASTE_INTENT_STORAGE_KEY\",\n  \"duration_s\": 42\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Record media intent",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/records/{{record_id}}/media/intent",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "records",
+                "{{record_id}}",
+                "media",
+                "intent"
+              ]
+            },
+            "description": "A field record's photographs and audio: the same handshake as an interview's media, addressed by the server id records:sync returned. Complete never queues transcription.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"client_id\": \"{{$guid}}\",\n  \"kind\": \"audio\",\n  \"content_type\": \"audio/mp4\",\n  \"byte_size\": 2048000\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Record media complete",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/records/{{record_id}}/media/complete",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "records",
+                "{{record_id}}",
+                "media",
+                "complete"
+              ]
+            },
+            "description": "A field record's photographs and audio: the same handshake as an interview's media, addressed by the server id records:sync returned. Complete never queues transcription.",
             "body": {
               "mode": "raw",
               "raw": "{\n  \"client_id\": \"PASTE_INTENT_CLIENT_ID\",\n  \"storage_key\": \"PASTE_INTENT_STORAGE_KEY\",\n  \"duration_s\": 42\n}",

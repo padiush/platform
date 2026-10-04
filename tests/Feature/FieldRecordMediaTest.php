@@ -8,6 +8,8 @@ use App\Models\Project;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+use Inertia\Testing\AssertableInertia as Assert;
 use Tests\Concerns\InteractsWithProjects;
 use Tests\TestCase;
 
@@ -177,5 +179,32 @@ class FieldRecordMediaTest extends TestCase
             'fieldRecord' => $foreignRecord->id,
             'medium' => $media->id,
         ]))->assertRedirect(route('catalogs.index'));
+    }
+
+    /**
+     * A device registers an upload before it sends the bytes, so a connection
+     * lost in between leaves a pending row with nothing behind it. Listed, it
+     * would be a tile that never loads.
+     */
+    public function test_an_upload_still_pending_from_a_device_is_not_listed()
+    {
+        $this->attach()->assertRedirect();
+        Media::create([
+            'field_record_id' => $this->record->id,
+            'client_id' => (string) Str::uuid(),
+            'kind' => Media::KIND_PHOTO,
+            'storage_disk' => 's3',
+            'storage_key' => 'projects/1/field-records/1/media/pending.jpg',
+            'content_type' => 'image/jpeg',
+            'byte_size' => 1000,
+            'status' => Media::STATUS_PENDING,
+        ]);
+
+        $this->actingAs($this->editor())
+            ->get(route('catalogs.fieldRecords.index', ['project' => $this->project->id]))
+            ->assertInertia(fn (Assert $page) => $page
+                ->has('fieldRecords.0.media', 1)
+                ->where('fieldRecords.0.media.0.kind', Media::KIND_PHOTO)
+            );
     }
 }

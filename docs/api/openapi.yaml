@@ -308,6 +308,76 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/Error' }
+  /records/{record}/media/intent:
+    post:
+      tags: [Media]
+      summary: Register a field record's media upload and get a presigned URL
+      description: >
+        The same handshake as an interview's media, for a field record's
+        photographs and audio. The record is addressed by the server `id` that
+        records:sync returned, so it must have synced first. For a record of
+        something never collected, the photograph is the whole of the evidence.
+      parameters:
+        - $ref: '#/components/parameters/RecordId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/MediaIntentRequest' }
+      responses:
+        '200':
+          description: Presigned upload target
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/MediaIntentResponse' }
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: client_id already used by another record or by an interview
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+        '422':
+          description: Validation error (e.g. content_type does not match kind)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+  /records/{record}/media/complete:
+    post:
+      tags: [Media]
+      summary: Mark a field record's uploaded file stored
+      description: >
+        Never queues transcription: that pipeline serves interview audio, and its
+        result reaches the device through GET /instances/{instance}, which a
+        record has no counterpart to.
+      parameters:
+        - $ref: '#/components/parameters/RecordId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/MediaCompleteRequest' }
+      responses:
+        '200':
+          description: Stored
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/MediaCompleteResponse' }
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          description: Storage key mismatch, missing upload, or validation error
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
   /diagnostics:
     post:
       tags: [Diagnostics]
@@ -367,6 +437,12 @@ components:
       in: path
       required: true
       schema: { type: string, format: uuid }
+    RecordId:
+      name: record
+      in: path
+      required: true
+      description: The field record's server id, as records:sync returned it.
+      schema: { type: integer }
   responses:
     Unauthenticated:
       description: Missing or invalid token
