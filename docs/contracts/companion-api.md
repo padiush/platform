@@ -273,6 +273,31 @@ POST /api/v1/instances/{instance}/media/complete
   `GET /api/v1/instances/{instance}` returns
   `{ …, transcription: { status: "queued"|"processing"|"done"|"failed", text? } }`.
 
+### A field record's media
+
+The same handshake, owned by a field record instead of an interview
+([0011](../decisions/0011-companion-field-records.md)). For a record of
+something never collected, the photograph is the whole of the evidence
+([0010](../decisions/0010-field-records-and-basis.md)).
+
+```
+POST /api/v1/records/{record}/media/intent      // same body and response as above
+POST /api/v1/records/{record}/media/complete    → { id, status: "stored" }
+```
+
+- `{record}` is the server `id` that `records:sync` returned — the device has
+  no other way to name a record, so **sync the record first**, then upload its
+  media.
+- The same `record_data` capability as `records:sync`, checked on the record's
+  project.
+- A `client_id` names one file for one owner: reusing it on another record, or
+  across an interview and a record, is a **409** `api.media.client_id_conflict`.
+- **No transcription**, whatever the kind. That pipeline serves interview
+  audio, and its result reaches the device through `GET /instances/{instance}`,
+  which a record has no counterpart to.
+- A file the device registered but never completed stays `pending` and is not
+  shown on the web, so an interrupted upload never surfaces as a broken image.
+
 ## Diagnostics — integrity events from the device
 
 A few failures on a device destroy unsynced captures or leave an unencrypted

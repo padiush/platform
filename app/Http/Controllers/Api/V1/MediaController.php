@@ -5,8 +5,10 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Requests\Api\CompleteMediaRequest;
 use App\Http\Requests\Api\StoreMediaIntentRequest;
 use App\Jobs\TranscribeAudio;
+use App\Models\FieldRecord;
 use App\Models\InterviewInstance;
 use App\Models\Media;
+use App\Models\Project;
 use App\Services\Media\StoredObjectInspector;
 use App\Services\Media\UploadUrlFactory;
 use Illuminate\Http\JsonResponse;
@@ -17,12 +19,20 @@ use Illuminate\Http\JsonResponse;
  * device PUTs the file to object storage, then complete registers it. For audio,
  * complete enqueues transcription when it is enabled. See
  * docs/contracts/companion-api.md.
+ *
+ * Media belongs to an interview or to a field record, and both go through the
+ * same handshake: only the owner, its access check and the storage prefix
+ * differ, so the handshake itself is written once below.
  */
 class MediaController extends ApiController
 {
     private const DISK = 's3';
 
     private const UPLOAD_TTL_MINUTES = 15;
+
+    private const OWNER_INSTANCE = 'interview_instance_id';
+
+    private const OWNER_FIELD_RECORD = 'field_record_id';
 
     public function intent(
         StoreMediaIntentRequest $request,
@@ -32,6 +42,79 @@ class MediaController extends ApiController
         $project = $this->projectForInstance($instance);
         $this->requireCapability($request->user(), $project, 'record_data');
 
+        return $this->registerIntent(
+            $request,
+            $urls,
+            self::OWNER_INSTANCE,
+            $instance->id,
+            "projects/{$project->id}/instances/{$instance->id}/media"
+        );
+    }
+
+    public function complete(
+        CompleteMediaRequest $request,
+        InterviewInstance $instance,
+        StoredObjectInspector $objects
+    ): JsonResponse {
+        $project = $this->projectForInstance($instance);
+        $this->requireCapability($request->user(), $project, 'record_data');
+
+        return $this->completeUpload($request, $objects, self::OWNER_INSTANCE, $instance->id, true);
+    }
+
+    /**
+     * A field record's photographs and audio, addressed by the server id that
+     * records:sync returned — the device has no other way to name the record.
+     * For a record of something never collected, these are the whole of the
+     * evidence (docs/decisions/0010-field-records-and-basis.md).
+     */
+    public function recordIntent(
+        StoreMediaIntentRequest $request,
+        FieldRecord $record,
+        UploadUrlFactory $urls
+    ): JsonResponse {
+        $project = $this->projectForRecord($record);
+        $this->requireCapability($request->user(), $project, 'record_data');
+
+        // The same prefix the web's own uploads use for this record.
+        return $this->registerIntent(
+            $request,
+            $urls,
+            self::OWNER_FIELD_RECORD,
+            $record->id,
+            "projects/{$project->id}/field-records/{$record->id}/media"
+        );
+    }
+
+    /**
+     * Never queues transcription. That pipeline serves interview audio
+     * (docs/decisions/0005-interview-transcription-whisper.md), and its result
+     * reaches the device through GET /instances/{instance}, which a record has
+     * no counterpart to — a transcript would be produced for nobody to read.
+     */
+    public function recordComplete(
+        CompleteMediaRequest $request,
+        FieldRecord $record,
+        StoredObjectInspector $objects
+    ): JsonResponse {
+        $project = $this->projectForRecord($record);
+        $this->requireCapability($request->user(), $project, 'record_data');
+
+        return $this->completeUpload($request, $objects, self::OWNER_FIELD_RECORD, $record->id, false);
+    }
+
+    /**
+     * Register (or re-register) the device's intent to upload, and issue a
+     * presigned URL for it. Idempotent on `client_id`: a retried intent for
+     * the same owner gets the same storage key back.
+     */
+    private function registerIntent(
+        StoreMediaIntentRequest $request,
+        UploadUrlFactory $urls,
+        string $ownerColumn,
+        int|string $ownerId,
+        string $keyPrefix
+    ): JsonResponse {
         $clientId = $request->input('client_id');
         $kind = $request->input('kind');
         $contentType = $request->input('content_type');
@@ -39,16 +122,17 @@ class MediaController extends ApiController
 
         $media = Media::firstOrNew(['client_id' => $clientId]);
 
-        // A client_id already used on another instance is a conflict.
-        if ($media->exists && $media->interview_instance_id !== $instance->id) {
+        // A client_id already used by another owner — another interview,
+        // another record, or the other kind of owner altogether — is a conflict.
+        if ($media->exists && ! $this->ownedBy($media, $ownerColumn, $ownerId)) {
             $this->fail('api.media.client_id_conflict', 409);
         }
 
         $key = $media->storage_key
-            ?? $this->storageKey($project->id, $instance->id, $clientId, $contentType);
+            ?? "{$keyPrefix}/{$clientId}.{$this->extension($contentType)}";
 
         $media->fill([
-            'interview_instance_id' => $instance->id,
+            $ownerColumn => $ownerId,
             'kind' => $kind,
             'storage_disk' => self::DISK,
             'storage_key' => $key,
@@ -67,16 +151,21 @@ class MediaController extends ApiController
         ]);
     }
 
-    public function complete(
+    /**
+     * Confirm an upload landed as announced, and mark it stored. The object is
+     * inspected rather than taken on the device's word: a missing, truncated or
+     * mislabelled upload is refused here instead of surfacing later as a
+     * broken file nobody can account for.
+     */
+    private function completeUpload(
         CompleteMediaRequest $request,
-        InterviewInstance $instance,
-        StoredObjectInspector $objects
+        StoredObjectInspector $objects,
+        string $ownerColumn,
+        int|string $ownerId,
+        bool $transcribe
     ): JsonResponse {
-        $project = $this->projectForInstance($instance);
-        $this->requireCapability($request->user(), $project, 'record_data');
-
         $media = Media::where('client_id', $request->input('client_id'))
-            ->where('interview_instance_id', $instance->id)
+            ->where($ownerColumn, $ownerId)
             ->first();
 
         if (! $media) {
@@ -111,7 +200,7 @@ class MediaController extends ApiController
             $media->duration_s = $request->integer('duration_s');
         }
 
-        $queued = $media->isAudio() && config('services.transcription.enabled');
+        $queued = $transcribe && $media->isAudio() && config('services.transcription.enabled');
 
         if ($queued) {
             $media->transcription_status = 'queued';
@@ -132,6 +221,29 @@ class MediaController extends ApiController
         return response()->json($response);
     }
 
+    /**
+     * Whether this media row belongs to the given owner. Compared as strings:
+     * an interview id is a uuid, a record id an integer, and the database
+     * driver decides which type a column comes back as.
+     */
+    private function ownedBy(Media $media, string $ownerColumn, int|string $ownerId): bool
+    {
+        return $media->{$ownerColumn} !== null
+            && (string) $media->{$ownerColumn} === (string) $ownerId;
+    }
+
+    /** The project a record belongs to, or 404 if it is orphaned. */
+    private function projectForRecord(FieldRecord $record): Project
+    {
+        $project = $record->project;
+
+        if (! $project) {
+            $this->fail('api.not_found', 404);
+        }
+
+        return $project;
+    }
+
     private function assertContentTypeMatchesKind(string $kind, string $contentType): void
     {
         $prefix = $kind === Media::KIND_AUDIO ? 'audio/' : 'image/';
@@ -141,13 +253,6 @@ class MediaController extends ApiController
                 'content_type' => ['api.media.content_type_mismatch'],
             ]);
         }
-    }
-
-    private function storageKey(int $projectId, string $instanceId, string $clientId, string $contentType): string
-    {
-        $extension = $this->extension($contentType);
-
-        return "projects/{$projectId}/instances/{$instanceId}/media/{$clientId}.{$extension}";
     }
 
     private function extension(string $contentType): string

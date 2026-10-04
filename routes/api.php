@@ -62,6 +62,13 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
         Route::post('instances/{instance}/media/complete', [MediaController::class, 'complete'])
             ->name('instances.media.complete');
 
+        // The same, for a field record — addressed by the server id that
+        // records:sync returned, so the record must have synced first.
+        Route::post('records/{record}/media/intent', [MediaController::class, 'recordIntent'])
+            ->name('records.media.intent');
+        Route::post('records/{record}/media/complete', [MediaController::class, 'recordComplete'])
+            ->name('records.media.complete');
+
         // Integrity events from the device — a closed set of codes, no payload.
         // Account-scoped rather than per-project: the events worth reporting
         // are the ones where the local store is gone, and with it any record

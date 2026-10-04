@@ -75,9 +75,12 @@ device's `edited_at`, refusing the deposit and identification fields rather than
 ignoring them; and the project's collecting permits now travel read-only in the
 capture bundle, so a record made offline can name the permit it was collected
 under. Both are in [companion-api.md](contracts/companion-api.md) and
-[sync-protocol.md](contracts/sync-protocol.md). **The companion does not use any
-of it yet** — the local store, the capture screen and the media path are the
-remaining work.
+[sync-protocol.md](contracts/sync-protocol.md). A record's photographs and audio
+have their own upload endpoints too, `records/{record}/media/intent` and
+`…/complete` — the same presigned handshake as an interview's media, addressed
+by the server id `records:sync` returns. **The companion now stores, captures
+and sends records**; uploading a record's media from the device is the
+remaining piece.
 
 What remains before field deployment for sensitive studies is hardening rather
 than new surface — tracked as: **resumable media upload** (single PUT today, so
