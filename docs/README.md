@@ -86,15 +86,17 @@ and a record that was never sent can be discarded. The web shows that link
 from both sides: a record names the interview and question it came out of,
 and an interview lists the records made from each answer.
 
+**Media uploads resume.** A file larger than 8 MiB goes up as an S3 multipart
+upload the server tracks, and `media/parts` signs only the parts storage
+lacks, so a dropped connection, or an app killed mid-send, costs one part
+rather than the recording
+([ADR 0012](decisions/0012-resumable-media-upload.md)). The companion sends
+every large file this way, reading one part at a time from its encrypted
+store, and a scheduled job aborts uploads nobody came back for.
+
 What remains before field deployment for sensitive studies is hardening rather
-than new surface — tracked as: **resumable media upload** (the server side is
-built: a device that asks sends a large file as an S3 multipart upload, and
-`media/parts` signs only the parts storage lacks, per
-[ADR 0012](decisions/0012-resumable-media-upload.md); the companion still
-sends one `PUT`, so a long recording restarts from the beginning on a lost
-connection until it uses them),
-**transcription** (null-bound plumbing until a real queue and a self-hosted
-Whisper are provisioned, per
+than new surface — tracked as: **transcription** (null-bound plumbing until a
+real queue and a self-hosted Whisper are provisioned, per
 [ADR 0005](decisions/0005-interview-transcription-whisper.md)), and testing on
 physical devices.
 
