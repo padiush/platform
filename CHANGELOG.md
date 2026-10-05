@@ -11,6 +11,8 @@ language (`public/locales/whatsnew/`). How a release is cut is in
 
 ## [Unreleased]
 
+## [1.1.0] — 2026-10-05
+
 ### Added
 
 - A collapsible sidebar with a project switcher. Every project page lives under
@@ -36,9 +38,9 @@ language (`public/locales/whatsnew/`). How a release is cut is in
 - Guided tours (driver.js): a welcome tour, then one per section on its first
   visit (Proyectos included), leaving out what the user's role does not open.
   A user who starts with no project is shown the project switcher and sections
-  the first time they have one. Finished or skipped
-  tours are remembered per user (`users.completed_tours`). Each page has a ?
-  button to replay its tour, and Mi cuenta can offer them all again.
+  the first time they have one. Finished or skipped tours are remembered per
+  user (`users.completed_tours`). Each page has a ? button to replay its tour,
+  and Mi cuenta can offer them all again.
 - A system panel in three tabs, showing figures and names but never what is
   inside a project. **Summary**: users, active people, projects, storage by
   kind, the version and pending migrations, whether the scheduler, unfinished
@@ -53,9 +55,10 @@ language (`public/locales/whatsnew/`). How a release is cut is in
   `media:prune-orphans` run are kept in `system_runs`.
 - An example project: anyone can open a private, writable copy of the invented
   demonstration study from the dashboard or Proyectos, built in the language
-  they are using (`lang/*/example_study.php`), and remove it in one step. It is marked as an example wherever it appears, left out of the system
-  project count (`projects.is_example`), and syncs to the companion like any
-  other project. `DemoProjectSeeder` now builds the same study.
+  they are using (`lang/*/example_study.php`), and remove it in one step. It
+  is marked as an example wherever it appears, left out of the system project
+  count (`projects.is_example`), and syncs to the companion like any other
+  project. `DemoProjectSeeder` now builds the same study.
 - A demo image that can be run to try Padiush.
 
 ### Changed
@@ -94,6 +97,12 @@ language (`public/locales/whatsnew/`). How a release is cut is in
   deletions left behind, then `php artisan media:prune-orphans --delete` to
   remove them. It reads `--disk=s3` by default; run it for any other disk media
   was stored on.
+- Device uploads could fail on 1.0.0 because of the presigned header format.
+  Media rows still in `pending` show which files never arrived; the companion
+  retries them on its next send.
+- Optionally, add an `AbortIncompleteMultipartUpload` lifecycle rule to the
+  bucket, with a longer window than the scheduled job's seven days, as a
+  backstop for abandoned uploads.
 
 ## [1.0.0] — 2026-08-15
 
@@ -101,5 +110,6 @@ First public release: interview form design, offline capture with the companion
 app, species linking against taxonomic backbones, the five ethnobotanical
 indices, and export.
 
-[Unreleased]: https://github.com/padiush/platform/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/padiush/platform/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/padiush/platform/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/padiush/platform/releases/tag/v1.0.0
