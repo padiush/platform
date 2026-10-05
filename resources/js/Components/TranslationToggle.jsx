@@ -10,7 +10,11 @@ const LANGUAGE_NAMES = {
     en: 'English',
 };
 
-export default function TranslationToggle({ className = '' }) {
+/**
+ * Cycles the interface language. `compact` shows the language's code instead
+ * of its name, for the folded sidebar; the name stays its accessible label.
+ */
+export default function TranslationToggle({ className = '', compact = false }) {
     const { i18n } = useTranslation();
 
     const [langIndex, setLangIndex] = useState(
@@ -39,10 +43,17 @@ export default function TranslationToggle({ className = '' }) {
 
     return (
         <button
+            type="button"
             onClick={toggleLanguage}
             className={`${className} btn btn-ghost`}
+            aria-label={
+                compact ? LANGUAGE_NAMES[LANGUAGES[langIndex]] : undefined
+            }
+            title={compact ? LANGUAGE_NAMES[LANGUAGES[langIndex]] : undefined}
         >
-            {LANGUAGE_NAMES[LANGUAGES[langIndex]]}
+            {compact
+                ? LANGUAGES[langIndex]?.toUpperCase()
+                : LANGUAGE_NAMES[LANGUAGES[langIndex]]}
         </button>
     );
 }
