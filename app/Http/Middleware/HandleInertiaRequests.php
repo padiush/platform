@@ -86,6 +86,15 @@ class HandleInertiaRequests extends Middleware
             // links back to the site — the sign-in screens, chiefly — has to
             // know whether there is a site to link to.
             'publicSiteEnabled' => (bool) config('padiush.public_site_enabled'),
+            // The release running, and for a signed-in user who has not seen
+            // its notes yet, the last release they did see — "What's new"
+            // shows everything after it (docs/releasing.md). Resolved when
+            // the page renders, so a page that marks the release seen is
+            // drawn without the dialog.
+            'release' => fn () => [
+                'version' => config('app.version'),
+                'unseenSince' => $user?->hasUnseenRelease() ? $user->last_seen_version : null,
+            ],
             // AGPL section 13. Shared everywhere because the offer of source
             // has to hold on every page a user of the service can reach.
             'sourceUrl' => config('padiush.source_url'),

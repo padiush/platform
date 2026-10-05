@@ -86,4 +86,27 @@ class User extends Authenticatable implements HasLocalePreference
     {
         return $this->locale;
     }
+
+    /**
+     * A new account has nothing to catch up on: it starts on the release it
+     * was created under, so "What's new" first appears at the next one.
+     */
+    protected static function booted(): void
+    {
+        static::creating(function (User $user) {
+            $user->last_seen_version ??= config('app.version');
+        });
+    }
+
+    /** Whether a release has shipped since this user last saw the notes. */
+    public function hasUnseenRelease(): bool
+    {
+        return version_compare((string) $this->last_seen_version, (string) config('app.version'), '<');
+    }
+
+    /** Note that the user has seen the notes of the release running now. */
+    public function markReleaseSeen(): void
+    {
+        $this->forceFill(['last_seen_version' => config('app.version')])->save();
+    }
 }

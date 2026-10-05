@@ -168,6 +168,7 @@ docker compose down                          # stop; add -v to also drop the dat
 - [docs/data-model.md](docs/data-model.md) — the domain map and the folk-name → taxon pipeline.
 - [docs/contracts/](docs/contracts/) and [docs/api/openapi.yaml](docs/api/openapi.yaml) — the `/api/v1` capture API and the offline sync protocol, used by the [companion app](https://github.com/padiush/companion).
 - [docs/decisions/](docs/decisions/) — architecture decisions, including what was rejected and why.
+- [CHANGELOG.md](CHANGELOG.md) and [docs/releasing.md](docs/releasing.md) — what each release changed, and how a release is cut.
 
 ## Provenance
 

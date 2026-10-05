@@ -1,0 +1,25 @@
+{
+    "releases": [
+        {
+            "version": "1.1.0",
+            "date": null,
+            "items": [
+                "Um menu lateral com os seus projetos: escolha o projeto no topo e tudo dele fica à mão, no computador, no tablet ou no celular.",
+                "Cada projeto abre em um resumo de como anda o trabalho: entrevistas, registros, espécies e o que ainda falta revisar.",
+                "Os registros de campo têm uma seção própria, junto às licenças de coleta. Além de espécimes coletados, você pode registrar o que só foi observado e acompanhar as determinações e os números de tombo.",
+                "Os registros, as fotos e as notas de voz feitos com o app de campo chegam à web, e cada registro mostra de qual resposta de entrevista saiu.",
+                "Em Minha conta você vê onde a sua sessão está aberta e pode encerrá-la em qualquer navegador ou dispositivo de campo.",
+                "As gravações longas enviadas pelo app de campo não recomeçam mais quando a conexão cai: continuam de onde pararam."
+            ]
+        },
+        {
+            "version": "1.0.0",
+            "date": "2026-08-15",
+            "items": [
+                "Crie formulários de entrevista e registre as entrevistas na web ou com o app de campo, mesmo sem conexão.",
+                "Vincule as respostas ao catálogo de espécies do projeto.",
+                "Calcule os índices etnobotânicos (RFC, UV, CI, ICF e FL) e exporte os dados."
+            ]
+        }
+    ]
+}
