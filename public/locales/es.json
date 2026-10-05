@@ -48,18 +48,18 @@
             "unknown_browser": "Navegador desconocido",
             "sign_out": "Cerrar sesión",
             "sign_out_others": "Cerrar las demás sesiones",
-            "others_hint": "Se cerrará la sesión en todos los demás navegadores, también en los que la recuerdan. Escribe tu contraseña para confirmar.",
+            "others_hint": "Se cerrará la sesión en todos los demás navegadores, incluso en los que tienen marcada la opción «Mantener mi sesión activa». Escribe tu contraseña para confirmar.",
             "password": "Contraseña",
             "confirm_title": "¿Cerrar esta sesión?",
             "confirm_message": "Ese navegador tendrá que volver a iniciar sesión.",
-            "unavailable": "Esta instalación no guarda las sesiones de forma que puedan listarse. Quien la administra puede activarlo con SESSION_DRIVER=database.",
+            "unavailable": "Esta instalación no guarda las sesiones de una forma que permita mostrarlas. Quien administra el servidor puede activarlo con SESSION_DRIVER=database.",
             "signed_out": "Se cerró la sesión en ese navegador.",
             "others_signed_out": "Se cerró la sesión en los demás navegadores.",
             "not_found": "Esa sesión ya no está abierta."
         },
         "devices": {
             "title": "Dispositivos de la aplicación de campo",
-            "description": "Cada teléfono o tableta donde iniciaste sesión en la aplicación de campo. Revoca el de un dispositivo perdido.",
+            "description": "Los teléfonos y tabletas donde iniciaste sesión en la aplicación de campo. Si pierdes uno, revoca su acceso desde aquí.",
             "none_title": "Ningún dispositivo ha iniciado sesión",
             "none_hint": "Cuando inicies sesión en la aplicación de campo, el dispositivo aparecerá aquí.",
             "signed_in": "Desde el {{when}}",
@@ -73,7 +73,7 @@
         },
         "tours": {
             "title": "Recorridos guiados",
-            "description": "Las explicaciones paso a paso de cada página. Cada una se muestra una vez; vuelve a verlas todas desde aquí.",
+            "description": "Cada página tiene una explicación paso a paso que se muestra una sola vez. Desde aquí puedes volver a verlas todas.",
             "reset": "Ver los recorridos de nuevo",
             "reset_done": "Listo: cada recorrido se mostrará otra vez la próxima vez que abras su página."
         }
@@ -139,7 +139,7 @@
     },
     "example": {
         "cta": "Explorar un proyecto de ejemplo",
-        "cta_hint": "Un estudio inventado, con entrevistas, registros y catálogo, para recorrer cada sección y probar sin miedo.",
+        "cta_hint": "Un estudio inventado, con entrevistas, registros y catálogo, para recorrer cada sección y probar sin miedo a romper nada.",
         "badge": "Ejemplo",
         "notice": "Proyecto de ejemplo: los datos son inventados y puedes cambiar lo que quieras.",
         "remove": "Quitar el ejemplo",
@@ -944,12 +944,12 @@
             "uploads_none": "Ninguna abierta",
             "uploads_some_one": "1 abierta, empezada {{when}}. Las abandonadas se cancelan cada día.",
             "uploads_some_other": "{{count}} abiertas, la más antigua {{when}}. Las abandonadas se cancelan cada día.",
-            "waiting": "Esperando a llegar",
+            "waiting": "Por llegar",
             "waiting_none": "Nada pendiente",
-            "waiting_some_one": "1 archivo anunciado por la app de campo que aún no llega",
-            "waiting_some_other": "{{count}} archivos anunciados por la app de campo que aún no llegan",
+            "waiting_some_one": "1 archivo que la aplicación de campo anunció aún no ha llegado",
+            "waiting_some_other": "{{count}} archivos que la aplicación de campo anunció aún no han llegado",
             "orphans": "Archivos sin dueño",
-            "orphans_never": "Nunca revisado. En el servidor se buscan con media:prune-orphans.",
+            "orphans_never": "Aún no se ha revisado. Se buscan en el servidor con media:prune-orphans.",
             "orphans_clean": "Ninguno en la última revisión, {{when}}",
             "orphans_found_one": "1 archivo, {{size}}, en la revisión de {{when}}. Se borra con media:prune-orphans --delete.",
             "orphans_found_other": "{{count}} archivos, {{size}}, en la revisión de {{when}}. Se borran con media:prune-orphans --delete.",
@@ -960,11 +960,11 @@
             "title": "Quién ocupa más espacio",
             "all": "Ver todo",
             "empty": "Todavía no hay archivos guardados.",
-            "note": "Cuenta los proyectos que cada persona creó. Solo tamaños: el contenido no se ve desde aquí."
+            "note": "Se suma el espacio de los proyectos que creó cada persona. Aquí solo se ven tamaños, nunca el contenido."
         },
         "log": {
             "title": "Cambios de administración",
-            "note": "Lo ven todas las personas con permisos de sistema.",
+            "note": "Este registro lo ven todas las personas con permisos de sistema.",
             "empty": "Todavía no hay cambios.",
             "console": "Desde el servidor",
             "actions": {
@@ -1013,7 +1013,7 @@
             "admin_badge": "Sistema",
             "delete": "Eliminar…",
             "no_match": "Nadie coincide con la búsqueda.",
-            "note": "El espacio de una persona es el de los proyectos que creó: lo que su equipo graba en ellos cuenta para ella."
+            "note": "A cada persona se le cuenta el espacio de los proyectos que creó, incluido lo que su equipo graba en ellos."
         },
         "invites": {
             "title": "Invitaciones pendientes",
@@ -1028,7 +1028,7 @@
             "loading": "Calculando lo que se elimina…",
             "failed": "No se pudo calcular lo que se elimina. Cierra y vuelve a intentarlo.",
             "goes": "Se elimina",
-            "stays": "Se queda",
+            "stays": "Se conserva",
             "projects_one": "1 proyecto que creó, con todo lo que tiene:",
             "projects_other": "{{count}} proyectos que creó, con todo lo que tienen:",
             "no_projects": "No creó ningún proyecto.",
@@ -1041,15 +1041,15 @@
             "and_more_other": "{{count}} más",
             "files_one": "1 grabación o foto, {{size}}, se borra del almacenamiento.",
             "files_other": "{{count}} grabaciones y fotos, {{size}}, se borran del almacenamiento.",
-            "others_one": "Lo que registró en 1 proyecto de otra persona se queda en él. Solo deja de ser miembro.",
-            "others_other": "Lo que registró en {{count}} proyectos de otras personas se queda en ellos. Solo deja de ser miembro.",
+            "others_one": "Lo que registró en el proyecto de otra persona se conserva allí; solo deja de ser miembro.",
+            "others_other": "Lo que registró en {{count}} proyectos de otras personas se conserva allí; solo deja de ser miembro.",
             "others_none": "No es miembro de proyectos de otras personas.",
-            "transfer_hint": "¿Sus proyectos deben seguir? Transfiérelos a otra persona antes de eliminar la cuenta.",
+            "transfer_hint": "¿Sus proyectos deben continuar? Transfiérelos a otra persona antes de eliminar la cuenta.",
             "transfer": "Transferir proyectos…",
             "transfer_to": "Transferir a",
             "transfer_choose": "Elige a una persona",
             "transfer_confirm": "Transferir",
-            "transfer_note": "Quien los reciba pasa a administrarlos. Un proyecto de ejemplo no se transfiere.",
+            "transfer_note": "La persona que los reciba pasará a administrarlos. Los proyectos de ejemplo no se transfieren.",
             "confirm_label": "Escribe su correo para confirmar: {{email}}",
             "delete": "Eliminar la cuenta"
         },
@@ -1059,7 +1059,7 @@
             "audio": "Audio · {{size}}",
             "photo": "Fotos · {{size}}",
             "by_person": "Por persona",
-            "by_person_note": "Los proyectos que cada persona creó",
+            "by_person_note": "Según los proyectos que creó cada persona",
             "owner_line_one": "1 proyecto · Audio {{audio}} · Fotos {{photo}}",
             "owner_line_other": "{{count}} proyectos · Audio {{audio}} · Fotos {{photo}}",
             "col_audio": "Audio",
@@ -1068,11 +1068,11 @@
             "col_share": "Parte del total",
             "col_limit": "Límite",
             "no_limit": "Sin límite",
-            "limits_note": "Por ahora no hay límites: aquí se ve cuánto ocupa cada quien, sin frenar a nadie.",
+            "limits_note": "Por ahora no hay límites de espacio: esta vista solo muestra cuánto ocupa cada persona.",
             "largest": "Proyectos más grandes",
             "largest_line_one": "de {{owner}} · 1 archivo",
             "largest_line_other": "de {{owner}} · {{files}} archivos",
-            "largest_note": "Nombre y tamaño, nada más. Abrir un proyecto sigue siendo solo para sus miembros.",
+            "largest_note": "Solo se muestran el nombre y el tamaño. Únicamente sus miembros pueden abrir un proyecto.",
             "upkeep": "Mantenimiento",
             "empty": "Todavía no hay archivos guardados."
         },
@@ -1168,7 +1168,7 @@
             },
             "account": {
                 "title": "Mi cuenta",
-                "body": "Dónde está abierta tu sesión y tus dispositivos de campo. Desde aquí también puedes volver a ver todos los recorridos."
+                "body": "Aquí ves dónde tienes la sesión abierta y tus dispositivos de campo. También puedes volver a ver todos los recorridos."
             },
             "help": {
                 "title": "Ayuda en cada página",
@@ -1208,13 +1208,13 @@
             },
             "example": {
                 "title": "Un proyecto de ejemplo",
-                "body": "Abre una copia privada de un estudio inventado para recorrer cada sección. Aparece marcado como «Ejemplo» y lo quitas cuando quieras."
+                "body": "Abre una copia privada de un estudio inventado para recorrer cada sección. Aparece marcado como «Ejemplo» y puedes quitarlo cuando quieras."
             }
         },
         "overview": {
             "example": {
                 "title": "Estás en el ejemplo",
-                "body": "Los datos de este proyecto son inventados: cambia, borra y prueba lo que quieras. Cuando termines, quítalo desde esta franja."
+                "body": "Los datos de este proyecto son inventados: cambia, borra y prueba lo que quieras. Cuando termines, puedes quitarlo desde este aviso."
             },
             "stats": {
                 "title": "Cómo va el trabajo",
@@ -1225,12 +1225,12 @@
                 "body": "Lo que más se hace desde aquí: empezar una entrevista, registrar, diseñar formularios, vincular especies o exportar."
             },
             "pending": {
-                "title": "Lo que espera",
-                "body": "Archivos por llegar de la app de campo, registros sin identificar y respuestas sin vincular. Cuando no queda nada, lo dice."
+                "title": "Pendientes",
+                "body": "Archivos que aún no llegan de la aplicación de campo, registros sin identificar y respuestas sin vincular. Si no hay nada pendiente, también te lo indica."
             },
             "recent": {
                 "title": "Lo más reciente",
-                "body": "Las últimas entrevistas y registros del proyecto, para retomar donde quedaste."
+                "body": "Las últimas entrevistas y registros del proyecto, para retomar donde lo dejaste."
             }
         },
         "forms": {
@@ -1244,11 +1244,11 @@
             },
             "toggle": {
                 "title": "Habilítalo para entrevistar",
-                "body": "Solo los formularios habilitados se pueden usar en una entrevista, en la web y en la app de campo."
+                "body": "Solo los formularios habilitados se pueden usar en una entrevista, en la web y en la aplicación de campo."
             },
             "capture": {
-                "title": "Y después, a campo",
-                "body": "La app de campo descarga los formularios habilitados y permite entrevistar sin conexión."
+                "title": "Después, al campo",
+                "body": "La aplicación de campo descarga los formularios habilitados y permite entrevistar sin conexión."
             }
         },
         "designer": {
@@ -1262,11 +1262,11 @@
             },
             "save": {
                 "title": "Guarda los cambios",
-                "body": "Esta marca dice si hay cambios sin guardar. Si el formulario ya tiene entrevistas, piensa bien antes de quitar un campo: sus respuestas se pierden."
+                "body": "Este indicador muestra si hay cambios sin guardar. Si el formulario ya tiene entrevistas, piénsalo bien antes de quitar un campo: sus respuestas se perderán."
             },
             "preview": {
                 "title": "Vista previa",
-                "body": "Mira el formulario tal como lo verá quien entrevista, antes de habilitarlo."
+                "body": "Revisa el formulario tal como lo verá la persona que entrevista, antes de habilitarlo."
             }
         },
         "interviews": {
@@ -1284,7 +1284,7 @@
             },
             "companion": {
                 "title": "También desde el teléfono",
-                "body": "Con la app de campo se entrevista sin conexión, con audio, fotos y ubicación. Lo capturado llega aquí al enviarlo."
+                "body": "Con la aplicación de campo puedes entrevistar sin conexión, con audio, fotos y ubicación. Lo que registres llega aquí cuando lo envíes."
             }
         },
         "records": {
@@ -1306,23 +1306,23 @@
             },
             "add": {
                 "title": "Registrar desde la web",
-                "body": "Añade un registro aquí, o hazlo en campo con la app: llega solo al enviarlo."
+                "body": "Añade un registro aquí o hazlo en campo con la aplicación: llegará aquí cuando lo envíes."
             }
         },
         "permits": {
             "what": {
                 "title": "Permisos de colecta",
-                "body": "Los permisos bajo los que el proyecto colecta. Cada registro indica su permiso, o por qué no hacía falta."
+                "body": "Los permisos con los que el proyecto realiza colectas. Cada registro indica su permiso, o por qué no hacía falta."
             },
             "add": {
                 "title": "Añade un permiso",
-                "body": "Regístralo antes de salir a campo: la app de campo descarga los permisos del proyecto para elegirlos sin conexión."
+                "body": "Regístralo antes de salir a campo: la aplicación de campo descarga los permisos del proyecto para elegirlos sin conexión."
             }
         },
         "catalog": {
             "metrics": {
                 "title": "El catálogo del proyecto",
-                "body": "Las especies del proyecto, y cuántas y de qué familias se han mencionado en las entrevistas."
+                "body": "Las especies del proyecto, cuántas se han mencionado en las entrevistas y de qué familias son."
             },
             "register": {
                 "title": "Registra especies",
@@ -1370,7 +1370,7 @@
             },
             "pending": {
                 "title": "Invitaciones pendientes",
-                "body": "Las invitaciones enviadas que aún no se aceptan."
+                "body": "Las invitaciones enviadas que aún no se han aceptado."
             }
         },
         "in_menu": "En el teléfono, está en el menú ☰ de arriba."
