@@ -117,6 +117,13 @@ class User extends Authenticatable implements HasLocalePreference
         static::creating(function (User $user) {
             $user->last_seen_version ??= config('app.version');
         });
+
+        // The projects an account owns cascade in the database; deleting them
+        // through the model takes their catalog, questions and stored files
+        // with them (Project::booted).
+        static::deleting(function (User $user) {
+            $user->projects()->get()->each->delete();
+        });
     }
 
     /** Whether a release has shipped since this user last saw the notes. */
