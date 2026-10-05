@@ -53,7 +53,14 @@ class DemoProjectSeeder extends Seeder
             ]
         );
 
-        app(ExampleStudy::class)->build($user, self::PROJECT_NAME, 'Proyecto demostrativo', example: false);
+        // In Spanish, the language the screenshots are taken in.
+        app(ExampleStudy::class)->build(
+            $user,
+            'es',
+            example: false,
+            name: self::PROJECT_NAME,
+            institution: 'Proyecto demostrativo',
+        );
 
         $this->command?->info('Demo project seeded: '.self::PROJECT_NAME);
     }

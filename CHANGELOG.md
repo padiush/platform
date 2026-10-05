@@ -40,8 +40,8 @@ language (`public/locales/whatsnew/`). How a release is cut is in
   tours are remembered per user (`users.completed_tours`). Each page has a ?
   button to replay its tour, and Mi cuenta can offer them all again.
 - An example project: anyone can open a private, writable copy of the invented
-  demonstration study from the dashboard or Proyectos, and remove it in one
-  step. It is marked as an example wherever it appears, left out of the system
+  demonstration study from the dashboard or Proyectos, built in the language
+  they are using (`lang/*/example_study.php`), and remove it in one step. It is marked as an example wherever it appears, left out of the system
   project count (`projects.is_example`), and syncs to the companion like any
   other project. `DemoProjectSeeder` now builds the same study.
 - A demo image that can be run to try Padiush.

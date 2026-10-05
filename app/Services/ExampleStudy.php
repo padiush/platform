@@ -27,23 +27,21 @@ use Illuminate\Support\Facades\DB;
  * Every informant, answer and use-report here is invented. The taxa are real
  * botanical names — a plant is not personal data, and fictional binomials
  * would make the taxonomic features look wrong — but nothing here describes a
- * real person or a real interview. The content is in Spanish, the language of
- * the study it imitates.
+ * real person or a real interview.
+ *
+ * Its words come from lang/{locale}/example_study.php, so a copy is built in
+ * its owner's language. Only the words change: every copy draws the same
+ * figures from the same seed.
  */
 class ExampleStudy
 {
     /** Fixed so the figures, and therefore the screenshots, are reproducible. */
     private const SEED = 20260806;
 
-    private const CATEGORIES = [
-        'Medicinal',
-        'Alimenticio',
-        'Construcción',
-        'Combustible',
-        'Ritual',
-        'Artesanal',
-    ];
+    /** The options, by key, in the order the seed draws them. */
+    private const CATEGORIES = ['medicinal', 'food', 'construction', 'fuel', 'ritual', 'craft'];
 
+    /** Proper nouns: the same in every language. */
     private const COMMUNITIES = [
         'San Antonio',
         'El Zapote',
@@ -51,55 +49,55 @@ class ExampleStudy
         'Concepción',
     ];
 
-    private const PARTS = [
-        'Hoja',
-        'Corteza',
-        'Fruto',
-        'Raíz',
-        'Flor',
-        'Tallo',
-        'Semilla',
-    ];
+    private const PARTS = ['leaf', 'bark', 'fruit', 'root', 'flower', 'stem', 'seed'];
 
-    private const PREPARATIONS = [
-        'Infusión',
-        'Cocimiento',
-        'Emplasto',
-        'Consumo directo',
-        'Macerado',
-    ];
+    private const PREPARATIONS = ['infusion', 'decoction', 'poultice', 'raw', 'maceration'];
 
     /**
-     * Each entry is [family, genus, epithet, authority, local name, citation
-     * weight, categories => affinity]. The weights are tuned so a handful of
+     * Each entry is [family, genus, epithet, authority, citation weight,
+     * category => affinity]. The local names are in the language files, by
+     * scientific name. The weights are tuned so a handful of
      * species are near-universally cited and the tail is sparse, which is what
      * a real citation-frequency distribution looks like.
      */
     private const SPECIES = [
-        ['Myrtaceae', 'Psidium', 'guajava', 'L.', 'guayaba', 0.85, ['Alimenticio' => 0.9, 'Medicinal' => 0.7]],
-        ['Asteraceae', 'Matricaria', 'chamomilla', 'L.', 'manzanilla', 0.80, ['Medicinal' => 0.95]],
-        ['Rutaceae', 'Citrus', 'aurantiifolia', '(Christm.) Swingle', 'limón', 0.80, ['Medicinal' => 0.8, 'Alimenticio' => 0.85]],
-        ['Zingiberaceae', 'Zingiber', 'officinale', 'Roscoe', 'jengibre', 0.60, ['Medicinal' => 0.9, 'Alimenticio' => 0.4]],
-        ['Lauraceae', 'Persea', 'americana', 'Mill.', 'aguacate', 0.60, ['Alimenticio' => 0.9, 'Medicinal' => 0.3]],
-        ['Moringaceae', 'Moringa', 'oleifera', 'Lam.', 'moringa', 0.55, ['Medicinal' => 0.7, 'Alimenticio' => 0.7]],
-        ['Annonaceae', 'Annona', 'muricata', 'L.', 'guanábana', 0.50, ['Alimenticio' => 0.8, 'Medicinal' => 0.5]],
-        ['Urticaceae', 'Cecropia', 'obtusifolia', 'Bertol.', 'guarumo', 0.45, ['Medicinal' => 0.8, 'Combustible' => 0.3]],
-        ['Burseraceae', 'Bursera', 'simaruba', '(L.) Sarg.', 'jiote', 0.40, ['Medicinal' => 0.7, 'Construcción' => 0.4, 'Ritual' => 0.2]],
-        ['Lamiaceae', 'Ocimum', 'basilicum', 'L.', 'albahaca', 0.40, ['Medicinal' => 0.6, 'Alimenticio' => 0.5, 'Ritual' => 0.3]],
-        ['Meliaceae', 'Cedrela', 'odorata', 'L.', 'cedro', 0.35, ['Construcción' => 0.9, 'Artesanal' => 0.5]],
-        ['Asteraceae', 'Tagetes', 'erecta', 'L.', 'flor de muerto', 0.35, ['Ritual' => 0.8, 'Medicinal' => 0.3]],
-        ['Bignoniaceae', 'Crescentia', 'alata', 'Kunth', 'morro', 0.30, ['Artesanal' => 0.8, 'Alimenticio' => 0.2]],
-        ['Acanthaceae', 'Justicia', 'carthaginensis', 'Jacq.', 'chichipince', 0.25, ['Medicinal' => 0.7]],
+        ['Myrtaceae', 'Psidium', 'guajava', 'L.', 0.85, ['food' => 0.9, 'medicinal' => 0.7]],
+        ['Asteraceae', 'Matricaria', 'chamomilla', 'L.', 0.80, ['medicinal' => 0.95]],
+        ['Rutaceae', 'Citrus', 'aurantiifolia', '(Christm.) Swingle', 0.80, ['medicinal' => 0.8, 'food' => 0.85]],
+        ['Zingiberaceae', 'Zingiber', 'officinale', 'Roscoe', 0.60, ['medicinal' => 0.9, 'food' => 0.4]],
+        ['Lauraceae', 'Persea', 'americana', 'Mill.', 0.60, ['food' => 0.9, 'medicinal' => 0.3]],
+        ['Moringaceae', 'Moringa', 'oleifera', 'Lam.', 0.55, ['medicinal' => 0.7, 'food' => 0.7]],
+        ['Annonaceae', 'Annona', 'muricata', 'L.', 0.50, ['food' => 0.8, 'medicinal' => 0.5]],
+        ['Urticaceae', 'Cecropia', 'obtusifolia', 'Bertol.', 0.45, ['medicinal' => 0.8, 'fuel' => 0.3]],
+        ['Burseraceae', 'Bursera', 'simaruba', '(L.) Sarg.', 0.40, ['medicinal' => 0.7, 'construction' => 0.4, 'ritual' => 0.2]],
+        ['Lamiaceae', 'Ocimum', 'basilicum', 'L.', 0.40, ['medicinal' => 0.6, 'food' => 0.5, 'ritual' => 0.3]],
+        ['Meliaceae', 'Cedrela', 'odorata', 'L.', 0.35, ['construction' => 0.9, 'craft' => 0.5]],
+        ['Asteraceae', 'Tagetes', 'erecta', 'L.', 0.35, ['ritual' => 0.8, 'medicinal' => 0.3]],
+        ['Bignoniaceae', 'Crescentia', 'alata', 'Kunth', 0.30, ['craft' => 0.8, 'food' => 0.2]],
+        ['Acanthaceae', 'Justicia', 'carthaginensis', 'Jacq.', 0.25, ['medicinal' => 0.7]],
     ];
 
+    /** The language this copy is being built in. */
+    private string $locale = 'es';
+
     /**
-     * Build the study as a project the user administers, in one transaction.
-     * The same seed always gives the same figures, so every copy matches the
-     * screenshots and the indices a user sees can be compared with anyone
-     * else's.
+     * Build the study as a project the user administers, in one transaction,
+     * in the given language; the name and institution default to that
+     * language's. The same seed always gives the same figures, so every copy
+     * matches the screenshots and the indices a user sees can be compared
+     * with anyone else's.
      */
-    public function build(User $owner, string $name, string $institution, bool $example = true): Project
-    {
+    public function build(
+        User $owner,
+        string $locale = 'es',
+        bool $example = true,
+        ?string $name = null,
+        ?string $institution = null,
+    ): Project {
+        $this->locale = $locale;
+        $name ??= $this->words('name');
+        $institution ??= $this->words('institution');
+
         mt_srand(self::SEED);
 
         try {
@@ -165,20 +163,20 @@ class ExampleStudy
             'reference' => 'DEMO-RES-042-2026',
             'issued_on' => '2026-01-15',
             'expires_on' => '2027-01-14',
-            'notes' => 'Recolecta de material botánico con fines de investigación etnobotánica.',
+            'notes' => $this->words('permit_notes'),
         ]);
         $permit->project_id = $project->id;
         $permit->save();
 
         // Identified, deposited, voucher issued by the project itself — the
         // community-herbarium case.
-        foreach (array_slice(array_keys($species), 0, 3) as $index => $local) {
+        foreach (array_slice(array_keys($species), 0, 3) as $index => $scientific) {
             $fieldRecord = new FieldRecord([
                 'collection_number' => (string) (101 + $index),
                 'collector' => $collector,
                 'collected_on' => '2026-03-'.str_pad((string) (10 + $index), 2, '0', STR_PAD_LEFT),
-                'locality' => 'Cafetal de altura, cantón El Rosario',
-                'repository' => 'Herbario comunitario de El Rosario',
+                'locality' => $this->words('localities.coffee'),
+                'repository' => $this->words('repository'),
                 'accession_number' => 'DEMO-'.str_pad((string) ($index + 1), 4, '0', STR_PAD_LEFT),
                 'collecting_permit_id' => $permit->id,
             ]);
@@ -186,7 +184,7 @@ class ExampleStudy
             $fieldRecord->save();
 
             $determination = new Determination([
-                'catalog_species_id' => $species[$local]->id,
+                'catalog_species_id' => $species[$scientific]->id,
                 'determiner' => 'M. Alvarenga',
                 'determined_on' => '2026-04-02',
                 'is_current' => true,
@@ -200,7 +198,7 @@ class ExampleStudy
             'collection_number' => '104',
             'collector' => $collector,
             'collected_on' => '2026-03-14',
-            'locality' => 'Borde de quebrada, cantón El Rosario',
+            'locality' => $this->words('localities.stream'),
         ]);
         $indet->project_id = $project->id;
         $indet->save();
@@ -221,9 +219,9 @@ class ExampleStudy
             'basis_of_record' => FieldRecord::BASIS_OBSERVATION,
             'collector' => $collector,
             'collected_on' => '2026-03-18',
-            'locality' => 'Sendero al mirador, cantón El Rosario',
-            'vernacular_name' => 'cortez blanco',
-            'notes' => 'Árbol en pie, señalado durante el recorrido. No se recolectó.',
+            'locality' => $this->words('localities.trail'),
+            'vernacular_name' => $this->words('observation.name'),
+            'notes' => $this->words('observation.notes'),
         ]);
         $observed->project_id = $project->id;
         $observed->save();
@@ -234,7 +232,7 @@ class ExampleStudy
                 'collection_number' => $number,
                 'collector' => $collector,
                 'collected_on' => '2026-03-1'.(5 + $offset),
-                'locality' => 'Huerto familiar, cantón El Rosario',
+                'locality' => $this->words('localities.garden'),
                 // Cultivated in a household garden: outside the permit regime,
                 // which is an answer rather than a blank.
                 'permit_exemption' => 'cultivated',
@@ -244,13 +242,13 @@ class ExampleStudy
         }
     }
 
-    /** @return array<string, CatalogSpecies> keyed by local name */
+    /** @return array<string, CatalogSpecies> keyed by scientific name */
     private function catalog(Project $project): array
     {
         $catalog = [];
 
-        foreach (self::SPECIES as [$family, $genus, $epithet, $authority, $local]) {
-            $catalog[$local] = CatalogSpecies::create([
+        foreach (self::SPECIES as [$family, $genus, $epithet, $authority]) {
+            $catalog["{$genus} {$epithet}"] = CatalogSpecies::create([
                 'project_id' => $project->id,
                 'family' => $family,
                 'genus' => $genus,
@@ -267,23 +265,23 @@ class ExampleStudy
     {
         $form = InterviewForm::create([
             'project_id' => $project->id,
-            'name' => 'Entrevista etnobotánica (demostración)',
-            'description' => 'Instrumento de ejemplo: datos del informante y usos reportados por especie.',
+            'name' => $this->words('form.name'),
+            'description' => $this->words('form.description'),
             'is_active' => true,
         ]);
 
         $informant = InterviewSection::create([
             'interview_form_id' => $form->id,
-            'name' => 'Datos del informante',
-            'description' => 'Información general de la persona entrevistada.',
+            'name' => $this->words('sections.informant.name'),
+            'description' => $this->words('sections.informant.description'),
             'order' => 1,
             'repeatable' => false,
         ]);
 
         $uses = InterviewSection::create([
             'interview_form_id' => $form->id,
-            'name' => 'Usos reportados',
-            'description' => 'Un conjunto por cada planta mencionada.',
+            'name' => $this->words('sections.uses.name'),
+            'description' => $this->words('sections.uses.description'),
             'order' => 2,
             'repeatable' => true,
         ]);
@@ -291,39 +289,39 @@ class ExampleStudy
         $items = [
             'edad' => InterviewItem::create([
                 'interview_section_id' => $informant->id,
-                'label' => 'Edad', 'name' => 'edad', 'type' => 'number',
+                ...$this->question('age'), 'type' => 'number',
                 'required' => true, 'order' => 1, 'min' => 18, 'max' => 99, 'step' => 1,
             ]),
             'comunidad' => InterviewItem::create([
                 'interview_section_id' => $informant->id,
-                'label' => 'Comunidad', 'name' => 'comunidad', 'type' => 'select',
+                ...$this->question('community'), 'type' => 'select',
                 'required' => true, 'order' => 2, 'options' => self::COMMUNITIES,
             ]),
             'residencia' => InterviewItem::create([
                 'interview_section_id' => $informant->id,
-                'label' => 'Años de residencia', 'name' => 'residencia', 'type' => 'number',
+                ...$this->question('residence'), 'type' => 'number',
                 'required' => false, 'order' => 3, 'min' => 0, 'max' => 99, 'step' => 1,
             ]),
             'planta' => InterviewItem::create([
                 'interview_section_id' => $uses->id,
-                'label' => 'Nombre local de la planta', 'name' => 'planta', 'type' => 'text',
+                ...$this->question('plant'), 'type' => 'text',
                 'required' => true, 'order' => 1, 'link_to_species' => true,
             ]),
             'categoria' => InterviewItem::create([
                 'interview_section_id' => $uses->id,
-                'label' => 'Categoría de uso', 'name' => 'categoria', 'type' => 'select',
-                'required' => true, 'order' => 2, 'options' => self::CATEGORIES,
+                ...$this->question('category'), 'type' => 'select',
+                'required' => true, 'order' => 2, 'options' => $this->options('categories', self::CATEGORIES),
                 'is_use_category' => true,
             ]),
             'parte' => InterviewItem::create([
                 'interview_section_id' => $uses->id,
-                'label' => 'Parte utilizada', 'name' => 'parte', 'type' => 'select',
-                'required' => false, 'order' => 3, 'options' => self::PARTS,
+                ...$this->question('part'), 'type' => 'select',
+                'required' => false, 'order' => 3, 'options' => $this->options('parts', self::PARTS),
             ]),
             'preparacion' => InterviewItem::create([
                 'interview_section_id' => $uses->id,
-                'label' => 'Preparación', 'name' => 'preparacion', 'type' => 'select',
-                'required' => false, 'order' => 4, 'options' => self::PREPARATIONS,
+                ...$this->question('preparation'), 'type' => 'select',
+                'required' => false, 'order' => 4, 'options' => $this->options('preparations', self::PREPARATIONS),
             ]),
         ];
 
@@ -360,7 +358,9 @@ class ExampleStudy
 
             $set = 0;
 
-            foreach (self::SPECIES as [, , , , $local, $weight, $affinities]) {
+            foreach (self::SPECIES as [, $genus, $epithet, , $weight, $affinities]) {
+                $scientific = "{$genus} {$epithet}";
+
                 if (mt_rand(1, 100) > $weight * 100) {
                     continue;
                 }
@@ -375,17 +375,41 @@ class ExampleStudy
                         $sections['usos'],
                         $items['planta'],
                         $set,
-                        $local,
-                        $species[$local]->id
+                        $this->words("species.{$scientific}"),
+                        $species[$scientific]->id
                     );
-                    $this->answer($instance, $sections['usos'], $items['categoria'], $set, $category);
-                    $this->answer($instance, $sections['usos'], $items['parte'], $set, self::PARTS[mt_rand(0, count(self::PARTS) - 1)]);
-                    $this->answer($instance, $sections['usos'], $items['preparacion'], $set, self::PREPARATIONS[mt_rand(0, count(self::PREPARATIONS) - 1)]);
+                    $this->answer($instance, $sections['usos'], $items['categoria'], $set, $this->words("categories.{$category}"));
+                    $this->answer($instance, $sections['usos'], $items['parte'], $set, $this->words('parts.'.self::PARTS[mt_rand(0, count(self::PARTS) - 1)]));
+                    $this->answer($instance, $sections['usos'], $items['preparacion'], $set, $this->words('preparations.'.self::PREPARATIONS[mt_rand(0, count(self::PREPARATIONS) - 1)]));
 
                     $set++;
                 }
             }
         }
+    }
+
+    /** One of the study's words, in the language of this copy. */
+    private function words(string $key): string
+    {
+        return trans("example_study.{$key}", [], $this->locale);
+    }
+
+    /** @return array{label: string, name: string} */
+    private function question(string $key): array
+    {
+        return [
+            'label' => $this->words("items.{$key}.label"),
+            'name' => $this->words("items.{$key}.name"),
+        ];
+    }
+
+    /**
+     * @param  list<string>  $keys
+     * @return list<string>
+     */
+    private function options(string $group, array $keys): array
+    {
+        return array_map(fn (string $key) => $this->words("{$group}.{$key}"), $keys);
     }
 
     private function answer(

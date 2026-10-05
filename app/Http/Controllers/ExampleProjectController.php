@@ -18,13 +18,17 @@ class ExampleProjectController extends Controller
 {
     public function __construct(private ActiveProject $activeProject) {}
 
-    /** Open the user's example project, making it first if there is none yet. */
+    /**
+     * Open the user's example project, making it first if there is none yet,
+     * in the language they are using. Once made it is theirs, so it keeps
+     * that language.
+     */
     public function store(Request $request, ExampleStudy $study): RedirectResponse
     {
         $user = $request->user();
 
         $project = $this->ownExample($request)
-            ?? $study->build($user, __('Example: useful plants of the highlands'), __('Example project'));
+            ?? $study->build($user, app()->getLocale());
 
         $this->activeProject->remember($user, $project);
 
