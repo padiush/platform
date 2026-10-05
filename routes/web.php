@@ -71,12 +71,20 @@ Route::middleware(['auth'])->group(function () {
         ->group(function () {
             Route::get('/', [SystemController::class, 'index'])
                 ->name('index');
+            Route::get('/users', [SystemController::class, 'users'])
+                ->name('users');
+            Route::get('/storage', [SystemController::class, 'storage'])
+                ->name('storage');
             Route::post('/registration-invites', [SystemController::class, 'inviteRegistration'])
                 ->name('registration-invites.store');
-            // Bulk delete must be defined before single delete to avoid
-            // "bulk-delete" being treated as a {user} parameter.
-            Route::delete('/users/bulk-delete', [SystemController::class, 'destroyUsers'])
-                ->name('users.bulk-delete');
+            Route::post('/registration-invites/{invite}/resend', [SystemController::class, 'resendInvite'])
+                ->name('registration-invites.resend');
+            Route::delete('/registration-invites/{invite}', [SystemController::class, 'withdrawInvite'])
+                ->name('registration-invites.destroy');
+            Route::get('/users/{user}/deletion', [SystemController::class, 'deletionPreview'])
+                ->name('users.deletion');
+            Route::post('/users/{user}/transfer', [SystemController::class, 'transferProjects'])
+                ->name('users.transfer');
             Route::delete('/users/{user}', [SystemController::class, 'destroyUser'])
                 ->name('users.delete');
         });
