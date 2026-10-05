@@ -34,7 +34,43 @@
         "expand_menu": "Expandir menú",
         "close_menu": "Cerrar menú",
         "settings": "Ajustes",
-        "members": "Miembros"
+        "members": "Miembros",
+        "account": "Mi cuenta"
+    },
+    "account": {
+        "title": "Mi cuenta",
+        "sessions": {
+            "title": "Sesiones del navegador",
+            "description": "Los navegadores donde has iniciado sesión. Cierra la de uno que ya no uses o que no reconozcas.",
+            "this_browser": "Este navegador",
+            "active_now": "Activo ahora",
+            "last_active": "Última actividad {{when}}",
+            "unknown_browser": "Navegador desconocido",
+            "sign_out": "Cerrar sesión",
+            "sign_out_others": "Cerrar las demás sesiones",
+            "others_hint": "Se cerrará la sesión en todos los demás navegadores, también en los que la recuerdan. Escribe tu contraseña para confirmar.",
+            "password": "Contraseña",
+            "confirm_title": "¿Cerrar esta sesión?",
+            "confirm_message": "Ese navegador tendrá que volver a iniciar sesión.",
+            "unavailable": "Esta instalación no guarda las sesiones de forma que puedan listarse. Quien la administra puede activarlo con SESSION_DRIVER=database.",
+            "signed_out": "Se cerró la sesión en ese navegador.",
+            "others_signed_out": "Se cerró la sesión en los demás navegadores.",
+            "not_found": "Esa sesión ya no está abierta."
+        },
+        "devices": {
+            "title": "Dispositivos de la aplicación de campo",
+            "description": "Cada teléfono o tableta donde iniciaste sesión en la aplicación de campo. Revoca el de un dispositivo perdido.",
+            "none_title": "Ningún dispositivo ha iniciado sesión",
+            "none_hint": "Cuando inicies sesión en la aplicación de campo, el dispositivo aparecerá aquí.",
+            "signed_in": "Desde el {{when}}",
+            "last_used": "usado {{when}}",
+            "never_used": "sin usar aún",
+            "revoke": "Revocar",
+            "confirm_title": "¿Revocar este dispositivo?",
+            "confirm_message": "{{name}} tendrá que volver a iniciar sesión en la aplicación de campo para enviar y recibir datos.",
+            "revoked": "Se revocó el acceso de ese dispositivo.",
+            "not_found": "Ese dispositivo ya no tiene acceso."
+        }
     },
     "titles": {
         "my_projects": "Mis proyectos"

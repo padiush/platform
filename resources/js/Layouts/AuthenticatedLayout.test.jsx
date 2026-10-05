@@ -186,6 +186,15 @@ describe('AuthenticatedLayout', () => {
         ).not.toHaveAttribute('aria-current');
     });
 
+    it('opens the account from its owner’s name', () => {
+        currentRoute = 'account.show';
+        layout();
+
+        const account = screen.getByRole('link', { name: /Investigadora/ });
+        expect(account).toHaveAttribute('href', '/account.show');
+        expect(account).toHaveAttribute('aria-current', 'page');
+    });
+
     it('offers the system only to its administrators', () => {
         layout();
         expect(

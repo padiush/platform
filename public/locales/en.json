@@ -34,7 +34,43 @@
         "expand_menu": "Expand menu",
         "close_menu": "Close menu",
         "settings": "Settings",
-        "members": "Members"
+        "members": "Members",
+        "account": "My account"
+    },
+    "account": {
+        "title": "My account",
+        "sessions": {
+            "title": "Browser sessions",
+            "description": "The browsers you are signed in on. Sign out one you no longer use or don't recognise.",
+            "this_browser": "This browser",
+            "active_now": "Active now",
+            "last_active": "Last active {{when}}",
+            "unknown_browser": "Unknown browser",
+            "sign_out": "Sign out",
+            "sign_out_others": "Sign out other sessions",
+            "others_hint": "Every other browser will be signed out, including those that remember you. Enter your password to confirm.",
+            "password": "Password",
+            "confirm_title": "Sign out this session?",
+            "confirm_message": "That browser will have to sign in again.",
+            "unavailable": "This installation doesn't keep sessions where they can be listed. Whoever runs it can turn this on with SESSION_DRIVER=database.",
+            "signed_out": "That browser was signed out.",
+            "others_signed_out": "Your other browsers were signed out.",
+            "not_found": "That session is no longer open."
+        },
+        "devices": {
+            "title": "Field app devices",
+            "description": "Each phone or tablet you signed in on with the field app. Revoke a lost one.",
+            "none_title": "No device has signed in",
+            "none_hint": "When you sign in to the field app, the device will appear here.",
+            "signed_in": "Since {{when}}",
+            "last_used": "used {{when}}",
+            "never_used": "not used yet",
+            "revoke": "Revoke",
+            "confirm_title": "Revoke this device?",
+            "confirm_message": "{{name}} will have to sign in to the field app again to send and receive data.",
+            "revoked": "That device's access was revoked.",
+            "not_found": "That device no longer has access."
+        }
     },
     "titles": {
         "my_projects": "My Projects"

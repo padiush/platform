@@ -63,7 +63,13 @@
         <server name="MAIL_MAILER" value="array" force="true"/>
         <env name="MAIL_MAILER" value="array" force="true"/>
         <env name="QUEUE_CONNECTION" value="sync"/>
-        <env name="SESSION_DRIVER" value="array"/>
+        <!--
+            Forced like DB_* above: docker-compose sets SESSION_DRIVER=database
+            on the app container, so a plain <env> loses and every test that
+            does not migrate a database fails on the missing sessions table.
+        -->
+        <server name="SESSION_DRIVER" value="array" force="true"/>
+        <env name="SESSION_DRIVER" value="array" force="true"/>
         <env name="TELESCOPE_ENABLED" value="false"/>
     </php>
 </phpunit>

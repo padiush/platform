@@ -57,8 +57,10 @@ POST /api/v1/tokens
   the rejected alternative.)
 - **Prohibited handling:** the app must never store the password; only the
   returned token, in the platform secure store (Keychain / Keystore).
-- Revocation: `DELETE /api/v1/tokens/current` (this device) — web manages the
-  rest via Sanctum.
+- Revocation: `DELETE /api/v1/tokens/current` (this device). On the web, **Mi
+  cuenta** (`/account`) lists every device a user signed in on, by its
+  `device_name` and when it was last used, and revokes any of them; that
+  device's next request answers 401 and it has to sign in again.
 
 ## Pull — cache what the device needs offline
 
