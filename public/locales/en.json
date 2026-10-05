@@ -3,12 +3,7 @@
         "welcome_message": "Welcome to {{appName}}, {{name}}!",
         "title": "Dashboard",
         "greeting": "Hello, {{name}}!",
-        "subtitle": "Where do you want to continue today?",
         "projects_desc": "Create and manage your research projects and their collaborators.",
-        "design_desc": "Design the interview forms your team uses in the field.",
-        "interview_desc": "Record new interviews for your active projects.",
-        "catalogs_desc": "Keep your species catalogs identified and up to date.",
-        "data_desc": "Link answers to species and export publishable datasets.",
         "no_projects_hint": "Start by creating your first project — everything else builds on it."
     },
     "app": {
@@ -17,10 +12,7 @@
     "navigation": {
         "projects": "Projects",
         "interviews": "Interviews",
-        "catalogs": "Catalogs",
         "data": "Data",
-        "design": "Form Designer",
-        "interview": "Conduct interviews",
         "system_dashboard": "System Dashboard",
         "breadcrumb": "Breadcrumb",
         "back": "Back",
@@ -129,16 +121,15 @@
     "designer": {
         "title": "Interview Designer",
         "index": {
-            "enabled": "Enabled?",
-            "form_name": "Form Name",
-            "interviews": "Interviews",
-            "actions": "Actions",
+            "status_on": "Enabled",
+            "status_off": "Disabled",
             "edit": "Edit",
             "disable": "Disable",
             "enable": "Enable",
             "delete": "Delete",
             "confirm_delete": "Are you sure you want to perform this action?\n\nNote that all interviews made with this form will be deleted.\n\nThis cannot be undone.",
             "no_forms_yet": "No interviews have been designed for this project yet.",
+            "no_forms_hint": "Create a form and design its sections and questions. Switch it on to start interviewing with it.",
             "create": "Create form",
             "edit_details": "Edit form details",
             "wizard": "Open designer"
@@ -199,6 +190,7 @@
         "form_toggle_success": "The form status has been updated.",
         "form_not_found": "The form was not found in this project.",
         "no_access": "You do not have permission to design interviews in this project.",
+        "project_finished": "This project has been finished and takes no new forms.",
         "invalid_move": "The section cannot be moved in that direction.",
         "item_created": "The field has been added.",
         "item_updated": "The field has been updated.",
@@ -267,11 +259,11 @@
     "interviews": {
         "new_interview": "New interview",
         "no_interviews": "There are no active interview forms for this project.",
+        "no_active_forms_hint": "Switch on a form in Forms to start interviewing with it.",
         "title": "Interviews",
         "view_existing": "See list of interviews",
         "add_section": "Add {{section}}",
         "created_by": "Created by",
-        "form_on_project": "{{form}} in {{project}}",
         "identifier": "Identifier",
         "instance": {
             "title": "Interview {{id}}"
@@ -879,10 +871,6 @@
     },
     "hubs": {
         "empty": {
-            "title_designer": "No projects to design forms for",
-            "hint_designer": "You need an active project where you can manage forms. Create a project or ask its manager for form access.",
-            "title_interviews": "No projects ready for interviews",
-            "hint_interviews": "You need an active project where you can record data, with at least one enabled form.",
             "title_data": "No data to process yet",
             "hint_data": "You need a project where you can manage data or generate reports.",
             "cta": "Go to my projects"

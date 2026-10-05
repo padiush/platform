@@ -3,12 +3,7 @@
         "welcome_message": "Bem-vindo ao {{appName}}, {{name}}!",
         "title": "Painel",
         "greeting": "Olá, {{name}}!",
-        "subtitle": "Onde você quer continuar hoje?",
         "projects_desc": "Crie e gerencie seus projetos de pesquisa e seus colaboradores.",
-        "design_desc": "Desenhe os formulários de entrevista que sua equipe usa em campo.",
-        "interview_desc": "Registre novas entrevistas para seus projetos ativos.",
-        "catalogs_desc": "Mantenha seus catálogos de espécies identificados e atualizados.",
-        "data_desc": "Vincule respostas a espécies e exporte dados prontos para publicar.",
         "no_projects_hint": "Comece criando seu primeiro projeto — todo o resto parte daí."
     },
     "app": {
@@ -17,10 +12,7 @@
     "navigation": {
         "projects": "Projetos",
         "interviews": "Entrevistas",
-        "catalogs": "Catálogos",
         "data": "Dados",
-        "design": "Conceção de formulários",
-        "interview": "Realizar entrevistas",
         "system_dashboard": "Painel do sistema",
         "breadcrumb": "Trilha de navegação",
         "back": "Voltar",
@@ -129,16 +121,15 @@
     "designer": {
         "title": "Designer de Entrevistas",
         "index": {
-            "enabled": "Habilitado?",
-            "form_name": "Nome do formulário",
-            "interviews": "Entrevistas",
-            "actions": "Ações",
+            "status_on": "Habilitado",
+            "status_off": "Desabilitado",
             "edit": "Editar",
             "disable": "Desabilitar",
             "enable": "Habilitar",
             "delete": "Excluir",
             "confirm_delete": "Tem certeza de que deseja realizar esta ação?\n\nTodas as entrevistas feitas com este formulário serão excluídas.\n\nIsso não pode ser desfeito.",
             "no_forms_yet": "Nenhuma entrevista foi criada para este projeto ainda.",
+            "no_forms_hint": "Crie um formulário e desenhe as suas secções e perguntas. Ative-o para começar a entrevistar com ele.",
             "create": "Criar formulário",
             "edit_details": "Editar detalhes do formulário",
             "wizard": "Designer aberto"
@@ -199,6 +190,7 @@
         "form_toggle_success": "O status do formulário foi atualizado.",
         "form_not_found": "O formulário não foi encontrado neste projeto.",
         "no_access": "Você não tem permissão para criar entrevistas neste projeto.",
+        "project_finished": "Este projeto já foi finalizado e não aceita novos formulários.",
         "invalid_move": "A seção não pode ser movida nessa direção.",
         "item_created": "O campo foi adicionado.",
         "item_updated": "O campo foi atualizado.",
@@ -267,11 +259,11 @@
     "interviews": {
         "new_interview": "Nova entrevista",
         "no_interviews": "Não existem formulários de entrevista activos para este projeto.",
+        "no_active_forms_hint": "Ative um formulário em Formulários para começar a entrevistar com ele.",
         "title": "Entrevistas",
         "view_existing": "Ver lista de entrevistas",
         "add_section": "Adicionar {{secção}}",
         "created_by": "Criado por",
-        "form_on_project": "{{form}} em {{projeto}}",
         "identifier": "Identificador",
         "instance": {
             "title": "Entrevista {{id}}"
@@ -879,10 +871,6 @@
     },
     "hubs": {
         "empty": {
-            "title_designer": "Nenhum projeto para desenhar formulários",
-            "hint_designer": "Você precisa de um projeto ativo onde possa administrar formulários. Crie um projeto ou peça acesso a quem o administra.",
-            "title_interviews": "Nenhum projeto pronto para entrevistas",
-            "hint_interviews": "Você precisa de um projeto ativo onde possa registrar dados, com pelo menos um formulário habilitado.",
             "title_data": "Ainda não há dados para processar",
             "hint_data": "Você precisa de um projeto onde possa administrar dados ou gerar relatórios.",
             "cta": "Ir para meus projetos"

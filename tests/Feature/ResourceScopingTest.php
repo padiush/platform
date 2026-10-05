@@ -43,7 +43,7 @@ class ResourceScopingTest extends TestCase
             ['name' => 'Hijacked name']
         );
 
-        $response->assertRedirect(route('designer.index'));
+        $response->assertRedirect(route('designer.index', $mine));
         $response->assertSessionHas('message', 'designer.form_not_found');
         $this->assertDatabaseHas('interview_forms', [
             'id' => $foreignForm->id,
@@ -68,7 +68,7 @@ class ResourceScopingTest extends TestCase
             ])
         );
 
-        $response->assertRedirect(route('designer.index'));
+        $response->assertRedirect(route('designer.index', $mine));
         $response->assertSessionHas('message', 'designer.form_not_found');
         $this->assertDatabaseHas('interview_forms', [
             'id' => $foreignForm->id,
@@ -120,7 +120,7 @@ class ResourceScopingTest extends TestCase
             ]
         );
 
-        $response->assertRedirect(route('designer.index'));
+        $response->assertRedirect(route('designer.index', $mine));
         $this->assertDatabaseHas('interview_forms', [
             'name' => 'My form',
             'project_id' => $mine->id,
@@ -260,13 +260,14 @@ class ResourceScopingTest extends TestCase
 
         $response = $this->actingAs($user)->delete(
             route('interviews.section.remove', [
+                'project' => $mine,
                 'instance' => $instance,
                 'section' => $foreignSection,
             ]),
             ['repeatable_index' => 0]
         );
 
-        $response->assertRedirect(route('interviews.index'));
+        $response->assertRedirect(route('interviews.index', $mine));
         $this->assertDatabaseHas('instance_answers', ['id' => $answer->id]);
     }
 }

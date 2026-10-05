@@ -49,10 +49,10 @@ class InterviewInstancesAuthorizationTest extends TestCase
     public function test_outsider_cannot_view_an_instance()
     {
         $response = $this->actingAs($this->outsider())->get(
-            route('interviews.show', ['instance' => $this->instance])
+            route('interviews.show', ['project' => $this->project, 'instance' => $this->instance])
         );
 
-        $response->assertRedirect(route('interviews.index'));
+        $response->assertRedirect(route('dashboard'));
         $response->assertSessionHas('message', 'interviews.no_access');
         $response->assertSessionHas('message_type', 'error');
     }
@@ -62,10 +62,11 @@ class InterviewInstancesAuthorizationTest extends TestCase
         $user = $this->userWithCapability($this->project, 'record_data', false);
 
         $response = $this->actingAs($user)->get(
-            route('interviews.show', ['instance' => $this->instance])
+            route('interviews.show', ['project' => $this->project, 'instance' => $this->instance])
         );
 
-        $response->assertRedirect(route('interviews.index'));
+        // To the project's overview, which every member can open.
+        $response->assertRedirect(route('projects.overview', $this->project));
         $response->assertSessionHas('message', 'interviews.no_access');
     }
 
@@ -74,7 +75,7 @@ class InterviewInstancesAuthorizationTest extends TestCase
         $user = $this->userWithCapability($this->project, 'record_data');
 
         $response = $this->actingAs($user)->get(
-            route('interviews.show', ['instance' => $this->instance])
+            route('interviews.show', ['project' => $this->project, 'instance' => $this->instance])
         );
 
         $response->assertOk();
@@ -90,20 +91,20 @@ class InterviewInstancesAuthorizationTest extends TestCase
     public function test_outsider_cannot_list_instances()
     {
         $response = $this->actingAs($this->outsider())->get(
-            route('interviews.instances', ['form' => $this->form])
+            route('interviews.instances', ['project' => $this->project, 'form' => $this->form])
         );
 
-        $response->assertRedirect(route('interviews.index'));
+        $response->assertRedirect(route('dashboard'));
         $response->assertSessionHas('message', 'interviews.no_access');
     }
 
     public function test_outsider_cannot_create_an_instance()
     {
         $response = $this->actingAs($this->outsider())->get(
-            route('interviews.create', ['form' => $this->form])
+            route('interviews.create', ['project' => $this->project, 'form' => $this->form])
         );
 
-        $response->assertRedirect(route('interviews.index'));
+        $response->assertRedirect(route('dashboard'));
         $response->assertSessionHas('message', 'interviews.no_access');
         $this->assertSame(1, InterviewInstance::count());
     }
@@ -111,10 +112,10 @@ class InterviewInstancesAuthorizationTest extends TestCase
     public function test_outsider_cannot_delete_an_instance()
     {
         $response = $this->actingAs($this->outsider())->delete(
-            route('interviews.destroy', ['instance' => $this->instance])
+            route('interviews.destroy', ['project' => $this->project, 'instance' => $this->instance])
         );
 
-        $response->assertRedirect(route('interviews.index'));
+        $response->assertRedirect(route('dashboard'));
         $this->assertDatabaseHas('interview_instances', [
             'id' => $this->instance->id,
         ]);
@@ -123,7 +124,7 @@ class InterviewInstancesAuthorizationTest extends TestCase
     public function test_outsider_cannot_save_an_answer()
     {
         $response = $this->actingAs($this->outsider())->postJson(
-            route('interviews.save_answer', ['instance' => $this->instance]),
+            route('interviews.save_answer', ['project' => $this->project, 'instance' => $this->instance]),
             ['item_id' => $this->item->id, 'value' => 'stolen']
         );
 
@@ -139,7 +140,7 @@ class InterviewInstancesAuthorizationTest extends TestCase
         $user = $this->userWithCapability($this->project, 'record_data', false);
 
         $response = $this->actingAs($user)->postJson(
-            route('interviews.save_answer', ['instance' => $this->instance]),
+            route('interviews.save_answer', ['project' => $this->project, 'instance' => $this->instance]),
             ['item_id' => $this->item->id, 'value' => 'stolen']
         );
 
@@ -155,7 +156,7 @@ class InterviewInstancesAuthorizationTest extends TestCase
         $user = $this->userWithCapability($this->project, 'record_data');
 
         $response = $this->actingAs($user)->postJson(
-            route('interviews.save_answer', ['instance' => $this->instance]),
+            route('interviews.save_answer', ['project' => $this->project, 'instance' => $this->instance]),
             ['item_id' => $this->item->id, 'value' => 'a valid answer']
         );
 
@@ -174,7 +175,7 @@ class InterviewInstancesAuthorizationTest extends TestCase
         $foreignItem = InterviewItem::factory()->create();
 
         $response = $this->actingAs($user)->postJson(
-            route('interviews.save_answer', ['instance' => $this->instance]),
+            route('interviews.save_answer', ['project' => $this->project, 'instance' => $this->instance]),
             ['item_id' => $foreignItem->id, 'value' => 'misplaced']
         );
 
@@ -189,11 +190,33 @@ class InterviewInstancesAuthorizationTest extends TestCase
         $this->project->update(['finished' => true]);
 
         $response = $this->actingAs($user)->postJson(
-            route('interviews.save_answer', ['instance' => $this->instance]),
+            route('interviews.save_answer', ['project' => $this->project, 'instance' => $this->instance]),
             ['item_id' => $this->item->id, 'value' => 'too late']
         );
 
         $response->assertForbidden();
         $this->assertSame(0, InstanceAnswer::count());
+    }
+
+    /** The address names the project; an interview of another one is not in it. */
+    public function test_an_interview_is_not_reached_through_another_projects_address()
+    {
+        $elsewhere = Project::factory()->create();
+        $user = $this->userWithCapability($elsewhere, 'record_data');
+        $this->giveAccess($user, $this->project, 'record_data', false);
+
+        $this->actingAs($user)
+            ->get(route('interviews.show', ['project' => $elsewhere, 'instance' => $this->instance]))
+            ->assertRedirect(route('interviews.index', $elsewhere))
+            ->assertSessionHas('message', 'interviews.form_not_found');
+
+        $this->actingAs($user)
+            ->postJson(
+                route('interviews.save_answer', ['project' => $elsewhere, 'instance' => $this->instance]),
+                ['item_id' => $this->item->id, 'value' => 'x']
+            )
+            ->assertForbidden();
+
+        $this->assertDatabaseMissing('instance_answers', ['interview_instance_id' => $this->instance->id]);
     }
 }

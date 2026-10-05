@@ -129,6 +129,7 @@ class FieldRecordAnswerLinkTest extends TestCase
                 $page->component('Records/Index')->where('canOpenInterviews', true);
 
                 $this->assertSame([
+                    'project_id' => $this->project->id,
                     'instance_id' => $this->instance->id,
                     'question' => 'Nombre local de la planta',
                 ], $this->recordFromAnswer($page)['interview']);
@@ -163,7 +164,7 @@ class FieldRecordAnswerLinkTest extends TestCase
         $this->recordsPage($this->catalogReader())
             ->assertInertia(function (Assert $page) {
                 $this->assertSame(
-                    ['instance_id', 'question'],
+                    ['project_id', 'instance_id', 'question'],
                     array_keys($this->recordFromAnswer($page)['interview'])
                 );
             });
@@ -207,7 +208,7 @@ class FieldRecordAnswerLinkTest extends TestCase
     public function test_an_interview_lists_the_records_made_from_each_answer()
     {
         $this->actingAs($this->recorder())
-            ->get(route('interviews.show', ['instance' => $this->instance]))
+            ->get(route('interviews.show', ['project' => $this->project, 'instance' => $this->instance]))
             ->assertOk()
             ->assertInertia(fn (Assert $page) => $page
                 ->component('Interviews/Instance')
@@ -226,7 +227,7 @@ class FieldRecordAnswerLinkTest extends TestCase
     public function test_a_recorder_who_cannot_read_the_catalog_sees_the_records_unlinked()
     {
         $this->actingAs($this->recorderWithoutCatalog())
-            ->get(route('interviews.show', ['instance' => $this->instance]))
+            ->get(route('interviews.show', ['project' => $this->project, 'instance' => $this->instance]))
             ->assertOk()
             ->assertInertia(fn (Assert $page) => $page
                 ->where('canViewCatalog', false)

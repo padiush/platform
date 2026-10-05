@@ -67,7 +67,7 @@ class DesignerAuthorizationTest extends TestCase
             ])
         );
 
-        $response->assertRedirect(route('designer.index'));
+        $response->assertRedirect(route('dashboard'));
         $response->assertSessionHas('message', 'designer.no_access');
         $response->assertSessionHas('message_type', 'error');
     }
@@ -87,7 +87,8 @@ class DesignerAuthorizationTest extends TestCase
             ])
         );
 
-        $response->assertRedirect(route('designer.index'));
+        // To the project's overview, which every member can open.
+        $response->assertRedirect(route('projects.overview', $this->project));
         $response->assertSessionHas('message', 'designer.no_access');
     }
 
@@ -100,7 +101,7 @@ class DesignerAuthorizationTest extends TestCase
             ])
         );
 
-        $response->assertRedirect(route('designer.index'));
+        $response->assertRedirect(route('dashboard'));
         $response->assertSessionHas('message', 'designer.no_access');
     }
 
@@ -116,7 +117,7 @@ class DesignerAuthorizationTest extends TestCase
             ])
         );
 
-        $response->assertRedirect(route('designer.index'));
+        $response->assertRedirect(route('designer.index', $otherProject));
         $response->assertSessionHas('message', 'designer.form_not_found');
     }
 

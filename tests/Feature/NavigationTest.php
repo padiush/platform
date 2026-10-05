@@ -29,8 +29,6 @@ class NavigationTest extends TestCase
         ]);
 
         $hubs = [
-            ['designer.index', 'Designer/Index'],
-            ['interviews.index', 'Interviews/Index'],
             ['data.index', 'Data/Index'],
         ];
 

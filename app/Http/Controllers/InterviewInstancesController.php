@@ -9,6 +9,7 @@ use App\Models\InterviewItem;
 use App\Models\InterviewSection;
 use App\Models\Project;
 use App\Models\User;
+use App\Services\ActiveProject;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -32,21 +33,23 @@ class InterviewInstancesController extends Controller
         string $permission = 'record_data'
     ): void {
         if (! Auth::user()->can(Str::camel($permission), $project)) {
-            self::deny('interviews.no_access');
+            // To the overview of the project the user works in, which every
+            // member can open; the interviews could turn them away again.
+            self::deny('interviews.no_access', app(ActiveProject::class)->home(request()));
         }
 
-        // Check if the form belongs to the project
+        // The address names the project; the form and the interview must be
+        // of it, or ids from another project could be mixed in.
         if ($form && $form->project_id !== $project->id) {
-            self::deny('interviews.form_not_found');
+            self::deny('interviews.form_not_found', route('interviews.index', ['project' => $project->id]));
         }
 
-        // Check if the instance belongs to the form
-        if ($instance && $instance->interview_form_id !== $form->id) {
-            self::deny('interviews.instance_not_found');
+        if ($instance && $instance->interview_form_id !== $form?->id) {
+            self::deny('interviews.instance_not_found', route('interviews.index', ['project' => $project->id]));
         }
     }
 
-    private static function deny(string $message): never
+    private static function deny(string $message, string $to): never
     {
         throw new HttpResponseException(
             request()->expectsJson()
@@ -55,55 +58,44 @@ class InterviewInstancesController extends Controller
                     403
                 )
                 : redirect()
-                    ->route('interviews.index')
+                    ->to($to)
                     ->with('message', $message)
                     ->with('message_type', 'error')
         );
     }
 
-    public function index(Request $request): Response|RedirectResponse
+    /** A finished project takes no new interviews and no new answers. */
+    private static function denyIfFinished(Project $project): void
     {
-        $accesses = Auth::user()
-            ->projectAccesses()
-            ->with(['project.activeInterviewForms.instances', 'capability'])
-            ->get();
-
-        $projects = collect();
-
-        foreach ($accesses as $access) {
-            $project = $access->project;
-
-            if (! $project) {
-                continue;
-            }
-
-            // Narrowed to the project the sidebar is open on.
-            if ($request->filled('project') && $project->id !== $request->integer('project')) {
-                continue;
-            }
-
-            if (! $project->finished && $access->capability->record_data) {
-                $projects->push($project);
-            }
+        if ($project->finished) {
+            self::deny('interviews.project_finished', app(ActiveProject::class)->home(request()));
         }
+    }
+
+    /** The project's active forms, each to start an interview on or list its own. */
+    public function index(Project $project): Response|RedirectResponse
+    {
+        self::verifyAccess($project);
+        self::denyIfFinished($project);
 
         return Inertia::render('Interviews/Index', [
-            'projects' => $projects,
-            'user' => Auth::user(),
+            'project' => ['id' => $project->id, 'name' => $project->name],
+            'forms' => $project->activeInterviewForms()
+                ->withCount('instances')
+                ->get()
+                ->map(fn (InterviewForm $form) => [
+                    'id' => $form->id,
+                    'name' => $form->name,
+                    'instances_count' => $form->instances_count,
+                ])
+                ->all(),
         ]);
     }
 
-    public function create(InterviewForm $form): RedirectResponse
+    public function create(Project $project, InterviewForm $form): RedirectResponse
     {
-        $project = Project::find($form->project_id);
-
         self::verifyAccess($project, $form);
-
-        if ($project->finished) {
-            return redirect()
-                ->route('projects.index')
-                ->with('message', 'interviews.project_finished');
-        }
+        self::denyIfFinished($project);
 
         $instance = InterviewInstance::create([
             'interview_form_id' => $form->id,
@@ -112,16 +104,15 @@ class InterviewInstancesController extends Controller
 
         return redirect()
             ->route('interviews.show', [
+                'project' => $project->id,
                 'instance' => $instance->id,
             ])
             ->with('message', 'interviews.instance_created')
             ->with('message_type', 'success');
     }
 
-    public function list(InterviewForm $form): Response|RedirectResponse
+    public function list(Project $project, InterviewForm $form): Response|RedirectResponse
     {
-        $project = Project::findOrFail($form->project_id);
-
         self::verifyAccess($project, $form);
 
         $instances = InterviewInstance::with('user')
@@ -153,19 +144,12 @@ class InterviewInstancesController extends Controller
         ]);
     }
 
-    public function show(InterviewInstance $instance): Response|RedirectResponse
+    public function show(Project $project, InterviewInstance $instance): Response|RedirectResponse
     {
         $form = $instance->form;
-        $project = $form->project;
 
         self::verifyAccess($project, $form, $instance);
-
-        if ($project->finished) {
-            return redirect()
-                ->route('projects.index')
-                ->with('message', 'interviews.project_finished');
-        }
-
+        self::denyIfFinished($project);
         // Eager load sections and items
         $form->load('sections.items');
         $form->sections = $form->sections->sortBy('order')->values();
@@ -216,6 +200,7 @@ class InterviewInstancesController extends Controller
 
     public function saveAnswer(
         Request $request,
+        Project $project,
         InterviewInstance $instance
     ): JsonResponse {
         $validated = $request->validate([
@@ -225,7 +210,6 @@ class InterviewInstancesController extends Controller
         ]);
 
         $form = $instance->form;
-        $project = $form->project;
 
         self::verifyAccess($project, $form, $instance);
 
@@ -273,6 +257,7 @@ class InterviewInstancesController extends Controller
 
     public function destroyRepeatableSet(
         Request $request,
+        Project $project,
         InterviewInstance $instance,
         InterviewSection $section
     ): RedirectResponse {
@@ -280,14 +265,13 @@ class InterviewInstancesController extends Controller
 
         // Validate access
         $form = $instance->form;
-        $project = $form->project;
 
         self::verifyAccess($project, $form, $instance);
 
         // The section must belong to the instance's form, otherwise this
         // could delete answers from another form's section.
         if ($section->interview_form_id !== $form->id) {
-            self::deny('interviews.instance_not_found');
+            self::deny('interviews.instance_not_found', route('interviews.index', ['project' => $project->id]));
         }
 
         // Delete all answers for the section at that index
@@ -309,15 +293,14 @@ class InterviewInstancesController extends Controller
 
         // Redirect back to the instance view
         return redirect()
-            ->route('interviews.show', ['instance' => $instance->id])
+            ->route('interviews.show', ['project' => $project->id, 'instance' => $instance->id])
             ->with('message', 'interviews.repeatable_set_deleted')
             ->with('message_type', 'success');
     }
 
-    public function destroy(InterviewInstance $instance): RedirectResponse
+    public function destroy(Project $project, InterviewInstance $instance): RedirectResponse
     {
         $form = $instance->form;
-        $project = $form->project;
 
         self::verifyAccess($project, $form, $instance);
 
@@ -328,7 +311,7 @@ class InterviewInstancesController extends Controller
         $instance->delete();
 
         return redirect()
-            ->route('interviews.instances', ['form' => $form->id])
+            ->route('interviews.instances', ['project' => $project->id, 'form' => $form->id])
             ->with('message', 'interviews.instance_deleted')
             ->with('message_type', 'success');
     }

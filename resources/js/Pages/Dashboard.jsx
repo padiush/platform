@@ -1,19 +1,16 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import {
-    faClipboardQuestion,
-    faFolderOpen,
-    faLeaf,
-    faPenRuler,
-    faTable,
-} from '@fortawesome/free-solid-svg-icons';
+import { faFolderOpen } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link, usePage } from '@inertiajs/react';
 import { useTranslation } from 'react-i18next';
 
+/**
+ * The welcome for someone with no project yet: everything else starts from
+ * one, so it points at Proyectos. Anyone with a project lands on its overview.
+ */
 export default function Dashboard() {
     const { t } = useTranslation();
     const { auth } = usePage().props;
-    const hasProjects = auth.projects > 0;
 
     return (
         <AuthenticatedLayout title={t('dashboard.title')}>
@@ -26,9 +23,7 @@ export default function Dashboard() {
                             })}
                         </h2>
                         <p className="text-base-content/70 mt-1 text-lg">
-                            {hasProjects
-                                ? t('dashboard.subtitle')
-                                : t('dashboard.no_projects_hint')}
+                            {t('dashboard.no_projects_hint')}
                         </p>
                     </div>
 
@@ -40,38 +35,6 @@ export default function Dashboard() {
                         >
                             {t('dashboard.projects_desc')}
                         </QuickLink>
-                        {hasProjects && (
-                            <>
-                                <QuickLink
-                                    href={route('designer.index')}
-                                    icon={faPenRuler}
-                                    title={t('navigation.design')}
-                                >
-                                    {t('dashboard.design_desc')}
-                                </QuickLink>
-                                <QuickLink
-                                    href={route('interviews.index')}
-                                    icon={faClipboardQuestion}
-                                    title={t('navigation.interview')}
-                                >
-                                    {t('dashboard.interview_desc')}
-                                </QuickLink>
-                                <QuickLink
-                                    href={route('catalogs.index')}
-                                    icon={faLeaf}
-                                    title={t('navigation.catalogs')}
-                                >
-                                    {t('dashboard.catalogs_desc')}
-                                </QuickLink>
-                                <QuickLink
-                                    href={route('data.index')}
-                                    icon={faTable}
-                                    title={t('navigation.data')}
-                                >
-                                    {t('dashboard.data_desc')}
-                                </QuickLink>
-                            </>
-                        )}
                     </div>
                 </div>
             </div>

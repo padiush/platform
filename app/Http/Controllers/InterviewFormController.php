@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\InterviewForm;
 use App\Models\Project;
 use App\Models\User;
+use App\Services\ActiveProject;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -26,41 +27,41 @@ class InterviewFormController extends Controller
         if ($form->project_id !== $project->id) {
             throw new HttpResponseException(
                 redirect()
-                    ->route('designer.index')
+                    ->route('designer.index', ['project' => $project->id])
                     ->with('message', 'designer.form_not_found')
                     ->with('message_type', 'error')
             );
         }
     }
 
-    public function index(Request $request): Response|RedirectResponse
+    /**
+     * The project's forms. A finished project takes no new forms, so its
+     * forms are not offered for editing either; its interviews stay readable
+     * in the data views.
+     */
+    public function index(Project $project): Response|RedirectResponse
     {
-        $accesses = Auth::user()
-            ->projectAccesses()
-            ->with(['project.interviewForms.instances', 'capability'])
-            ->get();
+        if (! Auth::user()->can('manageForms', $project)) {
+            return $this->denyNoAccess();
+        }
 
-        $projects = collect();
-
-        foreach ($accesses as $access) {
-            $project = $access->project;
-            if (! $project) {
-                // Access row pointing at a deleted project — skip it.
-                continue;
-            }
-
-            // Narrowed to the project the sidebar is open on.
-            if ($request->filled('project') && $project->id !== $request->integer('project')) {
-                continue;
-            }
-
-            if (! $project->finished && $access->capability->manage_forms) {
-                $projects->push($project);
-            }
+        if ($project->finished) {
+            return $this->denyNoAccess('designer.project_finished');
         }
 
         return Inertia::render('Designer/Index', [
-            'projects' => $projects,
+            'project' => ['id' => $project->id, 'name' => $project->name],
+            'forms' => $project->interviewForms()
+                ->withCount('instances')
+                ->get(['id', 'project_id', 'name', 'description', 'is_active'])
+                ->map(fn (InterviewForm $form) => [
+                    'id' => $form->id,
+                    'name' => $form->name,
+                    'description' => $form->description,
+                    'is_active' => (bool) $form->is_active,
+                    'instances_count' => $form->instances_count,
+                ])
+                ->all(),
         ]);
     }
 
@@ -70,9 +71,9 @@ class InterviewFormController extends Controller
             return $this->denyNoAccess();
         }
 
-        // The form-details form is a modal on the designer list; deep-link
-        // opens it there, carrying which project it belongs to.
-        return redirect()->route('designer.index', ['create' => $project->id]);
+        // The form-details form is a modal on the project's forms; deep-link
+        // opens it there.
+        return redirect()->route('designer.index', ['project' => $project->id, 'create' => 1]);
     }
 
     public function store(Request $request, Project $project): RedirectResponse
@@ -97,7 +98,7 @@ class InterviewFormController extends Controller
         // The details are captured in the modal; land back on the list, where
         // the new form is ready to open in the Wizard.
         return redirect()
-            ->route('designer.index')
+            ->route('designer.index', ['project' => $project->id])
             ->with('message', 'designer.form_create_success')
             ->with('message_type', 'success');
     }
@@ -124,7 +125,7 @@ class InterviewFormController extends Controller
         ]);
 
         return redirect()
-            ->route('designer.index')
+            ->route('designer.index', ['project' => $project->id])
             ->with('message', 'designer.form_update_success')
             ->with('message_type', 'success');
     }
@@ -158,7 +159,7 @@ class InterviewFormController extends Controller
         $form->delete();
 
         return redirect()
-            ->route('designer.index')
+            ->route('designer.index', ['project' => $project->id])
             ->with('message', 'designer.form_delete_success')
             ->with('message_type', 'success');
     }
@@ -177,7 +178,7 @@ class InterviewFormController extends Controller
         $form->save();
 
         return redirect()
-            ->route('designer.index')
+            ->route('designer.index', ['project' => $project->id])
             ->with('message', 'designer.form_toggle_success')
             ->with('message_type', 'success');
     }
@@ -192,14 +193,18 @@ class InterviewFormController extends Controller
 
         self::ensureFormBelongsToProject($project, $form);
 
-        return redirect()->route('designer.index', ['edit' => $form->id]);
+        return redirect()->route('designer.index', ['project' => $project->id, 'edit' => $form->id]);
     }
 
-    private function denyNoAccess(): RedirectResponse
+    /**
+     * Turned away: to the overview of the project the user works in, which
+     * every member can open.
+     */
+    private function denyNoAccess(string $message = 'designer.no_access'): RedirectResponse
     {
         return redirect()
-            ->route('projects.index')
-            ->with('message', 'designer.no_access')
+            ->to(app(ActiveProject::class)->home(request()))
+            ->with('message', $message)
             ->with('message_type', 'error');
     }
 }

@@ -1,9 +1,13 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import axios from 'axios';
 import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('axios', () => ({ default: { post: vi.fn() } }));
 
-globalThis.route = (name, params) => `/${name}/${params}`;
+globalThis.route = (name, params) =>
+    typeof params === 'object'
+        ? `/${name}/${Object.values(params).join('/')}`
+        : `/${name}/${params}`;
 
 import ItemRender from './ItemRender';
 
@@ -124,5 +128,29 @@ describe('ItemRender', () => {
         );
 
         expect(screen.queryByText('RA-031')).not.toBeInTheDocument();
+    });
+
+    /** The interview's address names its project, so the answer goes there. */
+    it('saves an answer to the interview under its project', async () => {
+        render(
+            <ItemRender
+                item={item}
+                projectId={7}
+                instance={instance}
+                repeatableIndex={null}
+                answers={[]}
+            />,
+        );
+
+        const field = screen.getByRole('textbox');
+        fireEvent.change(field, { target: { value: 'Ruda' } });
+        fireEvent.blur(field);
+
+        await waitFor(() =>
+            expect(axios.post).toHaveBeenCalledWith(
+                '/interviews.save_answer/7/a9731e28',
+                expect.objectContaining({ item_id: 4, value: 'Ruda' }),
+            ),
+        );
     });
 });

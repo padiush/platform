@@ -3,12 +3,7 @@
         "welcome_message": "¡Te damos la bienvenida a {{appName}}, {{name}}!",
         "title": "Dashboard",
         "greeting": "¡Hola, {{name}}!",
-        "subtitle": "¿Dónde quieres continuar hoy?",
         "projects_desc": "Crea y administra tus proyectos de investigación y sus colaboradores.",
-        "design_desc": "Diseña los formularios de entrevista que tu equipo usa en campo.",
-        "interview_desc": "Registra nuevas entrevistas para tus proyectos activos.",
-        "catalogs_desc": "Mantén tus catálogos de especies identificados y al día.",
-        "data_desc": "Vincula respuestas con especies y exporta datos listos para publicar.",
         "no_projects_hint": "Empieza creando tu primer proyecto: todo lo demás parte de ahí."
     },
     "app": {
@@ -17,9 +12,6 @@
     "navigation": {
         "projects": "Proyectos",
         "interviews": "Entrevistas",
-        "design": "Diseñar formularios",
-        "interview": "Realizar entrevistas",
-        "catalogs": "Catálogos",
         "data": "Datos",
         "system_dashboard": "Panel del sistema",
         "breadcrumb": "Ruta de navegación",
@@ -136,16 +128,15 @@
             "description_label": "Descripción"
         },
         "index": {
-            "enabled": "¿Habilitado?",
-            "form_name": "Nombre del formulario",
-            "interviews": "Entrevistas",
-            "actions": "Acciones",
+            "status_on": "Habilitado",
+            "status_off": "Deshabilitado",
             "edit": "Editar",
             "delete": "Eliminar",
             "enable": "Habilitar",
             "disable": "Deshabilitar",
             "create": "Crear formulario",
             "no_forms_yet": "No se han diseñado entrevistas para este proyecto aún.",
+            "no_forms_hint": "Crea un formulario y diseña sus secciones y preguntas. Actívalo para empezar a entrevistar con él.",
             "confirm_delete": "¿Realmente deseas realizar esta acción?\n\nToma en cuenta que se eliminarán todas las entrevistas realizadas con este formulario.\n\nEsto no puede deshacerse.",
             "edit_details": "Editar detalles del formulario",
             "wizard": "Abrir diseñador"
@@ -199,6 +190,7 @@
         "form_toggle_success": "Se ha actualizado el estado del formulario.",
         "form_not_found": "No se ha encontrado el formulario en este proyecto.",
         "no_access": "No tienes permisos para diseñar entrevistas en este proyecto.",
+        "project_finished": "Este proyecto ya ha finalizado y no admite formularios nuevos.",
         "invalid_move": "No se puede mover la sección en esa dirección.",
         "item_created": "Se ha agregado el campo.",
         "item_updated": "Se ha actualizado el campo.",
@@ -269,10 +261,10 @@
         "new_interview": "Nueva entrevista",
         "view_existing": "Ver listado de entrevistas",
         "no_interviews": "No hay formularios de entrevista activos para este proyecto.",
+        "no_active_forms_hint": "Activa un formulario en Formularios para empezar a entrevistar con él.",
         "timestamp": "Fecha y hora",
         "created_by": "Creada por",
         "identifier": "Identificador",
-        "form_on_project": "{{form}} en {{project}}",
         "instance": {
             "title": "Entrevista {{id}}"
         },
@@ -879,10 +871,6 @@
     },
     "hubs": {
         "empty": {
-            "title_designer": "No hay proyectos para diseñar formularios",
-            "hint_designer": "Necesitas un proyecto activo donde puedas administrar formularios. Crea un proyecto o pide acceso a quien lo administra.",
-            "title_interviews": "No hay proyectos listos para entrevistas",
-            "hint_interviews": "Necesitas un proyecto activo donde puedas registrar datos, con al menos un formulario habilitado.",
             "title_data": "Aún no hay datos para procesar",
             "hint_data": "Necesitas un proyecto donde puedas administrar datos o generar reportes.",
             "cta": "Ir a mis proyectos"

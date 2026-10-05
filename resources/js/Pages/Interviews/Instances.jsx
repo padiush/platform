@@ -19,7 +19,10 @@ export default function InterviewInstances({ project, form, instances }) {
     const handleDelete = (instance) => {
         setDeletionModalOptions({
             name: t('interviews.instance.title', { id: instance.id }),
-            url: route('interviews.destroy', instance.id),
+            url: route('interviews.destroy', {
+                project: project.id,
+                instance: instance.id,
+            }),
         });
 
         deletionModalRef.current.showModal();
@@ -27,21 +30,17 @@ export default function InterviewInstances({ project, form, instances }) {
 
     return (
         <AuthenticatedLayout
-            title={t('interviews.title')}
+            title={form.name}
             breadcrumbs={[
                 {
-                    label: t('navigation.interview'),
-                    href: route('interviews.index'),
+                    label: t('navigation.interviews'),
+                    href: route('interviews.index', { project: project.id }),
                 },
                 { label: form.name },
             ]}
-            subtitle={t('interviews.form_on_project', {
-                form: form.name,
-                project: project.name,
-            })}
             action={
                 <Link
-                    href={route('interviews.index')}
+                    href={route('interviews.index', { project: project.id })}
                     className="btn btn-ghost"
                     aria-label={t('navigation.back')}
                 >
@@ -77,7 +76,11 @@ export default function InterviewInstances({ project, form, instances }) {
                                                 <Link
                                                     href={route(
                                                         'interviews.show',
-                                                        instance.id,
+                                                        {
+                                                            project: project.id,
+                                                            instance:
+                                                                instance.id,
+                                                        },
                                                     )}
                                                     className="btn btn-xs btn-primary join-item"
                                                 >

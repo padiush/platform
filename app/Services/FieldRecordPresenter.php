@@ -88,7 +88,7 @@ class FieldRecordPresenter
      * Expects `answer.item` loaded; null when the answer is gone, which
      * releases the record rather than deleting it.
      *
-     * @return array{instance_id: string, question: string|null}|null
+     * @return array{project_id: int, instance_id: string, question: string|null}|null
      */
     private function interview(FieldRecord $fieldRecord): ?array
     {
@@ -99,6 +99,7 @@ class FieldRecordPresenter
         }
 
         return [
+            'project_id' => $fieldRecord->project_id,
             'instance_id' => $answer->interview_instance_id,
             'question' => $answer->item?->label,
         ];

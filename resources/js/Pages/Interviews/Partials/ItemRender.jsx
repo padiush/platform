@@ -70,6 +70,7 @@ function hasContent(type, value) {
 
 export default function ItemRender({
     item,
+    projectId,
     instance,
     repeatableIndex = null,
     answers = [],
@@ -127,11 +128,17 @@ export default function ItemRender({
         setSaveState('saving');
 
         try {
-            await axios.post(route('interviews.save_answer', instance.id), {
-                item_id: item.id,
-                repeatable_index: repeatableIndex,
-                value: typeof value === 'string' ? value.trim() : value,
-            });
+            await axios.post(
+                route('interviews.save_answer', {
+                    project: projectId,
+                    instance: instance.id,
+                }),
+                {
+                    item_id: item.id,
+                    repeatable_index: repeatableIndex,
+                    value: typeof value === 'string' ? value.trim() : value,
+                },
+            );
             setError(null);
             setSaveState('saved');
             onAnswered(item.id, repeatableIndex, hasContent(item.type, value));

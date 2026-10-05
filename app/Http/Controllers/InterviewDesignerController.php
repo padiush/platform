@@ -6,6 +6,7 @@ use App\Models\InterviewForm;
 use App\Models\InterviewItem;
 use App\Models\InterviewSection;
 use App\Models\Project;
+use App\Services\ActiveProject;
 use App\Services\FormStructureService;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\JsonResponse;
@@ -26,15 +27,17 @@ class InterviewDesignerController extends Controller
         InterviewForm $form
     ): void {
         if (! Auth::user()->can('manageForms', $project)) {
-            self::deny('designer.no_access');
+            // To the overview of the project the user works in, which every
+            // member can open; the forms could turn them away again.
+            self::deny('designer.no_access', app(ActiveProject::class)->home(request()));
         }
 
         if ($form->project_id !== $project->id) {
-            self::deny('designer.form_not_found');
+            self::deny('designer.form_not_found', route('designer.index', ['project' => $project->id]));
         }
     }
 
-    private static function deny(string $message): never
+    private static function deny(string $message, string $to): never
     {
         throw new HttpResponseException(
             request()->expectsJson()
@@ -43,7 +46,7 @@ class InterviewDesignerController extends Controller
                     403
                 )
                 : redirect()
-                    ->route('designer.index')
+                    ->to($to)
                     ->with('message', $message)
                     ->with('message_type', 'error')
         );

@@ -24,6 +24,7 @@ function ProgressBadge({ answered, total }) {
 
 export default function SectionRender({
     section,
+    projectId,
     instance,
     answers = [],
     answeredKeys = new Set(),
@@ -66,6 +67,7 @@ export default function SectionRender({
     const handleRemove = (index) => {
         router.delete(
             route('interviews.section.remove', {
+                project: projectId,
                 instance: instance.id,
                 section: section.id,
             }),
@@ -122,6 +124,7 @@ export default function SectionRender({
                                     <ItemRender
                                         key={item.id}
                                         item={item}
+                                        projectId={projectId}
                                         instance={instance}
                                         answers={answers}
                                         repeatableIndex={i}
@@ -182,6 +185,7 @@ export default function SectionRender({
                     <ItemRender
                         key={item.id}
                         item={item}
+                        projectId={projectId}
                         instance={instance}
                         answers={answers}
                         catalogProjectId={catalogProjectId}
