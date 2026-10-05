@@ -252,11 +252,11 @@ export default function Sidebar({ rail = false, onToggleRail = null }) {
                 <Link
                     href={route('account.show')}
                     data-tour="nav-account"
-                    className={`btn btn-ghost h-auto min-h-9 justify-start gap-2 px-2 py-1.5 font-medium ${
+                    className={`btn btn-ghost h-auto min-h-9 gap-2 px-2 py-1.5 font-medium ${
                         route().current('account.*')
                             ? 'bg-primary-content/15'
                             : ''
-                    } ${rail ? 'justify-center' : ''}`}
+                    } ${rail ? 'justify-center' : 'justify-start'}`}
                     aria-current={
                         route().current('account.*') ? 'page' : undefined
                     }

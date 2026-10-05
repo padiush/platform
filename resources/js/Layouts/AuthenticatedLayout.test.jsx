@@ -106,6 +106,33 @@ describe('AuthenticatedLayout', () => {
         expect(link).toHaveAttribute('href', '/software.notice');
     });
 
+    it('marks an example project as one, in the switcher and on the page', () => {
+        const example = {
+            id: 3,
+            name: 'Ejemplo: plantas útiles',
+            finished: false,
+            is_example: true,
+        };
+        mockProps = props({
+            projectNav: {
+                active: example,
+                projects: [herbs, example],
+                sections: { overview: '/dashboard' },
+            },
+        });
+        layout();
+
+        expect(screen.getByText('example.notice')).toBeInTheDocument();
+        expect(screen.getAllByText('example.badge').length).toBeGreaterThan(0);
+    });
+
+    it('says nothing about examples in a real project', () => {
+        layout();
+
+        expect(screen.queryByText('example.notice')).not.toBeInTheDocument();
+        expect(screen.queryByText('example.badge')).not.toBeInTheDocument();
+    });
+
     it('offers the sections the active project opens, and only those', () => {
         layout();
 
@@ -312,6 +339,19 @@ describe('AuthenticatedLayout', () => {
             expect(
                 screen.getByRole('button', { name: 'navigation.expand_menu' }),
             ).toBeInTheDocument();
+        });
+
+        /** Folded, the account sits in the same column as every other icon. */
+        it('centres the account when folded', () => {
+            window.innerWidth = 1440;
+            window.localStorage.setItem('padiush.sidebar.rail', '1');
+            layout();
+
+            const account = screen.getByRole('link', {
+                name: 'navigation.account',
+            });
+            expect(account).toHaveClass('justify-center');
+            expect(account).not.toHaveClass('justify-start');
         });
 
         /** On a phone it opens over the page, labels and all. */

@@ -1,5 +1,5 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { faFolderOpen } from '@fortawesome/free-solid-svg-icons';
+import { faFlask, faFolderOpen } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link, usePage } from '@inertiajs/react';
 import { useTranslation } from 'react-i18next';
@@ -36,6 +36,15 @@ export default function Dashboard() {
                         >
                             {t('dashboard.projects_desc')}
                         </QuickLink>
+                        <QuickLink
+                            tour="dashboard-example"
+                            href={route('projects.example.store')}
+                            method="post"
+                            icon={faFlask}
+                            title={t('example.cta')}
+                        >
+                            {t('example.cta_hint')}
+                        </QuickLink>
                     </div>
                 </div>
             </div>
@@ -43,12 +52,22 @@ export default function Dashboard() {
     );
 }
 
-function QuickLink({ href, icon, title, children, tour = undefined }) {
+/** A large card that opens a page, or — given `method` — does something. */
+function QuickLink({
+    href,
+    icon,
+    title,
+    children,
+    tour = undefined,
+    method = undefined,
+}) {
     return (
         <Link
             href={href}
+            method={method}
+            as={method ? 'button' : 'a'}
             data-tour={tour}
-            className="card bg-base-200 text-base-content shadow-md transition-all duration-200 hover:-translate-y-1 hover:shadow-xl"
+            className="card bg-base-200 text-base-content w-full text-left shadow-md transition-all duration-200 hover:-translate-y-1 hover:shadow-xl"
         >
             <div className="card-body">
                 <div className="text-primary text-3xl">

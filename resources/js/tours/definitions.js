@@ -21,6 +21,11 @@ export const TOURS = {
                 requires: true,
             },
             {
+                key: 'example',
+                element: '[data-tour="dashboard-example"]',
+                requires: true,
+            },
+            {
                 key: 'account',
                 element: '[data-tour="nav-account"]',
                 side: 'right',
@@ -69,10 +74,22 @@ export const TOURS = {
                 requires: true,
             },
             { key: 'create', element: '[data-tour="projects-create"]' },
+            // Offered only while the user has no example project open.
+            {
+                key: 'example',
+                element: '[data-tour="projects-example"]',
+                requires: true,
+            },
         ],
     },
     overview: {
         steps: [
+            // First, inside the example project: none of this is real.
+            {
+                key: 'example',
+                element: '[data-tour="example-notice"]',
+                requires: true,
+            },
             { key: 'stats', element: '[data-tour="overview-stats"]' },
             {
                 key: 'actions',

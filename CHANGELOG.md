@@ -39,6 +39,11 @@ language (`public/locales/whatsnew/`). How a release is cut is in
   the first time they have one. Finished or skipped
   tours are remembered per user (`users.completed_tours`). Each page has a ?
   button to replay its tour, and Mi cuenta can offer them all again.
+- An example project: anyone can open a private, writable copy of the invented
+  demonstration study from the dashboard or Proyectos, built in the language
+  they are using (`lang/*/example_study.php`), and remove it in one step. It is marked as an example wherever it appears, left out of the system
+  project count (`projects.is_example`), and syncs to the companion like any
+  other project. `DemoProjectSeeder` now builds the same study.
 - A demo image that can be run to try Padiush.
 
 ### Changed
@@ -54,6 +59,9 @@ language (`public/locales/whatsnew/`). How a release is cut is in
 - Presigned upload headers are sent as plain strings, which the companion's
   HTTP client requires. Uploads from the field app failed without this.
 - Open dependency advisories are patched.
+- Deleting a project takes its catalog species, their photos and its forms'
+  questions with it. Those tables have no foreign key to cascade from, so they
+  were left behind.
 
 ### Upgrading
 

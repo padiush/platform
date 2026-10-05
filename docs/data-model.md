@@ -35,7 +35,7 @@ Project ─┬─ ProjectAccess ── ProjectCapability      (who can do what)
 | Entity | Purpose | Key fields | PK |
 |---|---|---|---|
 | `User` | Account | `name`, `email`, `system_admin` | int |
-| `Project` | Study container | `name`, `author`, `institution`, `author_email`, `country`, `finished`, `published`, `shared`, `user_id` (owner) | int |
+| `Project` | Study container | `name`, `author`, `institution`, `author_email`, `country`, `finished`, `published`, `shared`, `is_example` (a user's copy of the invented demo study), `user_id` (owner) | int |
 | `ProjectCapability` | A role = a set of permission flags | `name` + 8 booleans (below) | int |
 | `ProjectAccess` | A user's role on a project | `user_id`, `project_id`, `project_capability_id` — **unique** `(user_id, project_id)` | int |
 | `ProjectInvite` | Pending access grant, by email | `project_id`, `inviting_user_id`, `invited_user_id?`, `invited_name`, `invited_email`, `project_capability_id`, `expires_at` | int |

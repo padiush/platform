@@ -36,7 +36,27 @@ class Project extends Model
         'finished' => 'boolean',
         'published' => 'boolean',
         'shared' => 'boolean',
+        'is_example' => 'boolean',
     ];
+
+    protected static function booted(): void
+    {
+        // Forms, sections, interviews, records, permits and memberships go
+        // with the project through their foreign keys. A form's questions and
+        // the catalog have never had one, so without this a deleted project
+        // leaves them behind. Gathered before the cascade takes the sections
+        // that lead to the questions.
+        static::deleting(function (Project $project) {
+            InterviewItem::whereIn('interview_section_id', InterviewSection::select('interview_sections.id')
+                ->join('interview_forms', 'interview_forms.id', '=', 'interview_sections.interview_form_id')
+                ->where('interview_forms.project_id', $project->id))
+                ->delete();
+
+            $species = CatalogSpecies::where('project_id', $project->id);
+            CatalogSpeciesPhoto::whereIn('catalog_species_id', (clone $species)->select('id'))->delete();
+            $species->delete();
+        });
+    }
 
     public function user()
     {

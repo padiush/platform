@@ -7,6 +7,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { formatLongDate, formatRelativeTime } from '@/utils/datetime';
 import {
     faCircleInfo,
+    faFlask,
     faPenToSquare,
     faPlus,
     faTrashCan,
@@ -28,6 +29,9 @@ export default function Index({ projects, invites }) {
     });
 
     const [createParam, setCreate] = useQueryModal('create');
+
+    // One example per user: offered until it exists, then it is just listed.
+    const hasExample = projects.some((project) => project.is_example);
 
     const handleDelete = (project) => {
         setDeletionModalOptions({
@@ -115,7 +119,21 @@ export default function Index({ projects, invites }) {
                             data-tour="projects-list"
                         >
                             {projects.map((project) => (
-                                <Card key={project.id} title={project.name}>
+                                <Card
+                                    key={project.id}
+                                    title={
+                                        project.is_example ? (
+                                            <span className="flex flex-col items-start gap-1">
+                                                {project.name}
+                                                <span className="badge badge-info badge-soft badge-sm">
+                                                    {t('example.badge')}
+                                                </span>
+                                            </span>
+                                        ) : (
+                                            project.name
+                                        )
+                                    }
+                                >
                                     {project.author && (
                                         <p>
                                             {t('projects.created_on_by', {
@@ -180,7 +198,19 @@ export default function Index({ projects, invites }) {
                         </div>
                     )}
 
-                    <div className="mt-6 flex justify-end">
+                    <div className="mt-6 flex flex-wrap justify-end gap-2">
+                        {!hasExample && (
+                            <Link
+                                href={route('projects.example.store')}
+                                method="post"
+                                as="button"
+                                className="btn btn-ghost"
+                                data-tour="projects-example"
+                            >
+                                <FontAwesomeIcon icon={faFlask} />
+                                {t('example.cta')}
+                            </Link>
+                        )}
                         <button
                             type="button"
                             className="btn btn-primary"

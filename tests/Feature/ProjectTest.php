@@ -2,6 +2,11 @@
 
 namespace Tests\Feature;
 
+use App\Models\CatalogSpecies;
+use App\Models\CatalogSpeciesPhoto;
+use App\Models\InterviewForm;
+use App\Models\InterviewItem;
+use App\Models\InterviewSection;
 use App\Models\Project;
 use App\Models\ProjectAccess;
 use App\Models\ProjectCapability;
@@ -330,6 +335,41 @@ class ProjectTest extends TestCase
             'project_id' => $project->id,
             'project_capability_id' => $capabilityId,
         ]);
+    }
+
+    public function test_deleting_a_project_takes_its_catalog_and_questions_with_it()
+    {
+        $project = Project::factory()->create();
+        $other = Project::factory()->create();
+        $species = CatalogSpecies::factory()->create(['project_id' => $project->id]);
+        $kept = CatalogSpecies::factory()->create(['project_id' => $other->id]);
+        CatalogSpeciesPhoto::create(['catalog_species_id' => $species->id, 'path' => 'species/a.jpg']);
+        CatalogSpeciesPhoto::create(['catalog_species_id' => $kept->id, 'path' => 'species/b.jpg']);
+
+        $section = $this->sectionIn($project);
+        $keptSection = $this->sectionIn($other);
+
+        $project->delete();
+
+        $this->assertDatabaseMissing('interview_items', ['interview_section_id' => $section->id]);
+        $this->assertDatabaseHas('interview_items', ['interview_section_id' => $keptSection->id]);
+        $this->assertDatabaseMissing('catalog_species', ['project_id' => $project->id]);
+        $this->assertDatabaseMissing('catalog_species_photos', ['catalog_species_id' => $species->id]);
+        $this->assertNotNull($kept->fresh());
+        $this->assertDatabaseHas('catalog_species_photos', ['catalog_species_id' => $kept->id]);
+    }
+
+    /** A form section in the project, with one question in it. */
+    private function sectionIn(Project $project): InterviewSection
+    {
+        $form = InterviewForm::create(['project_id' => $project->id, 'name' => 'Usos', 'is_active' => true]);
+        $section = InterviewSection::create(['interview_form_id' => $form->id, 'name' => 'Usos', 'order' => 1]);
+        InterviewItem::create([
+            'interview_section_id' => $section->id,
+            'label' => 'Planta', 'name' => 'planta', 'type' => 'text', 'order' => 1,
+        ]);
+
+        return $section;
     }
 
     public function test_registered_users_can_be_invited()

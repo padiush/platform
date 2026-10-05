@@ -167,7 +167,7 @@ class ActiveProject
      * What the sidebar needs: every project the user can open, the active
      * one, and the sections it offers there.
      *
-     * @return array{active: array{id:int, name:string, finished:bool}|null, projects: array<int, array{id:int, name:string, finished:bool}>, sections: array<string, string>}
+     * @return array{active: array{id:int, name:string, finished:bool, is_example:bool}|null, projects: array<int, array{id:int, name:string, finished:bool, is_example:bool}>, sections: array<string, string>}
      */
     public function navigation(Request $request): array
     {
@@ -178,6 +178,7 @@ class ActiveProject
             'id' => $project->id,
             'name' => $project->name,
             'finished' => (bool) $project->finished,
+            'is_example' => (bool) $project->is_example,
         ];
 
         return [

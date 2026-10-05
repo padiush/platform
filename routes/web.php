@@ -3,6 +3,7 @@
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\ActiveProjectController;
 use App\Http\Controllers\CollectingPermitController;
+use App\Http\Controllers\ExampleProjectController;
 use App\Http\Controllers\FieldRecordController;
 use App\Http\Controllers\FieldRecordMediaController;
 use App\Http\Controllers\InterviewDataController;
@@ -32,6 +33,12 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/projects/{project}', [ProjectOverviewController::class, 'show'])
         ->whereNumber('project')
         ->name('projects.overview');
+
+    // The example project: the invented demo study, a private copy per user.
+    Route::post('/projects/example', [ExampleProjectController::class, 'store'])
+        ->name('projects.example.store');
+    Route::delete('/projects/example', [ExampleProjectController::class, 'destroy'])
+        ->name('projects.example.destroy');
 
     // The sidebar's project switcher.
     Route::post('/projects/{project}/activate', [ActiveProjectController::class, 'store'])

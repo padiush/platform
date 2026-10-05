@@ -137,6 +137,17 @@
             "delete": "Excluir projeto"
         }
     },
+    "example": {
+        "cta": "Explorar um projeto de exemplo",
+        "cta_hint": "Um estudo inventado, com entrevistas, registros e catálogo, para percorrer cada seção e testar sem medo.",
+        "badge": "Exemplo",
+        "notice": "Projeto de exemplo: os dados são inventados e você pode mudar o que quiser.",
+        "remove": "Remover o exemplo",
+        "remove_title": "Remover o projeto de exemplo?",
+        "remove_message": "O projeto de exemplo é excluído com tudo o que contém, incluindo suas alterações. Você pode abrir um novo quando quiser.",
+        "created": "Pronto: este é o seu projeto de exemplo.",
+        "removed": "O projeto de exemplo foi removido."
+    },
     "actions": {
         "accept": "Aceitar",
         "decline": "Recusar",
@@ -992,6 +1003,10 @@
                 "title": "Comece por um projeto",
                 "body": "Tudo no Padiush parte de um projeto. Crie-o aqui; depois você poderá criar formulários e convidar a sua equipe."
             },
+            "example": {
+                "title": "Ou explore um exemplo",
+                "body": "Abra um estudo inventado, já cheio de entrevistas, registros e espécies, para ver como tudo funciona. É só seu e você pode removê-lo quando quiser."
+            },
             "account": {
                 "title": "Minha conta",
                 "body": "Onde a sua sessão está aberta e os seus dispositivos de campo. Daqui você também pode ver todos os tours de novo."
@@ -1031,9 +1046,17 @@
             "create": {
                 "title": "Crie um projeto",
                 "body": "Dê um nome e uma descrição. Depois você poderá criar o primeiro formulário e convidar a sua equipe."
+            },
+            "example": {
+                "title": "Um projeto de exemplo",
+                "body": "Abra uma cópia privada de um estudo inventado para percorrer cada seção. Ele aparece marcado como “Exemplo” e você o remove quando quiser."
             }
         },
         "overview": {
+            "example": {
+                "title": "Você está no exemplo",
+                "body": "Os dados deste projeto são inventados: mude, apague e teste o que quiser. Quando terminar, remova-o por esta faixa."
+            },
             "stats": {
                 "title": "Como anda o trabalho",
                 "body": "Entrevistas, registros de campo, espécies do catálogo e respostas ainda sem vínculo. Toque num número para ir à seção."
