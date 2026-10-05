@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\CatalogSpecies;
 use App\Models\InstanceAnswer;
 use App\Models\Project;
+use App\Services\ActiveProject;
 use App\Services\CatalogSpeciesSearch;
 use App\Services\FieldRecordPresenter;
 use App\Services\GbifDistribution;
@@ -26,68 +27,27 @@ class ProjectCatalogController extends Controller
     /** Linked interview records shown per page on the species page. */
     private const LINKED_PER_PAGE = 15;
 
-    public function index(Request $request): Response|RedirectResponse
+    /**
+     * The catalog used to open on a list of every project's; each project now
+     * has its own, so this opens the one the user is working in.
+     */
+    public function index(Request $request, ActiveProject $active): RedirectResponse
     {
-        $accesses = Auth::user()
-            ->projectAccesses()
-            ->with([
-                'capability',
-                'project' => fn ($query) => $query->withCount('catalogSpecies'),
-            ])
-            ->get();
+        $project = $active->resolve($request);
 
-        $projects = collect();
-
-        foreach ($accesses as $access) {
-            $project = $access->project;
-
-            if (! $project) {
-                continue;
-            }
-
-            // Narrowed to the project the sidebar is open on.
-            if ($request->filled('project') && $project->id !== $request->integer('project')) {
-                continue;
-            }
-
-            if ($access->capability->view_catalog) {
-                $projects->push([
-                    'id' => $project->id,
-                    'name' => $project->name,
-                    'catalog_species_count' => $project->catalog_species_count,
-                    'linked_species_count' => $project
-                        ->linkedSpecies()
-                        ->count(),
-                    'linked_families_count' => $project
-                        ->linkedFamilies()
-                        ->count(),
-                    // Reachable even with an empty catalog: collections are
-                    // recorded before anything is identified, so this must not
-                    // depend on a taxon existing yet.
-                    'field_record_count' => $project->fieldRecords()->count(),
-                    'can_edit_catalog' => (bool) $access->capability->edit_catalog,
-                    'can_view_catalog' => true, // already verified
-                ]);
-            }
-        }
-
-        return Inertia::render('Catalog/Index', [
-            'projects' => $projects,
-        ]);
+        return $project
+            ? redirect()->route('catalogs.show', ['project' => $project->id])
+            : redirect()->route('dashboard');
     }
 
     public function registerSpecies(Project $project): RedirectResponse
     {
         if (! Auth::user()->can('editCatalog', $project)) {
-            return redirect()
-                ->route('catalogs.index')
-                ->with('message', 'catalogs.no_access')
-                ->with('message_type', 'error');
+            return $this->noAccess();
         }
 
-        // The register form is a modal on the catalog hub; deep-link opens it
-        // there, carrying which project it belongs to.
-        return redirect()->route('catalogs.index', ['create' => $project->id]);
+        // The register form is a modal on the catalog; deep-link opens it there.
+        return redirect()->route('catalogs.show', ['project' => $project->id, 'create' => 1]);
     }
 
     public function storeSpecies(
@@ -104,10 +64,7 @@ class ProjectCatalogController extends Controller
         ]);
 
         if (! Auth::user()->can('editCatalog', $project)) {
-            return redirect()
-                ->route('catalogs.index')
-                ->with('message', 'catalogs.no_access')
-                ->with('message_type', 'error');
+            return $this->noAccess();
         }
 
         CatalogSpecies::create([
@@ -122,7 +79,7 @@ class ProjectCatalogController extends Controller
         ]);
 
         return redirect()
-            ->route('catalogs.index')
+            ->route('catalogs.show', ['project' => $project->id])
             ->with('message', 'catalogs.species_registered')
             ->with('message_type', 'success');
     }
@@ -276,19 +233,7 @@ class ProjectCatalogController extends Controller
         CatalogSpeciesSearch $search
     ): Response|RedirectResponse {
         if (! Auth::user()->can('viewCatalog', $project)) {
-            return redirect()
-                ->route('catalogs.index')
-                ->with('error', 'No tienes permisos para ver este catálogo.');
-        }
-
-        // Only bounce when the catalog is genuinely empty. An empty search or
-        // filter result stays on the page and shows an in-place empty state.
-        $catalogIsEmpty = ! CatalogSpecies::where('project_id', $project->id)->exists();
-
-        if ($catalogIsEmpty) {
-            return redirect()
-                ->route('catalogs.index')
-                ->with('error', 'Este catálogo no tiene especies registradas.');
+            return $this->noAccess('catalogs.no_view_access');
         }
 
         $filters = [
@@ -321,6 +266,14 @@ class ProjectCatalogController extends Controller
                 'id' => $project->id,
                 'name' => $project->name,
             ],
+            // An empty catalog opens here too, on how to start one, rather
+            // than turning away the section the sidebar offers.
+            'counts' => fn () => [
+                'species' => CatalogSpecies::where('project_id', $project->id)->count(),
+                'linked_species' => $project->linkedSpecies()->count(),
+                'linked_families' => $project->linkedFamilies()->count(),
+            ],
+            'canEdit' => (bool) Auth::user()->can('editCatalog', $project),
             'species' => $species,
             'filters' => $filters,
             // Dropdown data doesn't change with the filters, so skip it on the
@@ -375,16 +328,11 @@ class ProjectCatalogController extends Controller
         $user = Auth::user();
 
         if (! $user->can('viewCatalog', $project)) {
-            return redirect()
-                ->route('catalogs.index')
-                ->with('error', 'No tienes permisos para ver este catálogo.');
+            return $this->noAccess('catalogs.no_view_access');
         }
 
         if ($species->project_id !== $project->id) {
-            return redirect()
-                ->route('catalogs.index')
-                ->with('message', 'catalogs.species_not_found')
-                ->with('message_type', 'error');
+            return $this->speciesNotFound($project);
         }
 
         // Linked answers are interview data: everyone with view_catalog sees the
@@ -536,17 +484,11 @@ class ProjectCatalogController extends Controller
         WfoNameResolver $resolver
     ): RedirectResponse {
         if (! Auth::user()->can('editCatalog', $project)) {
-            return redirect()
-                ->route('catalogs.index')
-                ->with('message', 'catalogs.no_access')
-                ->with('message_type', 'error');
+            return $this->noAccess();
         }
 
         if ($species->project_id !== $project->id) {
-            return redirect()
-                ->route('catalogs.index')
-                ->with('message', 'catalogs.species_not_found')
-                ->with('message_type', 'error');
+            return $this->speciesNotFound($project);
         }
 
         $validated = $request->validate([
@@ -691,17 +633,11 @@ class ProjectCatalogController extends Controller
         CatalogSpecies $species
     ): RedirectResponse {
         if (! Auth::user()->can('editCatalog', $project)) {
-            return redirect()
-                ->route('catalogs.index')
-                ->with('message', 'catalogs.no_access')
-                ->with('message_type', 'error');
+            return $this->noAccess();
         }
 
         if ($species->project_id !== $project->id) {
-            return redirect()
-                ->route('catalogs.index')
-                ->with('message', 'catalogs.species_not_found')
-                ->with('message_type', 'error');
+            return $this->speciesNotFound($project);
         }
 
         foreach ($species->photos as $photo) {
@@ -719,5 +655,25 @@ class ProjectCatalogController extends Controller
             ->route('catalogs.show', ['project' => $project->id])
             ->with('message', 'catalogs.species_deleted')
             ->with('message_type', 'success');
+    }
+
+    /**
+     * Turned away for want of the role: to the overview of the project the
+     * user works in, which every member can open.
+     */
+    private function noAccess(string $message = 'catalogs.no_access'): RedirectResponse
+    {
+        return redirect()
+            ->to(app(ActiveProject::class)->home(request()))
+            ->with('message', $message)
+            ->with('message_type', 'error');
+    }
+
+    private function speciesNotFound(Project $project): RedirectResponse
+    {
+        return redirect()
+            ->route('catalogs.show', ['project' => $project->id])
+            ->with('message', 'catalogs.species_not_found')
+            ->with('message_type', 'error');
     }
 }

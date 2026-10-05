@@ -121,7 +121,7 @@ class FieldRecordMediaTest extends TestCase
 
         $this->actingAs($this->outsider())
             ->get($this->url('catalogs.fieldRecords.media.show', ['medium' => $media->id]))
-            ->assertRedirect(route('catalogs.index'));
+            ->assertRedirect(route('dashboard'));
     }
 
     public function test_a_viewer_cannot_attach_or_remove()
@@ -132,11 +132,11 @@ class FieldRecordMediaTest extends TestCase
         $this->actingAs($this->viewer())->post(
             $this->url('catalogs.fieldRecords.media.store'),
             ['file' => UploadedFile::fake()->image('otra.jpg')]
-        )->assertRedirect(route('catalogs.index'));
+        )->assertRedirect(route('projects.overview', $this->project));
 
         $this->actingAs($this->viewer())
             ->delete($this->url('catalogs.fieldRecords.media.destroy', ['medium' => $media->id]))
-            ->assertRedirect(route('catalogs.index'));
+            ->assertRedirect(route('projects.overview', $this->project));
 
         $this->assertSame(1, Media::count());
     }
@@ -178,7 +178,7 @@ class FieldRecordMediaTest extends TestCase
             'project' => $this->project->id,
             'fieldRecord' => $foreignRecord->id,
             'medium' => $media->id,
-        ]))->assertRedirect(route('catalogs.index'));
+        ]))->assertRedirect(route('catalogs.fieldRecords.index', $this->project));
     }
 
     /**

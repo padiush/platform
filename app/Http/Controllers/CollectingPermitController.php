@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\CollectingPermit;
 use App\Models\Project;
+use App\Services\ActiveProject;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -26,7 +27,7 @@ class CollectingPermitController extends Controller
         $user = Auth::user();
 
         if (! $user->can('viewCatalog', $project)) {
-            return $this->noAccess();
+            return $this->noAccess('catalogs.no_view_access');
         }
 
         $permits = $project->collectingPermits()
@@ -35,7 +36,7 @@ class CollectingPermitController extends Controller
             ->orderBy('reference')
             ->get();
 
-        return Inertia::render('Catalog/Permits', [
+        return Inertia::render('Records/Permits', [
             'project' => ['id' => $project->id, 'name' => $project->name],
             'permits' => $permits->map(fn (CollectingPermit $permit) => [
                 'id' => $permit->id,
@@ -50,7 +51,6 @@ class CollectingPermitController extends Controller
                 'field_records_count' => $permit->field_records_count,
             ])->all(),
             'canEdit' => (bool) $user->can('editCatalog', $project),
-            'speciesCount' => $project->catalogSpecies()->count(),
         ]);
     }
 
@@ -79,7 +79,7 @@ class CollectingPermitController extends Controller
         }
 
         if ($permit->project_id !== $project->id) {
-            return $this->notFound();
+            return $this->notFound($project);
         }
 
         $permit->update($request->validate($this->rules($project, $permit)));
@@ -96,7 +96,7 @@ class CollectingPermitController extends Controller
         }
 
         if ($permit->project_id !== $project->id) {
-            return $this->notFound();
+            return $this->notFound($project);
         }
 
         // The collections taken under it survive with a null reference: a
@@ -136,18 +136,22 @@ class CollectingPermitController extends Controller
         return Auth::user()->can('editCatalog', $project) ? null : $this->noAccess();
     }
 
-    private function noAccess(): RedirectResponse
+    /**
+     * Turned away for want of the role: to the overview of the project the
+     * user works in, which every member can open.
+     */
+    private function noAccess(string $message = 'catalogs.no_access'): RedirectResponse
     {
         return redirect()
-            ->route('catalogs.index')
-            ->with('message', 'catalogs.no_access')
+            ->to(app(ActiveProject::class)->home(request()))
+            ->with('message', $message)
             ->with('message_type', 'error');
     }
 
-    private function notFound(): RedirectResponse
+    private function notFound(Project $project): RedirectResponse
     {
         return redirect()
-            ->route('catalogs.index')
+            ->route('catalogs.permits.index', ['project' => $project->id])
             ->with('message', 'catalogs.permits.not_found')
             ->with('message_type', 'error');
     }

@@ -27,7 +27,7 @@ class CatalogSpeciesTest extends TestCase
         $this->project = Project::factory()->create();
     }
 
-    public function test_editor_register_link_redirects_to_the_hub_modal()
+    public function test_editor_register_link_opens_the_form_on_the_catalog()
     {
         $user = $this->userWithCapability($this->project, 'edit_catalog');
 
@@ -36,7 +36,7 @@ class CatalogSpeciesTest extends TestCase
         );
 
         $response->assertRedirect(
-            route('catalogs.index', ['create' => $this->project->id])
+            route('catalogs.show', ['project' => $this->project->id, 'create' => 1])
         );
     }
 
@@ -54,7 +54,7 @@ class CatalogSpeciesTest extends TestCase
             ]
         );
 
-        $response->assertRedirect(route('catalogs.index'));
+        $response->assertRedirect(route('catalogs.show', $this->project));
         $response->assertSessionHas('message', 'catalogs.species_registered');
         $this->assertDatabaseHas('catalog_species', [
             'project_id' => $this->project->id,
@@ -85,7 +85,9 @@ class CatalogSpeciesTest extends TestCase
             ['genus' => 'Inga', 'name' => 'edulis']
         );
 
-        $response->assertRedirect(route('catalogs.index'));
+        // To the project's overview, which every member can open: back to the
+        // catalog could turn them away again.
+        $response->assertRedirect(route('projects.overview', $this->project));
         $response->assertSessionHas('message', 'catalogs.no_access');
         $this->assertDatabaseCount('catalog_species', 0);
     }
@@ -97,7 +99,7 @@ class CatalogSpeciesTest extends TestCase
             ['genus' => 'Inga', 'name' => 'edulis']
         );
 
-        $response->assertRedirect(route('catalogs.index'));
+        $response->assertRedirect(route('dashboard'));
         $this->assertDatabaseCount('catalog_species', 0);
     }
 
@@ -109,15 +111,60 @@ class CatalogSpeciesTest extends TestCase
         ));
     }
 
-    public function test_empty_catalog_redirects_to_the_index()
+    /**
+     * The sidebar offers the catalog in every project whose role reads it, so
+     * an empty one opens in place, on how to start it, rather than bouncing.
+     */
+    public function test_an_empty_catalog_opens_in_place()
     {
-        $user = $this->userWithCapability($this->project, 'view_catalog');
+        $user = $this->userWithCapability($this->project, 'edit_catalog');
 
         $response = $this->actingAs($user)->get(
             route('catalogs.show', $this->project)
         );
 
-        $response->assertRedirect(route('catalogs.index'));
+        $response->assertOk();
+        $response->assertInertia(fn (Assert $page) => $page
+            ->component('Catalog/SpeciesIndex')
+            ->where('counts.species', 0)
+            ->where('canEdit', true)
+            ->has('species.data', 0)
+        );
+    }
+
+    public function test_the_catalog_counts_what_interviews_reported()
+    {
+        $user = $this->userWithCapability($this->project, 'edit_catalog', false);
+        $this->species(['family' => 'Urticaceae', 'genus' => 'Cecropia']);
+        $this->species(['family' => 'Fabaceae', 'genus' => 'Inga']);
+
+        $response = $this->actingAs($user)->get(
+            route('catalogs.show', $this->project)
+        );
+
+        $response->assertInertia(fn (Assert $page) => $page
+            ->where('counts.species', 2)
+            ->where('counts.linked_species', 0)
+            ->where('counts.linked_families', 0)
+            ->where('canEdit', false)
+        );
+    }
+
+    /** The landing page from before each project had its own catalog. */
+    public function test_the_old_catalog_landing_page_opens_the_active_projects_catalog()
+    {
+        $user = $this->userWithCapability($this->project, 'view_catalog');
+
+        $this->actingAs($user)
+            ->get(route('catalogs.index'))
+            ->assertRedirect(route('catalogs.show', $this->project));
+    }
+
+    public function test_the_old_catalog_landing_page_welcomes_someone_with_no_project()
+    {
+        $this->actingAs($this->outsider())
+            ->get(route('catalogs.index'))
+            ->assertRedirect(route('dashboard'));
     }
 
     public function test_viewer_sees_all_species_in_taxonomic_order()
@@ -237,7 +284,8 @@ class CatalogSpeciesTest extends TestCase
             route('catalogs.show', $this->project)
         );
 
-        $response->assertRedirect(route('catalogs.index'));
+        $response->assertRedirect(route('dashboard'));
+        $response->assertSessionHas('message', 'catalogs.no_view_access');
     }
 
     /**
@@ -462,7 +510,7 @@ class CatalogSpeciesTest extends TestCase
             ['wfo_id' => 'wfo-0000354479']
         );
 
-        $response->assertRedirect(route('catalogs.index'));
+        $response->assertRedirect(route('projects.overview', $this->project));
         $this->assertSame('carthagenensis', $species->refresh()->name);
         Http::assertNothingSent();
     }

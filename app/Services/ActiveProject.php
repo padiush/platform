@@ -102,6 +102,20 @@ class ActiveProject
             ->first();
     }
 
+    /**
+     * Where to send someone a page turned away: the overview of the project
+     * they are working in, or the welcome when they have none. Never the page
+     * of a section, which could turn them away again.
+     */
+    public function home(Request $request): string
+    {
+        $project = $this->resolve($request);
+
+        return $project
+            ? route('projects.overview', ['project' => $project->id])
+            : route('dashboard');
+    }
+
     /** Remember the project the user is working in, on their account. */
     public function remember(User $user, Project $project): void
     {
@@ -141,7 +155,7 @@ class ActiveProject
             'records' => $can->view_catalog
                 ? route('catalogs.fieldRecords.index', ['project' => $id]) : null,
             'catalog' => $can->view_catalog
-                ? route('catalogs.index', ['project' => $id]) : null,
+                ? route('catalogs.show', ['project' => $id]) : null,
             'data' => $can->manage_data || $can->generate_reports
                 ? route('data.index', ['project' => $id]) : null,
         ];

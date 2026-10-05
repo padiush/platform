@@ -8,6 +8,7 @@ use App\Models\Determination;
 use App\Models\FieldRecord;
 use App\Models\Project;
 use App\Services\AccessionNumbers;
+use App\Services\ActiveProject;
 use App\Services\FieldRecordPresenter;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -44,10 +45,7 @@ class FieldRecordController extends Controller
         $user = Auth::user();
 
         if (! $user->can('viewCatalog', $project)) {
-            return redirect()
-                ->route('catalogs.index')
-                ->with('message', 'catalogs.no_access')
-                ->with('message_type', 'error');
+            return $this->noAccess('catalogs.no_view_access');
         }
 
         $fieldRecords = $project->fieldRecords()
@@ -55,7 +53,7 @@ class FieldRecordController extends Controller
             ->orderByDesc('created_at')
             ->get();
 
-        return Inertia::render('Catalog/FieldRecords', [
+        return Inertia::render('Records/Index', [
             'project' => ['id' => $project->id, 'name' => $project->name],
             'fieldRecords' => $this->presenter->collection($fieldRecords),
             'summary' => [
@@ -96,9 +94,6 @@ class FieldRecordController extends Controller
             // only for someone who could open it anyway.
             'canOpenInterviews' => (bool) $user->can('recordData', $project),
             'nextAccessionNumber' => $this->accessions->peek($project),
-            // The species tab is a dead end without one — catalogs.show
-            // redirects away from an empty catalog.
-            'speciesCount' => $project->catalogSpecies()->count(),
         ]);
     }
 
@@ -112,10 +107,7 @@ class FieldRecordController extends Controller
     public function export(Request $request, Project $project): BinaryFileResponse|RedirectResponse
     {
         if (! Auth::user()->can('viewCatalog', $project)) {
-            return redirect()
-                ->route('catalogs.index')
-                ->with('message', 'catalogs.no_access')
-                ->with('message_type', 'error');
+            return $this->noAccess('catalogs.no_view_access');
         }
 
         // Defaults to xlsx, matching the indices download — a bare link from
@@ -203,7 +195,7 @@ class FieldRecordController extends Controller
         }
 
         if ($species->project_id !== $project->id) {
-            return $this->speciesNotFound();
+            return $this->speciesNotFound($project);
         }
 
         $validated = $request->validate($this->collectionRules($project) + $this->determinationRules());
@@ -232,7 +224,7 @@ class FieldRecordController extends Controller
         }
 
         if ($fieldRecord->project_id !== $project->id) {
-            return $this->fieldRecordNotFound();
+            return $this->fieldRecordNotFound($project);
         }
 
         $fieldRecord->update($request->validate($this->collectionRules($project)));
@@ -260,7 +252,7 @@ class FieldRecordController extends Controller
         }
 
         if ($fieldRecord->project_id !== $project->id) {
-            return $this->fieldRecordNotFound();
+            return $this->fieldRecordNotFound($project);
         }
 
         $validated = $request->validate(
@@ -307,7 +299,7 @@ class FieldRecordController extends Controller
         }
 
         if ($fieldRecord->project_id !== $project->id) {
-            return $this->fieldRecordNotFound();
+            return $this->fieldRecordNotFound($project);
         }
 
         if ($fieldRecord->basis_of_record === FieldRecord::BASIS_OBSERVATION) {
@@ -355,7 +347,7 @@ class FieldRecordController extends Controller
         }
 
         if ($fieldRecord->project_id !== $project->id) {
-            return $this->fieldRecordNotFound();
+            return $this->fieldRecordNotFound($project);
         }
 
         $fieldRecord->delete();
@@ -443,28 +435,33 @@ class FieldRecordController extends Controller
 
     private function denyUnlessEditable(Project $project): ?RedirectResponse
     {
-        if (Auth::user()->can('editCatalog', $project)) {
-            return null;
-        }
+        return Auth::user()->can('editCatalog', $project) ? null : $this->noAccess();
+    }
 
+    /**
+     * Turned away for want of the role: to the overview of the project the
+     * user works in, which every member can open.
+     */
+    private function noAccess(string $message = 'catalogs.no_access'): RedirectResponse
+    {
         return redirect()
-            ->route('catalogs.index')
-            ->with('message', 'catalogs.no_access')
+            ->to(app(ActiveProject::class)->home(request()))
+            ->with('message', $message)
             ->with('message_type', 'error');
     }
 
-    private function speciesNotFound(): RedirectResponse
+    private function speciesNotFound(Project $project): RedirectResponse
     {
         return redirect()
-            ->route('catalogs.index')
+            ->route('catalogs.show', ['project' => $project->id])
             ->with('message', 'catalogs.species_not_found')
             ->with('message_type', 'error');
     }
 
-    private function fieldRecordNotFound(): RedirectResponse
+    private function fieldRecordNotFound(Project $project): RedirectResponse
     {
         return redirect()
-            ->route('catalogs.index')
+            ->route('catalogs.fieldRecords.index', ['project' => $project->id])
             ->with('message', 'catalogs.fieldRecords.not_found')
             ->with('message_type', 'error');
     }

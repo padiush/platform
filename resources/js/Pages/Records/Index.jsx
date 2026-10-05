@@ -2,17 +2,17 @@ import Card from '@/Components/Card';
 import ConfirmModal from '@/Components/ConfirmModal';
 import FormModal from '@/Components/FormModal';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import CatalogTabs from '@/Pages/Catalog/Partials/CatalogTabs';
 import {
     CollectionModal,
     DepositModal,
     DetermineModal,
-} from '@/Pages/Catalog/Partials/FieldRecordModals';
-import FieldRecordTable from '@/Pages/Catalog/Partials/FieldRecordTable';
-import RecordMedia from '@/Pages/Catalog/Partials/RecordMedia';
-import { faArrowLeft, faDownload } from '@fortawesome/free-solid-svg-icons';
+} from '@/Pages/Records/Partials/FieldRecordModals';
+import FieldRecordTable from '@/Pages/Records/Partials/FieldRecordTable';
+import RecordMedia from '@/Pages/Records/Partials/RecordMedia';
+import RecordTabs from '@/Pages/Records/Partials/RecordTabs';
+import { faDownload } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Link, router } from '@inertiajs/react';
+import { router } from '@inertiajs/react';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -80,7 +80,6 @@ export default function FieldRecords({
     canEdit = false,
     canOpenInterviews = false,
     nextAccessionNumber = null,
-    speciesCount = null,
     permits = [],
     exemptions = [],
 }) {
@@ -129,42 +128,10 @@ export default function FieldRecords({
     }
 
     return (
-        <AuthenticatedLayout
-            title={t('catalogs.fieldRecords.title')}
-            breadcrumbs={[
-                {
-                    label: t('navigation.catalogs'),
-                    href: route('catalogs.index'),
-                },
-                {
-                    label: project.name,
-                    // Same reason the species tab is disabled when the catalog
-                    // is empty: catalogs.show bounces straight back.
-                    href:
-                        speciesCount === null || speciesCount > 0
-                            ? route('catalogs.show', { project: project.id })
-                            : undefined,
-                },
-                { label: t('catalogs.fieldRecords.title') },
-            ]}
-            subtitle={project.name}
-            action={
-                <Link
-                    href={route('catalogs.show', { project: project.id })}
-                    className="btn btn-ghost btn-circle"
-                    aria-label={t('navigation.back')}
-                >
-                    <FontAwesomeIcon icon={faArrowLeft} />
-                </Link>
-            }
-        >
+        <AuthenticatedLayout title={t('catalogs.fieldRecords.title')}>
             <div className="p-4 md:pt-8 lg:pt-12">
                 <div className="mx-auto max-w-7xl space-y-4 sm:px-6 lg:px-8">
-                    <CatalogTabs
-                        project={project}
-                        active="fieldRecords"
-                        speciesCount={speciesCount}
-                    />
+                    <RecordTabs project={project} active="records" />
 
                     <Summary summary={summary} />
 

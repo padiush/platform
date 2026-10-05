@@ -56,7 +56,7 @@ study documents is never collected, and a record that could never carry a
 voucher is not a gap in the evidence. Built: the two tables and per-project
 accession numbering, a records list that follows the field order (recorded
 first, identified later, deposited later still), collecting permits managed
-under the catalog and chosen when a record is made, photographs and audio on a
+beside the records and chosen when a record is made, photographs and audio on a
 record as well as on an interview, a `Voucher No.` and permit column on the
 species-indices export, a Darwin-Core-termed export of the records themselves,
 and voucher, permit and observation coverage stated on the report page beside

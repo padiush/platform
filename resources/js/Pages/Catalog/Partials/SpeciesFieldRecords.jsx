@@ -1,5 +1,5 @@
-import { CollectionModal } from '@/Pages/Catalog/Partials/FieldRecordModals';
-import FieldRecordTable from '@/Pages/Catalog/Partials/FieldRecordTable';
+import { CollectionModal } from '@/Pages/Records/Partials/FieldRecordModals';
+import FieldRecordTable from '@/Pages/Records/Partials/FieldRecordTable';
 import { Link } from '@inertiajs/react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';

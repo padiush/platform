@@ -48,18 +48,13 @@ const SECTIONS = [
         key: 'records',
         label: 'navigation.field_records',
         icon: faSeedling,
-        patterns: ['catalogs.fieldRecords.*'],
+        patterns: ['catalogs.fieldRecords.*', 'catalogs.permits.*'],
     },
     {
         key: 'catalog',
         label: 'navigation.catalog',
         icon: faBookOpen,
-        patterns: [
-            'catalogs.index',
-            'catalogs.show',
-            'catalogs.species.*',
-            'catalogs.permits.*',
-        ],
+        patterns: ['catalogs.index', 'catalogs.show', 'catalogs.species.*'],
     },
     {
         key: 'data',

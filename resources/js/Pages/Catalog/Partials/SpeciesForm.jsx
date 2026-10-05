@@ -7,8 +7,8 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 /**
- * Catalog species register form, rendered inside a FormModal on the catalog
- * hub. A researcher can optionally search WFO and pick a name to prefill the
+ * Catalog species register form, rendered inside a FormModal on a project's
+ * catalog. A researcher can optionally search WFO and pick a name to prefill the
  * taxonomy (correct spelling and authorship, recorded as provenance) instead of
  * hand-typing it; the fields stay editable and manual entry still works.
  */

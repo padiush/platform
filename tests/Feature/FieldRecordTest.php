@@ -270,7 +270,7 @@ class FieldRecordTest extends TestCase
         $this->actingAs($this->editor())
             ->get($this->url('catalogs.fieldRecords.index'))
             ->assertInertia(fn (Assert $page) => $page
-                ->component('Catalog/FieldRecords')
+                ->component('Records/Index')
                 ->has('fieldRecords', 3)
                 ->where('summary.total', 3)
                 ->where('summary.vouchered', 1)
@@ -576,7 +576,7 @@ class FieldRecordTest extends TestCase
 
         $this->actingAs($this->outsider())
             ->get($this->url('catalogs.fieldRecords.export'))
-            ->assertRedirect(route('catalogs.index'));
+            ->assertRedirect(route('dashboard'));
     }
 
     public function test_the_export_covers_only_this_project()
@@ -605,26 +605,36 @@ class FieldRecordTest extends TestCase
 
         $this->actingAs($this->viewer())
             ->post($this->url('catalogs.fieldRecords.store'), ['collector' => 'Someone'])
-            ->assertRedirect(route('catalogs.index'));
+            ->assertRedirect(route('projects.overview', $this->project));
 
         $this->assertSame(0, FieldRecord::count());
     }
 
-    public function test_the_project_list_offers_a_route_to_records_with_an_empty_catalog()
+    /**
+     * Records come before taxa, so a brand-new project is the one most likely
+     * to have records and an empty catalog. Neither page may depend on the
+     * other: the records open, and so does the catalog, on how to start it.
+     */
+    public function test_records_and_the_catalog_open_while_the_catalog_is_empty()
     {
         $emptyCatalog = Project::factory()->create();
         $user = $this->userWithCapability($emptyCatalog, 'view_catalog');
         FieldRecord::factory()->create(['project_id' => $emptyCatalog->id]);
 
-        // catalogs.show redirects away when no species exist, so the catalog
-        // index is the only page a brand-new project can reach — and that is
-        // precisely the project whose fieldRecords come before its taxa.
         $this->actingAs($user)
-            ->get(route('catalogs.index'))
+            ->get(route('catalogs.fieldRecords.index', $emptyCatalog))
+            ->assertOk()
             ->assertInertia(fn (Assert $page) => $page
-                ->component('Catalog/Index')
-                ->where('projects.0.catalog_species_count', 0)
-                ->where('projects.0.field_record_count', 1)
+                ->component('Records/Index')
+                ->where('summary.total', 1)
+            );
+
+        $this->actingAs($user)
+            ->get(route('catalogs.show', $emptyCatalog))
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->component('Catalog/SpeciesIndex')
+                ->where('counts.species', 0)
             );
     }
 
@@ -632,7 +642,7 @@ class FieldRecordTest extends TestCase
     {
         $this->actingAs($this->outsider())
             ->get($this->url('catalogs.fieldRecords.index'))
-            ->assertRedirect(route('catalogs.index'));
+            ->assertRedirect(route('dashboard'));
     }
 
     public function test_a_specimen_from_another_project_cannot_be_touched()
@@ -642,12 +652,12 @@ class FieldRecordTest extends TestCase
         foreach (['catalogs.fieldRecords.determine', 'catalogs.fieldRecords.deposit'] as $action) {
             $this->actingAs($this->editor())
                 ->post($this->url($action, ['fieldRecord' => $foreign->id]), [])
-                ->assertRedirect(route('catalogs.index'));
+                ->assertRedirect($this->url('catalogs.fieldRecords.index'));
         }
 
         $this->actingAs($this->editor())
             ->delete($this->url('catalogs.fieldRecords.destroy', ['fieldRecord' => $foreign->id]))
-            ->assertRedirect(route('catalogs.index'));
+            ->assertRedirect($this->url('catalogs.fieldRecords.index'));
 
         $this->assertNotNull($foreign->fresh());
     }
