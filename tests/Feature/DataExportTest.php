@@ -204,6 +204,6 @@ class DataExportTest extends TestCase
 
         $this->actingAs($this->outsider())->get(
             route('data.export', $this->project)
-        )->assertRedirect(route('projects.index'));
+        )->assertRedirect(route('dashboard'));
     }
 }

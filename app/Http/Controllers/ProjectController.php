@@ -19,8 +19,14 @@ use Inertia\Response;
 
 class ProjectController extends Controller
 {
-    public function index(): Response
+    public function index(Request $request): Response|RedirectResponse
     {
+        // A project's details used to be edited in a modal here; an old link
+        // to it opens the project's settings now.
+        if (ctype_digit((string) $request->query('edit'))) {
+            return redirect()->route('projects.edit', ['project' => (int) $request->query('edit')], 301);
+        }
+
         $accesses = Auth::user()
             ->projectAccesses()
             ->with(['project.user', 'capability'])
@@ -92,7 +98,8 @@ class ProjectController extends Controller
             ->with('message_type', 'success');
     }
 
-    public function edit(Project $project): RedirectResponse
+    /** The project's settings: its details, and deleting it. */
+    public function edit(Project $project): Response|RedirectResponse
     {
         if (! Auth::user()->can('view', $project)) {
             return $this->denyNoAccess();
@@ -102,7 +109,9 @@ class ProjectController extends Controller
             return $this->denyNoPermission();
         }
 
-        return redirect()->route('projects.index', ['edit' => $project->id]);
+        return Inertia::render('Projects/Settings', [
+            'project' => $project->only(['id', 'name', 'author', 'institution', 'author_email', 'country', 'finished']),
+        ]);
     }
 
     public function update(Request $request, Project $project)
@@ -132,7 +141,7 @@ class ProjectController extends Controller
         ]);
 
         return redirect()
-            ->route('projects.index')
+            ->route('projects.edit', ['project' => $project->id])
             ->with('message', 'project.update_success')
             ->with('message_type', 'success');
     }

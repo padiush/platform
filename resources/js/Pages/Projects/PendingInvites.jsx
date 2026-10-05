@@ -53,11 +53,7 @@ export default function PendingInvites({ project, invites, filters }) {
             title={t('projects.pending_invites')}
             breadcrumbs={[
                 {
-                    label: t('navigation.projects'),
-                    href: route('projects.index'),
-                },
-                {
-                    label: t('projects.access'),
+                    label: t('navigation.members'),
                     href: route('projects.accesses', { project: project.id }),
                 },
                 { label: t('projects.pending_invites') },

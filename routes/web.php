@@ -11,6 +11,7 @@ use App\Http\Controllers\InterviewInstancesController;
 use App\Http\Controllers\InterviewMediaController;
 use App\Http\Controllers\LegacyCatalogRedirectController;
 use App\Http\Controllers\LegacyInterviewRedirectController;
+use App\Http\Controllers\LegacyProjectRedirectController;
 use App\Http\Controllers\ProjectCatalogController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ProjectOverviewController;
@@ -56,25 +57,6 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/', 'index')->name('index');
             Route::get('/create', 'create')->name('create');
             Route::post('/create', 'store');
-            Route::get('/{project}/edit', 'edit')->name('edit');
-            Route::post('/{project}/edit', 'update');
-            Route::delete('/{project}/delete', 'destroy')->name('delete');
-
-            Route::get('/{project}/accesses', 'manageAccess')->name('accesses');
-            Route::delete(
-                '/{project}/accesses/{user}/revoke',
-                'revokeAccess'
-            )->name('accesses.revoke');
-            Route::post('/{project}/accesses/invite', 'inviteUser')->name(
-                'accesses.invite'
-            );
-            Route::get('/{project}/accesses/invites', 'projectInvites')->name(
-                'accesses.invites'
-            );
-            Route::delete(
-                '/{project}/accesses/invites/{invite}/revoke',
-                'revokeInvite'
-            )->name('accesses.invites.revoke');
 
             Route::get('/accept/{invite}', 'acceptInvite')->name(
                 'invites.accept'
@@ -82,6 +64,24 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/decline/{invite}', 'declineInvite')->name(
                 'invites.decline'
             );
+
+            // A project's administration: its details, and who works in it.
+            // Route names predate the move to /settings and /members.
+            Route::whereNumber('project')->group(function () {
+                Route::get('/{project}/settings', 'edit')->name('edit');
+                Route::post('/{project}/settings', 'update');
+                Route::delete('/{project}', 'destroy')->name('delete');
+
+                Route::get('/{project}/members', 'manageAccess')->name('accesses');
+                Route::post('/{project}/members/invite', 'inviteUser')
+                    ->name('accesses.invite');
+                Route::get('/{project}/members/invites', 'projectInvites')
+                    ->name('accesses.invites');
+                Route::delete('/{project}/members/invites/{invite}', 'revokeInvite')
+                    ->name('accesses.invites.revoke');
+                Route::delete('/{project}/members/{user}', 'revokeAccess')
+                    ->name('accesses.revoke');
+            });
         });
 
     // A project's interview forms: designing them, and the form's details.
@@ -242,57 +242,57 @@ Route::middleware(['auth'])->group(function () {
         ->whereNumber('project')
         ->where('path', '.*');
 
-    Route::controller(InterviewDataController::class)->group(function () {
-        Route::get('/data', 'index')->name('data.index');
-        Route::get('/data/{project}/view', 'viewData')->name('data.view');
-    });
+    // A project's interview data: the table, linking answers to species, the
+    // reports, and exports. Route names predate the move under /projects.
+    Route::prefix('/projects/{project}/data')
+        ->whereNumber('project')
+        ->name('data.')
+        ->group(function () {
+            Route::controller(InterviewDataController::class)->group(function () {
+                Route::get('/', 'viewData')->name('view');
+                Route::post('/chart-preference', 'saveChartPreference')
+                    ->name('chart-preference');
 
-    // What the companion captured, finally visible. Read-only: the device
-    // authors this material and owns its lifecycle.
-    Route::controller(InterviewMediaController::class)->group(function () {
-        Route::get(
-            '/data/{project}/interviews/{instance}/media',
-            'index'
-        )->name('data.media.index');
-        Route::get(
-            '/data/{project}/interviews/{instance}/media/{medium}',
-            'show'
-        )->name('data.media.show');
-    });
+                Route::get('/links', 'linkSpecies')->name('link');
+                Route::get('/links/species-search', 'searchSpecies')
+                    ->name('link.species-search');
+                Route::post('/links/handle', 'handleLinkRequest')->name('link.handle');
+                Route::post('/links/bulk', 'handleBulkLinkRequest')->name('link.bulk');
 
-    Route::controller(InterviewDataController::class)->group(function () {
-        Route::post(
-            '/data/{project}/chart-preference',
-            'saveChartPreference'
-        )->name('data.chart-preference');
-        Route::get('/data/link/{project}', 'linkSpecies')->name('data.link');
-        Route::get(
-            '/data/link/{project}/species-search',
-            'searchSpecies'
-        )->name('data.link.species-search');
-        Route::post('/data/link/{project}/handle', 'handleLinkRequest')->name(
-            'data.link.handle'
-        );
-        Route::post('/data/link/{project}/bulk', 'handleBulkLinkRequest')->name(
-            'data.link.bulk'
-        );
+                Route::get('/reports', 'reports')->name('reports');
+                Route::get('/reports/download', 'downloadReport')
+                    ->name('reports.download');
 
-        Route::get('/data/{project}/reports', 'reports')->name(
-            'data.reports'
-        );
-        Route::get('/data/{project}/reports/download', 'downloadReport')->name(
-            'data.reports.download'
-        );
+                Route::get('/export', 'prepareExport')->name('export');
+                Route::get('/export/preview', 'exportPreview')->name('export.preview');
+                Route::post('/export/download', 'downloadExport')
+                    ->name('export.download');
+            });
 
-        Route::get('/data/{project}/export', 'prepareExport')->name(
-            'data.export'
-        );
-        Route::get('/data/{project}/export/preview', 'exportPreview')->name(
-            'data.export.preview'
-        );
-        Route::post('/data/{project}/export/download', 'downloadExport')->name(
-            'data.export.download'
-        );
+            // What the companion captured, finally visible. Read-only: the
+            // device authors this material and owns its lifecycle.
+            Route::controller(InterviewMediaController::class)->group(function () {
+                Route::get('/interviews/{instance}/media', 'index')
+                    ->name('media.index');
+                Route::get('/interviews/{instance}/media/{medium}', 'show')
+                    ->name('media.show');
+            });
+        });
+
+    // Addresses from before the data and a project's administration moved
+    // under the project, kept working for bookmarks and shared links.
+    Route::controller(LegacyProjectRedirectController::class)->group(function () {
+        Route::get('/data', 'data');
+        Route::get('/data/link/{project}/{path?}', 'links')
+            ->whereNumber('project')
+            ->where('path', '.*');
+        Route::get('/data/{project}/{path}', 'dataPage')
+            ->whereNumber('project')
+            ->where('path', '.*');
+        Route::get('/projects/{project}/edit', 'settings')->whereNumber('project');
+        Route::get('/projects/{project}/accesses/{path?}', 'members')
+            ->whereNumber('project')
+            ->where('path', '.*');
     });
 });
 

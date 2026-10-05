@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Concerns;
 
 use App\Models\Project;
+use App\Services\ActiveProject;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Support\Facades\Auth;
 
@@ -24,24 +25,21 @@ trait ChecksProjectDataAccess
     {
         $user = Auth::user();
 
-        if (! $user->can('view', $project)) {
-            $this->deny('No tienes acceso a este proyecto.', $json);
-        }
-
         if (
-            ! $user->can('manageData', $project) &&
-            ! $user->can('generateReports', $project)
+            ! $user->can('view', $project) || (
+                ! $user->can('manageData', $project) &&
+                ! $user->can('generateReports', $project)
+            )
         ) {
-            $this->deny(
-                'No tienes permisos para acceder a los datos de este proyecto.',
-                $json
-            );
+            $this->deny('data.no_access', $json);
         }
     }
 
     /**
      * JSON for a request that asked for it, a flashed redirect otherwise —
-     * thrown rather than returned so a caller cannot forget to stop.
+     * thrown rather than returned so a caller cannot forget to stop. The
+     * redirect goes to the overview of the project the user works in, which
+     * every member can open; the data could turn them away again.
      */
     protected function deny(string $message, bool $json): never
     {
@@ -49,8 +47,9 @@ trait ChecksProjectDataAccess
             $json || request()->expectsJson()
                 ? response()->json(['error' => $message], 403)
                 : redirect()
-                    ->route('projects.index')
-                    ->with('error', $message)
+                    ->to(app(ActiveProject::class)->home(request()))
+                    ->with('message', $message)
+                    ->with('message_type', 'error')
         );
     }
 }

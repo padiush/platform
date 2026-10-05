@@ -124,7 +124,7 @@ class InterviewMediaTest extends TestCase
 
         $this->actingAs($user)
             ->get($this->url('data.media.show', ['medium' => $medium->id]))
-            ->assertRedirect(route('projects.index'));
+            ->assertRedirect(route('projects.overview', $this->project));
     }
 
     public function test_a_stranger_is_refused()
@@ -137,7 +137,7 @@ class InterviewMediaTest extends TestCase
 
         $this->actingAs($this->outsider())
             ->get($this->url('data.media.show', ['medium' => $medium->id]))
-            ->assertRedirect(route('projects.index'));
+            ->assertRedirect(route('dashboard'));
     }
 
     public function test_media_of_another_project_cannot_be_reached_through_this_one()

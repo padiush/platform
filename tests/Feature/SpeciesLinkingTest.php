@@ -65,13 +65,18 @@ class SpeciesLinkingTest extends TestCase
         ));
     }
 
-    public function test_empty_project_redirects_to_the_data_index()
+    /** Nothing to link yet: the tab opens on why, rather than turning away. */
+    public function test_an_empty_project_opens_in_place()
     {
         $response = $this->actingAs($this->manager())->get(
             route('data.link', $this->project)
         );
 
-        $response->assertRedirect(route('data.index'));
+        $response->assertOk();
+        $response->assertInertia(fn (Assert $page) => $page
+            ->component('Data/LinkSpecies')
+            ->where('linkable', false)
+        );
     }
 
     public function test_page_renders_grouped_rows_and_totals()

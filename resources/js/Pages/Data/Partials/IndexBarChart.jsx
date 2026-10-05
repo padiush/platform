@@ -56,7 +56,7 @@ export default function IndexBarChart({ species }) {
                     {t('data.reports.charts.index')}
                 </span>
                 <select
-                    className="select select-bordered select-sm w-auto"
+                    className="select select-bordered select-sm w-auto max-w-full min-w-0"
                     value={metric}
                     onChange={(event) => setMetric(event.target.value)}
                 >

@@ -5,9 +5,9 @@ import Pagination from '@/Components/Pagination';
 import Select from '@/Components/Select';
 import SpeciesPickerModal from '@/Components/SpeciesPickerModal';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import DataTabs from '@/Pages/Data/Partials/DataTabs';
 import { formatDateTime } from '@/utils/datetime';
 import {
-    faArrowLeft,
     faChevronDown,
     faChevronRight,
     faLink,
@@ -15,7 +15,7 @@ import {
     faPen,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Link, router, usePage } from '@inertiajs/react';
+import { router, usePage } from '@inertiajs/react';
 import axios from 'axios';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -70,7 +70,14 @@ function SpeciesLabel({ species, mixed, t }) {
     );
 }
 
-export default function LinkSpecies({ project, rows, filters, totals }) {
+export default function LinkSpecies({
+    project,
+    tabs = {},
+    linkable = true,
+    rows,
+    filters,
+    totals,
+}) {
     const { t, i18n } = useTranslation();
     const { csrf_token } = usePage().props;
 
@@ -354,125 +361,121 @@ export default function LinkSpecies({ project, rows, filters, totals }) {
     );
 
     return (
-        <AuthenticatedLayout
-            title={t('data.title')}
-            breadcrumbs={[
-                { label: t('navigation.data'), href: route('data.index') },
-            ]}
-            action={
-                <Link
-                    className="btn btn-ghost btn-circle"
-                    href={route('data.index')}
-                    aria-label={t('navigation.back')}
-                >
-                    <FontAwesomeIcon icon={faArrowLeft} />
-                </Link>
-            }
-        >
+        <AuthenticatedLayout title={t('data.title')}>
             <div className="p-4 md:pt-8 lg:pt-12">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                    <Card
-                        title={t('data.title')}
-                        actions={
-                            <span className="flex items-center gap-2 text-sm">
-                                <StatusBadge
-                                    linked={totals.linked}
-                                    total={totals.total}
-                                />
-                                <span className="text-base-content/60">
-                                    {t('data.linked_of_total')}
+                    <DataTabs project={project} active="link" tabs={tabs} />
+                    {!linkable ? (
+                        <EmptyState
+                            title={t('data.no_linkable_title')}
+                            hint={t('data.no_linkable_hint')}
+                        />
+                    ) : (
+                        <Card
+                            title={t('data.title')}
+                            actions={
+                                <span className="flex items-center gap-2 text-sm">
+                                    <StatusBadge
+                                        linked={totals.linked}
+                                        total={totals.total}
+                                    />
+                                    <span className="text-base-content/60">
+                                        {t('data.linked_of_total')}
+                                    </span>
                                 </span>
-                            </span>
-                        }
-                    >
-                        <div className="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                            <div className="sm:col-span-2">
-                                <Input
-                                    name="q"
-                                    label={t('data.search_label')}
-                                    value={q}
-                                    placeholder={t('data.search_placeholder')}
-                                    leftAddon={
-                                        <span className="bg-base-200 border-base-300 join-item flex items-center border px-3">
-                                            <FontAwesomeIcon
-                                                icon={faMagnifyingGlass}
-                                                className="text-base-content/50"
-                                            />
-                                        </span>
-                                    }
-                                    onChange={(e) => setQ(e.target.value)}
-                                />
-                            </div>
+                            }
+                        >
+                            <div className="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                                <div className="sm:col-span-2">
+                                    <Input
+                                        name="q"
+                                        label={t('data.search_label')}
+                                        value={q}
+                                        placeholder={t(
+                                            'data.search_placeholder',
+                                        )}
+                                        leftAddon={
+                                            <span className="bg-base-200 border-base-300 join-item flex items-center border px-3">
+                                                <FontAwesomeIcon
+                                                    icon={faMagnifyingGlass}
+                                                    className="text-base-content/50"
+                                                />
+                                            </span>
+                                        }
+                                        onChange={(e) => setQ(e.target.value)}
+                                    />
+                                </div>
 
-                            <Select
-                                label={t('data.status.label')}
-                                value={status}
-                                onChange={(e) => {
-                                    setStatus(e.target.value);
-                                    visit({
-                                        q,
-                                        status: e.target.value,
-                                        group: grouped,
-                                    });
-                                }}
-                            >
-                                <option value="all">
-                                    {t('data.status.all')}
-                                </option>
-                                <option value="unlinked">
-                                    {t('data.status.unlinked')}
-                                </option>
-                                <option value="linked">
-                                    {t('data.status.linked')}
-                                </option>
-                            </Select>
+                                <Select
+                                    label={t('data.status.label')}
+                                    value={status}
+                                    onChange={(e) => {
+                                        setStatus(e.target.value);
+                                        visit({
+                                            q,
+                                            status: e.target.value,
+                                            group: grouped,
+                                        });
+                                    }}
+                                >
+                                    <option value="all">
+                                        {t('data.status.all')}
+                                    </option>
+                                    <option value="unlinked">
+                                        {t('data.status.unlinked')}
+                                    </option>
+                                    <option value="linked">
+                                        {t('data.status.linked')}
+                                    </option>
+                                </Select>
 
-                            <div className="fieldset w-full">
-                                {/* Spacer legend aligns the box with the
+                                <div className="fieldset w-full">
+                                    {/* Spacer legend aligns the box with the
                                     labeled controls on one row; only needed
                                     when they sit side by side (sm+). */}
-                                <span className="fieldset-legend hidden sm:block">
-                                    &nbsp;
-                                </span>
-                                <label className="input input-bordered flex cursor-pointer items-center gap-2">
-                                    <input
-                                        type="checkbox"
-                                        className="checkbox checkbox-sm"
-                                        checked={grouped}
-                                        onChange={(e) =>
-                                            visit({
-                                                q,
-                                                status,
-                                                group: e.target.checked,
-                                            })
-                                        }
-                                    />
-                                    <span className="truncate">
-                                        {t('data.group_by_name')}
+                                    <span className="fieldset-legend hidden sm:block">
+                                        &nbsp;
                                     </span>
-                                </label>
+                                    <label className="input input-bordered flex cursor-pointer items-center gap-2">
+                                        <input
+                                            type="checkbox"
+                                            className="checkbox checkbox-sm"
+                                            checked={grouped}
+                                            onChange={(e) =>
+                                                visit({
+                                                    q,
+                                                    status,
+                                                    group: e.target.checked,
+                                                })
+                                            }
+                                        />
+                                        <span className="truncate">
+                                            {t('data.group_by_name')}
+                                        </span>
+                                    </label>
+                                </div>
                             </div>
-                        </div>
 
-                        {rows.data.length > 0 ? (
-                            <>
-                                <ul className="border-base-300 divide-base-300 rounded-box divide-y border">
-                                    {grouped
-                                        ? rows.data.map(renderGroup)
-                                        : rows.data.map(renderFlatRow)}
-                                </ul>
-                                <Pagination
-                                    links={rows.links}
-                                    className="mt-4"
+                            {rows.data.length > 0 ? (
+                                <>
+                                    <ul className="border-base-300 divide-base-300 rounded-box divide-y border">
+                                        {grouped
+                                            ? rows.data.map(renderGroup)
+                                            : rows.data.map(renderFlatRow)}
+                                    </ul>
+                                    <Pagination
+                                        links={rows.links}
+                                        className="mt-4"
+                                    />
+                                </>
+                            ) : (
+                                <EmptyState
+                                    title={t('data.no_matches_title')}
+                                    hint={t('data.no_matches_hint')}
                                 />
-                            </>
-                        ) : (
-                            <EmptyState
-                                title={t('data.no_matches_title')}
-                                hint={t('data.no_matches_hint')}
-                            />
-                        )}
-                    </Card>
+                            )}
+                        </Card>
+                    )}
                 </div>
             </div>
 

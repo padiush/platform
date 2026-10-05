@@ -9,10 +9,12 @@ import {
     faClipboardQuestion,
     faFolderOpen,
     faGauge,
+    faGear,
     faPenRuler,
     faRightFromBracket,
     faSeedling,
     faServer,
+    faUsers,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link, usePage } from '@inertiajs/react';
@@ -64,12 +66,28 @@ const SECTIONS = [
     },
 ];
 
+/** The project's administration, for the roles that run it. */
+const ADMIN_SECTIONS = [
+    {
+        key: 'settings',
+        label: 'navigation.settings',
+        icon: faGear,
+        patterns: ['projects.edit'],
+    },
+    {
+        key: 'members',
+        label: 'navigation.members',
+        icon: faUsers,
+        patterns: ['projects.accesses', 'projects.accesses.*'],
+    },
+];
+
 /** The section the current page belongs to, if any. */
 export function currentSection() {
     const current = route();
 
     return (
-        SECTIONS.find((section) =>
+        [...SECTIONS, ...ADMIN_SECTIONS].find((section) =>
             section.patterns.some((pattern) => current.current(pattern)),
         )?.key ?? null
     );
@@ -113,6 +131,7 @@ export default function Sidebar({ rail = false, onToggleRail = null }) {
     const section = currentSection();
     const offered = projectNav?.sections ?? {};
     const sections = SECTIONS.filter(({ key }) => offered[key]);
+    const adminSections = ADMIN_SECTIONS.filter(({ key }) => offered[key]);
 
     return (
         <aside
@@ -163,7 +182,7 @@ export default function Sidebar({ rail = false, onToggleRail = null }) {
                 />
             )}
 
-            <nav className="min-h-0 flex-1 overflow-y-auto">
+            <nav className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto">
                 {/* Someone with no project yet has only Proyectos to go to. */}
                 {sections.length > 0 && (
                     <>
@@ -180,6 +199,21 @@ export default function Sidebar({ rail = false, onToggleRail = null }) {
                             ))}
                         </ul>
 
+                        {adminSections.length > 0 && (
+                            <ul className="menu mt-3 w-full gap-1 p-0">
+                                {adminSections.map(({ key, label, icon }) => (
+                                    <NavItem
+                                        key={key}
+                                        href={offered[key]}
+                                        icon={icon}
+                                        label={t(label)}
+                                        active={section === key}
+                                        rail={rail}
+                                    />
+                                ))}
+                            </ul>
+                        )}
+
                         <div className="border-primary-content/20 my-3 border-t" />
                     </>
                 )}
@@ -189,10 +223,7 @@ export default function Sidebar({ rail = false, onToggleRail = null }) {
                         href={route('projects.index')}
                         icon={faFolderOpen}
                         label={t('navigation.projects')}
-                        active={
-                            route().current('projects.*') &&
-                            !route().current('projects.overview')
-                        }
+                        active={route().current('projects.index')}
                         rail={rail}
                     />
                     {auth.user.system_admin && (

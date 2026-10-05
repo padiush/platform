@@ -53,11 +53,8 @@ class DataAuthorizationTest extends TestCase
             route('data.link', ['project' => $this->project])
         );
 
-        $response->assertRedirect(route('projects.index'));
-        $response->assertSessionHas(
-            'error',
-            'No tienes acceso a este proyecto.'
-        );
+        $response->assertRedirect(route('dashboard'));
+        $response->assertSessionHas('message', 'data.no_access');
     }
 
     public function test_outsider_cannot_link_species()
@@ -84,7 +81,7 @@ class DataAuthorizationTest extends TestCase
             route('data.export', ['project' => $this->project])
         );
 
-        $response->assertRedirect(route('projects.index'));
+        $response->assertRedirect(route('dashboard'));
     }
 
     public function test_outsider_cannot_run_the_custom_export()
@@ -98,7 +95,7 @@ class DataAuthorizationTest extends TestCase
             ]
         );
 
-        $response->assertRedirect(route('projects.index'));
+        $response->assertRedirect(route('dashboard'));
     }
 
     public function test_outsider_cannot_run_the_ethnobotanyr_export()
@@ -112,7 +109,7 @@ class DataAuthorizationTest extends TestCase
             ]
         );
 
-        $response->assertRedirect(route('projects.index'));
+        $response->assertRedirect(route('dashboard'));
     }
 
     public function test_member_can_open_the_export_page()

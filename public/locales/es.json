@@ -32,7 +32,9 @@
         "menu": "Navegación",
         "collapse_menu": "Contraer menú",
         "expand_menu": "Expandir menú",
-        "close_menu": "Cerrar menú"
+        "close_menu": "Cerrar menú",
+        "settings": "Ajustes",
+        "members": "Miembros"
     },
     "titles": {
         "my_projects": "Mis proyectos"
@@ -48,14 +50,12 @@
         "no_projects": "No eres autor ni has participado en ningún proyecto aún.",
         "create": "Crear proyecto",
         "create_project": "Crear proyecto",
-        "edit_project_details": "Editar detalles del proyecto",
         "project_details": "Detalles del proyecto",
         "name": "Nombre del proyecto",
         "author": "Autoría",
         "institution": "Institución",
         "author_email": "Correo electrónico del autor",
         "country": "País",
-        "access": "Acceso al proyecto",
         "invite_user": "Invitar usuario al proyecto",
         "invite_user_hint": "Envía una invitación por correo para dar acceso a este proyecto.",
         "users_with_access": "Usuarios con acceso al proyecto",
@@ -87,7 +87,13 @@
         "cannot_accept_another_user_invite": "No puedes aceptar esta invitación.",
         "invite_expired": "Esta invitación ha expirado.",
         "invite_not_found": "Esa invitación no pertenece a este proyecto.",
-        "cannot_decline_another_user_invite": "No puedes declinar esta invitación."
+        "cannot_decline_another_user_invite": "No puedes declinar esta invitación.",
+        "settings": {
+            "details": "Detalles del proyecto",
+            "delete_title": "Eliminar el proyecto",
+            "delete_hint": "Se eliminan el proyecto, sus formularios, entrevistas, registros y catálogo, y el acceso de todos sus miembros. No se puede deshacer.",
+            "delete": "Eliminar proyecto"
+        }
     },
     "actions": {
         "accept": "Aceptar",
@@ -546,9 +552,6 @@
         "tab_records": "Registros"
     },
     "data": {
-        "data_processing": "Procesamiento de datos",
-        "unlinked_reports": "Reportes de uso sin vincular a información taxonómica",
-        "linked_reports": "Reportes de uso vinculados a información taxonómica",
         "link_species": "Vincular especie",
         "title": "Vincular especies",
         "generate_ethnobotanyr": "Generar reporte para EthnobotanyR",
@@ -624,7 +627,9 @@
                 "count": "Conteo",
                 "percent": "%"
             },
-            "customize_export": "Personalizar exportación…"
+            "customize_export": "Personalizar exportación…",
+            "no_data_title": "Aún no hay entrevistas con datos",
+            "no_data_hint": "Las respuestas aparecerán aquí cuando se registren entrevistas, en la web o desde la aplicación de campo."
         },
         "export": {
             "title": "Exportar",
@@ -703,6 +708,15 @@
             "photo_alt": "Fotografía de la entrevista",
             "title": "Evidencia",
             "transcript": "Transcripción"
+        },
+        "no_access": "No tienes acceso a los datos de ese proyecto.",
+        "no_linkable_title": "No hay respuestas que vincular",
+        "no_linkable_hint": "Marca una pregunta de un formulario como vinculada a especies; sus respuestas aparecerán aquí para identificarlas con el catálogo.",
+        "tabs": {
+            "table": "Datos",
+            "link": "Vincular especies",
+            "reports": "Índices",
+            "export": "Exportar"
         }
     },
     "public": {
@@ -868,13 +882,6 @@
     "theme": {
         "switch_to_light": "Cambiar a tema claro",
         "switch_to_dark": "Cambiar a tema oscuro"
-    },
-    "hubs": {
-        "empty": {
-            "title_data": "Aún no hay datos para procesar",
-            "hint_data": "Necesitas un proyecto donde puedas administrar datos o generar reportes.",
-            "cta": "Ir a mis proyectos"
-        }
     },
     "software": {
         "title": "Sobre este software",

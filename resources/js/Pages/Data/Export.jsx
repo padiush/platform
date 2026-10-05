@@ -2,9 +2,10 @@ import Card from '@/Components/Card';
 import ExportFieldPicker from '@/Components/ExportFieldPicker';
 import Select from '@/Components/Select';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { faArrowLeft, faDownload } from '@fortawesome/free-solid-svg-icons';
+import DataTabs from '@/Pages/Data/Partials/DataTabs';
+import { faDownload } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Link, usePage } from '@inertiajs/react';
+import { usePage } from '@inertiajs/react';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -46,7 +47,7 @@ function PreviewTable({ preview }) {
     );
 }
 
-export default function DataExport({ project, forms, initial }) {
+export default function DataExport({ project, tabs = {}, forms, initial }) {
     const { t } = useTranslation();
     const { csrf_token } = usePage().props;
 
@@ -154,23 +155,10 @@ export default function DataExport({ project, forms, initial }) {
         (mode === 'custom' ? selected.size > 0 : categoryFieldId !== '');
 
     return (
-        <AuthenticatedLayout
-            title={t('data.export.title')}
-            breadcrumbs={[
-                { label: t('navigation.data'), href: route('data.index') },
-            ]}
-            action={
-                <Link
-                    className="btn btn-ghost btn-circle"
-                    href={route('data.index')}
-                    aria-label={t('navigation.back')}
-                >
-                    <FontAwesomeIcon icon={faArrowLeft} />
-                </Link>
-            }
-        >
+        <AuthenticatedLayout title={t('data.export.title')}>
             <div className="p-4 md:pt-8 lg:pt-12">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
+                    <DataTabs project={project} active="export" tabs={tabs} />
                     <Card title={t('data.export.title')}>
                         <div className="mb-4 flex flex-wrap items-end gap-3">
                             <div className="join">

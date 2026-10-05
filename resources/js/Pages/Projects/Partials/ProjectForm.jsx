@@ -3,11 +3,12 @@ import { useForm, usePage } from '@inertiajs/react';
 import { useTranslation } from 'react-i18next';
 
 /**
- * Project create/edit form body, rendered inside a FormModal. Submits via
- * Inertia (so validation errors render inline and success flashes + refreshes
- * the list); `onClose` closes the modal on cancel and on success.
+ * Project create/edit form body: inside a FormModal on the list of projects,
+ * or on its own on a project's settings. Submits via Inertia (so validation
+ * errors render inline and success flashes + refreshes the page); `onClose`,
+ * when there is a modal to close, closes it on cancel and on success.
  */
-export default function ProjectForm({ project = null, onClose }) {
+export default function ProjectForm({ project = null, onClose = null }) {
     const { t } = useTranslation();
     const { auth } = usePage().props;
     const isEdit = Boolean(project);
@@ -27,7 +28,7 @@ export default function ProjectForm({ project = null, onClose }) {
             isEdit
                 ? route('projects.edit', { project: project.id })
                 : route('projects.create'),
-            { preserveScroll: true, onSuccess: onClose },
+            { preserveScroll: true, onSuccess: () => onClose?.() },
         );
     };
 
@@ -53,13 +54,15 @@ export default function ProjectForm({ project = null, onClose }) {
                 {field('country', t('projects.country'))}
             </div>
             <div className="mt-4 flex justify-end gap-2">
-                <button
-                    type="button"
-                    className="btn btn-ghost"
-                    onClick={onClose}
-                >
-                    {t('actions.cancel')}
-                </button>
+                {onClose && (
+                    <button
+                        type="button"
+                        className="btn btn-ghost"
+                        onClick={onClose}
+                    >
+                        {t('actions.cancel')}
+                    </button>
+                )}
                 <button
                     type="submit"
                     className="btn btn-primary"
