@@ -314,6 +314,19 @@ describe('AuthenticatedLayout', () => {
             ).toBeInTheDocument();
         });
 
+        /** Folded, the account sits in the same column as every other icon. */
+        it('centres the account when folded', () => {
+            window.innerWidth = 1440;
+            window.localStorage.setItem('padiush.sidebar.rail', '1');
+            layout();
+
+            const account = screen.getByRole('link', {
+                name: 'navigation.account',
+            });
+            expect(account).toHaveClass('justify-center');
+            expect(account).not.toHaveClass('justify-start');
+        });
+
         /** On a phone it opens over the page, labels and all. */
         it('does not fold on a phone', () => {
             poseWide(false);
