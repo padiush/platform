@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\FieldRecord;
 use App\Models\Media;
 use App\Models\Project;
+use App\Services\ActiveProject;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -51,7 +52,7 @@ class FieldRecordMediaController extends Controller
         }
 
         if ($fieldRecord->project_id !== $project->id) {
-            return $this->notFound();
+            return $this->notFound($project);
         }
 
         $request->validate([
@@ -117,7 +118,7 @@ class FieldRecordMediaController extends Controller
 
         if ($fieldRecord->project_id !== $project->id
             || $medium->field_record_id !== $fieldRecord->id) {
-            return $this->notFound();
+            return $this->notFound($project);
         }
 
         $disk = Storage::disk($medium->storage_disk);
@@ -142,7 +143,7 @@ class FieldRecordMediaController extends Controller
 
         if ($fieldRecord->project_id !== $project->id
             || $medium->field_record_id !== $fieldRecord->id) {
-            return $this->notFound();
+            return $this->notFound($project);
         }
 
         // The bytes go with the row. Nothing else references them, and leaving
@@ -160,18 +161,22 @@ class FieldRecordMediaController extends Controller
         return Auth::user()->can('editCatalog', $project) ? null : $this->noAccess();
     }
 
+    /**
+     * Turned away for want of the role: to the overview of the project the
+     * user works in, which every member can open.
+     */
     private function noAccess(): RedirectResponse
     {
         return redirect()
-            ->route('catalogs.index')
+            ->to(app(ActiveProject::class)->home(request()))
             ->with('message', 'catalogs.no_access')
             ->with('message_type', 'error');
     }
 
-    private function notFound(): RedirectResponse
+    private function notFound(Project $project): RedirectResponse
     {
         return redirect()
-            ->route('catalogs.index')
+            ->route('catalogs.fieldRecords.index', ['project' => $project->id])
             ->with('message', 'catalogs.fieldRecords.not_found')
             ->with('message_type', 'error');
     }

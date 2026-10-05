@@ -22,7 +22,7 @@ vi.mock('@/Layouts/AuthenticatedLayout', () => ({
 
 globalThis.route = (name) => `/${name}`;
 
-import FieldRecords from './FieldRecords';
+import FieldRecords from './Index';
 
 const project = { id: 1, name: 'A study' };
 

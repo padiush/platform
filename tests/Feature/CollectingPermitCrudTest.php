@@ -124,7 +124,7 @@ class CollectingPermitCrudTest extends TestCase
         $this->actingAs($this->editor())
             ->get($this->url('catalogs.permits.index'))
             ->assertInertia(fn (Assert $page) => $page
-                ->component('Catalog/Permits')
+                ->component('Records/Permits')
                 ->has('permits', 1)
                 ->where('permits.0.field_records_count', 2)
                 // Read from the date on the permit, not a ruling about it.
@@ -145,7 +145,7 @@ class CollectingPermitCrudTest extends TestCase
                 'authority' => 'MARN',
                 'reference' => 'NOPE-1',
             ])
-            ->assertRedirect(route('catalogs.index'));
+            ->assertRedirect(route('projects.overview', $this->project));
 
         $this->assertSame(1, CollectingPermit::count());
     }
@@ -154,7 +154,7 @@ class CollectingPermitCrudTest extends TestCase
     {
         $this->actingAs($this->outsider())
             ->get($this->url('catalogs.permits.index'))
-            ->assertRedirect(route('catalogs.index'));
+            ->assertRedirect(route('dashboard'));
     }
 
     public function test_a_permit_from_another_project_cannot_be_touched()
@@ -163,7 +163,7 @@ class CollectingPermitCrudTest extends TestCase
 
         $this->actingAs($this->editor())
             ->delete($this->url('catalogs.permits.destroy', ['permit' => $foreign->id]))
-            ->assertRedirect(route('catalogs.index'));
+            ->assertRedirect($this->url('catalogs.permits.index'));
 
         $this->assertNotNull($foreign->fresh());
     }

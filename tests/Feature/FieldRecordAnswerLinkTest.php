@@ -126,7 +126,7 @@ class FieldRecordAnswerLinkTest extends TestCase
         $this->recordsPage($this->recorder())
             ->assertOk()
             ->assertInertia(function (Assert $page) {
-                $page->component('Catalog/FieldRecords')->where('canOpenInterviews', true);
+                $page->component('Records/Index')->where('canOpenInterviews', true);
 
                 $this->assertSame([
                     'instance_id' => $this->instance->id,

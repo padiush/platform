@@ -55,7 +55,7 @@ function props(overrides = {}) {
             sections: {
                 overview: '/dashboard',
                 records: '/catalogs.fieldRecords.index/1',
-                catalog: '/catalogs.index?project=1',
+                catalog: '/catalogs.show/1',
             },
         },
         ...overrides,
@@ -132,6 +132,30 @@ describe('AuthenticatedLayout', () => {
         ).toHaveAttribute('aria-current', 'page');
         expect(
             screen.getByRole('link', { name: 'navigation.catalog' }),
+        ).not.toHaveAttribute('aria-current');
+    });
+
+    it('counts the permits as field records, not as the catalog', () => {
+        currentRoute = 'catalogs.permits.index';
+        layout();
+
+        expect(
+            screen.getByRole('link', { name: 'navigation.field_records' }),
+        ).toHaveAttribute('aria-current', 'page');
+        expect(
+            screen.getByRole('link', { name: 'navigation.catalog' }),
+        ).not.toHaveAttribute('aria-current');
+    });
+
+    it('marks the catalog on a species page', () => {
+        currentRoute = 'catalogs.species.show';
+        layout();
+
+        expect(
+            screen.getByRole('link', { name: 'navigation.catalog' }),
+        ).toHaveAttribute('aria-current', 'page');
+        expect(
+            screen.getByRole('link', { name: 'navigation.field_records' }),
         ).not.toHaveAttribute('aria-current');
     });
 

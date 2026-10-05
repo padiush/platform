@@ -2,11 +2,9 @@ import Card from '@/Components/Card';
 import ConfirmModal from '@/Components/ConfirmModal';
 import EmptyState from '@/Components/EmptyState';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import CatalogTabs from '@/Pages/Catalog/Partials/CatalogTabs';
-import PermitModal from '@/Pages/Catalog/Partials/PermitModal';
-import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Link, router } from '@inertiajs/react';
+import PermitModal from '@/Pages/Records/Partials/PermitModal';
+import RecordTabs from '@/Pages/Records/Partials/RecordTabs';
+import { router } from '@inertiajs/react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -34,12 +32,7 @@ function Expiry({ permit }) {
  * The authorisations a project collects under.
  * See docs/decisions/0009-collecting-permits.md.
  */
-export default function Permits({
-    project,
-    permits = [],
-    canEdit = false,
-    speciesCount = null,
-}) {
+export default function Permits({ project, permits = [], canEdit = false }) {
     const { t } = useTranslation();
     const [adding, setAdding] = useState(false);
     const [editing, setEditing] = useState(null);
@@ -56,42 +49,10 @@ export default function Permits({
     }
 
     return (
-        <AuthenticatedLayout
-            title={t('catalogs.permits.title')}
-            breadcrumbs={[
-                {
-                    label: t('navigation.catalogs'),
-                    href: route('catalogs.index'),
-                },
-                {
-                    label: project.name,
-                    href:
-                        speciesCount === null || speciesCount > 0
-                            ? route('catalogs.show', { project: project.id })
-                            : undefined,
-                },
-                { label: t('catalogs.permits.title') },
-            ]}
-            subtitle={project.name}
-            action={
-                <Link
-                    href={route('catalogs.fieldRecords.index', {
-                        project: project.id,
-                    })}
-                    className="btn btn-ghost btn-circle"
-                    aria-label={t('navigation.back')}
-                >
-                    <FontAwesomeIcon icon={faArrowLeft} />
-                </Link>
-            }
-        >
+        <AuthenticatedLayout title={t('catalogs.permits.title')}>
             <div className="p-4 md:pt-8 lg:pt-12">
                 <div className="mx-auto max-w-7xl space-y-4 sm:px-6 lg:px-8">
-                    <CatalogTabs
-                        project={project}
-                        active="permits"
-                        speciesCount={speciesCount}
-                    />
+                    <RecordTabs project={project} active="permits" />
 
                     <Card title={t('catalogs.permits.all_permits')}>
                         <p className="text-base-content/70 mb-4 text-sm">

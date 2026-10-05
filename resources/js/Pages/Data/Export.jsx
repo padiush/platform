@@ -158,9 +158,7 @@ export default function DataExport({ project, forms, initial }) {
             title={t('data.export.title')}
             breadcrumbs={[
                 { label: t('navigation.data'), href: route('data.index') },
-                { label: project.name },
             ]}
-            subtitle={project.name}
             action={
                 <Link
                     className="btn btn-ghost btn-circle"

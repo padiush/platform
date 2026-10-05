@@ -307,6 +307,7 @@
         "family": "Family",
         "genus": "Genre",
         "no_access": "You do not have access to edit the catalog of this project.",
+        "no_view_access": "You don't have access to that project's catalog or field records.",
         "no_projects": "You have not participated in any project, so you do not have access to catalogs.",
         "register_species": "Register species in the catalog",
         "reported_families": "Families reported in interviews",
@@ -317,9 +318,7 @@
         "species_list": "List of species",
         "species_registered": "The species has been recorded in the catalog.",
         "species_deleted": "The species has been removed from the catalog.",
-        "title": "Species catalogs",
         "total_species": "Species registered in the catalog",
-        "view_catalog": "See catalog",
         "taxonomic_info": "Taxonomic Information",
         "loading": "Loading taxonomic data...",
         "not_found": "No matching name found.",
@@ -333,7 +332,6 @@
         "no_match_found": "No matches found",
         "query": "Search performed",
         "references": "Online references",
-        "subtitle": "Ethnobotanical catalog of",
         "taxonomic_cross_reference": "Taxonomic cross-reference",
         "wfo_query_info": "Results are displayed when querying for {{name}} against WFO records.",
         "species_not_found": "The species does not belong to this project.",
@@ -342,6 +340,11 @@
         "all_genera": "All genera",
         "no_matches_title": "No matches",
         "no_matches_hint": "Adjust the search or filters to see more species.",
+        "empty": {
+            "title": "The catalog has no species yet",
+            "hint_edit": "Register the first species to identify field records and interview answers with it.",
+            "hint_read": "Species will appear here once someone allowed to edit the catalog registers them."
+        },
         "link_status": {
             "label": "Interview links",
             "all": "All",
@@ -478,7 +481,6 @@
             },
             "mint": "Issue the project's next number",
             "no_permits_yet": "Record a permit under the Permits tab to choose one here.",
-            "no_species_yet": "This project has no species recorded yet.",
             "none_for_taxon_hint": "Records that do not have a name yet are in the project's list.",
             "none_for_taxon_title": "No record identified as this taxon",
             "none_hint": "Note here what you document in the field, whether or not you collect it. You can identify and deposit it later.",
@@ -547,6 +549,9 @@
             "specimens": "Records covered",
             "title": "Permits"
         }
+    },
+    "records": {
+        "tab_records": "Records"
     },
     "data": {
         "custom_export": "Customized export",
@@ -878,8 +883,6 @@
             "hint_designer": "You need an active project where you can manage forms. Create a project or ask its manager for form access.",
             "title_interviews": "No projects ready for interviews",
             "hint_interviews": "You need an active project where you can record data, with at least one enabled form.",
-            "title_catalogs": "No catalogs available",
-            "hint_catalogs": "You need a project where you can view the species catalog.",
             "title_data": "No data to process yet",
             "hint_data": "You need a project where you can manage data or generate reports.",
             "cta": "Go to my projects"

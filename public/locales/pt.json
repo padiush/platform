@@ -309,6 +309,7 @@
         "genus": "Género",
         "loading": "Carregar informações taxonómicas...",
         "no_access": "Não tem acesso para editar o catálogo deste projeto.",
+        "no_view_access": "Você não tem acesso ao catálogo nem aos registros de campo desse projeto.",
         "no_preferred_usage": "Não existe uma utilização aceite descrita.",
         "no_projects": "Não participou em nenhum projeto, pelo que não tem acesso aos catálogos.",
         "not_found": "Não foi encontrado nenhum nome correspondente.",
@@ -322,13 +323,10 @@
         "species_registered": "A espécie foi registada no catálogo.",
         "species_deleted": "A espécie foi eliminada do catálogo.",
         "taxonomic_info": "Informação taxonómica",
-        "title": "Catálogos de espécies",
         "total_species": "Espécies constantes do catálogo",
-        "view_catalog": "Ver catálogo",
         "view_on_wfo": "Ver em WFO",
         "error_fetching_data": "Houve um erro na obtenção dos dados",
         "external_references": "Referências externas",
-        "subtitle": "Catálogo etnobotânico de",
         "wfo_query_info": "Os resultados são apresentados quando se consulta o {{name}} nos registos WFO.",
         "accepted_as": "O nome atualmente aceite para esta espécie é",
         "match": "Correspondência exacta",
@@ -342,6 +340,11 @@
         "all_genera": "Todos os géneros",
         "no_matches_title": "Sem correspondências",
         "no_matches_hint": "Ajuste a pesquisa ou os filtros para ver mais espécies.",
+        "empty": {
+            "title": "O catálogo ainda não tem espécies",
+            "hint_edit": "Registre a primeira espécie para identificar com ela os registros de campo e as respostas das entrevistas.",
+            "hint_read": "As espécies aparecerão aqui quando alguém com permissão para editar o catálogo as registrar."
+        },
         "link_status": {
             "label": "Ligação a entrevistas",
             "all": "Todas",
@@ -478,7 +481,6 @@
             },
             "mint": "Emitir o próximo número do projeto",
             "no_permits_yet": "Regista uma permissão no separador Permissões para a poderes escolher aqui.",
-            "no_species_yet": "Este projeto ainda não tem espécies registadas.",
             "none_for_taxon_hint": "Os registos que ainda não têm nome estão na lista do projeto.",
             "none_for_taxon_title": "Nenhum registo identificado como este táxon",
             "none_hint": "Anota aqui o que documentas em campo, colhas ou não. Podes identificá-lo e depositá-lo mais tarde.",
@@ -547,6 +549,9 @@
             "specimens": "Registos cobertos",
             "title": "Permissões"
         }
+    },
+    "records": {
+        "tab_records": "Registros"
     },
     "data": {
         "custom_export": "Exportação personalizada",
@@ -878,8 +883,6 @@
             "hint_designer": "Você precisa de um projeto ativo onde possa administrar formulários. Crie um projeto ou peça acesso a quem o administra.",
             "title_interviews": "Nenhum projeto pronto para entrevistas",
             "hint_interviews": "Você precisa de um projeto ativo onde possa registrar dados, com pelo menos um formulário habilitado.",
-            "title_catalogs": "Nenhum catálogo disponível",
-            "hint_catalogs": "Você precisa de um projeto onde possa ver o catálogo de espécies.",
             "title_data": "Ainda não há dados para processar",
             "hint_data": "Você precisa de um projeto onde possa administrar dados ou gerar relatórios.",
             "cta": "Ir para meus projetos"

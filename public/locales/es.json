@@ -301,12 +301,10 @@
         }
     },
     "catalogs": {
-        "title": "Catálogos de especies",
         "total_species": "Especies registradas en el catálogo",
         "reported_species": "Especies reportadas en entrevistas",
         "reported_families": "Familias reportadas en entrevistas",
         "register_species": "Registrar especie en el catálogo",
-        "view_catalog": "Ver catálogo",
         "catalog_for_project": "Catálogo del proyecto",
         "species_info": "Información de la especie",
         "family": "Familia",
@@ -315,6 +313,7 @@
         "authority": "Abreviatura de la autoridad",
         "no_projects": "No has participado en ningún proyecto, por lo que no tienes acceso a catálogos.",
         "no_access": "No tienes acceso a editar el catálogo de este proyecto.",
+        "no_view_access": "No tienes acceso al catálogo ni a los registros de campo de ese proyecto.",
         "species_registered": "Se ha registrado la especie en el catálogo.",
         "species_deleted": "La especie ha sido eliminada del catálogo.",
         "ethnobotanical_catalog": "Catálogo etnobotánico",
@@ -328,7 +327,6 @@
         "taxonomic_info": "Información Taxonómica",
         "view_on_wfo": "Ver este registro en WFO",
         "external_references": "Referencias externas",
-        "subtitle": "Catálogo etnobotánico de",
         "taxonomic_cross_reference": "Referencia taxonómica cruzada",
         "query": "Búsqueda realizada",
         "match": "Coincidencia exacta",
@@ -342,6 +340,11 @@
         "all_genera": "Todos los géneros",
         "no_matches_title": "Sin coincidencias",
         "no_matches_hint": "Ajusta la búsqueda o los filtros para ver más especies.",
+        "empty": {
+            "title": "El catálogo aún no tiene especies",
+            "hint_edit": "Registra la primera especie para identificar con ella los registros de campo y las respuestas de las entrevistas.",
+            "hint_read": "Las especies aparecerán aquí cuando alguien con permiso para editar el catálogo las registre."
+        },
         "link_status": {
             "label": "Vínculo con entrevistas",
             "all": "Todas",
@@ -478,7 +481,6 @@
             },
             "mint": "Emitir el siguiente número del proyecto",
             "no_permits_yet": "Registra un permiso en la pestaña Permisos para poder elegirlo aquí.",
-            "no_species_yet": "Este proyecto aún no tiene especies registradas.",
             "none_for_taxon_hint": "Los registros que aún no tienen nombre están en la lista del proyecto.",
             "none_for_taxon_title": "Ningún registro identificado como este taxón",
             "none_hint": "Anota aquí lo que documentes en campo, lo recolectes o no. Puedes identificarlo y depositarlo más adelante.",
@@ -547,6 +549,9 @@
             "specimens": "Registros cubiertos",
             "title": "Permisos"
         }
+    },
+    "records": {
+        "tab_records": "Registros"
     },
     "data": {
         "data_processing": "Procesamiento de datos",
@@ -878,8 +883,6 @@
             "hint_designer": "Necesitas un proyecto activo donde puedas administrar formularios. Crea un proyecto o pide acceso a quien lo administra.",
             "title_interviews": "No hay proyectos listos para entrevistas",
             "hint_interviews": "Necesitas un proyecto activo donde puedas registrar datos, con al menos un formulario habilitado.",
-            "title_catalogs": "No hay catálogos disponibles",
-            "hint_catalogs": "Necesitas un proyecto donde puedas ver el catálogo de especies.",
             "title_data": "Aún no hay datos para procesar",
             "hint_data": "Necesitas un proyecto donde puedas administrar datos o generar reportes.",
             "cta": "Ir a mis proyectos"

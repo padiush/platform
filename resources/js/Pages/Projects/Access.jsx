@@ -48,9 +48,7 @@ export default function Accesses({
                     label: t('navigation.projects'),
                     href: route('projects.index'),
                 },
-                { label: project.name },
             ]}
-            subtitle={project.name}
             action={
                 <Link
                     href={route('projects.index')}

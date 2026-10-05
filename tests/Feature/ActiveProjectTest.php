@@ -165,7 +165,7 @@ class ActiveProjectTest extends TestCase
                 'forms' => route('designer.index', ['project' => $id]),
                 'interviews' => route('interviews.index', ['project' => $id]),
                 'records' => route('catalogs.fieldRecords.index', ['project' => $id]),
-                'catalog' => route('catalogs.index', ['project' => $id]),
+                'catalog' => route('catalogs.show', ['project' => $id]),
                 'data' => route('data.index', ['project' => $id]),
             ], $this->nav($page)['sections']));
     }
@@ -235,7 +235,7 @@ class ActiveProjectTest extends TestCase
     /** Each section's landing page shows only the project the sidebar is on. */
     public function test_a_landing_page_narrowed_to_one_project_shows_only_it()
     {
-        foreach (['designer.index', 'interviews.index', 'catalogs.index', 'data.index'] as $name) {
+        foreach (['designer.index', 'interviews.index', 'data.index'] as $name) {
             $this->actingAs($this->user)
                 ->get(route($name, ['project' => $this->trees->id]))
                 ->assertOk()
@@ -252,7 +252,7 @@ class ActiveProjectTest extends TestCase
     public function test_a_landing_page_without_a_project_still_shows_them_all()
     {
         $this->actingAs($this->user)
-            ->get(route('catalogs.index'))
+            ->get(route('data.index'))
             ->assertInertia(fn (Assert $page) => $this->assertCount(
                 2,
                 $page->toArray()['props']['projects']

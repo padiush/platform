@@ -9,6 +9,7 @@ use App\Http\Controllers\InterviewDesignerController;
 use App\Http\Controllers\InterviewFormController;
 use App\Http\Controllers\InterviewInstancesController;
 use App\Http\Controllers\InterviewMediaController;
+use App\Http\Controllers\LegacyCatalogRedirectController;
 use App\Http\Controllers\ProjectCatalogController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ProjectOverviewController;
@@ -145,142 +146,107 @@ Route::middleware(['auth'])->group(function () {
             );
         });
 
-    Route::controller(ProjectCatalogController::class)->group(function () {
-        Route::get('/catalogs', 'index')->name('catalogs.index');
-        Route::get('/catalogs/{project}', 'show')->name('catalogs.show');
+    // A project's catalog: the taxa its records and answers are identified
+    // as. Route names predate the move under /projects and are kept.
+    Route::controller(ProjectCatalogController::class)
+        ->prefix('/projects/{project}/catalog')
+        ->whereNumber('project')
+        ->name('catalogs.')
+        ->group(function () {
+            Route::get('/', 'show')->name('show');
 
-        Route::get(
-            '/catalogs/{project}/species/register',
-            'registerSpecies'
-        )->name('catalogs.species.register');
-        Route::post('/catalogs/{project}/species/register', 'storeSpecies');
+            Route::get('/species/register', 'registerSpecies')
+                ->name('species.register');
+            Route::post('/species/register', 'storeSpecies');
 
-        // Prefill registration from a WFO name. Literal paths must precede the
-        // {species} route below, or they'd be captured as a species id.
-        Route::get(
-            '/catalogs/{project}/species/wfo-search',
-            'searchWfoNames'
-        )->name('catalogs.species.wfo-search');
-        Route::post(
-            '/catalogs/{project}/species/wfo-resolve',
-            'resolveWfoName'
-        )->name('catalogs.species.wfo-resolve');
+            // Prefill registration from a WFO name. Literal paths must precede
+            // the {species} route below, or they'd be captured as a species id.
+            Route::get('/species/wfo-search', 'searchWfoNames')
+                ->name('species.wfo-search');
+            Route::post('/species/wfo-resolve', 'resolveWfoName')
+                ->name('species.wfo-resolve');
 
-        // iNaturalist reference photo: attribution (JSON) + a same-origin,
-        // never-stored image proxy. Literal paths, before the {species} route.
-        Route::get(
-            '/catalogs/{project}/species/inaturalist',
-            'inaturalistInfo'
-        )->name('catalogs.species.inaturalist');
-        Route::get(
-            '/catalogs/{project}/species/inaturalist-photo',
-            'inaturalistPhoto'
-        )->name('catalogs.species.inaturalist-photo');
+            // iNaturalist reference photo: attribution (JSON) + a same-origin,
+            // never-stored image proxy. Literal paths, before the {species} route.
+            Route::get('/species/inaturalist', 'inaturalistInfo')
+                ->name('species.inaturalist');
+            Route::get('/species/inaturalist-photo', 'inaturalistPhoto')
+                ->name('species.inaturalist-photo');
 
-        Route::get(
-            '/catalogs/{project}/species/{species}',
-            'showSpecies'
-        )->name('catalogs.species.show');
+            Route::get('/species/{species}', 'showSpecies')
+                ->name('species.show');
 
-        // Fetch (and cache) the species' geographic range from WCVP via GBIF.
-        Route::post(
-            '/catalogs/{project}/species/{species}/distribution',
-            'fetchDistribution'
-        )->name('catalogs.species.distribution');
+            // Fetch (and cache) the species' geographic range from WCVP via GBIF.
+            Route::post('/species/{species}/distribution', 'fetchDistribution')
+                ->name('species.distribution');
 
-        // Preview the taxonomy a WFO name would apply, then adopt it.
-        Route::post(
-            '/catalogs/{project}/species/{species}/wfo-preview',
-            'previewWfoName'
-        )->name('catalogs.species.wfo-preview');
-        Route::patch(
-            '/catalogs/{project}/species/{species}',
-            'updateSpecies'
-        )->name('catalogs.species.update');
+            // Preview the taxonomy a WFO name would apply, then adopt it.
+            Route::post('/species/{species}/wfo-preview', 'previewWfoName')
+                ->name('species.wfo-preview');
+            Route::patch('/species/{species}', 'updateSpecies')
+                ->name('species.update');
 
-        Route::delete(
-            '/catalogs/{project}/species/{species}/delete',
-            'destroySpecies'
-        )->name('catalogs.species.delete');
-    });
+            Route::delete('/species/{species}/delete', 'destroySpecies')
+                ->name('species.delete');
+        });
 
-    // Collecting permits — the authorisations a project collects under.
-    // See docs/decisions/0009-collecting-permits.md.
-    Route::controller(CollectingPermitController::class)->group(function () {
-        Route::get(
-            '/catalogs/{project}/permits',
-            'index'
-        )->name('catalogs.permits.index');
-        Route::post(
-            '/catalogs/{project}/permits',
-            'store'
-        )->name('catalogs.permits.store');
-        Route::patch(
-            '/catalogs/{project}/permits/{permit}',
-            'update'
-        )->name('catalogs.permits.update');
-        Route::delete(
-            '/catalogs/{project}/permits/{permit}',
-            'destroy'
-        )->name('catalogs.permits.destroy');
-    });
+    // The catalog's landing page from before it moved under each project.
+    Route::get('/catalogs', [ProjectCatalogController::class, 'index'])
+        ->name('catalogs.index');
 
     // FieldRecords — the physical collections a project has made. Collected and
     // recorded first, identified later, deposited later still, so determining
     // and depositing are their own routes rather than fields on a create form.
     // See docs/decisions/0008-specimens-and-determinations.md.
-    Route::controller(FieldRecordController::class)->group(function () {
-        Route::get(
-            '/catalogs/{project}/records',
-            'index'
-        )->name('catalogs.fieldRecords.index');
-        Route::get(
-            '/catalogs/{project}/records/export',
-            'export'
-        )->name('catalogs.fieldRecords.export');
-        Route::post(
-            '/catalogs/{project}/records',
-            'store'
-        )->name('catalogs.fieldRecords.store');
-        // Shortcut from a species page, where the identification is already known.
-        Route::post(
-            '/catalogs/{project}/species/{species}/records',
-            'storeForSpecies'
-        )->name('catalogs.fieldRecords.store-for-species');
-        Route::patch(
-            '/catalogs/{project}/records/{fieldRecord}',
-            'update'
-        )->name('catalogs.fieldRecords.update');
-        Route::post(
-            '/catalogs/{project}/records/{fieldRecord}/determine',
-            'determine'
-        )->name('catalogs.fieldRecords.determine');
-        Route::post(
-            '/catalogs/{project}/records/{fieldRecord}/deposit',
-            'deposit'
-        )->name('catalogs.fieldRecords.deposit');
-        Route::delete(
-            '/catalogs/{project}/records/{fieldRecord}',
-            'destroy'
-        )->name('catalogs.fieldRecords.destroy');
-    });
+    Route::controller(FieldRecordController::class)
+        ->prefix('/projects/{project}')
+        ->whereNumber('project')
+        ->name('catalogs.fieldRecords.')
+        ->group(function () {
+            Route::get('/records', 'index')->name('index');
+            Route::get('/records/export', 'export')->name('export');
+            Route::post('/records', 'store')->name('store');
+            // Shortcut from a species page, where the identification is already known.
+            Route::post('/catalog/species/{species}/records', 'storeForSpecies')
+                ->name('store-for-species');
+            Route::patch('/records/{fieldRecord}', 'update')->name('update');
+            Route::post('/records/{fieldRecord}/determine', 'determine')
+                ->name('determine');
+            Route::post('/records/{fieldRecord}/deposit', 'deposit')
+                ->name('deposit');
+            Route::delete('/records/{fieldRecord}', 'destroy')->name('destroy');
+        });
 
     // Photographs and audio on a field record. Posted from the browser rather
     // than handshaked like the companion's device uploads.
-    Route::controller(FieldRecordMediaController::class)->group(function () {
-        Route::post(
-            '/catalogs/{project}/records/{fieldRecord}/media',
-            'store'
-        )->name('catalogs.fieldRecords.media.store');
-        Route::get(
-            '/catalogs/{project}/records/{fieldRecord}/media/{medium}',
-            'show'
-        )->name('catalogs.fieldRecords.media.show');
-        Route::delete(
-            '/catalogs/{project}/records/{fieldRecord}/media/{medium}',
-            'destroy'
-        )->name('catalogs.fieldRecords.media.destroy');
-    });
+    Route::controller(FieldRecordMediaController::class)
+        ->prefix('/projects/{project}/records/{fieldRecord}/media')
+        ->whereNumber('project')
+        ->name('catalogs.fieldRecords.media.')
+        ->group(function () {
+            Route::post('/', 'store')->name('store');
+            Route::get('/{medium}', 'show')->name('show');
+            Route::delete('/{medium}', 'destroy')->name('destroy');
+        });
+
+    // Collecting permits — the authorisations a project collects under, kept
+    // beside its records. See docs/decisions/0009-collecting-permits.md.
+    Route::controller(CollectingPermitController::class)
+        ->prefix('/projects/{project}/permits')
+        ->whereNumber('project')
+        ->name('catalogs.permits.')
+        ->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::post('/', 'store')->name('store');
+            Route::patch('/{permit}', 'update')->name('update');
+            Route::delete('/{permit}', 'destroy')->name('destroy');
+        });
+
+    // Addresses from when records, permits and species lived under
+    // /catalogs/{project}, kept working for bookmarks and shared links.
+    Route::get('/catalogs/{project}/{path?}', LegacyCatalogRedirectController::class)
+        ->whereNumber('project')
+        ->where('path', '.*');
 
     Route::controller(InterviewDataController::class)->group(function () {
         Route::get('/data', 'index')->name('data.index');

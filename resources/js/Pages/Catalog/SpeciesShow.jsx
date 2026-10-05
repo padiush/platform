@@ -630,14 +630,9 @@ export default function SpeciesShow({
                     {species.authority}
                 </>
             }
-            subtitle={`${t('catalogs.subtitle')} ${project.name}`}
             breadcrumbs={[
                 {
-                    label: t('navigation.catalogs'),
-                    href: route('catalogs.index'),
-                },
-                {
-                    label: project.name,
+                    label: t('navigation.catalog'),
                     href: route('catalogs.show', { project: project.id }),
                 },
                 { label: `${species.genus} ${species.name}` },

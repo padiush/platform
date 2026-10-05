@@ -133,7 +133,6 @@ export default function Reports({ project, indices, evidence = null }) {
             title={t('data.reports.title')}
             breadcrumbs={[
                 { label: t('navigation.data'), href: route('data.index') },
-                { label: project.name },
             ]}
             subtitle={t('data.reports.subtitle')}
             action={

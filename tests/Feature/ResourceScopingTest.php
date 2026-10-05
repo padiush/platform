@@ -148,7 +148,7 @@ class ResourceScopingTest extends TestCase
             ])
         );
 
-        $response->assertRedirect(route('catalogs.index'));
+        $response->assertRedirect(route('catalogs.show', $mine));
         $response->assertSessionHas('message', 'catalogs.species_not_found');
     }
 
@@ -169,7 +169,7 @@ class ResourceScopingTest extends TestCase
             ])
         );
 
-        $response->assertRedirect(route('catalogs.index'));
+        $response->assertRedirect(route('catalogs.show', $mine));
         $response->assertSessionHas('message', 'catalogs.species_not_found');
         $this->assertDatabaseHas('catalog_species', [
             'id' => $foreignSpecies->id,
