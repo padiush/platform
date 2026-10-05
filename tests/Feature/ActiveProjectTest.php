@@ -66,14 +66,14 @@ class ActiveProjectTest extends TestCase
         $this->assertEquals($before, $this->user->fresh()->updated_at);
     }
 
-    /** An interview names no project in its address, but belongs to one. */
+    /** An interview is in the project its address names. */
     public function test_an_interview_is_in_its_forms_project()
     {
         $form = InterviewForm::factory()->create(['project_id' => $this->trees->id]);
         $instance = InterviewInstance::factory()->create(['interview_form_id' => $form->id]);
 
         $this->actingAs($this->user)
-            ->get(route('interviews.show', $instance))
+            ->get(route('interviews.show', ['project' => $this->trees, 'instance' => $instance]))
             ->assertOk()
             ->assertInertia(fn (Assert $page) => $this->assertSame(
                 $this->trees->id,
@@ -235,7 +235,7 @@ class ActiveProjectTest extends TestCase
     /** Each section's landing page shows only the project the sidebar is on. */
     public function test_a_landing_page_narrowed_to_one_project_shows_only_it()
     {
-        foreach (['designer.index', 'interviews.index', 'data.index'] as $name) {
+        foreach (['data.index'] as $name) {
             $this->actingAs($this->user)
                 ->get(route($name, ['project' => $this->trees->id]))
                 ->assertOk()

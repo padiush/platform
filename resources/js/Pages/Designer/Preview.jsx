@@ -50,8 +50,8 @@ export default function Preview({ project, form }) {
             title={t('designer.preview_title')}
             breadcrumbs={[
                 {
-                    label: t('navigation.design'),
-                    href: route('designer.index'),
+                    label: t('navigation.forms'),
+                    href: route('designer.index', { project: project.id }),
                 },
                 {
                     label: form.name,

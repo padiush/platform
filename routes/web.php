@@ -10,6 +10,7 @@ use App\Http\Controllers\InterviewFormController;
 use App\Http\Controllers\InterviewInstancesController;
 use App\Http\Controllers\InterviewMediaController;
 use App\Http\Controllers\LegacyCatalogRedirectController;
+use App\Http\Controllers\LegacyInterviewRedirectController;
 use App\Http\Controllers\ProjectCatalogController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ProjectOverviewController;
@@ -83,68 +84,61 @@ Route::middleware(['auth'])->group(function () {
             );
         });
 
-    Route::prefix('designer')
+    // A project's interview forms: designing them, and the form's details.
+    // Route names predate the move under /projects and are kept.
+    Route::prefix('/projects/{project}/forms')
+        ->whereNumber('project')
         ->name('designer.')
         ->group(function () {
-            Route::controller(InterviewFormController::class)->group(
-                function () {
-                    Route::get('/', 'index')->name('index');
-                    Route::get('/{project}/create', 'create')->name('create');
-                    Route::post('/{project}/create', 'store');
-                    Route::get('/{project}/form/{form}', 'edit')->name(
-                        'form.edit'
-                    );
-                    Route::put('/{project}/form/{form}', 'update')->name(
-                        'form.update'
-                    );
-                    Route::delete(
-                        '/{project}/form/{form}/delete',
-                        'destroy'
-                    )->name('form.delete');
-                    Route::put('/{project}/form/{form}/toggle', 'toggle')->name(
-                        'form.toggle'
-                    );
-                }
-            );
+            Route::controller(InterviewFormController::class)->group(function () {
+                Route::get('/', 'index')->name('index');
+                Route::get('/create', 'create')->name('create');
+                Route::post('/create', 'store');
+                Route::get('/{form}/edit', 'edit')->name('form.edit');
+                Route::put('/{form}', 'update')->name('form.update');
+                Route::delete('/{form}', 'destroy')->name('form.delete');
+                Route::put('/{form}/toggle', 'toggle')->name('form.toggle');
+            });
 
-            Route::controller(InterviewDesignerController::class)->group(
-                function () {
-                    Route::get(
-                        '/{project}/form/{form}/wizard',
-                        'designer'
-                    )->name('form.wizard');
-                    Route::get(
-                        '/{project}/form/{form}/preview',
-                        'preview'
-                    )->name('form.preview');
-                    Route::put(
-                        '/{project}/form/{form}/structure',
-                        'updateStructure'
-                    )->name('form.structure.update');
-                }
-            );
+            Route::controller(InterviewDesignerController::class)->group(function () {
+                Route::get('/{form}/design', 'designer')->name('form.wizard');
+                Route::get('/{form}/preview', 'preview')->name('form.preview');
+                Route::put('/{form}/structure', 'updateStructure')
+                    ->name('form.structure.update');
+            });
         });
 
+    // A project's interviews: starting one from an active form, the ones
+    // each form has taken, and answering one.
     Route::controller(InterviewInstancesController::class)
-        ->prefix('interviews')
+        ->prefix('/projects/{project}/interviews')
+        ->whereNumber('project')
         ->name('interviews.')
         ->group(function () {
             Route::get('/', 'index')->name('index');
-            Route::get('/{form}/create', 'create')->name('create');
-            Route::get('/{form}/instances', 'list')->name('instances');
-            Route::get('/instance/{instance}', 'show')->name('show');
-            Route::post('/instance/{instance}/save', 'saveAnswer')->name(
-                'save_answer'
-            );
-            Route::delete(
-                '/instance/{instance}/sections/{section}',
-                'destroyRepeatableSet'
-            )->name('section.remove');
-
-            Route::delete('/instance/{instance}/delete', 'destroy')->name(
-                'destroy'
-            );
+            Route::get('/forms/{form}', 'list')->name('instances');
+            Route::get('/forms/{form}/new', 'create')->name('create');
+            Route::get('/{instance}', 'show')->whereUuid('instance')->name('show');
+            Route::post('/{instance}/answers', 'saveAnswer')->name('save_answer');
+            Route::delete('/{instance}/sections/{section}', 'destroyRepeatableSet')
+                ->name('section.remove');
+            Route::delete('/{instance}', 'destroy')->name('destroy');
         });
+
+    // Addresses from before forms and interviews moved under their project,
+    // kept working for bookmarks and shared links.
+    Route::controller(LegacyInterviewRedirectController::class)->group(function () {
+        Route::get('/designer', 'forms');
+        Route::get('/designer/{project}/{path}', 'form')
+            ->whereNumber('project')
+            ->where('path', '.*');
+        Route::get('/interviews', 'interviews');
+        Route::get('/interviews/{form}/{page}', 'formInterviews')
+            ->whereNumber('form')
+            ->whereIn('page', ['create', 'instances']);
+        Route::get('/interviews/instance/{instance}', 'interview')
+            ->whereUuid('instance');
+    });
 
     // A project's catalog: the taxa its records and answers are identified
     // as. Route names predate the move under /projects and are kept.

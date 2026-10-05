@@ -84,7 +84,10 @@ function InterviewOrigin({ interview, canOpen }) {
         <div className="text-base-content/70 mt-1 max-w-56 text-xs whitespace-normal">
             {canOpen ? (
                 <Link
-                    href={route('interviews.show', interview.instance_id)}
+                    href={route('interviews.show', {
+                        project: interview.project_id,
+                        instance: interview.instance_id,
+                    })}
                     className="link"
                 >
                     {label}

@@ -5,7 +5,10 @@ vi.mock('@inertiajs/react', () => ({
     Link: ({ children, ...props }) => <a {...props}>{children}</a>,
 }));
 
-globalThis.route = (name, params) => `/${name}/${params}`;
+globalThis.route = (name, params) =>
+    typeof params === 'object'
+        ? `/${name}/${Object.values(params).join('/')}`
+        : `/${name}/${params}`;
 
 import FieldRecordTable from './FieldRecordTable';
 
@@ -148,6 +151,7 @@ describe('FieldRecordTable', () => {
             ...indet,
             id: 3,
             interview: {
+                project_id: 3,
                 instance_id: 'a9731e28',
                 question: 'Nombre local de la planta',
             },
@@ -174,7 +178,7 @@ describe('FieldRecordTable', () => {
 
             expect(
                 screen.getByText('catalogs.fieldRecords.from_interview'),
-            ).toHaveAttribute('href', '/interviews.show/a9731e28');
+            ).toHaveAttribute('href', '/interviews.show/3/a9731e28');
         });
 
         /** Someone who reads the catalog but not the interviews. */

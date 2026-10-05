@@ -22,7 +22,7 @@ class DesignerFormTest extends TestCase
         );
 
         $response->assertRedirect(
-            route('designer.index', ['create' => $project->id])
+            route('designer.index', ['project' => $project, 'create' => 1])
         );
     }
 
@@ -37,7 +37,7 @@ class DesignerFormTest extends TestCase
         );
 
         $response->assertRedirect(
-            route('designer.index', ['edit' => $form->id])
+            route('designer.index', ['project' => $project, 'edit' => $form->id])
         );
     }
 
@@ -51,7 +51,7 @@ class DesignerFormTest extends TestCase
             ['name' => 'Field guide', 'description' => 'Notes']
         );
 
-        $response->assertRedirect(route('designer.index'));
+        $response->assertRedirect(route('designer.index', $project));
         $response->assertSessionHas('message', 'designer.form_create_success');
         $this->assertDatabaseHas('interview_forms', [
             'project_id' => $project->id,

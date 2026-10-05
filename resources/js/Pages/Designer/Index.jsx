@@ -1,4 +1,3 @@
-import Alert from '@/Components/Alert';
 import Card from '@/Components/Card';
 import DeletionModal from '@/Components/DeletionModal';
 import EmptyState from '@/Components/EmptyState';
@@ -7,12 +6,10 @@ import IconButton from '@/Components/IconButton';
 import useQueryModal from '@/Hooks/useQueryModal';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import {
-    faCheck,
     faPenToSquare,
     faPlus,
     faPowerOff,
     faTrashCan,
-    faXmark,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link } from '@inertiajs/react';
@@ -20,7 +17,11 @@ import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import FormDetailsForm from './Partials/FormDetailsForm';
 
-export default function DesignerIndex({ projects }) {
+/**
+ * A project's interview forms: design each one, edit its details, switch it
+ * on for interviews or off, and add new ones.
+ */
+export default function DesignerIndex({ project, forms = [] }) {
     const { t } = useTranslation();
     const deletionModalRef = useRef();
     const [deletionModalOptions, setDeletionModalOptions] = useState({
@@ -31,23 +32,16 @@ export default function DesignerIndex({ projects }) {
     const [createParam, setCreate] = useQueryModal('create');
     const [editParam, setEdit] = useQueryModal('edit');
 
-    const creatingProject = createParam
-        ? projects.find((p) => p.id === Number(createParam))
-        : null;
-
+    const creating = createParam !== null;
     const editingForm = editParam
-        ? projects
-              .flatMap((p) =>
-                  p.interview_forms.map((f) => ({ ...f, project: p })),
-              )
-              .find((f) => f.id === Number(editParam))
+        ? forms.find((f) => f.id === Number(editParam))
         : null;
 
-    const handleDelete = (projectId, form) => {
+    const handleDelete = (form) => {
         setDeletionModalOptions({
             name: form.name,
             url: route('designer.form.delete', {
-                project: projectId,
+                project: project.id,
                 form: form.id,
             }),
         });
@@ -59,208 +53,152 @@ export default function DesignerIndex({ projects }) {
         <AuthenticatedLayout title={t('designer.title')}>
             <div className="p-4 md:pt-8 lg:pt-12">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                    {projects.length === 0 && (
-                        <EmptyState
-                            title={t('hubs.empty.title_designer')}
-                            hint={t('hubs.empty.hint_designer')}
-                            ctaHref={route('projects.index')}
-                            ctaLabel={t('hubs.empty.cta')}
-                        />
-                    )}
-                    {projects.length > 0 && (
-                        <div className="grid w-full grid-cols-1 gap-4">
-                            {projects.map((project) => (
-                                <Card key={project.id} title={project.name}>
-                                    {project.interview_forms.length > 0 ? (
-                                        <table className="table-compact table w-full table-fixed">
-                                            <thead>
-                                                <tr>
-                                                    <th className="hidden lg:table-cell">
-                                                        {t(
-                                                            'designer.index.form_name',
+                    <Card
+                        actions={
+                            <button
+                                type="button"
+                                onClick={() => setCreate(1)}
+                                className="btn btn-primary btn-sm"
+                            >
+                                <FontAwesomeIcon icon={faPlus} />
+                                {t('designer.index.create')}
+                            </button>
+                        }
+                    >
+                        {forms.length > 0 ? (
+                            <ul className="divide-base-300 divide-y">
+                                {forms.map((form) => (
+                                    // Side by side where there is room; on a
+                                    // phone the actions go under the form.
+                                    <li
+                                        key={form.id}
+                                        className="flex flex-col gap-3 py-3 lg:flex-row lg:items-center lg:justify-between"
+                                    >
+                                        <div className="min-w-0">
+                                            <div className="flex flex-wrap items-center gap-2">
+                                                <span className="font-medium break-words">
+                                                    {form.name}
+                                                </span>
+                                                <span
+                                                    className={`badge badge-sm ${
+                                                        form.is_active
+                                                            ? 'badge-success badge-soft'
+                                                            : 'badge-ghost'
+                                                    }`}
+                                                >
+                                                    {form.is_active
+                                                        ? t(
+                                                              'designer.index.status_on',
+                                                          )
+                                                        : t(
+                                                              'designer.index.status_off',
+                                                          )}
+                                                </span>
+                                            </div>
+                                            {form.description && (
+                                                <div className="text-base-content/70 mt-0.5 text-sm break-words">
+                                                    {form.description}
+                                                </div>
+                                            )}
+                                            <div className="text-base-content/60 mt-0.5 text-xs">
+                                                {form.instances_count > 0 ? (
+                                                    <Link
+                                                        className="link link-hover"
+                                                        href={route(
+                                                            'interviews.instances',
+                                                            {
+                                                                project:
+                                                                    project.id,
+                                                                form: form.id,
+                                                            },
                                                         )}
-                                                    </th>
-                                                    <th
-                                                        className="text-center"
-                                                        style={{
-                                                            width: '125px',
-                                                        }}
                                                     >
                                                         {t(
-                                                            'designer.index.enabled',
+                                                            'designer.interviews_recorded',
+                                                            {
+                                                                count: form.instances_count,
+                                                            },
                                                         )}
-                                                    </th>
-                                                    <th className="table-cell lg:hidden">
-                                                        {t(
-                                                            'designer.index.form_name',
-                                                        )}
-                                                    </th>
-                                                    <th className="hidden text-center lg:table-cell">
-                                                        {t(
-                                                            'designer.index.interviews',
-                                                        )}
-                                                    </th>
-                                                    <th className="text-center">
-                                                        {t(
-                                                            'designer.index.actions',
-                                                        )}
-                                                    </th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {project.interview_forms.map(
-                                                    (form) => (
-                                                        <tr key={form.id}>
-                                                            <td className="text-wrap">
-                                                                {form.name}
-                                                                {form.description && (
-                                                                    <div className="text-xs">
-                                                                        {
-                                                                            form.description
-                                                                        }
-                                                                    </div>
-                                                                )}
-                                                            </td>
-                                                            <td className="text-center">
-                                                                <FontAwesomeIcon
-                                                                    icon={
-                                                                        form.is_active
-                                                                            ? faCheck
-                                                                            : faXmark
-                                                                    }
-                                                                />
-                                                            </td>
-                                                            <td className="hidden text-center lg:table-cell">
-                                                                {form.instances
-                                                                    .length >
-                                                                0 ? (
-                                                                    <Link
-                                                                        className="link link-hover"
-                                                                        href={route(
-                                                                            'interviews.instances',
-                                                                            {
-                                                                                form: form.id,
-                                                                            },
-                                                                        )}
-                                                                    >
-                                                                        {
-                                                                            form
-                                                                                .instances
-                                                                                .length
-                                                                        }
-                                                                    </Link>
-                                                                ) : (
-                                                                    form
-                                                                        .instances
-                                                                        .length
-                                                                )}
-                                                            </td>
-                                                            <td>
-                                                                <div className="flex flex-wrap items-center justify-end gap-1">
-                                                                    <Link
-                                                                        className="btn btn-primary btn-sm"
-                                                                        href={route(
-                                                                            'designer.form.wizard',
-                                                                            {
-                                                                                project:
-                                                                                    project.id,
-                                                                                form: form.id,
-                                                                            },
-                                                                        )}
-                                                                    >
-                                                                        {t(
-                                                                            'designer.index.wizard',
-                                                                        )}
-                                                                    </Link>
-                                                                    <button
-                                                                        type="button"
-                                                                        className="btn btn-ghost btn-sm"
-                                                                        onClick={() =>
-                                                                            setEdit(
-                                                                                form.id,
-                                                                            )
-                                                                        }
-                                                                    >
-                                                                        <FontAwesomeIcon
-                                                                            icon={
-                                                                                faPenToSquare
-                                                                            }
-                                                                        />
-                                                                        {t(
-                                                                            'designer.index.edit_details',
-                                                                        )}
-                                                                    </button>
-                                                                    <Link
-                                                                        className="btn btn-ghost btn-sm"
-                                                                        href={route(
-                                                                            'designer.form.toggle',
-                                                                            {
-                                                                                project:
-                                                                                    project.id,
-                                                                                form: form.id,
-                                                                            },
-                                                                        )}
-                                                                        method="put"
-                                                                    >
-                                                                        <FontAwesomeIcon
-                                                                            icon={
-                                                                                faPowerOff
-                                                                            }
-                                                                        />
-                                                                        {form.is_active
-                                                                            ? t(
-                                                                                  'designer.index.disable',
-                                                                              )
-                                                                            : t(
-                                                                                  'designer.index.enable',
-                                                                              )}
-                                                                    </Link>
-                                                                    <IconButton
-                                                                        icon={
-                                                                            faTrashCan
-                                                                        }
-                                                                        label={t(
-                                                                            'designer.index.delete',
-                                                                        )}
-                                                                        className="text-error"
-                                                                        onClick={() =>
-                                                                            handleDelete(
-                                                                                project.id,
-                                                                                form,
-                                                                            )
-                                                                        }
-                                                                    />
-                                                                </div>
-                                                            </td>
-                                                        </tr>
-                                                    ),
+                                                    </Link>
+                                                ) : (
+                                                    t(
+                                                        'designer.interviews_recorded',
+                                                        {
+                                                            count: form.instances_count,
+                                                        },
+                                                    )
                                                 )}
-                                            </tbody>
-                                        </table>
-                                    ) : (
-                                        <Alert
-                                            type="info"
-                                            message={t(
-                                                'designer.index.no_forms_yet',
-                                            )}
-                                        />
-                                    )}
-                                    <div className="mt-2 flex justify-end">
-                                        <button
-                                            type="button"
-                                            onClick={() =>
-                                                setCreate(project.id)
-                                            }
-                                            className="btn btn-outline btn-primary btn-sm"
-                                        >
-                                            <FontAwesomeIcon icon={faPlus} />
-                                            {t('designer.index.create')}
-                                        </button>
-                                    </div>
-                                </Card>
-                            ))}
-                        </div>
-                    )}
+                                            </div>
+                                        </div>
+                                        <div className="flex shrink-0 flex-wrap items-center gap-1">
+                                            <Link
+                                                className="btn btn-primary btn-sm"
+                                                href={route(
+                                                    'designer.form.wizard',
+                                                    {
+                                                        project: project.id,
+                                                        form: form.id,
+                                                    },
+                                                )}
+                                            >
+                                                {t('designer.index.wizard')}
+                                            </Link>
+                                            <button
+                                                type="button"
+                                                className="btn btn-ghost btn-sm"
+                                                onClick={() => setEdit(form.id)}
+                                            >
+                                                <FontAwesomeIcon
+                                                    icon={faPenToSquare}
+                                                />
+                                                {t(
+                                                    'designer.index.edit_details',
+                                                )}
+                                            </button>
+                                            <Link
+                                                className="btn btn-ghost btn-sm"
+                                                href={route(
+                                                    'designer.form.toggle',
+                                                    {
+                                                        project: project.id,
+                                                        form: form.id,
+                                                    },
+                                                )}
+                                                method="put"
+                                                as="button"
+                                            >
+                                                <FontAwesomeIcon
+                                                    icon={faPowerOff}
+                                                />
+                                                {form.is_active
+                                                    ? t(
+                                                          'designer.index.disable',
+                                                      )
+                                                    : t(
+                                                          'designer.index.enable',
+                                                      )}
+                                            </Link>
+                                            <IconButton
+                                                icon={faTrashCan}
+                                                label={t(
+                                                    'designer.index.delete',
+                                                )}
+                                                className="text-error"
+                                                onClick={() =>
+                                                    handleDelete(form)
+                                                }
+                                            />
+                                        </div>
+                                    </li>
+                                ))}
+                            </ul>
+                        ) : (
+                            <EmptyState
+                                title={t('designer.index.no_forms_yet')}
+                                hint={t('designer.index.no_forms_hint')}
+                            />
+                        )}
+                    </Card>
                 </div>
             </div>
 
@@ -271,18 +209,14 @@ export default function DesignerIndex({ projects }) {
             />
 
             <FormModal
-                open={!!creatingProject}
+                open={creating}
                 onClose={() => setCreate(null)}
-                title={
-                    creatingProject
-                        ? `${t('designer.create_form.title')} — ${creatingProject.name}`
-                        : t('designer.create_form.title')
-                }
+                title={t('designer.create_form.title')}
             >
-                {creatingProject && (
+                {creating && (
                     <FormDetailsForm
-                        key={`create-${createParam}`}
-                        project={creatingProject}
+                        key="create"
+                        project={project}
                         onClose={() => setCreate(null)}
                     />
                 )}
@@ -300,7 +234,7 @@ export default function DesignerIndex({ projects }) {
                 {editingForm && (
                     <FormDetailsForm
                         key={`edit-${editParam}`}
-                        project={editingForm.project}
+                        project={project}
                         form={editingForm}
                         onClose={() => setEdit(null)}
                     />

@@ -63,27 +63,27 @@ export default function Instance({
             title={title}
             breadcrumbs={[
                 {
-                    label: t('navigation.interview'),
-                    href: route('interviews.index'),
+                    label: t('navigation.interviews'),
+                    href: route('interviews.index', { project: project.id }),
                 },
                 {
                     label: form.name,
-                    href: route('interviews.instances', { form: form.id }),
+                    href: route('interviews.instances', {
+                        project: project.id,
+                        form: form.id,
+                    }),
                 },
                 { label: t('interviews.instance_label') },
             ]}
-            subtitle={[
-                t('interviews.form_on_project', {
-                    form: form.name,
-                    project: project.name,
-                }),
-                instance.user?.name,
-            ]
+            subtitle={[form.name, instance.user?.name]
                 .filter(Boolean)
                 .join(' · ')}
             action={
                 <Link
-                    href={route('interviews.instances', { form: form.id })}
+                    href={route('interviews.instances', {
+                        project: project.id,
+                        form: form.id,
+                    })}
                     className="btn btn-ghost"
                     aria-label={t('navigation.back')}
                 >
@@ -105,6 +105,7 @@ export default function Instance({
                             <SectionRender
                                 key={index}
                                 section={section}
+                                projectId={project.id}
                                 instance={instance}
                                 answers={answers}
                                 answeredKeys={answeredKeys}

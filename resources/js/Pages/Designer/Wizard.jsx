@@ -149,14 +149,14 @@ export default function Wizard({ project, form, structure, instancesCount }) {
             subtitle={form.name}
             breadcrumbs={[
                 {
-                    label: t('navigation.design'),
-                    href: route('designer.index'),
+                    label: t('navigation.forms'),
+                    href: route('designer.index', { project: project.id }),
                 },
                 { label: form.name },
             ]}
             action={
                 <Link
-                    href={route('designer.index')}
+                    href={route('designer.index', { project: project.id })}
                     className="btn btn-ghost"
                     aria-label={t('navigation.back')}
                 >

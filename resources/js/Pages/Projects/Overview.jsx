@@ -247,7 +247,11 @@ export default function Overview({
                                                 <Link
                                                     href={route(
                                                         'interviews.show',
-                                                        interview.id,
+                                                        {
+                                                            project: project.id,
+                                                            instance:
+                                                                interview.id,
+                                                        },
                                                     )}
                                                     className="hover:bg-base-200/60 rounded-field block px-2 py-2 transition"
                                                 >
