@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Services\ActiveProject;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 use Spatie\Honeypot\Honeypot;
@@ -62,6 +63,11 @@ class HandleInertiaRequests extends Middleware
                     ),
                 ],
             ],
+            // The sidebar: the user's projects, the one it is open on, and the
+            // sections that project offers them.
+            'projectNav' => fn () => $user
+                ? app(ActiveProject::class)->navigation($request)
+                : null,
             'honeypot' => new Honeypot(config('honeypot')),
             'ziggy' => fn () => [
                 ...(new Ziggy)->toArray(),

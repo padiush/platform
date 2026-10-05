@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ActiveProjectController;
 use App\Http\Controllers\CollectingPermitController;
 use App\Http\Controllers\FieldRecordController;
 use App\Http\Controllers\FieldRecordMediaController;
@@ -21,6 +22,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', function () {
         return Inertia::render('Dashboard');
     })->name('dashboard');
+
+    // The sidebar's project switcher.
+    Route::post('/projects/{project}/activate', [ActiveProjectController::class, 'store'])
+        ->name('projects.activate');
 
     Route::middleware('system_admin')
         ->prefix('system')

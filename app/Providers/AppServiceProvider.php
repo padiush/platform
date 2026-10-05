@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Services\ActiveProject;
 use App\Services\Media\FilesystemStoredObjectInspector;
 use App\Services\Media\S3UploadUrlFactory;
 use App\Services\Media\StoredObjectInspector;
@@ -25,6 +26,10 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(UploadUrlFactory::class, S3UploadUrlFactory::class);
         $this->app->bind(StoredObjectInspector::class, FilesystemStoredObjectInspector::class);
         $this->app->bind(Transcriber::class, NullTranscriber::class);
+
+        // One per request: the middleware that remembers the project and the
+        // shared props that draw the sidebar read the same accesses.
+        $this->app->scoped(ActiveProject::class);
     }
 
     /**
