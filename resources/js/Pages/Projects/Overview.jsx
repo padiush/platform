@@ -168,6 +168,7 @@ export default function Overview({
 
     return (
         <AuthenticatedLayout
+            tour="overview"
             title={project.name}
             headTitle={`${t('navigation.overview')} · ${project.name}`}
             subtitle={t('navigation.overview')}
@@ -180,7 +181,10 @@ export default function Overview({
                         </div>
                     )}
 
-                    <div className="stats bg-base-100 border-base-300 grid w-full grid-flow-row grid-cols-2 overflow-hidden border shadow-sm lg:grid-cols-4">
+                    <div
+                        data-tour="overview-stats"
+                        className="stats bg-base-100 border-base-300 grid w-full grid-flow-row grid-cols-2 overflow-hidden border shadow-sm lg:grid-cols-4"
+                    >
                         <Stat
                             label={t('overview.interviews')}
                             value={counts.interviews}
@@ -204,7 +208,10 @@ export default function Overview({
                     </div>
 
                     {shortcuts.length > 0 && (
-                        <div className="flex flex-wrap gap-2">
+                        <div
+                            className="flex flex-wrap gap-2"
+                            data-tour="overview-actions"
+                        >
                             {shortcuts.map((shortcut) => (
                                 <Link
                                     key={shortcut.key}
@@ -220,6 +227,7 @@ export default function Overview({
 
                     <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
                         <Card
+                            tour="overview-pending"
                             title={t('overview.waiting')}
                             className="lg:col-span-1"
                         >
@@ -239,7 +247,10 @@ export default function Overview({
                         </Card>
 
                         {recentInterviews && (
-                            <Card title={t('overview.recent_interviews')}>
+                            <Card
+                                tour="overview-recent"
+                                title={t('overview.recent_interviews')}
+                            >
                                 {recentInterviews.length > 0 ? (
                                     <ul className="-mx-2 flex flex-col">
                                         {recentInterviews.map((interview) => (

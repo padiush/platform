@@ -19,6 +19,7 @@ use App\Http\Controllers\ProjectOverviewController;
 use App\Http\Controllers\PublicPageController;
 use App\Http\Controllers\SoftwareNoticeController;
 use App\Http\Controllers\SystemController;
+use App\Http\Controllers\TourController;
 use App\Http\Controllers\WfoController;
 use App\Http\Controllers\WhatsNewController;
 use Illuminate\Support\Facades\Route;
@@ -39,6 +40,12 @@ Route::middleware(['auth'])->group(function () {
     // What's new: the notes of every release, and the one the user has seen.
     Route::get('/whats-new', [WhatsNewController::class, 'index'])->name('whats-new');
     Route::post('/whats-new/seen', [WhatsNewController::class, 'seen'])->name('whats-new.seen');
+
+    // Guided tours: which ones the user has been through, and starting over.
+    Route::post('/tours/{tour}/done', [TourController::class, 'complete'])
+        ->where('tour', '[a-z_]+')
+        ->name('tours.done');
+    Route::delete('/tours', [TourController::class, 'reset'])->name('tours.reset');
 
     // Mi cuenta: where the user is signed in, and signing it out.
     Route::controller(AccountController::class)

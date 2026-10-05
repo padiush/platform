@@ -10,6 +10,7 @@ import {
     faDesktop,
     faMobileScreen,
     faRightFromBracket,
+    faRotateLeft,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { router, useForm } from '@inertiajs/react';
@@ -280,6 +281,27 @@ export default function Show({ account, sessions = null, devices = [] }) {
                             </ul>
                         )}
                     </Card>
+
+                    <Card
+                        className="w-full"
+                        title={t('account.tours.title')}
+                        description={t('account.tours.description')}
+                        actions={
+                            <button
+                                type="button"
+                                className="btn btn-outline btn-sm"
+                                data-testid="reset-tours"
+                                onClick={() =>
+                                    router.delete(route('tours.reset'), {
+                                        preserveScroll: true,
+                                    })
+                                }
+                            >
+                                <FontAwesomeIcon icon={faRotateLeft} />
+                                {t('account.tours.reset')}
+                            </button>
+                        }
+                    />
                 </div>
             </div>
 

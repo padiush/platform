@@ -37,14 +37,14 @@ export default function Accesses({
     };
 
     return (
-        <AuthenticatedLayout title={t('navigation.members')}>
+        <AuthenticatedLayout tour="members" title={t('navigation.members')}>
             <div className="p-4 md:pt-8 lg:pt-12">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
                     <div className="grid w-full grid-cols-1 gap-4 lg:grid-cols-3">
                         {/* Invitation section */}
                         <div className="grid grid-cols-1 gap-4">
                             {invites.length > 0 && (
-                                <div>
+                                <div data-tour="members-pending">
                                     <a
                                         href={route(
                                             'projects.accesses.invites',
@@ -62,7 +62,10 @@ export default function Accesses({
                                 </div>
                             )}
 
-                            <Card title={t('projects.invite_user')}>
+                            <Card
+                                tour="members-invite"
+                                title={t('projects.invite_user')}
+                            >
                                 <p className="text-sm opacity-80">
                                     {t('projects.invite_user_hint')}
                                 </p>
@@ -81,6 +84,7 @@ export default function Accesses({
 
                         {/* User list section */}
                         <Card
+                            tour="members-list"
                             className="lg:col-span-2"
                             title={t('projects.users_with_access')}
                         >

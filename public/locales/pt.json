@@ -70,6 +70,12 @@
             "confirm_message": "{{name}} terá de iniciar sessão novamente no aplicativo de campo para enviar e receber dados.",
             "revoked": "O acesso desse dispositivo foi revogado.",
             "not_found": "Esse dispositivo já não tem acesso."
+        },
+        "tours": {
+            "title": "Tours guiados",
+            "description": "As explicações passo a passo de cada página. Cada uma aparece uma vez; veja todas de novo daqui.",
+            "reset": "Ver os tours de novo",
+            "reset_done": "Pronto: cada tour vai aparecer de novo da próxima vez que você abrir a página dele."
         }
     },
     "titles": {
@@ -174,7 +180,7 @@
             "no_forms_hint": "Crie um formulário e desenhe as suas secções e perguntas. Ative-o para começar a entrevistar com ele.",
             "create": "Criar formulário",
             "edit_details": "Editar detalhes do formulário",
-            "wizard": "Designer aberto"
+            "wizard": "Abrir designer"
         },
         "add_section_instance": "Adicionar",
         "create_form": {
@@ -969,5 +975,202 @@
         "footer_link": "Novidades",
         "footer_version": "Padiush {{version}}",
         "empty": "Ainda não há notas de versão."
+    },
+    "tours": {
+        "help": "Tour desta página",
+        "next": "Próximo",
+        "back": "Voltar",
+        "done": "Pronto",
+        "skip": "Pular",
+        "progress": "{{current}} de {{total}}",
+        "welcome": {
+            "intro": {
+                "title": "Boas-vindas ao Padiush",
+                "body": "Um tour rápido pelo essencial. Pule quando quiser e veja de novo com o botão ? de cada página."
+            },
+            "switcher": {
+                "title": "Seu projeto",
+                "body": "Tudo o que você vê pertence ao projeto escolhido aqui. Troque de projeto por este menu."
+            },
+            "sections": {
+                "title": "As seções do projeto",
+                "body": "Resumo, formulários, entrevistas, registros de campo, catálogo e dados. Você só vê as que o seu papel no projeto permite."
+            },
+            "admin": {
+                "title": "Administrar o projeto",
+                "body": "Em Configurações ficam os dados do projeto, e em Membros você convida a sua equipe e decide o que cada pessoa pode fazer."
+            },
+            "start": {
+                "title": "Comece por um projeto",
+                "body": "Tudo no Padiush parte de um projeto. Crie-o aqui; depois você poderá criar formulários e convidar a sua equipe."
+            },
+            "account": {
+                "title": "Minha conta",
+                "body": "Onde a sua sessão está aberta e os seus dispositivos de campo. Daqui você também pode ver todos os tours de novo."
+            },
+            "help": {
+                "title": "Ajuda em cada página",
+                "body": "Este botão explica a página em que você está. As novidades de cada versão ficam no rodapé da página."
+            }
+        },
+        "overview": {
+            "stats": {
+                "title": "Como anda o trabalho",
+                "body": "Entrevistas, registros de campo, espécies do catálogo e respostas ainda sem vínculo. Toque num número para ir à seção."
+            },
+            "actions": {
+                "title": "Atalhos",
+                "body": "O que mais se faz daqui: iniciar uma entrevista, registrar, criar formulários, vincular espécies ou exportar."
+            },
+            "pending": {
+                "title": "O que está pendente",
+                "body": "Arquivos que ainda vão chegar do app de campo, registros sem identificação e respostas sem vínculo. Quando não resta nada, ele avisa."
+            },
+            "recent": {
+                "title": "O mais recente",
+                "body": "As últimas entrevistas e registros do projeto, para retomar de onde você parou."
+            }
+        },
+        "forms": {
+            "new": {
+                "title": "Crie um formulário",
+                "body": "Um formulário é o instrumento da entrevista: suas seções e perguntas. Comece dando um nome a ele."
+            },
+            "design": {
+                "title": "Monte as perguntas",
+                "body": "Abra o designer para adicionar seções e campos, e veja como fica antes de usar."
+            },
+            "toggle": {
+                "title": "Habilite para entrevistar",
+                "body": "Só os formulários habilitados podem ser usados numa entrevista, na web e no app de campo."
+            },
+            "capture": {
+                "title": "E depois, para o campo",
+                "body": "O app de campo baixa os formulários habilitados e permite entrevistar sem conexão."
+            }
+        },
+        "designer": {
+            "sections": {
+                "title": "Seções",
+                "body": "Um formulário se organiza em seções. Escolha uma para editar ou crie uma nova. Uma seção pode se repetir, por exemplo uma para cada planta citada."
+            },
+            "fields": {
+                "title": "Adicione campos",
+                "body": "Texto, número, data ou opções (uma ou várias). Um campo pode ser marcado para vincular as respostas a espécies do catálogo."
+            },
+            "save": {
+                "title": "Salve as alterações",
+                "body": "Esta marca diz se há alterações não salvas. Se o formulário já tem entrevistas, pense bem antes de remover um campo: as respostas dele se perdem."
+            },
+            "preview": {
+                "title": "Pré-visualização",
+                "body": "Veja o formulário como quem entrevista vai ver, antes de habilitá-lo."
+            }
+        },
+        "interviews": {
+            "forms": {
+                "title": "Entrevistar",
+                "body": "Aqui estão os formulários habilitados do projeto. Cada entrevista é feita com um deles."
+            },
+            "new": {
+                "title": "Nova entrevista",
+                "body": "Inicie uma entrevista pela web. As respostas são salvas enquanto você digita."
+            },
+            "existing": {
+                "title": "Entrevistas feitas",
+                "body": "Revise as entrevistas de cada formulário, com gravações e fotos."
+            },
+            "companion": {
+                "title": "Também pelo celular",
+                "body": "Com o app de campo se entrevista sem conexão, com áudio, fotos e localização. O que ele captura chega aqui quando é enviado."
+            }
+        },
+        "records": {
+            "what": {
+                "title": "Registros de campo",
+                "body": "Cada planta documentada em campo: um espécime coletado ou algo apenas observado, com localização, fotos e licença."
+            },
+            "tabs": {
+                "title": "Registros e licenças",
+                "body": "As licenças de coleta do projeto ficam na aba ao lado."
+            },
+            "summary": {
+                "title": "A situação dos registros",
+                "body": "Quantos existem, quantos faltam identificar e quantos têm espécime-testemunho."
+            },
+            "filters": {
+                "title": "Filtre o que está pendente",
+                "body": "Mostre só os registros sem identificação, sem espécime ou apenas observados, para trabalhar neles."
+            },
+            "add": {
+                "title": "Registrar pela web",
+                "body": "Adicione um registro aqui, ou faça em campo com o app: ele chega sozinho ao ser enviado."
+            }
+        },
+        "permits": {
+            "what": {
+                "title": "Licenças de coleta",
+                "body": "As licenças sob as quais o projeto coleta. Cada registro indica a sua licença, ou por que não era necessária."
+            },
+            "add": {
+                "title": "Adicione uma licença",
+                "body": "Cadastre antes de ir a campo: o app de campo baixa as licenças do projeto para escolhê-las sem conexão."
+            }
+        },
+        "catalog": {
+            "metrics": {
+                "title": "O catálogo do projeto",
+                "body": "As espécies do projeto, e quantas e de quais famílias foram citadas nas entrevistas."
+            },
+            "register": {
+                "title": "Cadastre espécies",
+                "body": "Adicione uma espécie ao catálogo. Você pode buscá-la no World Flora Online para completar os dados."
+            },
+            "filters": {
+                "title": "Busque e filtre",
+                "body": "Por nome, família, gênero ou se já está vinculada a respostas."
+            },
+            "list": {
+                "title": "Cada espécie",
+                "body": "Abra uma espécie para ver seus usos, seus registros de campo e as respostas vinculadas."
+            }
+        },
+        "data": {
+            "tabs": {
+                "title": "Os dados do projeto",
+                "body": "Tudo o que foi coletado, em quatro abas. Você só vê as que o seu papel permite."
+            },
+            "table": {
+                "title": "Dados",
+                "body": "As respostas numa tabela, por formulário e seção, com filtros e um resumo de cada campo."
+            },
+            "link": {
+                "title": "Vincular espécies",
+                "body": "Ligue cada nome local dito numa entrevista a uma espécie do catálogo. Os índices são calculados sobre esses vínculos."
+            },
+            "reports": {
+                "title": "Índices",
+                "body": "Os índices etnobotânicos do projeto, com gráficos para explorar e baixar."
+            },
+            "export": {
+                "title": "Exportar",
+                "body": "Baixe os dados para analisar em outra ferramenta, com os campos que você escolher."
+            }
+        },
+        "members": {
+            "invite": {
+                "title": "Convide a sua equipe",
+                "body": "Convide por e-mail e escolha o papel: quais seções a pessoa pode abrir e o que pode alterar."
+            },
+            "list": {
+                "title": "Quem tem acesso",
+                "body": "As pessoas do projeto e seus papéis. Daqui você pode remover o acesso de alguém."
+            },
+            "pending": {
+                "title": "Convites pendentes",
+                "body": "Os convites enviados que ainda não foram aceitos."
+            }
+        },
+        "in_menu": "No celular, fica no menu ☰ no topo."
     }
 }

@@ -29,6 +29,7 @@ export default function Dashboard() {
 
                     <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
                         <QuickLink
+                            tour="dashboard-projects"
                             href={route('projects.index')}
                             icon={faFolderOpen}
                             title={t('navigation.projects')}
@@ -42,10 +43,11 @@ export default function Dashboard() {
     );
 }
 
-function QuickLink({ href, icon, title, children }) {
+function QuickLink({ href, icon, title, children, tour = undefined }) {
     return (
         <Link
             href={href}
+            data-tour={tour}
             className="card bg-base-200 text-base-content shadow-md transition-all duration-200 hover:-translate-y-1 hover:shadow-xl"
         >
             <div className="card-body">

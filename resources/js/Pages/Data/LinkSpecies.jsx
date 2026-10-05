@@ -361,7 +361,7 @@ export default function LinkSpecies({
     );
 
     return (
-        <AuthenticatedLayout title={t('data.title')}>
+        <AuthenticatedLayout tour="data" title={t('data.title')}>
             <div className="p-4 md:pt-8 lg:pt-12">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
                     <DataTabs project={project} active="link" tabs={tabs} />

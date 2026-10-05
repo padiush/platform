@@ -95,6 +95,9 @@ class HandleInertiaRequests extends Middleware
                 'version' => config('app.version'),
                 'unseenSince' => $user?->hasUnseenRelease() ? $user->last_seen_version : null,
             ],
+            // The guided tours this user has finished or skipped; each of the
+            // others starts once, on the page it explains.
+            'tours' => fn () => $user ? ($user->completed_tours ?? []) : null,
             // AGPL section 13. Shared everywhere because the offer of source
             // has to hold on every page a user of the service can reach.
             'sourceUrl' => config('padiush.source_url'),

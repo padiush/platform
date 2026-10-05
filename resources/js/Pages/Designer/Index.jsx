@@ -50,7 +50,7 @@ export default function DesignerIndex({ project, forms = [] }) {
     };
 
     return (
-        <AuthenticatedLayout title={t('designer.title')}>
+        <AuthenticatedLayout tour="forms" title={t('designer.title')}>
             <div className="p-4 md:pt-8 lg:pt-12">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
                     <Card
@@ -59,6 +59,7 @@ export default function DesignerIndex({ project, forms = [] }) {
                                 type="button"
                                 onClick={() => setCreate(1)}
                                 className="btn btn-primary btn-sm"
+                                data-tour="forms-new"
                             >
                                 <FontAwesomeIcon icon={faPlus} />
                                 {t('designer.index.create')}
@@ -66,8 +67,11 @@ export default function DesignerIndex({ project, forms = [] }) {
                         }
                     >
                         {forms.length > 0 ? (
-                            <ul className="divide-base-300 divide-y">
-                                {forms.map((form) => (
+                            <ul
+                                className="divide-base-300 divide-y"
+                                data-tour="forms-list"
+                            >
+                                {forms.map((form, index) => (
                                     // Side by side where there is room; on a
                                     // phone the actions go under the form.
                                     <li
@@ -133,6 +137,11 @@ export default function DesignerIndex({ project, forms = [] }) {
                                         <div className="flex shrink-0 flex-wrap items-center gap-1">
                                             <Link
                                                 className="btn btn-primary btn-sm"
+                                                data-tour={
+                                                    index === 0
+                                                        ? 'forms-design'
+                                                        : undefined
+                                                }
                                                 href={route(
                                                     'designer.form.wizard',
                                                     {
@@ -157,6 +166,11 @@ export default function DesignerIndex({ project, forms = [] }) {
                                             </button>
                                             <Link
                                                 className="btn btn-ghost btn-sm"
+                                                data-tour={
+                                                    index === 0
+                                                        ? 'forms-toggle'
+                                                        : undefined
+                                                }
                                                 href={route(
                                                     'designer.form.toggle',
                                                     {

@@ -112,7 +112,7 @@ export default function DataView({
 
     if (!structure) {
         return (
-            <AuthenticatedLayout {...layoutProps}>
+            <AuthenticatedLayout tour="data" {...layoutProps}>
                 <div className="p-4 md:pt-8 lg:pt-12">
                     <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
                         {dataTabs}
@@ -137,7 +137,7 @@ export default function DataView({
     const section = structure.section;
 
     return (
-        <AuthenticatedLayout {...layoutProps}>
+        <AuthenticatedLayout tour="data" {...layoutProps}>
             <div className="p-4 md:pt-8 lg:pt-12">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
                     {dataTabs}

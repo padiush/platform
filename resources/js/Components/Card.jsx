@@ -11,11 +11,14 @@ export default function Card({
     children,
     className = '',
     sameHeight = false,
+    // Names the card for a guided tour step (resources/js/tours).
+    tour = undefined,
 }) {
     const hasHeader = title || kicker || description || actions;
 
     return (
         <div
+            data-tour={tour}
             className={`card bg-base-100 border-base-300 text-base-content rounded-box border shadow-sm ${
                 sameHeight ? '' : 'self-start'
             } ${className}`}

@@ -13,13 +13,13 @@ export default function InterviewOverview({ project, forms = [] }) {
     const { t } = useTranslation();
 
     return (
-        <AuthenticatedLayout title={t('interviews.title')}>
+        <AuthenticatedLayout tour="interviews" title={t('interviews.title')}>
             <div className="p-4 md:pt-8 lg:pt-12">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                    <Card>
+                    <Card tour="interviews-forms">
                         {forms.length > 0 ? (
                             <ul className="divide-base-300 divide-y">
-                                {forms.map((form) => (
+                                {forms.map((form, index) => (
                                     // Side by side where there is room; on a
                                     // phone the actions go under the name.
                                     <li
@@ -49,6 +49,11 @@ export default function InterviewOverview({ project, forms = [] }) {
                                                     },
                                                 )}
                                                 className="btn btn-sm btn-primary"
+                                                data-tour={
+                                                    index === 0
+                                                        ? 'interviews-new'
+                                                        : undefined
+                                                }
                                             >
                                                 {t('interviews.new_interview')}
                                             </Link>
@@ -61,6 +66,11 @@ export default function InterviewOverview({ project, forms = [] }) {
                                                     },
                                                 )}
                                                 className="btn btn-sm btn-ghost"
+                                                data-tour={
+                                                    index === 0
+                                                        ? 'interviews-existing'
+                                                        : undefined
+                                                }
                                             >
                                                 {t('interviews.view_existing')}
                                             </Link>
