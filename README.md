@@ -4,7 +4,7 @@
 [![Licence: AGPL v3](https://img.shields.io/badge/licence-AGPL--3.0--or--later-blue.svg)](LICENSE)
 
 A hosted instance runs at **[padiushbio.com](https://padiushbio.com)**, with a
-companion field-capture app on [Android](https://github.com/padiush/companion).
+companion field-capture app on [Android and iOS](https://github.com/padiush/companion).
 You are free to run your own instance instead — see [Licence](#licence).
 
 ## Try it
