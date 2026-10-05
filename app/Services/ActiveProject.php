@@ -133,7 +133,7 @@ class ActiveProject
         $id = $project->id;
 
         $sections = [
-            'overview' => route('dashboard'),
+            'overview' => route('projects.overview', ['project' => $id]),
             'forms' => $open && $can->manage_forms
                 ? route('designer.index', ['project' => $id]) : null,
             'interviews' => $open && $can->record_data

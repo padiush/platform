@@ -88,11 +88,21 @@ class ActiveProjectTest extends TestCase
         $this->user->forceFill(['last_project_id' => $this->trees->id])->save();
 
         $this->actingAs($this->user)
-            ->get(route('dashboard'))
+            ->get(route('projects.index'))
             ->assertInertia(fn (Assert $page) => $this->assertSame(
                 $this->trees->id,
                 $this->nav($page)['active']['id']
             ));
+    }
+
+    /** Signing in lands on the overview of the project last worked in. */
+    public function test_the_dashboard_opens_the_last_projects_overview()
+    {
+        $this->user->forceFill(['last_project_id' => $this->trees->id])->save();
+
+        $this->actingAs($this->user)
+            ->get(route('dashboard'))
+            ->assertRedirect(route('projects.overview', $this->trees));
     }
 
     /** Never worked anywhere yet: an unfinished project before a finished one. */
@@ -102,10 +112,7 @@ class ActiveProjectTest extends TestCase
 
         $this->actingAs($this->user)
             ->get(route('dashboard'))
-            ->assertInertia(fn (Assert $page) => $this->assertSame(
-                $this->herbs->id,
-                $this->nav($page)['active']['id']
-            ));
+            ->assertRedirect(route('projects.overview', $this->herbs));
     }
 
     /** A project the user cannot open is never the one the sidebar is on. */
@@ -119,11 +126,14 @@ class ActiveProjectTest extends TestCase
         $this->assertSame($this->herbs->id, $this->user->fresh()->last_project_id);
     }
 
+    /** With nothing to open, signing in lands on the welcome. */
     public function test_a_user_with_no_project_has_none_active()
     {
         $this->actingAs($this->outsider())
             ->get(route('dashboard'))
+            ->assertOk()
             ->assertInertia(fn (Assert $page) => $page
+                ->component('Dashboard')
                 ->where('projectNav.active', null)
                 ->where('projectNav.projects', [])
                 ->where('projectNav.sections', [])
@@ -137,7 +147,7 @@ class ActiveProjectTest extends TestCase
         $this->trees->update(['finished' => true]);
 
         $this->actingAs($this->user)
-            ->get(route('dashboard'))
+            ->get(route('projects.index'))
             ->assertInertia(fn (Assert $page) => $page->where('projectNav.projects', [
                 ['id' => $this->herbs->id, 'name' => 'Hierbas', 'finished' => false],
                 ['id' => $this->trees->id, 'name' => 'Árboles', 'finished' => true],
@@ -151,7 +161,7 @@ class ActiveProjectTest extends TestCase
         $this->actingAs($this->user)
             ->get(route('catalogs.fieldRecords.index', $this->trees))
             ->assertInertia(fn (Assert $page) => $this->assertSame([
-                'overview' => route('dashboard'),
+                'overview' => route('projects.overview', ['project' => $id]),
                 'forms' => route('designer.index', ['project' => $id]),
                 'interviews' => route('interviews.index', ['project' => $id]),
                 'records' => route('catalogs.fieldRecords.index', ['project' => $id]),
@@ -206,7 +216,7 @@ class ActiveProjectTest extends TestCase
 
         $this->actingAs($this->user)
             ->post(route('projects.activate', $this->trees), ['section' => 'interviews'])
-            ->assertRedirect(route('dashboard'));
+            ->assertRedirect(route('projects.overview', $this->trees));
     }
 
     public function test_switching_to_a_project_out_of_reach_is_refused()

@@ -898,5 +898,29 @@
         "licences_no_notice_body": "These packages declare a licence in their metadata but ship no notice file. They are listed so the attribution is complete.",
         "licences_link": "Dependency licences",
         "footer_link": "Free software · source code"
+    },
+    "overview": {
+        "finished": "Finished project: it can be read and exported, but takes no new forms or interviews.",
+        "interviews": "Interviews",
+        "field_records": "Field records",
+        "species": "Species in the catalog",
+        "unlinked": "Unlinked answers",
+        "waiting": "Waiting",
+        "nothing_waiting": "Nothing waiting for now.",
+        "pending_media_one": "{{count}} file registered from a phone has not arrived yet",
+        "pending_media_other": "{{count}} files registered from phones have not arrived yet",
+        "undetermined_records_one": "{{count}} field record not yet identified",
+        "undetermined_records_other": "{{count}} field records not yet identified",
+        "unlinked_answers_one": "{{count}} answer not linked to a species",
+        "unlinked_answers_other": "{{count}} answers not linked to a species",
+        "recent_interviews": "Recent interviews",
+        "recent_records": "Recent records",
+        "no_interviews": "No interviews yet.",
+        "no_records": "No field records yet.",
+        "unnamed_record": "Unnamed record",
+        "new_interview": "New interview",
+        "design_forms": "Design forms",
+        "link_species": "Link species",
+        "export": "Export data"
     }
 }

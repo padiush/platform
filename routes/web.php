@@ -11,17 +11,21 @@ use App\Http\Controllers\InterviewInstancesController;
 use App\Http\Controllers\InterviewMediaController;
 use App\Http\Controllers\ProjectCatalogController;
 use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\ProjectOverviewController;
 use App\Http\Controllers\PublicPageController;
 use App\Http\Controllers\SoftwareNoticeController;
 use App\Http\Controllers\SystemController;
 use App\Http\Controllers\WfoController;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 
 Route::middleware(['auth'])->group(function () {
-    Route::get('/dashboard', function () {
-        return Inertia::render('Dashboard');
-    })->name('dashboard');
+    // Signing in lands on the project the user works in; with none yet, on a
+    // welcome that points at creating one.
+    Route::get('/dashboard', [ProjectOverviewController::class, 'landing'])
+        ->name('dashboard');
+    Route::get('/projects/{project}', [ProjectOverviewController::class, 'show'])
+        ->whereNumber('project')
+        ->name('projects.overview');
 
     // The sidebar's project switcher.
     Route::post('/projects/{project}/activate', [ActiveProjectController::class, 'store'])

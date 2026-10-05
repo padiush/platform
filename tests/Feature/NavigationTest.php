@@ -53,7 +53,7 @@ class NavigationTest extends TestCase
         // through as false and the flags must exist for every section.
         $user = $this->userWithCapability($project, 'manage_forms', false);
 
-        $response = $this->actingAs($user)->get(route('dashboard'));
+        $response = $this->actingAs($user)->get(route('projects.index'));
 
         $response->assertInertia(
             fn (Assert $page) => $page
@@ -70,7 +70,7 @@ class NavigationTest extends TestCase
         $project = Project::factory()->create();
         $user = $this->userWithCapability($project, 'manage_project');
 
-        $response = $this->actingAs($user)->get(route('dashboard'));
+        $response = $this->actingAs($user)->get(route('projects.index'));
 
         $response->assertInertia(
             fn (Assert $page) => $page
