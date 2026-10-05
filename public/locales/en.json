@@ -137,6 +137,17 @@
             "delete": "Delete project"
         }
     },
+    "example": {
+        "cta": "Explore an example project",
+        "cta_hint": "An invented study with interviews, field records and a catalog, to walk through every section and try things freely.",
+        "badge": "Example",
+        "notice": "Example project: the data is invented and you can change anything.",
+        "remove": "Remove the example",
+        "remove_title": "Remove the example project?",
+        "remove_message": "The example project is deleted with everything in it, including your changes. You can open a new one at any time.",
+        "created": "Done: this is your example project.",
+        "removed": "The example project was removed."
+    },
     "actions": {
         "accept": "Accept",
         "decline": "Decline",
@@ -992,6 +1003,10 @@
                 "title": "Start with a project",
                 "body": "Everything in Padiush starts from a project. Create one here; then you can design forms and invite your team."
             },
+            "example": {
+                "title": "Or explore an example",
+                "body": "Open an invented study, already full of interviews, records and species, to see how everything works. It is yours alone and you can remove it whenever you like."
+            },
             "account": {
                 "title": "My account",
                 "body": "Where you are signed in, and your field devices. You can also see every tour again from here."
@@ -1031,9 +1046,17 @@
             "create": {
                 "title": "Create a project",
                 "body": "Give it a name and a description. Then you can design its first form and invite your team."
+            },
+            "example": {
+                "title": "An example project",
+                "body": "Open a private copy of an invented study to walk through every section. It is marked “Example” and you remove it whenever you like."
             }
         },
         "overview": {
+            "example": {
+                "title": "You are in the example",
+                "body": "The data in this project is invented: change, delete and try anything. When you are done, remove it from this strip."
+            },
             "stats": {
                 "title": "Where the work stands",
                 "body": "Interviews, field records, catalog species and answers not linked yet. Tap a number to go to that section."

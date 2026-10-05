@@ -46,6 +46,11 @@ export default function ProjectSwitcher({
                 {/* Study titles run long; listed whole, not cut short. */}
                 <span className="block w-full min-w-0 text-left break-words whitespace-normal">
                     {project.name}
+                    {project.is_example && (
+                        <span className="badge badge-info badge-soft badge-xs ml-2 align-middle">
+                            {t('example.badge')}
+                        </span>
+                    )}
                 </span>
             </button>
         </li>
@@ -90,6 +95,11 @@ export default function ProjectSwitcher({
                     <span className="line-clamp-3 font-semibold break-words">
                         {label}
                     </span>
+                    {active?.is_example && (
+                        <span className="bg-primary-content/20 mt-1 inline-block rounded px-1.5 text-[0.65rem] font-semibold tracking-wide uppercase">
+                            {t('example.badge')}
+                        </span>
+                    )}
                 </span>
                 <FontAwesomeIcon
                     icon={faChevronDown}

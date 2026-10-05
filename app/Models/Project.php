@@ -36,6 +36,7 @@ class Project extends Model
         'finished' => 'boolean',
         'published' => 'boolean',
         'shared' => 'boolean',
+        'is_example' => 'boolean',
     ];
 
     protected static function booted(): void

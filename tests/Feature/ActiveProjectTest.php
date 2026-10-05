@@ -149,8 +149,8 @@ class ActiveProjectTest extends TestCase
         $this->actingAs($this->user)
             ->get(route('projects.index'))
             ->assertInertia(fn (Assert $page) => $page->where('projectNav.projects', [
-                ['id' => $this->herbs->id, 'name' => 'Hierbas', 'finished' => false],
-                ['id' => $this->trees->id, 'name' => 'Árboles', 'finished' => true],
+                ['id' => $this->herbs->id, 'name' => 'Hierbas', 'finished' => false, 'is_example' => false],
+                ['id' => $this->trees->id, 'name' => 'Árboles', 'finished' => true, 'is_example' => false],
             ]));
     }
 

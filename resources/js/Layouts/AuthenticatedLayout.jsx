@@ -1,5 +1,6 @@
 import Breadcrumbs from '@/Components/Breadcrumbs';
 import ErrorBoundary from '@/Components/ErrorBoundary';
+import ExampleNotice from '@/Components/ExampleNotice';
 import WhatsNewDialog from '@/Components/WhatsNewDialog';
 import { useFlashMessage } from '@/Hooks/useFlashMessage';
 import Sidebar from '@/Layouts/Partials/Sidebar';
@@ -78,7 +79,7 @@ export default function AuthenticatedLayout({
 }) {
     const { t } = useTranslation();
     const { FlashAlert, flashShown } = useFlashMessage();
-    const { release } = usePage().props;
+    const { release, projectNav } = usePage().props;
     const tours = useTours(tour, { auto: autoTours });
 
     const wide = useIsWide();
@@ -159,6 +160,8 @@ export default function AuthenticatedLayout({
                         </button>
                     )}
                 </div>
+
+                {projectNav?.active?.is_example && <ExampleNotice />}
 
                 <div className="bg-base-200/50 flex-1 overflow-y-auto">
                     {flashShown && <FlashAlert />}

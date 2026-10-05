@@ -67,6 +67,9 @@ indices serve ethnozoology and ethnomycology, which is where it is headed
 - **Guided tours** — each section explains itself step by step on a user's
   first visit, adapted to what their role lets them open. A tour can be
   skipped, replayed from the page's ? button, or offered again from Mi cuenta.
+- **Example project** — a private copy of an invented study, full of
+  interviews, field records and species, to explore and change freely before
+  starting a real one, and removed in one step.
 
 ## Technologies
 The project utilizes the following technologies:

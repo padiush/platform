@@ -44,7 +44,8 @@ class SystemController extends Controller
                 ->orderBy('expires_at')
                 ->get(['id', 'invited_name', 'invited_email', 'expires_at']),
             'user_count' => User::count(),
-            'project_count' => Project::count(),
+            // Example projects are copies of the invented demo study, not work.
+            'project_count' => Project::where('is_example', false)->count(),
         ]);
     }
 
