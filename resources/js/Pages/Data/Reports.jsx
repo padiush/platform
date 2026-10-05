@@ -135,6 +135,7 @@ export default function Reports({
 
     return (
         <AuthenticatedLayout
+            tour="data"
             title={t('data.reports.title')}
             subtitle={t('data.reports.subtitle')}
             actionRight={hasData && download}

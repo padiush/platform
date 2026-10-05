@@ -18,12 +18,17 @@ export default function DataTabs({ project, active, tabs = {} }) {
 
     return (
         // Wraps on a phone rather than scrolling a tab out of sight.
-        <div role="tablist" className="tabs tabs-box mb-4 w-fit flex-wrap">
+        <div
+            role="tablist"
+            className="tabs tabs-box mb-4 w-fit flex-wrap"
+            data-tour="data-tabs"
+        >
             {all.map((tab) =>
                 tab.key === active ? (
                     <span
                         key={tab.key}
                         role="tab"
+                        data-tour={`data-tab-${tab.key}`}
                         aria-current="page"
                         className="tab tab-active whitespace-nowrap"
                     >
@@ -33,6 +38,7 @@ export default function DataTabs({ project, active, tabs = {} }) {
                     <Link
                         key={tab.key}
                         role="tab"
+                        data-tour={`data-tab-${tab.key}`}
                         href={route(tab.route, { project: project.id })}
                         className="tab whitespace-nowrap"
                     >

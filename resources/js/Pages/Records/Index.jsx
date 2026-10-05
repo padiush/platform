@@ -128,16 +128,30 @@ export default function FieldRecords({
     }
 
     return (
-        <AuthenticatedLayout title={t('catalogs.fieldRecords.title')}>
+        <AuthenticatedLayout
+            tour="records"
+            title={t('catalogs.fieldRecords.title')}
+        >
             <div className="p-4 md:pt-8 lg:pt-12">
                 <div className="mx-auto max-w-7xl space-y-4 sm:px-6 lg:px-8">
-                    <RecordTabs project={project} active="records" />
+                    <div data-tour="records-tabs">
+                        <RecordTabs project={project} active="records" />
+                    </div>
 
-                    <Summary summary={summary} />
+                    <div data-tour="records-summary">
+                        <Summary summary={summary} />
+                    </div>
 
-                    <Card title={t('catalogs.fieldRecords.all_collections')}>
+                    <Card
+                        tour="records-table"
+                        title={t('catalogs.fieldRecords.all_collections')}
+                    >
                         <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-                            <div role="tablist" className="tabs tabs-box">
+                            <div
+                                role="tablist"
+                                className="tabs tabs-box"
+                                data-tour="records-filters"
+                            >
                                 {FILTERS.map((key) => (
                                     <button
                                         key={key}
@@ -194,6 +208,7 @@ export default function FieldRecords({
                                 {canEdit && (
                                     <button
                                         type="button"
+                                        data-tour="records-add"
                                         className="btn btn-primary btn-sm"
                                         onClick={() => setCollecting(true)}
                                     >

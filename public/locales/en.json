@@ -70,6 +70,12 @@
             "confirm_message": "{{name}} will have to sign in to the field app again to send and receive data.",
             "revoked": "That device's access was revoked.",
             "not_found": "That device no longer has access."
+        },
+        "tours": {
+            "title": "Guided tours",
+            "description": "The step-by-step explanations of each page. Each one is shown once; see them all again from here.",
+            "reset": "See the tours again",
+            "reset_done": "Done: each tour will show again the next time you open its page."
         }
     },
     "titles": {
@@ -969,5 +975,222 @@
         "footer_link": "What's new",
         "footer_version": "Padiush {{version}}",
         "empty": "There are no release notes yet."
+    },
+    "tours": {
+        "help": "Tour of this page",
+        "next": "Next",
+        "back": "Back",
+        "done": "Done",
+        "skip": "Skip",
+        "progress": "{{current}} of {{total}}",
+        "welcome": {
+            "intro": {
+                "title": "Welcome to Padiush",
+                "body": "A short tour of the essentials. Skip it whenever you like, and see it again with the ? button on each page."
+            },
+            "start": {
+                "title": "Start with a project",
+                "body": "Everything in Padiush starts from a project. Create one here; then you can design forms and invite your team."
+            },
+            "account": {
+                "title": "My account",
+                "body": "Where you are signed in, and your field devices. You can also see every tour again from here."
+            },
+            "help": {
+                "title": "Help on every page",
+                "body": "This button explains the page you are on. What each version brought is at the foot of the page."
+            }
+        },
+        "navigation": {
+            "switcher": {
+                "title": "Your project",
+                "body": "Everything you see belongs to the project chosen here. Switch projects from this menu."
+            },
+            "sections": {
+                "title": "The project's sections",
+                "body": "Overview, forms, interviews, field records, catalog and data. You only see the ones your role in the project allows."
+            },
+            "admin": {
+                "title": "Running the project",
+                "body": "Settings holds the project's details, and in Members you invite your team and decide what each person can do."
+            }
+        },
+        "projects": {
+            "what": {
+                "title": "Your projects",
+                "body": "A project is a study: its forms, interviews, records, catalog and team. Each one stands alone: someone working on one sees nothing of the others."
+            },
+            "invites": {
+                "title": "You have been invited",
+                "body": "Accept an invitation to join someone else's project, with the role they gave you."
+            },
+            "list": {
+                "title": "Open a project",
+                "body": "Go into a project to work on it. If you run it, you can edit its details and who has access from here."
+            },
+            "create": {
+                "title": "Create a project",
+                "body": "Give it a name and a description. Then you can design its first form and invite your team."
+            }
+        },
+        "overview": {
+            "stats": {
+                "title": "Where the work stands",
+                "body": "Interviews, field records, catalog species and answers not linked yet. Tap a number to go to that section."
+            },
+            "actions": {
+                "title": "Shortcuts",
+                "body": "What is done most from here: start an interview, record, design forms, link species or export."
+            },
+            "pending": {
+                "title": "What is waiting",
+                "body": "Files still to arrive from the field app, records not identified and answers not linked. When nothing is left, it says so."
+            },
+            "recent": {
+                "title": "Most recent",
+                "body": "The project's latest interviews and records, to pick up where you left off."
+            }
+        },
+        "forms": {
+            "new": {
+                "title": "Create a form",
+                "body": "A form is the interview's instrument: its sections and questions. Start by giving it a name."
+            },
+            "design": {
+                "title": "Design its questions",
+                "body": "Open the designer to add sections and fields, and see how it looks before using it."
+            },
+            "toggle": {
+                "title": "Enable it to interview",
+                "body": "Only enabled forms can be used in an interview, on the web and in the field app."
+            },
+            "capture": {
+                "title": "Then, to the field",
+                "body": "The field app downloads the enabled forms and lets you interview offline."
+            }
+        },
+        "designer": {
+            "sections": {
+                "title": "Sections",
+                "body": "A form is organised in sections. Choose one to edit it, or create a new one. A section can repeat, for example once for each plant mentioned."
+            },
+            "fields": {
+                "title": "Add fields",
+                "body": "Text, number, date or choices (one or several). A field can be marked to link its answers to catalog species."
+            },
+            "save": {
+                "title": "Save your changes",
+                "body": "This mark says whether there are unsaved changes. If the form already has interviews, think twice before removing a field: its answers are lost."
+            },
+            "preview": {
+                "title": "Preview",
+                "body": "See the form as an interviewer will, before enabling it."
+            }
+        },
+        "interviews": {
+            "forms": {
+                "title": "Interviewing",
+                "body": "Here are the project's enabled forms. Every interview is done with one of them."
+            },
+            "new": {
+                "title": "New interview",
+                "body": "Start an interview on the web. Answers are saved as you type them."
+            },
+            "existing": {
+                "title": "Interviews done",
+                "body": "Review each form's interviews, with their recordings and photos."
+            },
+            "companion": {
+                "title": "From the phone too",
+                "body": "The field app interviews offline, with audio, photos and location. What it captures arrives here when it is sent."
+            }
+        },
+        "records": {
+            "what": {
+                "title": "Field records",
+                "body": "Each plant documented in the field: a collected specimen or something only observed, with its location, photos and permit."
+            },
+            "tabs": {
+                "title": "Records and permits",
+                "body": "The project's collecting permits are in the next tab."
+            },
+            "summary": {
+                "title": "Where the records stand",
+                "body": "How many there are, how many are still to be identified, and how many have a voucher specimen."
+            },
+            "filters": {
+                "title": "Filter what is pending",
+                "body": "Show only the records not identified, without a specimen, or only observed, to work through them."
+            },
+            "add": {
+                "title": "Record from the web",
+                "body": "Add a record here, or do it in the field with the app: it arrives on its own when sent."
+            }
+        },
+        "permits": {
+            "what": {
+                "title": "Collecting permits",
+                "body": "The permits the project collects under. Each record names its permit, or why none was needed."
+            },
+            "add": {
+                "title": "Add a permit",
+                "body": "Register it before going to the field: the field app downloads the project's permits so they can be chosen offline."
+            }
+        },
+        "catalog": {
+            "metrics": {
+                "title": "The project's catalog",
+                "body": "The project's species, and how many, and from which families, have been mentioned in interviews."
+            },
+            "register": {
+                "title": "Register species",
+                "body": "Add a species to the catalog. You can look it up in World Flora Online to fill in its details."
+            },
+            "filters": {
+                "title": "Search and filter",
+                "body": "By name, family, genus, or whether it is linked to answers yet."
+            },
+            "list": {
+                "title": "Each species",
+                "body": "Open a species to see its uses, its field records and the answers linked to it."
+            }
+        },
+        "data": {
+            "tabs": {
+                "title": "The project's data",
+                "body": "Everything collected, in four tabs. You only see the ones your role allows."
+            },
+            "table": {
+                "title": "Data",
+                "body": "The answers in a table, by form and section, with filters and a summary of each field."
+            },
+            "link": {
+                "title": "Link species",
+                "body": "Match each local name said in an interview to a catalog species. The indices are computed on those links."
+            },
+            "reports": {
+                "title": "Indices",
+                "body": "The project's ethnobotanical indices, with charts to explore and download."
+            },
+            "export": {
+                "title": "Export",
+                "body": "Download the data to analyse in another tool, with the fields you choose."
+            }
+        },
+        "members": {
+            "invite": {
+                "title": "Invite your team",
+                "body": "Invite by email and choose their role: which sections they can open and what they can change."
+            },
+            "list": {
+                "title": "Who has access",
+                "body": "The project's people and their roles. From here you can remove someone's access."
+            },
+            "pending": {
+                "title": "Pending invitations",
+                "body": "Invitations sent that have not been accepted yet."
+            }
+        },
+        "in_menu": "On a phone, it is in the ☰ menu at the top."
     }
 }

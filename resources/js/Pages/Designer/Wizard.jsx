@@ -145,6 +145,7 @@ export default function Wizard({ project, form, structure, instancesCount }) {
 
     return (
         <AuthenticatedLayout
+            tour="designer"
             title={t('designer.title')}
             subtitle={form.name}
             breadcrumbs={[
@@ -173,6 +174,7 @@ export default function Wizard({ project, form, structure, instancesCount }) {
                         </span>
                     )}
                     <span
+                        data-tour="designer-save-state"
                         className={`badge whitespace-nowrap ${
                             isDirty ? 'badge-warning' : 'badge-success'
                         }`}
@@ -182,6 +184,7 @@ export default function Wizard({ project, form, structure, instancesCount }) {
                             : t('designer.saved_badge')}
                     </span>
                     <Link
+                        data-tour="designer-preview"
                         href={route('designer.form.preview', {
                             project: project.id,
                             form: form.id,
@@ -426,7 +429,9 @@ export default function Wizard({ project, form, structure, instancesCount }) {
                                     ),
                                 )}
 
-                                <AddFieldBar onAdd={addField} />
+                                <div data-tour="designer-add-field">
+                                    <AddFieldBar onAdd={addField} />
+                                </div>
                             </>
                         )}
                     </div>
@@ -485,7 +490,10 @@ export default function Wizard({ project, form, structure, instancesCount }) {
                         aria-label={t('actions.close')}
                         className="drawer-overlay"
                     ></label>
-                    <div className="bg-base-200 text-base-content min-h-full w-80 p-4 shadow-2xl lg:fixed lg:top-[10.5rem] lg:h-[calc(100vh-8.5rem)] lg:overflow-y-auto">
+                    <div
+                        data-tour="designer-sections"
+                        className="bg-base-200 text-base-content min-h-full w-80 p-4 shadow-2xl lg:fixed lg:top-[10.5rem] lg:h-[calc(100vh-8.5rem)] lg:overflow-y-auto"
+                    >
                         <SectionList
                             sections={sections}
                             selectedIndex={selectedIndex}

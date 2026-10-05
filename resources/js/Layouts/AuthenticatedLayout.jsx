@@ -3,7 +3,8 @@ import ErrorBoundary from '@/Components/ErrorBoundary';
 import WhatsNewDialog from '@/Components/WhatsNewDialog';
 import { useFlashMessage } from '@/Hooks/useFlashMessage';
 import Sidebar from '@/Layouts/Partials/Sidebar';
-import { faBars } from '@fortawesome/free-solid-svg-icons';
+import { useTours } from '@/tours/useTours';
+import { faBars, faCircleQuestion } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Head, Link, usePage } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
@@ -69,10 +70,16 @@ export default function AuthenticatedLayout({
     breadcrumbs = null,
     // Plain-text document title for when `title` is JSX.
     headTitle = null,
+    // The guided tour that explains this page (resources/js/tours).
+    tour = null,
+    // False on a page someone came to read, where no tour should start on
+    // its own over what they are reading.
+    autoTours = true,
 }) {
     const { t } = useTranslation();
     const { FlashAlert, flashShown } = useFlashMessage();
     const { release } = usePage().props;
+    const tours = useTours(tour, { auto: autoTours });
 
     const wide = useIsWide();
     const [rail, setRail] = useState(initialRail);
@@ -135,6 +142,22 @@ export default function AuthenticatedLayout({
                     </div>
 
                     {actionRight && actionRight}
+
+                    {tours.canReplay && (
+                        <button
+                            type="button"
+                            className="btn btn-ghost btn-square btn-sm shrink-0"
+                            data-tour="help"
+                            aria-label={t('tours.help')}
+                            title={t('tours.help')}
+                            onClick={tours.replay}
+                        >
+                            <FontAwesomeIcon
+                                icon={faCircleQuestion}
+                                className="text-base"
+                            />
+                        </button>
+                    )}
                 </div>
 
                 <div className="bg-base-200/50 flex-1 overflow-y-auto">

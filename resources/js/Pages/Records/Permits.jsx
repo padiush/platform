@@ -49,12 +49,15 @@ export default function Permits({ project, permits = [], canEdit = false }) {
     }
 
     return (
-        <AuthenticatedLayout title={t('catalogs.permits.title')}>
+        <AuthenticatedLayout tour="permits" title={t('catalogs.permits.title')}>
             <div className="p-4 md:pt-8 lg:pt-12">
                 <div className="mx-auto max-w-7xl space-y-4 sm:px-6 lg:px-8">
                     <RecordTabs project={project} active="permits" />
 
-                    <Card title={t('catalogs.permits.all_permits')}>
+                    <Card
+                        tour="permits-card"
+                        title={t('catalogs.permits.all_permits')}
+                    >
                         <p className="text-base-content/70 mb-4 text-sm">
                             {t('catalogs.permits.intro')}
                         </p>
@@ -151,7 +154,7 @@ export default function Permits({ project, permits = [], canEdit = false }) {
                         )}
 
                         {canEdit && (
-                            <div className="mt-4">
+                            <div className="mt-4" data-tour="permits-add">
                                 <button
                                     type="button"
                                     className="btn btn-primary btn-sm"

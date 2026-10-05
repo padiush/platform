@@ -1,3 +1,4 @@
+import 'driver.js/dist/driver.css';
 import '../css/app.css';
 import './bootstrap';
 import './i18n.js';

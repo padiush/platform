@@ -64,6 +64,9 @@ indices serve ethnozoology and ethnomycology, which is where it is headed
   collaborator on one study sees nothing of another.
 - **Trilingual throughout** — Spanish, English and Portuguese, including the
   emails and the validation messages.
+- **Guided tours** — each section explains itself step by step on a user's
+  first visit, adapted to what their role lets them open. A tour can be
+  skipped, replayed from the page's ? button, or offered again from Mi cuenta.
 
 ## Technologies
 The project utilizes the following technologies:

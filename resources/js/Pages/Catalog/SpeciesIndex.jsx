@@ -114,10 +114,16 @@ export default function CatalogSpeciesIndex({
     };
 
     return (
-        <AuthenticatedLayout title={t('catalogs.ethnobotanical_catalog')}>
+        <AuthenticatedLayout
+            tour="catalog"
+            title={t('catalogs.ethnobotanical_catalog')}
+        >
             <div className="p-4 md:pt-8 lg:pt-12">
                 <div className="mx-auto max-w-7xl space-y-4 sm:px-6 lg:px-8">
-                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                    <div
+                        className="grid grid-cols-1 gap-3 sm:grid-cols-3"
+                        data-tour="catalog-metrics"
+                    >
                         <MetricCard
                             label={t('catalogs.total_species')}
                             value={counts.species}
@@ -139,6 +145,7 @@ export default function CatalogSpeciesIndex({
                             canEdit && (
                                 <button
                                     type="button"
+                                    data-tour="catalog-register"
                                     onClick={() => setRegister(1)}
                                     className="btn btn-primary btn-sm"
                                 >
@@ -159,7 +166,10 @@ export default function CatalogSpeciesIndex({
                             />
                         ) : (
                             <>
-                                <div className="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                                <div
+                                    className="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4"
+                                    data-tour="catalog-filters"
+                                >
                                     <div className="sm:col-span-2 lg:col-span-4">
                                         <Input
                                             name="q"
@@ -251,7 +261,10 @@ export default function CatalogSpeciesIndex({
 
                                 {species.data.length > 0 ? (
                                     <>
-                                        <ul className="border-base-300 divide-base-300 rounded-box divide-y border">
+                                        <ul
+                                            className="border-base-300 divide-base-300 rounded-box divide-y border"
+                                            data-tour="catalog-list"
+                                        >
                                             {species.data.map((sp) => (
                                                 <li key={sp.id}>
                                                     <Link

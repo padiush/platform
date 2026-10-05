@@ -155,7 +155,7 @@ export default function DataExport({ project, tabs = {}, forms, initial }) {
         (mode === 'custom' ? selected.size > 0 : categoryFieldId !== '');
 
     return (
-        <AuthenticatedLayout title={t('data.export.title')}>
+        <AuthenticatedLayout tour="data" title={t('data.export.title')}>
             <div className="p-4 md:pt-8 lg:pt-12">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
                     <DataTabs project={project} active="export" tabs={tabs} />

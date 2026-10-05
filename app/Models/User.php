@@ -42,6 +42,27 @@ class User extends Authenticatable implements HasLocalePreference
     protected $casts = [
         'email_verified_at' => 'datetime',
         'system_admin' => 'boolean',
+        'completed_tours' => 'array',
+    ];
+
+    /**
+     * The guided tours the web offers: one welcome tour, then one for each
+     * section on its first visit. The names are shared with
+     * resources/js/tours/definitions.js.
+     */
+    public const TOURS = [
+        'welcome',
+        'navigation',
+        'projects',
+        'overview',
+        'forms',
+        'designer',
+        'interviews',
+        'records',
+        'permits',
+        'catalog',
+        'data',
+        'members',
     ];
 
     public function projects()
@@ -102,6 +123,23 @@ class User extends Authenticatable implements HasLocalePreference
     public function hasUnseenRelease(): bool
     {
         return version_compare((string) $this->last_seen_version, (string) config('app.version'), '<');
+    }
+
+    /** Note that the user has finished, or skipped, a guided tour. */
+    public function completeTour(string $tour): void
+    {
+        $done = $this->completed_tours ?? [];
+
+        if (! in_array($tour, $done, true)) {
+            $done[] = $tour;
+            $this->forceFill(['completed_tours' => $done])->save();
+        }
+    }
+
+    /** Offer every guided tour again, as if the user were new. */
+    public function resetTours(): void
+    {
+        $this->forceFill(['completed_tours' => []])->save();
     }
 
     /** Note that the user has seen the notes of the release running now. */

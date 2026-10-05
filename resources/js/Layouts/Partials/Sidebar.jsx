@@ -175,19 +175,24 @@ export default function Sidebar({ rail = false, onToggleRail = null }) {
             </div>
 
             {projectNav?.projects?.length > 0 && (
-                <ProjectSwitcher
-                    nav={projectNav}
-                    section={section}
-                    rail={rail}
-                    onExpand={onToggleRail}
-                />
+                <div data-tour="project-switcher">
+                    <ProjectSwitcher
+                        nav={projectNav}
+                        section={section}
+                        rail={rail}
+                        onExpand={onToggleRail}
+                    />
+                </div>
             )}
 
             <nav className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto">
                 {/* Someone with no project yet has only Proyectos to go to. */}
                 {sections.length > 0 && (
                     <>
-                        <ul className="menu w-full gap-1 p-0">
+                        <ul
+                            className="menu w-full gap-1 p-0"
+                            data-tour="nav-sections"
+                        >
                             {sections.map(({ key, label, icon }) => (
                                 <NavItem
                                     key={key}
@@ -201,7 +206,10 @@ export default function Sidebar({ rail = false, onToggleRail = null }) {
                         </ul>
 
                         {adminSections.length > 0 && (
-                            <ul className="menu mt-3 w-full gap-1 p-0">
+                            <ul
+                                className="menu mt-3 w-full gap-1 p-0"
+                                data-tour="nav-admin"
+                            >
                                 {adminSections.map(({ key, label, icon }) => (
                                     <NavItem
                                         key={key}
@@ -243,6 +251,7 @@ export default function Sidebar({ rail = false, onToggleRail = null }) {
                 {/* The account, under its owner's name. */}
                 <Link
                     href={route('account.show')}
+                    data-tour="nav-account"
                     className={`btn btn-ghost h-auto min-h-9 justify-start gap-2 px-2 py-1.5 font-medium ${
                         route().current('account.*')
                             ? 'bg-primary-content/15'
