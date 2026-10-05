@@ -72,6 +72,35 @@ class FieldRecordPresenter
             'determiner' => $current?->determiner,
             'determined_on' => $current?->determined_on?->toDateString(),
             'qualifier' => $current?->qualifier,
+            'interview' => $this->interview($fieldRecord),
+        ];
+    }
+
+    /**
+     * The interview answer the record came out of, if it came out of one:
+     * which interview, and the question that was being answered.
+     *
+     * The answer itself is left out. It is an informant's response, which the
+     * catalog's readers are not otherwise shown, and what it named is already
+     * on the record as its local name. Whether the interview can be opened is
+     * the page's to say, from the reader's own access.
+     *
+     * Expects `answer.item` loaded; null when the answer is gone, which
+     * releases the record rather than deleting it.
+     *
+     * @return array{instance_id: string, question: string|null}|null
+     */
+    private function interview(FieldRecord $fieldRecord): ?array
+    {
+        $answer = $fieldRecord->answer;
+
+        if ($answer === null) {
+            return null;
+        }
+
+        return [
+            'instance_id' => $answer->interview_instance_id,
+            'question' => $answer->item?->label,
         ];
     }
 

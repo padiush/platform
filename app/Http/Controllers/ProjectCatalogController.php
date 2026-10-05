@@ -410,6 +410,7 @@ class ProjectCatalogController extends Controller
             // it on demand when absent.
             'distribution' => $species->metadata['distribution'] ?? null,
             'fieldRecords' => $this->fieldRecordsFor($species),
+            'canOpenInterviews' => (bool) $user->can('recordData', $project),
         ]);
     }
 
@@ -426,7 +427,7 @@ class ProjectCatalogController extends Controller
     {
         return app(FieldRecordPresenter::class)->collection(
             $species->fieldRecords()
-                ->with(['currentDetermination.species', 'collectingPermit', 'media'])
+                ->with(['currentDetermination.species', 'collectingPermit', 'media', 'answer.item'])
                 ->orderByDesc('field_records.created_at')
                 ->get()
         );

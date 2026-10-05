@@ -1,4 +1,6 @@
 import EmptyState from '@/Components/EmptyState';
+import { Link } from '@inertiajs/react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 /**
@@ -64,12 +66,47 @@ function DeterminationCell({ fieldRecord }) {
 }
 
 /**
+ * Where a record came from, when it came out of an interview: an informant
+ * named the plant, and it was recorded there and then. The question is shown
+ * so the link reads without opening anything; the interview itself opens only
+ * for someone who could open it from the interviews list anyway.
+ */
+function InterviewOrigin({ interview, canOpen }) {
+    const { t } = useTranslation();
+
+    if (!interview) {
+        return null;
+    }
+
+    const label = t('catalogs.fieldRecords.from_interview');
+
+    return (
+        <div className="text-base-content/70 mt-1 max-w-56 text-xs whitespace-normal">
+            {canOpen ? (
+                <Link
+                    href={route('interviews.show', interview.instance_id)}
+                    className="link"
+                >
+                    {label}
+                </Link>
+            ) : (
+                label
+            )}
+            {interview.question && (
+                <span className="block">{interview.question}</span>
+            )}
+        </div>
+    );
+}
+
+/**
  * One row per physical collection. `columns` lets the species page drop the
  * determination column, which would repeat the taxon you are already looking at.
  */
 export default function FieldRecordTable({
     fieldRecords,
     canEdit = false,
+    canOpenInterviews = false,
     showDetermination = true,
     onEdit = () => {},
     onDetermine = () => {},
@@ -80,6 +117,22 @@ export default function FieldRecordTable({
     emptyHint,
 }) {
     const { t } = useTranslation();
+
+    // An interview links to one of its records by the row's anchor. The table
+    // renders after the browser has looked for that anchor, so the browser
+    // neither scrolls to it nor marks it; the row is found and marked here.
+    const [arrivedAt, setArrivedAt] = useState(null);
+    useEffect(() => {
+        const match = window.location.hash.match(/^#record-(\d+)$/);
+        if (!match) {
+            return;
+        }
+
+        setArrivedAt(Number(match[1]));
+        document
+            .getElementById(`record-${match[1]}`)
+            ?.scrollIntoView?.({ block: 'center' });
+    }, []);
 
     if (fieldRecords.length === 0) {
         return <EmptyState title={emptyTitle} hint={emptyHint} />;
@@ -104,9 +157,23 @@ export default function FieldRecordTable({
                 </thead>
                 <tbody>
                     {fieldRecords.map((fieldRecord) => (
-                        <tr key={fieldRecord.id}>
+                        <tr
+                            key={fieldRecord.id}
+                            // An interview links straight to its records'
+                            // rows; the one arrived at is marked.
+                            id={`record-${fieldRecord.id}`}
+                            className={
+                                arrivedAt === fieldRecord.id
+                                    ? 'bg-primary/10'
+                                    : undefined
+                            }
+                        >
                             <td>
                                 <AccessionCell fieldRecord={fieldRecord} />
+                                <InterviewOrigin
+                                    interview={fieldRecord.interview}
+                                    canOpen={canOpenInterviews}
+                                />
                             </td>
                             <td>{fieldRecord.collection_number ?? '—'}</td>
                             <td>{fieldRecord.collector ?? '—'}</td>

@@ -78,6 +78,7 @@ export default function FieldRecords({
     summary,
     catalog = [],
     canEdit = false,
+    canOpenInterviews = false,
     nextAccessionNumber = null,
     speciesCount = null,
     permits = [],
@@ -233,6 +234,7 @@ export default function FieldRecords({
                         <FieldRecordTable
                             fieldRecords={shown}
                             canEdit={canEdit}
+                            canOpenInterviews={canOpenInterviews}
                             onEdit={setEditing}
                             onDetermine={setDetermining}
                             onDeposit={setDepositing}

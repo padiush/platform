@@ -16,6 +16,7 @@ export default function SpeciesFieldRecords({
     species,
     fieldRecords = [],
     canEdit = false,
+    canOpenInterviews = false,
 }) {
     const { t } = useTranslation();
     const [collecting, setCollecting] = useState(false);
@@ -40,6 +41,7 @@ export default function SpeciesFieldRecords({
                 // project list. Recording is the one exception, below, because
                 // knowing the taxon is the reason you are on this page.
                 canEdit={false}
+                canOpenInterviews={canOpenInterviews}
                 showDetermination={false}
                 emptyTitle={t('catalogs.fieldRecords.none_for_taxon_title')}
                 emptyHint={t('catalogs.fieldRecords.none_for_taxon_hint')}

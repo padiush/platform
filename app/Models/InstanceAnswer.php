@@ -55,4 +55,14 @@ class InstanceAnswer extends Model
     {
         return $this->hasMany(InstanceAnswerRevision::class);
     }
+
+    /**
+     * The field records made from this answer: an informant named a plant,
+     * and it was recorded there and then. See
+     * docs/decisions/0011-companion-field-records.md.
+     */
+    public function fieldRecords()
+    {
+        return $this->hasMany(FieldRecord::class, 'instance_answer_id');
+    }
 }

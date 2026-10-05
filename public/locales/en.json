@@ -275,7 +275,11 @@
         "item_not_found": "The field was not found in this interview.",
         "instance_label": "Interview",
         "saving": "Saving…",
-        "saved": "Saved"
+        "saved": "Saved",
+        "field_records": "Field records:",
+        "field_record_unnumbered": "Unnumbered",
+        "field_records_count_one": "{{count}} field record",
+        "field_records_count_other": "{{count}} field records"
     },
     "common": {
         "actions": {
@@ -441,6 +445,7 @@
             "filter_unvouchered": "Unvouchered",
             "format_csv": "CSV (.csv)",
             "format_xlsx": "Excel (.xlsx)",
+            "from_interview": "From an interview",
             "identify": "Identify",
             "indet": "indet.",
             "locality": "Locality",

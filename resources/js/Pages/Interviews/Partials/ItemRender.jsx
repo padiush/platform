@@ -4,6 +4,62 @@ import axios from 'axios';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+/**
+ * How a field record reads beside the answer it came out of: by the number it
+ * is known by, or as an observation when nothing was taken to number.
+ */
+function recordLabel(record, t) {
+    if (record.accession_number || record.collection_number) {
+        return record.accession_number ?? record.collection_number;
+    }
+
+    return record.was_collected === false
+        ? t('catalogs.fieldRecords.basis_human_observation')
+        : t('interviews.field_record_unnumbered');
+}
+
+/**
+ * The field records made from this answer: an informant named a plant, and it
+ * was recorded there and then, on the companion (ADR 0011). Each opens on its
+ * row in the catalog for someone who can read the catalog.
+ *
+ * A plain link rather than an Inertia one: a full visit lands on the row's
+ * anchor, which is what marks it.
+ */
+function AnswerRecords({ records, catalogProjectId }) {
+    const { t } = useTranslation();
+
+    if (!records?.length) {
+        return null;
+    }
+
+    return (
+        <div className="mt-1 flex flex-wrap items-center gap-2 text-xs">
+            <span className="text-base-content/70">
+                {t('interviews.field_records')}
+            </span>
+            {records.map((record) =>
+                catalogProjectId ? (
+                    <a
+                        key={record.id}
+                        href={`${route('catalogs.fieldRecords.index', catalogProjectId)}#record-${record.id}`}
+                        className="badge badge-outline badge-sm hover:badge-primary"
+                    >
+                        {recordLabel(record, t)}
+                    </a>
+                ) : (
+                    <span
+                        key={record.id}
+                        className="badge badge-outline badge-sm"
+                    >
+                        {recordLabel(record, t)}
+                    </span>
+                ),
+            )}
+        </div>
+    );
+}
+
 function hasContent(type, value) {
     if (type === 'multi') {
         return Array.isArray(value) && value.length > 0;
@@ -17,6 +73,7 @@ export default function ItemRender({
     instance,
     repeatableIndex = null,
     answers = [],
+    catalogProjectId = null,
     onAnswered = () => {},
 }) {
     const { t } = useTranslation();
@@ -235,6 +292,10 @@ export default function ItemRender({
                 {saveState === 'saving' && t('interviews.saving')}
                 {saveState === 'saved' && t('interviews.saved')}
             </p>
+            <AnswerRecords
+                records={matchingAnswer?.field_records}
+                catalogProjectId={catalogProjectId}
+            />
         </div>
     );
 }

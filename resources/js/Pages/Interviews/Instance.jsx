@@ -14,7 +14,13 @@ function hasStoredContent(value) {
     return value !== null && value !== '' && value !== '[]';
 }
 
-export default function Instance({ project, form, instance, answers }) {
+export default function Instance({
+    project,
+    form,
+    instance,
+    answers,
+    canViewCatalog = false,
+}) {
     const { t, i18n } = useTranslation();
 
     // Humanized identity: when it was recorded and by whom — never the
@@ -102,6 +108,9 @@ export default function Instance({ project, form, instance, answers }) {
                                 instance={instance}
                                 answers={answers}
                                 answeredKeys={answeredKeys}
+                                catalogProjectId={
+                                    canViewCatalog ? project.id : null
+                                }
                                 onAnswered={handleAnswered}
                             />
                         ))}

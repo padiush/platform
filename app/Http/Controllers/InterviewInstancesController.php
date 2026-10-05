@@ -169,9 +169,11 @@ class InterviewInstancesController extends Controller
             $section->items = $section->items->sortBy('order')->values();
         }
 
-        // Load answers for this instance
+        // Load answers for this instance, each with the field records made
+        // from it (ADR 0011) — the other side of the record's link.
         $answers = $instance
             ->answers()
+            ->with('fieldRecords')
             ->get()
             ->map(function ($answer) {
                 return [
@@ -179,6 +181,16 @@ class InterviewInstancesController extends Controller
                     'section_id' => $answer->interview_section_id,
                     'repeatable_index' => $answer->repeatable_index,
                     'value' => $answer->answer,
+                    'field_records' => $answer->fieldRecords
+                        ->sortBy('created_at')
+                        ->values()
+                        ->map(fn ($record) => [
+                            'id' => $record->id,
+                            'accession_number' => $record->accession_number,
+                            'collection_number' => $record->collection_number,
+                            'was_collected' => $record->wasCollected(),
+                        ])
+                        ->all(),
                 ];
             });
 
@@ -191,6 +203,9 @@ class InterviewInstancesController extends Controller
             'form' => $form,
             'instance' => $instance,
             'answers' => $answers,
+            // The records are listed either way; they link to the catalog
+            // only for someone who can read it.
+            'canViewCatalog' => (bool) Auth::user()->can('viewCatalog', $project),
         ]);
     }
 
