@@ -81,6 +81,9 @@ Setup is in the [README](README.md). Two conventions the history follows:
 - **Commit messages follow [Conventional Commits](https://www.conventionalcommits.org/)**
   and describe the outcome rather than the mechanics — `git log` is the best
   guide to the house style.
+- **Changes people would notice go in the changelog.** Add a line under
+  *Unreleased* in [CHANGELOG.md](CHANGELOG.md) in the same pull request.
+  Releases are cut as described in [docs/releasing.md](docs/releasing.md).
 
 ## Never commit research data
 
