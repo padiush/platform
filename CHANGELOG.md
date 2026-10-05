@@ -54,6 +54,9 @@ language (`public/locales/whatsnew/`). How a release is cut is in
 - Presigned upload headers are sent as plain strings, which the companion's
   HTTP client requires. Uploads from the field app failed without this.
 - Open dependency advisories are patched.
+- Deleting a project takes its catalog species, their photos and its forms'
+  questions with it. Those tables have no foreign key to cascade from, so they
+  were left behind.
 
 ### Upgrading
 
