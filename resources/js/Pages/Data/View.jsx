@@ -119,9 +119,7 @@ export default function DataView({
         title: t('data.view.title'),
         breadcrumbs: [
             { label: t('navigation.data'), href: route('data.index') },
-            { label: project.name },
         ],
-        subtitle: project.name,
         action: backAction,
     };
 

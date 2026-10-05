@@ -57,12 +57,11 @@ export default function PendingInvites({ project, invites, filters }) {
                     href: route('projects.index'),
                 },
                 {
-                    label: project.name,
+                    label: t('projects.access'),
                     href: route('projects.accesses', { project: project.id }),
                 },
                 { label: t('projects.pending_invites') },
             ]}
-            subtitle={project.name}
             action={
                 <Link
                     className="btn btn-ghost btn-circle"

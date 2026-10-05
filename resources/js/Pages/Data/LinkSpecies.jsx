@@ -358,9 +358,7 @@ export default function LinkSpecies({ project, rows, filters, totals }) {
             title={t('data.title')}
             breadcrumbs={[
                 { label: t('navigation.data'), href: route('data.index') },
-                { label: project.name },
             ]}
-            subtitle={project.name}
             action={
                 <Link
                     className="btn btn-ghost btn-circle"
