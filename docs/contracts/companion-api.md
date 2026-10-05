@@ -260,7 +260,7 @@ POST /api/v1/instances/{instance}/media/intent
   body: { kind: "audio"|"photo", content_type, byte_size, client_id }
   → { upload_url, storage_key, expires_at }        // presigned PUT
 
-  (device PUTs the file directly to upload_url, resumable/chunked)
+  (device PUTs the whole file directly to upload_url, in one request)
 
 POST /api/v1/instances/{instance}/media/complete
   body: { client_id, storage_key, kind, duration_s? }
@@ -274,6 +274,12 @@ POST /api/v1/instances/{instance}/media/complete
 - Transcript delivery: the device learns of it on the next pull —
   `GET /api/v1/instances/{instance}` returns
   `{ …, transcription: { status: "queued"|"processing"|"done"|"failed", text? } }`.
+- **The upload is not resumable yet.** A dropped connection restarts the `PUT`
+  from the first byte. [0012](../decisions/0012-resumable-media-upload.md)
+  decides how a large file will resume: an S3 multipart upload the server
+  tracks, a `media/parts` endpoint that signs only the missing parts, and an
+  opt-in `resumable: true` on `intent` that leaves this handshake unchanged for
+  clients that do not send it.
 
 ### A field record's media
 

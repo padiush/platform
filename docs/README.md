@@ -88,7 +88,9 @@ and an interview lists the records made from each answer.
 
 What remains before field deployment for sensitive studies is hardening rather
 than new surface — tracked as: **resumable media upload** (single PUT today, so
-a long recording restarts from the beginning on a lost connection),
+a long recording restarts from the beginning on a lost connection; the design
+is settled in [ADR 0012](decisions/0012-resumable-media-upload.md) and not yet
+built),
 **transcription** (null-bound plumbing until a real queue and a self-hosted
 Whisper are provisioned, per
 [ADR 0005](decisions/0005-interview-transcription-whisper.md)), and testing on
@@ -134,6 +136,14 @@ physical devices.
   as a read-only pull. Built and released on this basis, which flips
   [ADR 0003](decisions/0003-capture-only-companion-scope.md) to **Accepted**
   ([companion API](contracts/companion-api.md#settled-decisions)).
+- **Resumable media upload** *(accepted 2026-10-05)* — a file larger than one
+  8 MiB part goes up as an S3 multipart upload the server starts and tracks;
+  a `media/parts` endpoint signs only the parts storage does not have, so a
+  dropped connection costs one part instead of the file, and the device keeps
+  no new state. Opt-in on `intent`, so older clients keep the single `PUT`.
+  The operating system's background upload was rejected because it needs the
+  recording as a plaintext file
+  ([ADR 0012](decisions/0012-resumable-media-upload.md)).
 - **Field records on the companion** *(accepted 2026-08-23)* — recording a
   field record is a field act, so the device authors it: basis, vernacular name,
   collection number, coordinates, photographs and the permit, including from

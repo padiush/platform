@@ -27,6 +27,7 @@ qualifying it.
 | [0009](0009-collecting-permits.md) | Record the permit a specimen was collected under | Accepted |
 | [0010](0010-field-records-and-basis.md) | Record what was observed, not only what was collected | Accepted |
 | [0011](0011-companion-field-records.md) | Record in the field, identify on the web | Accepted |
+| [0012](0012-resumable-media-upload.md) | Resume large media uploads from the parts the server already has | Accepted |
 
 ## Template
 

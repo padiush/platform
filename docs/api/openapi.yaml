@@ -250,7 +250,9 @@ paths:
       summary: Register a media upload and get a presigned URL
       description: >
         Large files go direct to object storage, not through the app server. The
-        device then PUTs the file to `upload_url` (resumable), then calls complete.
+        device then PUTs the whole file to `upload_url` in one request, then calls
+        complete. Resuming an interrupted upload is decided in ADR 0012 and not yet
+        built.
       parameters:
         - $ref: '#/components/parameters/InstanceId'
       requestBody:

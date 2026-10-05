@@ -152,7 +152,9 @@ resurrected by a re-pull" bug.
 Out-of-band from the instance push (files are large, connections flaky):
 
 1. Register intent → presigned direct-to-storage PUT (S3).
-2. Upload the file directly (resumable), independent of the JSON sync.
+2. Upload the file directly, independent of the JSON sync. One `PUT` today;
+   resuming from the parts already sent is decided in
+   [ADR 0012](../decisions/0012-resumable-media-upload.md) and not yet built.
 3. `complete` registers it and, for audio, enqueues transcription.
 4. Transcripts arrive on a later pull — never block capture or push on them.
 
