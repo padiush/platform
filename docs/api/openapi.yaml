@@ -477,7 +477,7 @@ components:
       properties:
         email: { type: string, format: email }
         password: { type: string, format: password }
-        device_name: { type: string, description: Names the token so a lost device can be revoked. }
+        device_name: { type: string, description: 'Names the token, so the user can recognise a lost device in Mi cuenta (/account) on the web and revoke it.' }
     TokenResponse:
       type: object
       properties:

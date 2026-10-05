@@ -6,6 +6,7 @@ import {
     faAnglesRight,
     faBookOpen,
     faChartColumn,
+    faCircleUser,
     faClipboardQuestion,
     faFolderOpen,
     faGauge,
@@ -239,11 +240,27 @@ export default function Sidebar({ rail = false, onToggleRail = null }) {
             </nav>
 
             <div className="border-primary-content/20 flex flex-col gap-1 border-t pt-3">
-                {!rail && (
-                    <div className="truncate px-2 text-sm font-medium opacity-80">
-                        {auth.user.name}
-                    </div>
-                )}
+                {/* The account, under its owner's name. */}
+                <Link
+                    href={route('account.show')}
+                    className={`btn btn-ghost h-auto min-h-9 justify-start gap-2 px-2 py-1.5 font-medium ${
+                        route().current('account.*')
+                            ? 'bg-primary-content/15'
+                            : ''
+                    } ${rail ? 'justify-center' : ''}`}
+                    aria-current={
+                        route().current('account.*') ? 'page' : undefined
+                    }
+                    aria-label={rail ? t('navigation.account') : undefined}
+                    title={t('navigation.account')}
+                >
+                    <FontAwesomeIcon icon={faCircleUser} className="shrink-0" />
+                    {!rail && (
+                        <span className="min-w-0 truncate text-left text-sm">
+                            {auth.user.name}
+                        </span>
+                    )}
+                </Link>
                 <div
                     className={`flex items-center ${rail ? 'flex-col' : 'flex-wrap'} gap-1`}
                 >

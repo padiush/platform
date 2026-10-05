@@ -18,6 +18,9 @@ services:
             DB_DATABASE: padiush
             DB_USERNAME: padiush
             DB_PASSWORD: padiush
+            # Sessions in the database, so Mi cuenta can list and sign out
+            # each browser the user is signed in on.
+            SESSION_DRIVER: database
             MAIL_MAILER: smtp
             MAIL_HOST: mailpit
             MAIL_PORT: 1025

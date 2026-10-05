@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AccountController;
 use App\Http\Controllers\ActiveProjectController;
 use App\Http\Controllers\CollectingPermitController;
 use App\Http\Controllers\FieldRecordController;
@@ -33,6 +34,19 @@ Route::middleware(['auth'])->group(function () {
     // The sidebar's project switcher.
     Route::post('/projects/{project}/activate', [ActiveProjectController::class, 'store'])
         ->name('projects.activate');
+
+    // Mi cuenta: where the user is signed in, and signing it out.
+    Route::controller(AccountController::class)
+        ->prefix('account')
+        ->name('account.')
+        ->group(function () {
+            Route::get('/', 'show')->name('show');
+            Route::delete('/sessions', 'destroyOtherSessions')->name('sessions.destroy-others');
+            Route::delete('/sessions/{session}', 'destroySession')->name('sessions.destroy');
+            Route::delete('/devices/{device}', 'destroyDevice')
+                ->whereNumber('device')
+                ->name('devices.destroy');
+        });
 
     Route::middleware('system_admin')
         ->prefix('system')
