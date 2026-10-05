@@ -3,9 +3,9 @@ import ChartCard from '@/Components/ChartCard';
 import EmptyState from '@/Components/EmptyState';
 import MetricCard from '@/Components/MetricCard';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { faArrowLeft, faDownload } from '@fortawesome/free-solid-svg-icons';
+import DataTabs from '@/Pages/Data/Partials/DataTabs';
+import { faDownload } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Link } from '@inertiajs/react';
 import { useTranslation } from 'react-i18next';
 import IndexBarChart from './Partials/IndexBarChart';
 import UseHeatmap from './Partials/UseHeatmap';
@@ -75,7 +75,12 @@ function ScientificName({ species }) {
     );
 }
 
-export default function Reports({ project, indices, evidence = null }) {
+export default function Reports({
+    project,
+    tabs = {},
+    indices,
+    evidence = null,
+}) {
     const { t } = useTranslation();
 
     const {
@@ -131,23 +136,12 @@ export default function Reports({ project, indices, evidence = null }) {
     return (
         <AuthenticatedLayout
             title={t('data.reports.title')}
-            breadcrumbs={[
-                { label: t('navigation.data'), href: route('data.index') },
-            ]}
             subtitle={t('data.reports.subtitle')}
-            action={
-                <Link
-                    href={route('data.index')}
-                    className="btn btn-ghost btn-circle"
-                    aria-label={t('navigation.back')}
-                >
-                    <FontAwesomeIcon icon={faArrowLeft} />
-                </Link>
-            }
             actionRight={hasData && download}
         >
             <div className="p-4 md:pt-8 lg:pt-12">
                 <div className="mx-auto max-w-7xl space-y-4 sm:px-6 lg:px-8">
+                    <DataTabs project={project} active="reports" tabs={tabs} />
                     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                         <MetricCard
                             label={t('data.reports.informants')}

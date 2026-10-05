@@ -39,48 +39,20 @@ class InterviewDataController extends Controller
 {
     use ChecksProjectDataAccess;
 
-    public function index(Request $request): Response|RedirectResponse
+    /**
+     * The data section's tabs the user's role opens: linking is for whoever
+     * manages the data, the reports for whoever generates them, and an export
+     * for either.
+     *
+     * @return array{link: bool, reports: bool, export: bool}
+     */
+    private function tabs(Project $project): array
     {
-        $accesses = Auth::user()
-            ->projectAccesses()
-            ->with(['project', 'capability'])
-            ->get();
+        $user = Auth::user();
+        $manage = $user->can('manageData', $project);
+        $reports = $user->can('generateReports', $project);
 
-        $projects = collect();
-
-        foreach ($accesses as $access) {
-            $project = $access->project;
-
-            if (! $project) {
-                continue;
-            }
-
-            // Narrowed to the project the sidebar is open on.
-            if ($request->filled('project') && $project->id !== $request->integer('project')) {
-                continue;
-            }
-
-            // Only include projects where the user has at least one relevant capability
-            $canManageData = (bool) $access->capability->manage_data;
-            $canGenerateReports = (bool) $access->capability->generate_reports;
-
-            if ($canManageData || $canGenerateReports) {
-                $projects->push([
-                    'id' => $project->id,
-                    'name' => $project->name,
-                    'unlinked_count' => $project->unlinkedAnswers()->count(),
-                    'linked_count' => $project->linkedAnswers()->count(),
-                    'capabilities' => [
-                        'manage_data' => $canManageData,
-                        'generate_reports' => $canGenerateReports,
-                    ],
-                ]);
-            }
-        }
-
-        return Inertia::render('Data/Index', [
-            'projects' => $projects,
-        ]);
+        return ['link' => $manage, 'reports' => $reports, 'export' => $manage || $reports];
     }
 
     public function viewData(
@@ -98,10 +70,18 @@ class InterviewDataController extends Controller
             ->filter(fn ($form) => $form->instances_count > 0)
             ->values();
 
+        // Nothing recorded yet: the section still opens, on how it fills.
         if ($forms->isEmpty()) {
-            return redirect()
-                ->route('data.index')
-                ->with('error', 'Este proyecto no tiene formularios con datos.');
+            return Inertia::render('Data/View', [
+                'project' => ['id' => $project->id, 'name' => $project->name],
+                'tabs' => $this->tabs($project),
+                'forms' => [],
+                'structure' => null,
+                'rows' => null,
+                'filters' => ['tab' => 'table'],
+                'interviewers' => [],
+                'summary' => null,
+            ]);
         }
 
         $form = $forms->firstWhere('id', (int) $request->query('form')) ?? $forms->first();
@@ -136,6 +116,7 @@ class InterviewDataController extends Controller
                 'id' => $project->id,
                 'name' => $project->name,
             ],
+            'tabs' => $this->tabs($project),
             'forms' => $forms->map(fn ($f) => [
                 'id' => $f->id,
                 'name' => $f->name,
@@ -244,17 +225,6 @@ class InterviewDataController extends Controller
     ): Response|RedirectResponse {
         $this->checkPermission($project);
 
-        // Only bounce when the project has no linkable answers at all. An empty
-        // search/filter result stays on the page and shows an empty state.
-        if ($project->speciesAnswers()->count() === 0) {
-            return redirect()
-                ->route('data.index')
-                ->with(
-                    'error',
-                    'No hay respuestas en este proyecto que puedan vincularse a especies.'
-                );
-        }
-
         $filters = [
             'q' => trim((string) $request->query('q', '')),
             'status' => in_array($request->query('status'), SpeciesLinkingList::STATUSES, true)
@@ -277,6 +247,10 @@ class InterviewDataController extends Controller
                 'id' => $project->id,
                 'name' => $project->name,
             ],
+            'tabs' => $this->tabs($project),
+            // A project with nothing to link opens on why, rather than turning
+            // away the tab the section offers.
+            'linkable' => $project->speciesAnswers()->exists(),
             'rows' => $rows,
             'filters' => $filters,
             'totals' => [
@@ -458,6 +432,7 @@ class InterviewDataController extends Controller
                 'id' => $project->id,
                 'name' => $project->name,
             ],
+            'tabs' => $this->tabs($project),
             'indices' => $indices->compute($project),
             // Stated, not enforced — the same treatment unlinked citations get,
             // so a researcher knows the denominator of what is documented.
@@ -552,6 +527,7 @@ class InterviewDataController extends Controller
                 'id' => $project->id,
                 'name' => $project->name,
             ],
+            'tabs' => $this->tabs($project),
             // Deep-link prefill (e.g. from the View page's "Customize export").
             'initial' => [
                 'mode' => in_array($request->query('mode'), ['custom', 'ethnobotanyr'], true)

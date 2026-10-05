@@ -2,8 +2,6 @@
 
 namespace App\Services;
 
-use App\Models\InterviewForm;
-use App\Models\InterviewInstance;
 use App\Models\Project;
 use App\Models\ProjectAccess;
 use App\Models\User;
@@ -15,19 +13,20 @@ use Illuminate\Support\Collection;
  *
  * Almost every page belongs to one project, so the navigation works in one at
  * a time instead of asking for the project again in every section. The page's
- * address is the authority: a page that names a project, or a form, interview
- * or record of one, is in that project. A page that names none — the
- * dashboard, a section's landing page — is in the project the user last
- * worked in, which is kept on their account.
+ * address is the authority: every page of a project is under
+ * /projects/{project}, and is in that project. A page that names none — the
+ * dashboard, the list of projects — is in the project the user last worked
+ * in, which is kept on their account.
  */
 class ActiveProject
 {
     /**
-     * The sidebar's sections, in order. Each one is offered in a project only
-     * when the user's role there opens it; a finished project takes no new
-     * forms and no new interviews, so those two are not offered in one.
+     * The sidebar's sections, in order, then the project's administration.
+     * Each one is offered in a project only when the user's role there opens
+     * it; a finished project takes no new forms and no new interviews, so
+     * those two are not offered in one.
      */
-    public const SECTIONS = ['overview', 'forms', 'interviews', 'records', 'catalog', 'data'];
+    public const SECTIONS = ['overview', 'forms', 'interviews', 'records', 'catalog', 'data', 'settings', 'members'];
 
     /** @var array<int, Collection<int, ProjectAccess>> */
     private array $accesses = [];
@@ -56,16 +55,13 @@ class ActiveProject
             return null;
         }
 
-        $project = match (true) {
-            $route->parameter('project') instanceof Project => $route->parameter('project'),
-            $route->parameter('form') instanceof InterviewForm => $route->parameter('form')->project,
-            $route->parameter('instance') instanceof InterviewInstance => $route->parameter('instance')->form?->project,
-            // A section's landing page narrowed to one project.
-            ctype_digit((string) $request->query('project')) => Project::find((int) $request->query('project')),
-            default => null,
-        };
+        $project = $route->parameter('project');
 
-        if ($project === null || ! $this->accesses($request->user())->has($project->id)) {
+        if (! $project instanceof Project) {
+            return null;
+        }
+
+        if (! $this->accesses($request->user())->has($project->id)) {
             return null;
         }
 
@@ -157,7 +153,11 @@ class ActiveProject
             'catalog' => $can->view_catalog
                 ? route('catalogs.show', ['project' => $id]) : null,
             'data' => $can->manage_data || $can->generate_reports
-                ? route('data.index', ['project' => $id]) : null,
+                ? route('data.view', ['project' => $id]) : null,
+            'settings' => $can->manage_project
+                ? route('projects.edit', ['project' => $id]) : null,
+            'members' => $can->manage_users
+                ? route('projects.accesses', ['project' => $id]) : null,
         ];
 
         return array_filter($sections);

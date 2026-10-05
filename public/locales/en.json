@@ -32,7 +32,9 @@
         "menu": "Navigation",
         "collapse_menu": "Collapse menu",
         "expand_menu": "Expand menu",
-        "close_menu": "Close menu"
+        "close_menu": "Close menu",
+        "settings": "Settings",
+        "members": "Members"
     },
     "titles": {
         "my_projects": "My Projects"
@@ -48,14 +50,12 @@
         "no_projects": "You are not the author of any project nor have participated in one yet.",
         "create": "Create Project",
         "create_project": "Create Project",
-        "edit_project_details": "Edit Project Details",
         "project_details": "Project Details",
         "name": "Project Name",
         "author": "Authorship",
         "institution": "Institution",
         "author_email": "Author Email",
         "country": "Country",
-        "access": "Project Access",
         "invite_user": "Invite User to Project",
         "invite_user_hint": "Send an email invitation to grant access to this project.",
         "users_with_access": "Users with Access to the Project",
@@ -87,7 +87,13 @@
         "cannot_accept_another_user_invite": "You cannot accept this invitation.",
         "cannot_decline_another_user_invite": "You cannot decline this invitation.",
         "invite_expired": "This invitation has expired.",
-        "invite_not_found": "That invitation doesn't belong to this project."
+        "invite_not_found": "That invitation doesn't belong to this project.",
+        "settings": {
+            "details": "Project details",
+            "delete_title": "Delete the project",
+            "delete_hint": "This deletes the project, its forms, interviews, records and catalog, and every member's access to it. It cannot be undone.",
+            "delete": "Delete project"
+        }
     },
     "actions": {
         "accept": "Accept",
@@ -547,14 +553,11 @@
     },
     "data": {
         "custom_export": "Customized export",
-        "data_processing": "Data processing",
         "generate_ethnobotanyr": "Generate report for EthnobotanyR",
         "link_species": "Link species",
         "title": "Link species",
         "link_to": "Link to species",
         "select_species": "Select a species",
-        "linked_reports": "Usage reports linked to taxonomic information",
-        "unlinked_reports": "Usage reports not linked to taxonomic information",
         "select_usage_field": "Select the field containing the use",
         "custom_instructions": "Select the fields you want to include in the report. You cannot mix fields from repeatable and unique sections.",
         "repeatable": "repeatable section",
@@ -624,7 +627,9 @@
                 "count": "Count",
                 "percent": "%"
             },
-            "customize_export": "Customize export…"
+            "customize_export": "Customize export…",
+            "no_data_title": "No interviews with data yet",
+            "no_data_hint": "Answers will appear here once interviews are recorded, on the web or from the field app."
         },
         "export": {
             "title": "Export",
@@ -703,6 +708,15 @@
             "photo_alt": "Photograph from the interview",
             "title": "Evidence",
             "transcript": "Transcript"
+        },
+        "no_access": "You don't have access to that project's data.",
+        "no_linkable_title": "No answers to link",
+        "no_linkable_hint": "Mark a form's question as linked to species; its answers will appear here to identify against the catalog.",
+        "tabs": {
+            "table": "Data",
+            "link": "Link species",
+            "reports": "Indices",
+            "export": "Export"
         }
     },
     "public": {
@@ -868,13 +882,6 @@
     "theme": {
         "switch_to_light": "Switch to light theme",
         "switch_to_dark": "Switch to dark theme"
-    },
-    "hubs": {
-        "empty": {
-            "title_data": "No data to process yet",
-            "hint_data": "You need a project where you can manage data or generate reports.",
-            "cta": "Go to my projects"
-        }
     },
     "software": {
         "title": "About this software",

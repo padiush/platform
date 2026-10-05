@@ -7,9 +7,10 @@ import Input from '@/Components/Input';
 import Pagination from '@/Components/Pagination';
 import Select from '@/Components/Select';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import DataTabs from '@/Pages/Data/Partials/DataTabs';
 import InterviewMedia from '@/Pages/Data/Partials/InterviewMedia';
 import { formatDateTime } from '@/utils/datetime';
-import { faArrowLeft, faDownload } from '@fortawesome/free-solid-svg-icons';
+import { faDownload } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link, router, usePage } from '@inertiajs/react';
 import axios from 'axios';
@@ -42,6 +43,7 @@ function Cell({ cell }) {
 
 export default function DataView({
     project,
+    tabs = {},
     forms,
     structure,
     rows,
@@ -105,33 +107,27 @@ export default function DataView({
         );
     };
 
-    const backAction = (
-        <Link
-            className="btn btn-ghost btn-circle"
-            href={route('data.index')}
-            aria-label={t('navigation.back')}
-        >
-            <FontAwesomeIcon icon={faArrowLeft} />
-        </Link>
-    );
-
-    const layoutProps = {
-        title: t('data.view.title'),
-        breadcrumbs: [
-            { label: t('navigation.data'), href: route('data.index') },
-        ],
-        action: backAction,
-    };
+    const layoutProps = { title: t('navigation.data') };
+    const dataTabs = <DataTabs project={project} active="table" tabs={tabs} />;
 
     if (!structure) {
         return (
             <AuthenticatedLayout {...layoutProps}>
                 <div className="p-4 md:pt-8 lg:pt-12">
                     <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                        <EmptyState
-                            title={t('data.view.no_sections_title')}
-                            hint={t('data.view.no_sections_hint')}
-                        />
+                        {dataTabs}
+                        {/* Nothing recorded yet, or a form with no sections. */}
+                        {forms.length === 0 ? (
+                            <EmptyState
+                                title={t('data.view.no_data_title')}
+                                hint={t('data.view.no_data_hint')}
+                            />
+                        ) : (
+                            <EmptyState
+                                title={t('data.view.no_sections_title')}
+                                hint={t('data.view.no_sections_hint')}
+                            />
+                        )}
                     </div>
                 </div>
             </AuthenticatedLayout>
@@ -144,6 +140,7 @@ export default function DataView({
         <AuthenticatedLayout {...layoutProps}>
             <div className="p-4 md:pt-8 lg:pt-12">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
+                    {dataTabs}
                     <Card title={t('data.view.title')}>
                         <div className="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
                             {forms.length > 1 && (

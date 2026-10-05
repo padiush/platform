@@ -105,7 +105,7 @@ class ProjectTest extends TestCase
         ]);
     }
 
-    public function test_projects_edit_redirects_to_the_list_modal_for_projects_with_manage_capability()
+    public function test_projects_settings_render_for_projects_with_manage_capability()
     {
         $user = User::factory()->create();
 
@@ -119,7 +119,25 @@ class ProjectTest extends TestCase
 
         $response = $this->actingAs($user)->get(route('projects.edit', $project));
 
-        $response->assertRedirect(route('projects.index', ['edit' => $project->id]));
+        $response->assertOk();
+        $response->assertInertia(fn ($page) => $page
+            ->component('Projects/Settings')
+            ->where('project.id', $project->id)
+            ->where('project.name', $project->name)
+        );
+        $this->assertSame("/projects/{$project->id}/settings", route('projects.edit', $project, false));
+    }
+
+    /** The details used to be edited in a modal on the list; an old link opens the settings. */
+    public function test_the_old_edit_link_opens_the_settings()
+    {
+        $user = User::factory()->create();
+        $project = Project::factory()->create(['user_id' => $user->id]);
+
+        $this->actingAs($user)
+            ->get(route('projects.index', ['edit' => $project->id]))
+            ->assertStatus(301)
+            ->assertRedirect(route('projects.edit', $project));
     }
 
     public function test_projects_edit_cannot_be_rendered_for_projects_without_access()
@@ -173,7 +191,7 @@ class ProjectTest extends TestCase
             'country' => 'El Salvador',
         ]);
 
-        $response->assertRedirect(route('projects.index'));
+        $response->assertRedirect(route('projects.edit', $project));
         $response->assertSessionHas('message', 'project.update_success');
         $response->assertSessionHas('message_type', 'success');
         $this->assertDatabaseHas('projects', [

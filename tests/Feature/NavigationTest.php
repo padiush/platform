@@ -15,11 +15,15 @@ class NavigationTest extends TestCase
 {
     use InteractsWithProjects, RefreshDatabase;
 
-    public function test_hub_pages_render_in_place_when_the_user_lacks_the_capability()
+    /**
+     * Each section lives under its project. A member whose role does not open
+     * one is sent to the project's overview, which every member can open,
+     * rather than to a page that could turn them away again.
+     */
+    public function test_a_section_the_role_does_not_open_leads_to_the_overview()
     {
         $project = Project::factory()->create();
-        // A role with every flag off (factory defaults): the member can open
-        // each hub and gets its empty state instead of a redirect bounce.
+        // A role with every flag off (factory defaults).
         $capability = ProjectCapability::factory()->create(['name' => 'None']);
         $user = User::factory()->create();
         ProjectAccess::factory()->create([
@@ -28,18 +32,18 @@ class NavigationTest extends TestCase
             'project_capability_id' => $capability->id,
         ]);
 
-        $hubs = [
-            ['data.index', 'Data/Index'],
-        ];
-
-        foreach ($hubs as [$routeName, $component]) {
-            $response = $this->actingAs($user)->get(route($routeName));
-
-            $response->assertOk();
-            $response->assertInertia(
-                fn (Assert $page) => $page->component($component)
-            );
+        foreach (['designer.index', 'interviews.index', 'catalogs.fieldRecords.index', 'catalogs.show', 'data.view'] as $name) {
+            $this->actingAs($user)
+                ->get(route($name, $project))
+                ->assertRedirect(route('projects.overview', $project));
         }
+
+        $this->actingAs($user)
+            ->get(route('projects.overview', $project))
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->where('projectNav.sections', ['overview' => route('projects.overview', $project)])
+            );
     }
 
     public function test_shared_capability_flags_reflect_the_users_accesses()

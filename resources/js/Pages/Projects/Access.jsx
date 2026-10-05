@@ -4,13 +4,9 @@ import ConfirmModal from '@/Components/ConfirmModal';
 import FormModal from '@/Components/FormModal';
 import useQueryModal from '@/Hooks/useQueryModal';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import {
-    faArrowLeft,
-    faTrashCan,
-    faUserPlus,
-} from '@fortawesome/free-solid-svg-icons';
+import { faTrashCan, faUserPlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Link, router } from '@inertiajs/react';
+import { router } from '@inertiajs/react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import InviteForm from './Partials/InviteForm';
@@ -41,24 +37,7 @@ export default function Accesses({
     };
 
     return (
-        <AuthenticatedLayout
-            title={t('projects.access')}
-            breadcrumbs={[
-                {
-                    label: t('navigation.projects'),
-                    href: route('projects.index'),
-                },
-            ]}
-            action={
-                <Link
-                    href={route('projects.index')}
-                    className="btn btn-ghost btn-circle"
-                    aria-label={t('navigation.back')}
-                >
-                    <FontAwesomeIcon icon={faArrowLeft} />
-                </Link>
-            }
-        >
+        <AuthenticatedLayout title={t('navigation.members')}>
             <div className="p-4 md:pt-8 lg:pt-12">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
                     <div className="grid w-full grid-cols-1 gap-4 lg:grid-cols-3">

@@ -159,6 +159,33 @@ describe('AuthenticatedLayout', () => {
         ).not.toHaveAttribute('aria-current');
     });
 
+    it('offers the project’s administration to the roles that run it', () => {
+        currentRoute = 'projects.edit';
+        mockProps = props({
+            projectNav: {
+                active: herbs,
+                projects: [herbs, trees],
+                sections: {
+                    overview: '/dashboard',
+                    settings: '/projects.edit/1',
+                    members: '/projects.accesses/1',
+                },
+            },
+        });
+        render(<AuthenticatedLayout title="Ajustes">page</AuthenticatedLayout>);
+
+        expect(
+            screen.getByRole('link', { name: 'navigation.settings' }),
+        ).toHaveAttribute('aria-current', 'page');
+        expect(
+            screen.getByRole('link', { name: 'navigation.members' }),
+        ).toHaveAttribute('href', '/projects.accesses/1');
+        // The list of projects is not where a project's settings are.
+        expect(
+            screen.getByRole('link', { name: 'navigation.projects' }),
+        ).not.toHaveAttribute('aria-current');
+    });
+
     it('offers the system only to its administrators', () => {
         layout();
         expect(

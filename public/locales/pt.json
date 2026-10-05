@@ -32,7 +32,9 @@
         "menu": "Navegação",
         "collapse_menu": "Recolher menu",
         "expand_menu": "Expandir menu",
-        "close_menu": "Fechar menu"
+        "close_menu": "Fechar menu",
+        "settings": "Configurações",
+        "members": "Membros"
     },
     "titles": {
         "my_projects": "Meus Projetos"
@@ -48,14 +50,12 @@
         "no_projects": "Você ainda não é autor nem participou de nenhum projeto.",
         "create": "Criar Projeto",
         "create_project": "Criar Projeto",
-        "edit_project_details": "Editar detalhes do projeto",
         "project_details": "Detalhes do projeto",
         "name": "Nome do projeto",
         "author": "Autor",
         "institution": "Instituição",
         "author_email": "Email do autor",
         "country": "País",
-        "access": "Acesso ao projeto",
         "invite_user": "Convidar usuário para o projeto",
         "invite_user_hint": "Envie um convite por e-mail para conceder acesso a este projeto.",
         "users_with_access": "Usuários com acesso ao projeto",
@@ -87,7 +87,13 @@
         "cannot_accept_another_user_invite": "Você não pode aceitar este convite.",
         "invite_expired": "Este convite expirou.",
         "invite_not_found": "Esse convite não pertence a este projeto.",
-        "cannot_decline_another_user_invite": "Você não pode recusar este convite."
+        "cannot_decline_another_user_invite": "Você não pode recusar este convite.",
+        "settings": {
+            "details": "Detalhes do projeto",
+            "delete_title": "Excluir o projeto",
+            "delete_hint": "Isto exclui o projeto, os seus formulários, entrevistas, registros e catálogo, e o acesso de todos os membros. Não pode ser desfeito.",
+            "delete": "Excluir projeto"
+        }
     },
     "actions": {
         "accept": "Aceitar",
@@ -547,14 +553,11 @@
     },
     "data": {
         "custom_export": "Exportação personalizada",
-        "data_processing": "Processamento de dados",
         "generate_ethnobotanyr": "Gerar relatório para EthnobotanyR",
         "link_species": "Espécies de ligação",
         "title": "Vincular espécies",
         "link_to": "Vincular à espécie",
         "select_species": "Selecione uma espécie",
-        "linked_reports": "Relatórios de utilização ligados a informações taxonómicas",
-        "unlinked_reports": "Relatórios de utilização sem ligação a informações taxonómicas",
         "select_usage_field": "Selecione o campo que contém o uso",
         "custom_instructions": "Selecione os campos que deseja incluir no relatório. Você não pode misturar campos de seções repetíveis com seções únicas.",
         "repeatable": "seção repetível",
@@ -624,7 +627,9 @@
                 "count": "Contagem",
                 "percent": "%"
             },
-            "customize_export": "Personalizar exportação…"
+            "customize_export": "Personalizar exportação…",
+            "no_data_title": "Ainda não há entrevistas com dados",
+            "no_data_hint": "As respostas aparecerão aqui quando forem registradas entrevistas, na web ou no aplicativo de campo."
         },
         "export": {
             "title": "Exportar",
@@ -703,6 +708,15 @@
             "photo_alt": "Fotografia da entrevista",
             "title": "Evidência",
             "transcript": "Transcrição"
+        },
+        "no_access": "Você não tem acesso aos dados desse projeto.",
+        "no_linkable_title": "Não há respostas para vincular",
+        "no_linkable_hint": "Marque uma pergunta de um formulário como vinculada a espécies; as respostas aparecerão aqui para identificá-las com o catálogo.",
+        "tabs": {
+            "table": "Dados",
+            "link": "Vincular espécies",
+            "reports": "Índices",
+            "export": "Exportar"
         }
     },
     "public": {
@@ -868,13 +882,6 @@
     "theme": {
         "switch_to_light": "Mudar para tema claro",
         "switch_to_dark": "Mudar para tema escuro"
-    },
-    "hubs": {
-        "empty": {
-            "title_data": "Ainda não há dados para processar",
-            "hint_data": "Você precisa de um projeto onde possa administrar dados ou gerar relatórios.",
-            "cta": "Ir para meus projetos"
-        }
     },
     "software": {
         "title": "Sobre este software",

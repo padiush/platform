@@ -226,7 +226,7 @@ class ResourceScopingTest extends TestCase
             ]
         );
 
-        $response->assertRedirect(route('projects.index'));
+        $response->assertRedirect(route('projects.overview', $mine));
     }
 
     public function test_repeatable_set_of_another_forms_section_cannot_be_deleted()

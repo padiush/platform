@@ -62,13 +62,20 @@ class InterviewDataViewTest extends TestCase
         return $instance;
     }
 
-    public function test_project_without_data_redirects()
+    /** The sidebar offers the section, so it opens even before any interview. */
+    public function test_a_project_without_data_opens_in_place()
     {
         $response = $this->actingAs($this->manager())->get(
             route('data.view', $this->project)
         );
 
-        $response->assertRedirect(route('data.index'));
+        $response->assertOk();
+        $response->assertInertia(fn (Assert $page) => $page
+            ->component('Data/View')
+            ->where('forms', [])
+            ->where('structure', null)
+            ->has('tabs')
+        );
     }
 
     public function test_manager_sees_the_data_table()
@@ -127,7 +134,9 @@ class InterviewDataViewTest extends TestCase
             route('data.view', $this->project)
         );
 
-        $response->assertRedirect(route('projects.index'));
+        // To the project's overview, which every member can open.
+        $response->assertRedirect(route('projects.overview', $this->project));
+        $response->assertSessionHas('message', 'data.no_access');
     }
 
     public function test_outsider_is_denied()
@@ -138,6 +147,6 @@ class InterviewDataViewTest extends TestCase
             route('data.view', $this->project)
         );
 
-        $response->assertRedirect(route('projects.index'));
+        $response->assertRedirect(route('dashboard'));
     }
 }

@@ -166,7 +166,9 @@ class ActiveProjectTest extends TestCase
                 'interviews' => route('interviews.index', ['project' => $id]),
                 'records' => route('catalogs.fieldRecords.index', ['project' => $id]),
                 'catalog' => route('catalogs.show', ['project' => $id]),
-                'data' => route('data.index', ['project' => $id]),
+                'data' => route('data.view', ['project' => $id]),
+                'settings' => route('projects.edit', ['project' => $id]),
+                'members' => route('projects.accesses', ['project' => $id]),
             ], $this->nav($page)['sections']));
     }
 
@@ -194,7 +196,7 @@ class ActiveProjectTest extends TestCase
         $this->actingAs($this->user)
             ->get(route('catalogs.fieldRecords.index', $this->trees))
             ->assertInertia(fn (Assert $page) => $this->assertSame(
-                ['overview', 'records', 'catalog', 'data'],
+                ['overview', 'records', 'catalog', 'data', 'settings', 'members'],
                 array_keys($this->nav($page)['sections'])
             ));
     }
@@ -228,34 +230,5 @@ class ActiveProjectTest extends TestCase
             ->assertForbidden();
 
         $this->assertNull($this->user->fresh()->last_project_id);
-    }
-
-    // ------------------------------------------------- landing pages ---
-
-    /** Each section's landing page shows only the project the sidebar is on. */
-    public function test_a_landing_page_narrowed_to_one_project_shows_only_it()
-    {
-        foreach (['data.index'] as $name) {
-            $this->actingAs($this->user)
-                ->get(route($name, ['project' => $this->trees->id]))
-                ->assertOk()
-                ->assertInertia(fn (Assert $page) => $this->assertSame(
-                    [$this->trees->id],
-                    collect($page->toArray()['props']['projects'])->pluck('id')->all(),
-                    $name
-                ));
-        }
-
-        $this->assertSame($this->trees->id, $this->user->fresh()->last_project_id);
-    }
-
-    public function test_a_landing_page_without_a_project_still_shows_them_all()
-    {
-        $this->actingAs($this->user)
-            ->get(route('data.index'))
-            ->assertInertia(fn (Assert $page) => $this->assertCount(
-                2,
-                $page->toArray()['props']['projects']
-            ));
     }
 }

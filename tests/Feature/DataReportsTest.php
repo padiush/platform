@@ -181,8 +181,8 @@ class DataReportsTest extends TestCase
             route('data.reports', ['project' => $this->project])
         );
 
-        $response->assertRedirect(route('projects.index'));
-        $response->assertSessionHas('error', 'No tienes acceso a este proyecto.');
+        $response->assertRedirect(route('dashboard'));
+        $response->assertSessionHas('message', 'data.no_access');
     }
 
     public function test_report_download_returns_a_file()
