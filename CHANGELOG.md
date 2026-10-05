@@ -65,13 +65,18 @@ language (`public/locales/whatsnew/`). How a release is cut is in
 - Deleting a field record, an interview, a form, a project or an account
   deletes its recordings and photographs from storage, not only their rows.
   Until now only removing a single photo from a record did, so deleted audio
-  and photographs stayed in the bucket.
+  and photographs stayed in the bucket. A new `media:prune-orphans` command
+  lists the objects left behind before this, and removes them with `--delete`.
 
 ### Upgrading
 
 - Run the migrations.
 - Run the scheduler (`php artisan schedule:run` every minute).
 - Set `SESSION_DRIVER=database`.
+- Run `php artisan media:prune-orphans` to see the stored files that earlier
+  deletions left behind, then `php artisan media:prune-orphans --delete` to
+  remove them. It reads `--disk=s3` by default; run it for any other disk media
+  was stored on.
 
 ## [1.0.0] — 2026-08-15
 
