@@ -15,6 +15,10 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         $schedule->command('sitemap:generate')->dailyAt('00:00');
+
+        // Parts of resumable uploads nobody came back for
+        // (docs/decisions/0012-resumable-media-upload.md).
+        $schedule->command('media:abort-stale-uploads')->dailyAt('03:00');
     }
 
     /**

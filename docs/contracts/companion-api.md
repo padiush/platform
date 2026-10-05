@@ -316,7 +316,9 @@ POST /api/v1/instances/{instance}/media/complete   // as above
   object assembled and succeeds.
 - **`410 api.media.upload_expired`** from `parts` or `complete` means storage no
   longer has the upload: it was abandoned and aborted. Call `intent` again,
-  which starts a new one.
+  which starts a new one. A scheduled job (`media:abort-stale-uploads`, daily)
+  aborts uploads started more than seven days ago and any that no media row
+  names.
 - **Opt-in.** A client that never sends `resumable` gets exactly the response
   above, and a server without this ignores the field and answers with an
   `upload_url` and no `upload`, which a client should treat as a single `PUT`.
