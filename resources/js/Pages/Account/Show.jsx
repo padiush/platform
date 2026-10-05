@@ -168,7 +168,7 @@ export default function Show({ account, sessions = null, devices = [] }) {
         <AuthenticatedLayout title={t('account.title')}>
             <div className="p-4 md:pt-8 lg:pt-12">
                 <div className="mx-auto flex max-w-3xl flex-col gap-4 sm:px-6 lg:px-8">
-                    <Card>
+                    <Card className="w-full">
                         <div className="min-w-0">
                             <div className="text-lg font-semibold break-words">
                                 {account.name}
@@ -180,6 +180,7 @@ export default function Show({ account, sessions = null, devices = [] }) {
                     </Card>
 
                     <Card
+                        className="w-full"
                         title={t('account.sessions.title')}
                         description={t('account.sessions.description')}
                         actions={
@@ -213,6 +214,7 @@ export default function Show({ account, sessions = null, devices = [] }) {
                     </Card>
 
                     <Card
+                        className="w-full"
                         title={t('account.devices.title')}
                         description={t('account.devices.description')}
                     >
