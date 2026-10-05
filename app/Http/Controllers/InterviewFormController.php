@@ -33,7 +33,7 @@ class InterviewFormController extends Controller
         }
     }
 
-    public function index(): Response|RedirectResponse
+    public function index(Request $request): Response|RedirectResponse
     {
         $accesses = Auth::user()
             ->projectAccesses()
@@ -46,6 +46,11 @@ class InterviewFormController extends Controller
             $project = $access->project;
             if (! $project) {
                 // Access row pointing at a deleted project — skip it.
+                continue;
+            }
+
+            // Narrowed to the project the sidebar is open on.
+            if ($request->filled('project') && $project->id !== $request->integer('project')) {
                 continue;
             }
 

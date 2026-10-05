@@ -26,7 +26,7 @@ class ProjectCatalogController extends Controller
     /** Linked interview records shown per page on the species page. */
     private const LINKED_PER_PAGE = 15;
 
-    public function index(): Response|RedirectResponse
+    public function index(Request $request): Response|RedirectResponse
     {
         $accesses = Auth::user()
             ->projectAccesses()
@@ -42,6 +42,11 @@ class ProjectCatalogController extends Controller
             $project = $access->project;
 
             if (! $project) {
+                continue;
+            }
+
+            // Narrowed to the project the sidebar is open on.
+            if ($request->filled('project') && $project->id !== $request->integer('project')) {
                 continue;
             }
 

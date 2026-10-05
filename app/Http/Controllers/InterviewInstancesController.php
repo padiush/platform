@@ -61,7 +61,7 @@ class InterviewInstancesController extends Controller
         );
     }
 
-    public function index(): Response|RedirectResponse
+    public function index(Request $request): Response|RedirectResponse
     {
         $accesses = Auth::user()
             ->projectAccesses()
@@ -74,6 +74,11 @@ class InterviewInstancesController extends Controller
             $project = $access->project;
 
             if (! $project) {
+                continue;
+            }
+
+            // Narrowed to the project the sidebar is open on.
+            if ($request->filled('project') && $project->id !== $request->integer('project')) {
                 continue;
             }
 

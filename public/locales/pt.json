@@ -26,7 +26,21 @@
         "back": "Voltar",
         "home": "Início",
         "open_menu": "Abrir menu",
-        "logout": "Sair"
+        "logout": "Sair",
+        "overview": "Resumo",
+        "forms": "Formulários",
+        "field_records": "Registros de campo",
+        "catalog": "Catálogo",
+        "project": "Projeto",
+        "switch_project": "Trocar de projeto",
+        "projects_in_progress": "Em andamento",
+        "projects_finished": "Finalizados",
+        "all_projects": "Todos os projetos",
+        "no_project": "Sem projeto",
+        "menu": "Navegação",
+        "collapse_menu": "Recolher menu",
+        "expand_menu": "Expandir menu",
+        "close_menu": "Fechar menu"
     },
     "titles": {
         "my_projects": "Meus Projetos"

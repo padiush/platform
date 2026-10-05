@@ -6,14 +6,17 @@ import { useTranslation } from 'react-i18next';
 /**
  * Trail for drill-down pages: every ancestor is a link, the current page is
  * plain text. Items: [{ label, href? }] — omit href on the last one.
+ * `compact` keeps it to one small line, each step shortened to fit.
  */
-export default function Breadcrumbs({ items }) {
+export default function Breadcrumbs({ items, compact = false }) {
     const { t } = useTranslation();
 
     return (
         <nav
             aria-label={t('navigation.breadcrumb')}
-            className="text-base-content/60 flex flex-wrap items-center gap-2 text-sm font-normal"
+            className={`text-base-content/60 flex items-center font-normal ${
+                compact ? 'min-w-0 gap-1.5 text-xs' : 'flex-wrap gap-2 text-sm'
+            }`}
         >
             {items.map((item, index) => (
                 <span

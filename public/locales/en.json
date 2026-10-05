@@ -26,7 +26,21 @@
         "back": "Back",
         "home": "Home",
         "open_menu": "Open menu",
-        "logout": "Log out"
+        "logout": "Log out",
+        "overview": "Overview",
+        "forms": "Forms",
+        "field_records": "Field records",
+        "catalog": "Catalog",
+        "project": "Project",
+        "switch_project": "Switch project",
+        "projects_in_progress": "In progress",
+        "projects_finished": "Finished",
+        "all_projects": "All projects",
+        "no_project": "No project",
+        "menu": "Navigation",
+        "collapse_menu": "Collapse menu",
+        "expand_menu": "Expand menu",
+        "close_menu": "Close menu"
     },
     "titles": {
         "my_projects": "My Projects"
