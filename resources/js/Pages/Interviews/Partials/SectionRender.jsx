@@ -27,6 +27,7 @@ export default function SectionRender({
     instance,
     answers = [],
     answeredKeys = new Set(),
+    catalogProjectId = null,
     onAnswered = () => {},
 }) {
     const { t } = useTranslation();
@@ -45,6 +46,17 @@ export default function SectionRender({
     useEffect(() => {
         setRepeatCount(initialRepeatCount);
     }, [initialRepeatCount]);
+
+    // A collapsed set would otherwise give no sign that a plant named in it
+    // was recorded; its header says how many field records came out of it.
+    const recordsIn = (repeatableIndex) =>
+        answers
+            .filter(
+                (ans) =>
+                    ans.section_id === section.id &&
+                    (ans.repeatable_index ?? 0) === repeatableIndex,
+            )
+            .reduce((sum, ans) => sum + (ans.field_records?.length ?? 0), 0);
 
     const answeredIn = (repeatableIndex) =>
         section.items.filter((item) =>
@@ -84,10 +96,19 @@ export default function SectionRender({
                             <span>
                                 {section.name} #{i + 1}
                             </span>
-                            <ProgressBadge
-                                answered={answeredIn(i)}
-                                total={section.items.length}
-                            />
+                            <span className="ml-2 inline-flex items-center gap-2">
+                                {recordsIn(i) > 0 && (
+                                    <span className="badge badge-outline badge-sm whitespace-nowrap">
+                                        {t('interviews.field_records_count', {
+                                            count: recordsIn(i),
+                                        })}
+                                    </span>
+                                )}
+                                <ProgressBadge
+                                    answered={answeredIn(i)}
+                                    total={section.items.length}
+                                />
+                            </span>
                         </summary>
                         <div className="collapse-content text-sm">
                             {section.description && (
@@ -104,6 +125,7 @@ export default function SectionRender({
                                         instance={instance}
                                         answers={answers}
                                         repeatableIndex={i}
+                                        catalogProjectId={catalogProjectId}
                                         onAnswered={onAnswered}
                                     />
                                 ))}
@@ -162,6 +184,7 @@ export default function SectionRender({
                         item={item}
                         instance={instance}
                         answers={answers}
+                        catalogProjectId={catalogProjectId}
                         onAnswered={onAnswered}
                     />
                 ))}

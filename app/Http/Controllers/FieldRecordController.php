@@ -51,7 +51,7 @@ class FieldRecordController extends Controller
         }
 
         $fieldRecords = $project->fieldRecords()
-            ->with(['currentDetermination.species', 'collectingPermit', 'media'])
+            ->with(['currentDetermination.species', 'collectingPermit', 'media', 'answer.item'])
             ->orderByDesc('created_at')
             ->get();
 
@@ -92,6 +92,9 @@ class FieldRecordController extends Controller
             'exemptions' => FieldRecord::EXEMPTIONS,
             'bases' => FieldRecord::BASES,
             'canEdit' => (bool) $user->can('editCatalog', $project),
+            // A record made from an interview answer links to that interview
+            // only for someone who could open it anyway.
+            'canOpenInterviews' => (bool) $user->can('recordData', $project),
             'nextAccessionNumber' => $this->accessions->peek($project),
             // The species tab is a dead end without one — catalogs.show
             // redirects away from an empty catalog.

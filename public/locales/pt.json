@@ -275,7 +275,11 @@
         "item_not_found": "O campo não foi encontrado nesta entrevista.",
         "instance_label": "Entrevista",
         "saving": "Salvando…",
-        "saved": "Salvo"
+        "saved": "Salvo",
+        "field_records": "Registros de campo:",
+        "field_record_unnumbered": "Sem número",
+        "field_records_count_one": "{{count}} registro de campo",
+        "field_records_count_other": "{{count}} registros de campo"
     },
     "common": {
         "actions": {
@@ -441,6 +445,7 @@
             "filter_unvouchered": "Sem voucher",
             "format_csv": "CSV (.csv)",
             "format_xlsx": "Excel (.xlsx)",
+            "from_interview": "De uma entrevista",
             "identify": "Identificar",
             "indet": "indet.",
             "locality": "Localidade",

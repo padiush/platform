@@ -472,6 +472,7 @@ export default function SpeciesShow({
     canEdit = false,
     distribution = null,
     fieldRecords = [],
+    canOpenInterviews = false,
 }) {
     const { t } = useTranslation();
     const deletionModalRef = useRef();
@@ -758,6 +759,7 @@ export default function SpeciesShow({
                         species={species}
                         fieldRecords={fieldRecords}
                         canEdit={canEdit}
+                        canOpenInterviews={canOpenInterviews}
                     />
                 </Card>
 

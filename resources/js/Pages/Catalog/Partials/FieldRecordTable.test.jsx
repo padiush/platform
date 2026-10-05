@@ -1,6 +1,12 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
+vi.mock('@inertiajs/react', () => ({
+    Link: ({ children, ...props }) => <a {...props}>{children}</a>,
+}));
+
+globalThis.route = (name, params) => `/${name}/${params}`;
+
 import FieldRecordTable from './FieldRecordTable';
 
 const determined = {
@@ -135,5 +141,85 @@ describe('FieldRecordTable', () => {
 
         expect(onDetermine).toHaveBeenCalledWith(determined);
         expect(onDeposit).toHaveBeenCalledWith(determined);
+    });
+
+    describe('a record made from an interview answer', () => {
+        const fromAnswer = {
+            ...indet,
+            id: 3,
+            interview: {
+                instance_id: 'a9731e28',
+                question: 'Nombre local de la planta',
+            },
+        };
+
+        it('says which question it came out of', () => {
+            render(<FieldRecordTable fieldRecords={[fromAnswer]} />);
+
+            expect(
+                screen.getByText('catalogs.fieldRecords.from_interview'),
+            ).toBeInTheDocument();
+            expect(
+                screen.getByText('Nombre local de la planta'),
+            ).toBeInTheDocument();
+        });
+
+        it('links to the interview for someone who can open it', () => {
+            render(
+                <FieldRecordTable
+                    fieldRecords={[fromAnswer]}
+                    canOpenInterviews
+                />,
+            );
+
+            expect(
+                screen.getByText('catalogs.fieldRecords.from_interview'),
+            ).toHaveAttribute('href', '/interviews.show/a9731e28');
+        });
+
+        /** Someone who reads the catalog but not the interviews. */
+        it('does not link for someone who cannot', () => {
+            render(<FieldRecordTable fieldRecords={[fromAnswer]} />);
+
+            expect(
+                screen
+                    .getByText('catalogs.fieldRecords.from_interview')
+                    .closest('a'),
+            ).toBeNull();
+        });
+
+        it('says nothing of the kind for a record made on its own', () => {
+            render(<FieldRecordTable fieldRecords={[determined]} />);
+
+            expect(
+                screen.queryByText('catalogs.fieldRecords.from_interview'),
+            ).not.toBeInTheDocument();
+        });
+
+        /** Arriving from an interview, the record's row is marked. */
+        it('marks the row an interview linked to', () => {
+            window.history.replaceState(null, '', '/records#record-3');
+
+            const { container } = render(
+                <FieldRecordTable fieldRecords={[fromAnswer, determined]} />,
+            );
+
+            expect(container.querySelector('#record-3')).toHaveClass(
+                'bg-primary/10',
+            );
+            expect(container.querySelector('#record-1')).not.toHaveClass(
+                'bg-primary/10',
+            );
+            window.history.replaceState(null, '', '/');
+        });
+
+        /** The interview page links to a record's row by this anchor. */
+        it('gives each row an anchor', () => {
+            const { container } = render(
+                <FieldRecordTable fieldRecords={[fromAnswer]} />,
+            );
+
+            expect(container.querySelector('#record-3')).not.toBeNull();
+        });
     });
 });
