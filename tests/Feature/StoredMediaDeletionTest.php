@@ -137,7 +137,7 @@ class StoredMediaDeletionTest extends TestCase
         $keptPhoto = $this->stored(['field_record_id' => $this->recordIn(Project::factory()->create(['user_id' => $kept->id]))->id]);
 
         $this->actingAs($admin)->delete(route('system.users.delete', $alice));
-        $this->actingAs($admin)->delete(route('system.users.bulk-delete'), ['ids' => [$bob->id]]);
+        $this->actingAs($admin)->delete(route('system.users.delete', $bob));
 
         $this->assertGone($alicePhoto);
         $this->assertGone($bobAudio);

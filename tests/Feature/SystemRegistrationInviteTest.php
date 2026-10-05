@@ -24,7 +24,7 @@ class SystemRegistrationInviteTest extends TestCase
             ['name' => 'Beta Tester', 'email' => 'Tester@Example.com']
         );
 
-        $response->assertRedirect(route('system.index'));
+        $response->assertRedirect(route('system.users'));
         $response->assertSessionHas('message', 'system.registration_invite_sent');
         $this->assertDatabaseHas('registration_invites', [
             'inviting_user_id' => $admin->id,
@@ -104,9 +104,9 @@ class SystemRegistrationInviteTest extends TestCase
         ]);
 
         $this->actingAs($admin)
-            ->get(route('system.index'))
+            ->get(route('system.users'))
             ->assertInertia(fn (Assert $page) => $page
-                ->component('System/Index')
+                ->component('System/Users')
                 ->has('registration_invites', 1)
                 ->where('registration_invites.0.id', $active->id));
     }

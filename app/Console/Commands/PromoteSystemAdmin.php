@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\AdminAction;
 use App\Models\User;
 use Illuminate\Console\Command;
 
@@ -38,6 +39,9 @@ class PromoteSystemAdmin extends Command
 
         $user->system_admin = true;
         $user->save();
+
+        // From the console: no administrator in the panel did this.
+        AdminAction::record(null, AdminAction::ADMIN_PROMOTED, ['name' => $user->name, 'email' => $user->email]);
 
         $this->info("{$user->email} is now a system administrator.");
 

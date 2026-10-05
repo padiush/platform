@@ -52,6 +52,8 @@ Project ─┬─ ProjectAccess ── ProjectCapability      (who can do what)
 | `CollectingPermit` | The authorisation material was collected under | `project_id`, `authority`, `reference` (**unique per project**), `issued_on?`, `expires_on?`, `notes?` | int |
 | `Determination` | What a record was identified as, by whom, when | `field_record_id`, `catalog_species_id?` (**null = `indet.`**), `determiner?`, `determined_on?`, `qualifier?` (`cf`·`aff`·`sp`), `is_current`, `notes?` | int |
 | `ChartPreference` | Persisted per-field chart choice (data viewer) | field key, chart type | int |
+| `AdminAction` | What a system administrator did, shown to every administrator | `actor_id?` (null from the console, or once the actor is deleted), `actor_name`, `action` (`invite.sent`·`invite.resent`·`invite.withdrawn`·`user.deleted`·`projects.transferred`·`admin.promoted`), `details` (names, emails and counts only), `created_at` | int |
+| `SystemRun` | When a maintenance job last ran, and what it found | `key` (`scheduler`·`media:prune-orphans`), `ran_at`, `summary?` | string |
 
 ### Item types
 

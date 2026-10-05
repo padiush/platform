@@ -39,6 +39,18 @@ language (`public/locales/whatsnew/`). How a release is cut is in
   the first time they have one. Finished or skipped
   tours are remembered per user (`users.completed_tours`). Each page has a ?
   button to replay its tour, and Mi cuenta can offer them all again.
+- A system panel in three tabs, showing figures and names but never what is
+  inside a project. **Summary**: users, active people, projects, storage by
+  kind, the version and pending migrations, whether the scheduler, unfinished
+  uploads and the orphaned-file check are in order, who stores the most, and
+  a record of what administrators did (`admin_actions`). **Users**: search,
+  filters, the projects each person owns or belongs to, their storage and
+  last activity (from web sessions and device tokens), and invitations that
+  can be resent or withdrawn. **Storage**: totals, use by owner, and the
+  largest projects by size. Deleting an account first shows what goes with it
+  and what stays, can transfer its projects to someone else, and is confirmed
+  by typing the account's email. A scheduler heartbeat and the last
+  `media:prune-orphans` run are kept in `system_runs`.
 - An example project: anyone can open a private, writable copy of the invented
   demonstration study from the dashboard or Proyectos, built in the language
   they are using (`lang/*/example_study.php`), and remove it in one step. It is marked as an example wherever it appears, left out of the system
@@ -53,6 +65,8 @@ language (`public/locales/whatsnew/`). How a release is cut is in
   out once.
 - The development stack uses SeaweedFS for object storage instead of the
   archived MinIO.
+- The system panel no longer deletes several accounts at once: each deletion
+  goes through its own preview of what goes with the account.
 
 ### Fixed
 

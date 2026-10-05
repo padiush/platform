@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\Media;
+use App\Models\SystemRun;
 use Carbon\CarbonImmutable;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Storage;
@@ -63,6 +64,14 @@ class PruneOrphanedMedia extends Command
                 $this->line($key);
             }
         }
+
+        // The admin panel says when this last looked, and what it found.
+        SystemRun::mark(SystemRun::PRUNE_ORPHANS, [
+            'found' => $orphans,
+            'bytes' => $bytes,
+            'deleted' => $delete,
+            'disk' => $diskName,
+        ]);
 
         $size = sprintf('%.1f MB', $bytes / 1_048_576);
 

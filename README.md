@@ -70,6 +70,10 @@ indices serve ethnozoology and ethnomycology, which is where it is headed
 - **Example project** — a private copy of an invented study, full of
   interviews, field records and species, to explore and change freely before
   starting a real one, and removed in one step.
+- **System panel** — for whoever runs an instance: people, projects and
+  storage by owner, the upkeep jobs' health, a record of what administrators
+  did, and account deletion that says what goes with it first. Sizes and
+  names only, never what is inside a project.
 
 ## Technologies
 The project utilizes the following technologies:

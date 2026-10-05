@@ -198,7 +198,7 @@ class ExampleProjectTest extends TestCase
         $this->actingAs(User::factory()->create())->post(route('projects.example.store'));
 
         $this->actingAs($admin)->get(route('system.index'))
-            ->assertInertia(fn (Assert $page) => $page->where('project_count', 1));
+            ->assertInertia(fn (Assert $page) => $page->where('counts.projects', 1));
     }
 
     public function test_the_sidebar_marks_an_example(): void
