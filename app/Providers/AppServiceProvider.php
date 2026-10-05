@@ -4,6 +4,8 @@ namespace App\Providers;
 
 use App\Services\ActiveProject;
 use App\Services\Media\FilesystemStoredObjectInspector;
+use App\Services\Media\MultipartUploads;
+use App\Services\Media\S3MultipartUploads;
 use App\Services\Media\S3UploadUrlFactory;
 use App\Services\Media\StoredObjectInspector;
 use App\Services\Media\UploadUrlFactory;
@@ -20,10 +22,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        // Companion media: presigned uploads and stored-object inspection via
-        // S3, plus a transcriber that is a no-op until Whisper is
-        // provisioned (ADR 0005). All are swappable in tests.
+        // Companion media: presigned uploads, resumable multipart uploads
+        // (ADR 0012) and stored-object inspection via S3, plus a transcriber
+        // that is a no-op until Whisper is provisioned (ADR 0005). All are
+        // swappable in tests.
         $this->app->bind(UploadUrlFactory::class, S3UploadUrlFactory::class);
+        $this->app->bind(MultipartUploads::class, S3MultipartUploads::class);
         $this->app->bind(StoredObjectInspector::class, FilesystemStoredObjectInspector::class);
         $this->app->bind(Transcriber::class, NullTranscriber::class);
 

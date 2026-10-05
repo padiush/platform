@@ -57,8 +57,12 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
             ->name('instances.show');
 
         // Media — audio & photos, uploaded direct to object storage.
+        // A large file may go up in parts that resume after a dropped
+        // connection (docs/decisions/0012-resumable-media-upload.md).
         Route::post('instances/{instance}/media/intent', [MediaController::class, 'intent'])
             ->name('instances.media.intent');
+        Route::post('instances/{instance}/media/parts', [MediaController::class, 'parts'])
+            ->name('instances.media.parts');
         Route::post('instances/{instance}/media/complete', [MediaController::class, 'complete'])
             ->name('instances.media.complete');
 
@@ -66,6 +70,8 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
         // records:sync returned, so the record must have synced first.
         Route::post('records/{record}/media/intent', [MediaController::class, 'recordIntent'])
             ->name('records.media.intent');
+        Route::post('records/{record}/media/parts', [MediaController::class, 'recordParts'])
+            ->name('records.media.parts');
         Route::post('records/{record}/media/complete', [MediaController::class, 'recordComplete'])
             ->name('records.media.complete');
 

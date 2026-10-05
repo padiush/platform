@@ -87,10 +87,12 @@ from both sides: a record names the interview and question it came out of,
 and an interview lists the records made from each answer.
 
 What remains before field deployment for sensitive studies is hardening rather
-than new surface — tracked as: **resumable media upload** (single PUT today, so
-a long recording restarts from the beginning on a lost connection; the design
-is settled in [ADR 0012](decisions/0012-resumable-media-upload.md) and not yet
-built),
+than new surface — tracked as: **resumable media upload** (the server side is
+built: a device that asks sends a large file as an S3 multipart upload, and
+`media/parts` signs only the parts storage lacks, per
+[ADR 0012](decisions/0012-resumable-media-upload.md); the companion still
+sends one `PUT`, so a long recording restarts from the beginning on a lost
+connection until it uses them),
 **transcription** (null-bound plumbing until a real queue and a self-hosted
 Whisper are provisioned, per
 [ADR 0005](decisions/0005-interview-transcription-whisper.md)), and testing on

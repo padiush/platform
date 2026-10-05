@@ -3,13 +3,16 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Requests\Api\CompleteMediaRequest;
+use App\Http\Requests\Api\MediaPartsRequest;
 use App\Http\Requests\Api\StoreMediaIntentRequest;
 use App\Jobs\TranscribeAudio;
 use App\Models\FieldRecord;
 use App\Models\InterviewInstance;
 use App\Models\Media;
 use App\Models\Project;
+use App\Services\Media\MultipartUploads;
 use App\Services\Media\StoredObjectInspector;
+use App\Services\Media\UploadGone;
 use App\Services\Media\UploadUrlFactory;
 use Illuminate\Http\JsonResponse;
 
@@ -23,12 +26,25 @@ use Illuminate\Http\JsonResponse;
  * Media belongs to an interview or to a field record, and both go through the
  * same handshake: only the owner, its access check and the storage prefix
  * differ, so the handshake itself is written once below.
+ *
+ * A device that asks for it sends a large file as a multipart upload instead,
+ * with one more step between intent and complete: `parts` lists what storage
+ * already holds and signs only what is missing, so a dropped connection costs
+ * one part rather than the file. The server keeps the upload; the device keeps
+ * nothing new (docs/decisions/0012-resumable-media-upload.md).
  */
 class MediaController extends ApiController
 {
     private const DISK = 's3';
 
     private const UPLOAD_TTL_MINUTES = 15;
+
+    /**
+     * 8 MiB: above S3's 5 MiB floor for every part but the last, two of the
+     * device's 4 MiB store chunks, and at most 63 parts for the largest file
+     * intent accepts.
+     */
+    public const PART_BYTES = 8 * 1024 * 1024;
 
     private const OWNER_INSTANCE = 'interview_instance_id';
 
@@ -37,7 +53,8 @@ class MediaController extends ApiController
     public function intent(
         StoreMediaIntentRequest $request,
         InterviewInstance $instance,
-        UploadUrlFactory $urls
+        UploadUrlFactory $urls,
+        MultipartUploads $multipart
     ): JsonResponse {
         $project = $this->projectForInstance($instance);
         $this->requireCapability($request->user(), $project, 'record_data');
@@ -45,21 +62,34 @@ class MediaController extends ApiController
         return $this->registerIntent(
             $request,
             $urls,
+            $multipart,
             self::OWNER_INSTANCE,
             $instance->id,
             "projects/{$project->id}/instances/{$instance->id}/media"
         );
     }
 
-    public function complete(
-        CompleteMediaRequest $request,
+    public function parts(
+        MediaPartsRequest $request,
         InterviewInstance $instance,
-        StoredObjectInspector $objects
+        MultipartUploads $multipart
     ): JsonResponse {
         $project = $this->projectForInstance($instance);
         $this->requireCapability($request->user(), $project, 'record_data');
 
-        return $this->completeUpload($request, $objects, self::OWNER_INSTANCE, $instance->id, true);
+        return $this->missingParts($request, $multipart, self::OWNER_INSTANCE, $instance->id);
+    }
+
+    public function complete(
+        CompleteMediaRequest $request,
+        InterviewInstance $instance,
+        StoredObjectInspector $objects,
+        MultipartUploads $multipart
+    ): JsonResponse {
+        $project = $this->projectForInstance($instance);
+        $this->requireCapability($request->user(), $project, 'record_data');
+
+        return $this->completeUpload($request, $objects, $multipart, self::OWNER_INSTANCE, $instance->id, true);
     }
 
     /**
@@ -71,7 +101,8 @@ class MediaController extends ApiController
     public function recordIntent(
         StoreMediaIntentRequest $request,
         FieldRecord $record,
-        UploadUrlFactory $urls
+        UploadUrlFactory $urls,
+        MultipartUploads $multipart
     ): JsonResponse {
         $project = $this->projectForRecord($record);
         $this->requireCapability($request->user(), $project, 'record_data');
@@ -80,6 +111,7 @@ class MediaController extends ApiController
         return $this->registerIntent(
             $request,
             $urls,
+            $multipart,
             self::OWNER_FIELD_RECORD,
             $record->id,
             "projects/{$project->id}/field-records/{$record->id}/media"
@@ -95,22 +127,37 @@ class MediaController extends ApiController
     public function recordComplete(
         CompleteMediaRequest $request,
         FieldRecord $record,
-        StoredObjectInspector $objects
+        StoredObjectInspector $objects,
+        MultipartUploads $multipart
     ): JsonResponse {
         $project = $this->projectForRecord($record);
         $this->requireCapability($request->user(), $project, 'record_data');
 
-        return $this->completeUpload($request, $objects, self::OWNER_FIELD_RECORD, $record->id, false);
+        return $this->completeUpload($request, $objects, $multipart, self::OWNER_FIELD_RECORD, $record->id, false);
+    }
+
+    public function recordParts(
+        MediaPartsRequest $request,
+        FieldRecord $record,
+        MultipartUploads $multipart
+    ): JsonResponse {
+        $project = $this->projectForRecord($record);
+        $this->requireCapability($request->user(), $project, 'record_data');
+
+        return $this->missingParts($request, $multipart, self::OWNER_FIELD_RECORD, $record->id);
     }
 
     /**
      * Register (or re-register) the device's intent to upload, and issue a
-     * presigned URL for it. Idempotent on `client_id`: a retried intent for
-     * the same owner gets the same storage key back.
+     * presigned URL for it, or start a multipart upload when the device asked
+     * to resume and the file is larger than one part. Idempotent on
+     * `client_id`: a retried intent for the same owner gets the same storage
+     * key back, and the same multipart upload while the file is unchanged.
      */
     private function registerIntent(
         StoreMediaIntentRequest $request,
         UploadUrlFactory $urls,
+        MultipartUploads $multipart,
         string $ownerColumn,
         int|string $ownerId,
         string $keyPrefix
@@ -130,6 +177,25 @@ class MediaController extends ApiController
 
         $key = $media->storage_key
             ?? "{$keyPrefix}/{$clientId}.{$this->extension($contentType)}";
+        $byteSize = $request->integer('byte_size');
+        $resumable = $request->boolean('resumable');
+        $multipartWanted = $resumable && $byteSize > self::PART_BYTES;
+
+        // An open upload is resumed only for the same file split the same way.
+        // Anything else — another size, another type, a single PUT this time —
+        // leaves its parts unusable, so they are discarded now rather than
+        // left for cleanup.
+        $resumes = $multipartWanted
+            && $media->isMultipart()
+            && $media->byte_size === $byteSize
+            && $media->content_type === $contentType
+            && $media->upload_part_size === self::PART_BYTES;
+
+        if ($media->isMultipart() && ! $resumes) {
+            $multipart->abort($media->storage_disk, $media->storage_key, $media->upload_id);
+            $media->upload_id = null;
+            $media->upload_part_size = null;
+        }
 
         $media->fill([
             $ownerColumn => $ownerId,
@@ -137,17 +203,97 @@ class MediaController extends ApiController
             'storage_disk' => self::DISK,
             'storage_key' => $key,
             'content_type' => $contentType,
-            'byte_size' => $request->integer('byte_size'),
+            'byte_size' => $byteSize,
             'status' => Media::STATUS_PENDING,
-        ])->save();
+        ]);
+
+        if ($multipartWanted) {
+            if (! $resumes) {
+                $media->upload_id = $multipart->start(self::DISK, $key, $contentType);
+                $media->upload_part_size = self::PART_BYTES;
+            }
+
+            $media->save();
+
+            return response()->json([
+                'storage_key' => $key,
+                'upload' => [
+                    'mode' => 'multipart',
+                    'part_size' => $media->upload_part_size,
+                    'part_count' => $media->partCount(),
+                ],
+            ]);
+        }
+
+        $media->save();
 
         $presigned = $urls->create(self::DISK, $key, $contentType, self::UPLOAD_TTL_MINUTES);
 
-        return response()->json([
+        $response = [
             'upload_url' => $presigned['url'],
             'headers' => $presigned['headers'],
             'storage_key' => $key,
             'expires_at' => $presigned['expires_at'],
+        ];
+
+        // Said only to a device that asked, so older clients see exactly the
+        // response they were written against.
+        if ($resumable) {
+            $response['upload'] = ['mode' => 'single'];
+        }
+
+        return response()->json($response);
+    }
+
+    /**
+     * Sign the parts of a multipart upload that storage does not hold yet, or
+     * holds at the wrong size. An empty list means every part is there and the
+     * device should complete. Asked as often as the device likes: the URLs
+     * expire, the upload does not, so a file sent over hours simply asks again.
+     */
+    private function missingParts(
+        MediaPartsRequest $request,
+        MultipartUploads $multipart,
+        string $ownerColumn,
+        int|string $ownerId
+    ): JsonResponse {
+        $media = $this->mediaForUpload($request->input('client_id'), $request->input('storage_key'), $ownerColumn, $ownerId);
+
+        // Already assembled: nothing left to send, and complete will say so.
+        if ($media->status === Media::STATUS_STORED) {
+            return response()->json(['parts' => [], 'expires_at' => null]);
+        }
+
+        if (! $media->isMultipart()) {
+            $this->fail('api.media.upload_expired', 410);
+        }
+
+        try {
+            $stored = $multipart->parts($media->storage_disk, $media->storage_key, $media->upload_id);
+        } catch (UploadGone) {
+            $this->forgetUpload($media);
+        }
+
+        $expiresAt = now()->addMinutes(self::UPLOAD_TTL_MINUTES);
+        $parts = [];
+
+        foreach (range(1, $media->partCount()) as $number) {
+            if (($stored[$number]['size'] ?? null) === $media->expectedPartSize($number)) {
+                continue;
+            }
+
+            $signed = $multipart->partUrl($media->storage_disk, $media->storage_key, $media->upload_id, $number, $expiresAt);
+
+            $parts[] = [
+                'number' => $number,
+                'url' => $signed['url'],
+                'headers' => $signed['headers'],
+            ];
+        }
+
+        return response()->json([
+            'parts' => $parts,
+            'expires_at' => $expiresAt->toIso8601String(),
         ]);
     }
 
@@ -160,27 +306,25 @@ class MediaController extends ApiController
     private function completeUpload(
         CompleteMediaRequest $request,
         StoredObjectInspector $objects,
+        MultipartUploads $multipart,
         string $ownerColumn,
         int|string $ownerId,
         bool $transcribe
     ): JsonResponse {
-        $media = Media::where('client_id', $request->input('client_id'))
-            ->where($ownerColumn, $ownerId)
-            ->first();
+        $media = $this->mediaForUpload($request->input('client_id'), $request->input('storage_key'), $ownerColumn, $ownerId);
 
-        if (! $media) {
-            $this->fail('api.media.not_found', 404);
-        }
+        $wasMultipart = $media->isMultipart();
 
-        // The completing key must be the one we issued at intent.
-        if ($media->storage_key !== $request->input('storage_key')) {
-            $this->fail('api.media.storage_key_mismatch', 422);
+        if ($wasMultipart) {
+            $this->assembleParts($media, $multipart);
         }
 
         $stored = $objects->inspect($media->storage_disk, $media->storage_key);
 
         if ($stored === null) {
-            $this->fail('api.media.upload_missing', 422);
+            // A multipart file with no upload and no object has lost its parts;
+            // the device starts again from intent rather than retrying this.
+            $this->fail($wasMultipart ? 'api.media.upload_expired' : 'api.media.upload_missing', $wasMultipart ? 410 : 422);
         }
 
         if ($media->byte_size !== null && $stored['byte_size'] !== $media->byte_size) {
@@ -219,6 +363,79 @@ class MediaController extends ApiController
         }
 
         return response()->json($response);
+    }
+
+    /**
+     * Turn a complete set of parts into the object, refusing an incomplete
+     * one. If storage no longer has the upload, the object may already have
+     * been assembled by an earlier complete whose answer never reached the
+     * device, so the caller goes on to inspect storage either way.
+     */
+    private function assembleParts(Media $media, MultipartUploads $multipart): void
+    {
+        try {
+            $stored = $multipart->parts($media->storage_disk, $media->storage_key, $media->upload_id);
+        } catch (UploadGone) {
+            $this->clearUpload($media);
+
+            return;
+        }
+
+        $etags = [];
+
+        foreach (range(1, $media->partCount()) as $number) {
+            if (($stored[$number]['size'] ?? null) !== $media->expectedPartSize($number)) {
+                $this->fail('api.media.upload_incomplete', 422);
+            }
+
+            $etags[$number] = $stored[$number]['etag'];
+        }
+
+        try {
+            $multipart->complete($media->storage_disk, $media->storage_key, $media->upload_id, $etags);
+        } catch (UploadGone) {
+            // Gone between the listing and now; inspection decides.
+        }
+
+        $this->clearUpload($media);
+    }
+
+    /**
+     * The media row an upload step names, by the device's `client_id` under
+     * this owner, with the storage key the intent issued.
+     */
+    private function mediaForUpload(string $clientId, string $storageKey, string $ownerColumn, int|string $ownerId): Media
+    {
+        $media = Media::where('client_id', $clientId)
+            ->where($ownerColumn, $ownerId)
+            ->first();
+
+        if (! $media) {
+            $this->fail('api.media.not_found', 404);
+        }
+
+        // The key must be the one we issued at intent.
+        if ($media->storage_key !== $storageKey) {
+            $this->fail('api.media.storage_key_mismatch', 422);
+        }
+
+        return $media;
+    }
+
+    /** Forget a multipart upload storage no longer has. */
+    private function clearUpload(Media $media): void
+    {
+        $media->upload_id = null;
+        $media->upload_part_size = null;
+        $media->save();
+    }
+
+    /** Forget an upload found gone, and tell the device to start again. */
+    private function forgetUpload(Media $media): never
+    {
+        $this->clearUpload($media);
+
+        $this->fail('api.media.upload_expired', 410);
     }
 
     /**
