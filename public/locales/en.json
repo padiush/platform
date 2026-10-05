@@ -48,18 +48,18 @@
             "unknown_browser": "Unknown browser",
             "sign_out": "Sign out",
             "sign_out_others": "Sign out other sessions",
-            "others_hint": "Every other browser will be signed out, including those that remember you. Enter your password to confirm.",
+            "others_hint": "Every other browser will be signed out, including those where “Keep me signed in” was ticked. Enter your password to confirm.",
             "password": "Password",
             "confirm_title": "Sign out this session?",
             "confirm_message": "That browser will have to sign in again.",
-            "unavailable": "This installation doesn't keep sessions where they can be listed. Whoever runs it can turn this on with SESSION_DRIVER=database.",
+            "unavailable": "This installation does not store sessions in a way that lets them be listed. The server's administrator can turn this on with SESSION_DRIVER=database.",
             "signed_out": "That browser was signed out.",
             "others_signed_out": "Your other browsers were signed out.",
             "not_found": "That session is no longer open."
         },
         "devices": {
             "title": "Field app devices",
-            "description": "Each phone or tablet you signed in on with the field app. Revoke a lost one.",
+            "description": "The phones and tablets where you signed in to the field app. If you lose one, revoke its access here.",
             "none_title": "No device has signed in",
             "none_hint": "When you sign in to the field app, the device will appear here.",
             "signed_in": "Since {{when}}",
@@ -73,7 +73,7 @@
         },
         "tours": {
             "title": "Guided tours",
-            "description": "The step-by-step explanations of each page. Each one is shown once; see them all again from here.",
+            "description": "Each page has a step-by-step explanation that is shown once. You can see them all again from here.",
             "reset": "See the tours again",
             "reset_done": "Done: each tour will show again the next time you open its page."
         }
@@ -139,7 +139,7 @@
     },
     "example": {
         "cta": "Explore an example project",
-        "cta_hint": "An invented study with interviews, field records and a catalog, to walk through every section and try things freely.",
+        "cta_hint": "An invented study with interviews, field records and a catalog, to walk through every section and experiment without worrying about breaking anything.",
         "badge": "Example",
         "notice": "Example project: the data is invented and you can change anything.",
         "remove": "Remove the example",
@@ -941,12 +941,12 @@
             "uploads_none": "None open",
             "uploads_some_one": "1 open, started {{when}}. Abandoned ones are cancelled daily.",
             "uploads_some_other": "{{count}} open, the oldest {{when}}. Abandoned ones are cancelled daily.",
-            "waiting": "On their way",
+            "waiting": "Still to arrive",
             "waiting_none": "Nothing pending",
             "waiting_some_one": "1 file announced by the field app has not arrived yet",
             "waiting_some_other": "{{count}} files announced by the field app have not arrived yet",
             "orphans": "Files with no owner",
-            "orphans_never": "Never checked. On the server, media:prune-orphans finds them.",
+            "orphans_never": "Not checked yet. On the server, media:prune-orphans finds them.",
             "orphans_clean": "None at the last check, {{when}}",
             "orphans_found_one": "1 file, {{size}}, at the check {{when}}. media:prune-orphans --delete removes it.",
             "orphans_found_other": "{{count}} files, {{size}}, at the check {{when}}. media:prune-orphans --delete removes them.",
@@ -957,11 +957,11 @@
             "title": "Who uses the most space",
             "all": "See all",
             "empty": "No files stored yet.",
-            "note": "Counts the projects each person created. Sizes only: content is not visible from here."
+            "note": "Adds up the projects each person created. Only sizes are shown here, never the content."
         },
         "log": {
             "title": "Administration changes",
-            "note": "Everyone with system permissions sees this.",
+            "note": "Everyone with system permissions can see this record.",
             "empty": "No changes yet.",
             "console": "From the server",
             "actions": {
@@ -1010,7 +1010,7 @@
             "admin_badge": "System",
             "delete": "Delete…",
             "no_match": "Nobody matches the search.",
-            "note": "A person's space is that of the projects they created: what their team records in them counts towards it."
+            "note": "Each person is counted the space of the projects they created, including what their team records in them."
         },
         "invites": {
             "title": "Pending invitations",
@@ -1025,7 +1025,7 @@
             "loading": "Working out what is deleted…",
             "failed": "Could not work out what is deleted. Close this and try again.",
             "goes": "Deleted",
-            "stays": "Stays",
+            "stays": "Kept",
             "projects_one": "1 project they created, with everything in it:",
             "projects_other": "{{count}} projects they created, with everything in them:",
             "no_projects": "They created no projects.",
@@ -1038,15 +1038,15 @@
             "and_more_other": "{{count}} more",
             "files_one": "1 recording or photo, {{size}}, is erased from storage.",
             "files_other": "{{count}} recordings and photos, {{size}}, are erased from storage.",
-            "others_one": "What they recorded in someone else's project stays there. They only stop being a member.",
-            "others_other": "What they recorded in {{count}} projects of other people stays there. They only stop being a member.",
+            "others_one": "What they recorded in someone else's project is kept there; they only stop being a member.",
+            "others_other": "What they recorded in {{count}} projects of other people is kept there; they only stop being a member.",
             "others_none": "They are not a member of anyone else's projects.",
             "transfer_hint": "Should their projects carry on? Transfer them to someone else before deleting the account.",
             "transfer": "Transfer projects…",
             "transfer_to": "Transfer to",
             "transfer_choose": "Choose a person",
             "transfer_confirm": "Transfer",
-            "transfer_note": "Whoever receives them becomes their administrator. An example project is not transferred.",
+            "transfer_note": "The person who receives them becomes their administrator. Example projects are not transferred.",
             "confirm_label": "Type their email to confirm: {{email}}",
             "delete": "Delete the account"
         },
@@ -1056,7 +1056,7 @@
             "audio": "Audio · {{size}}",
             "photo": "Photos · {{size}}",
             "by_person": "By person",
-            "by_person_note": "The projects each person created",
+            "by_person_note": "By the projects each person created",
             "owner_line_one": "1 project · Audio {{audio}} · Photos {{photo}}",
             "owner_line_other": "{{count}} projects · Audio {{audio}} · Photos {{photo}}",
             "col_audio": "Audio",
@@ -1065,11 +1065,11 @@
             "col_share": "Share of total",
             "col_limit": "Limit",
             "no_limit": "No limit",
-            "limits_note": "There are no limits for now: this shows how much each person uses, without stopping anyone.",
+            "limits_note": "There are no storage limits for now: this view only shows how much each person uses.",
             "largest": "Largest projects",
             "largest_line_one": "by {{owner}} · 1 file",
             "largest_line_other": "by {{owner}} · {{files}} files",
-            "largest_note": "Name and size, nothing else. Opening a project is still only for its members.",
+            "largest_note": "Only the name and size are shown. Only a project's members can open it.",
             "upkeep": "Upkeep",
             "empty": "No files stored yet."
         },
@@ -1168,7 +1168,7 @@
             },
             "account": {
                 "title": "My account",
-                "body": "Where you are signed in, and your field devices. You can also see every tour again from here."
+                "body": "See where you are signed in and your field devices. You can also see every tour again from here."
             },
             "help": {
                 "title": "Help on every page",
@@ -1208,13 +1208,13 @@
             },
             "example": {
                 "title": "An example project",
-                "body": "Open a private copy of an invented study to walk through every section. It is marked “Example” and you remove it whenever you like."
+                "body": "Open a private copy of an invented study to walk through every section. It is marked “Example”, and you can remove it whenever you like."
             }
         },
         "overview": {
             "example": {
                 "title": "You are in the example",
-                "body": "The data in this project is invented: change, delete and try anything. When you are done, remove it from this strip."
+                "body": "The data in this project is invented: change, delete and try anything. When you are done, you can remove it from this notice."
             },
             "stats": {
                 "title": "Where the work stands",
@@ -1225,8 +1225,8 @@
                 "body": "What is done most from here: start an interview, record, design forms, link species or export."
             },
             "pending": {
-                "title": "What is waiting",
-                "body": "Files still to arrive from the field app, records not identified and answers not linked. When nothing is left, it says so."
+                "title": "Pending",
+                "body": "Files not yet arrived from the field app, unidentified records and unlinked answers. If nothing is pending, it tells you that too."
             },
             "recent": {
                 "title": "Most recent",
@@ -1247,7 +1247,7 @@
                 "body": "Only enabled forms can be used in an interview, on the web and in the field app."
             },
             "capture": {
-                "title": "Then, to the field",
+                "title": "Then, into the field",
                 "body": "The field app downloads the enabled forms and lets you interview offline."
             }
         },
@@ -1262,7 +1262,7 @@
             },
             "save": {
                 "title": "Save your changes",
-                "body": "This mark says whether there are unsaved changes. If the form already has interviews, think twice before removing a field: its answers are lost."
+                "body": "This indicator shows whether there are unsaved changes. If the form already has interviews, think twice before removing a field: its answers will be lost."
             },
             "preview": {
                 "title": "Preview",
@@ -1284,7 +1284,7 @@
             },
             "companion": {
                 "title": "From the phone too",
-                "body": "The field app interviews offline, with audio, photos and location. What it captures arrives here when it is sent."
+                "body": "With the field app you can interview offline, with audio, photos and location. What you record arrives here once it is sent."
             }
         },
         "records": {
@@ -1306,7 +1306,7 @@
             },
             "add": {
                 "title": "Record from the web",
-                "body": "Add a record here, or do it in the field with the app: it arrives on its own when sent."
+                "body": "Add a record here, or in the field with the app: it arrives here once it is sent."
             }
         },
         "permits": {
@@ -1322,7 +1322,7 @@
         "catalog": {
             "metrics": {
                 "title": "The project's catalog",
-                "body": "The project's species, and how many, and from which families, have been mentioned in interviews."
+                "body": "The project's species, how many have been mentioned in interviews, and which families they belong to."
             },
             "register": {
                 "title": "Register species",

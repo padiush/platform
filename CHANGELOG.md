@@ -67,6 +67,9 @@ language (`public/locales/whatsnew/`). How a release is cut is in
   archived MinIO.
 - The system panel no longer deletes several accounts at once: each deletion
   goes through its own preview of what goes with the account.
+- Clearer wording in the guided tours, Mi cuenta and the system panel, in all
+  three languages, and one name for the field app throughout the Spanish and
+  Portuguese copy.
 
 ### Fixed
 
