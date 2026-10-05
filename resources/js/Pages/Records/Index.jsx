@@ -22,7 +22,7 @@ function Summary({ summary }) {
     const { t } = useTranslation();
 
     return (
-        <div className="stats stats-vertical sm:stats-horizontal bg-base-200/40 w-full">
+        <div className="stats bg-base-200/40 grid w-full grid-flow-row grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
             <div className="stat">
                 <div className="stat-title">
                     {t('catalogs.fieldRecords.stat_total')}
