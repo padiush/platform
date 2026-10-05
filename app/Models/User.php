@@ -52,6 +52,8 @@ class User extends Authenticatable implements HasLocalePreference
      */
     public const TOURS = [
         'welcome',
+        'navigation',
+        'projects',
         'overview',
         'forms',
         'designer',

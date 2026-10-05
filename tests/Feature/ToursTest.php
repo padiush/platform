@@ -25,11 +25,10 @@ class ToursTest extends TestCase
         $user = User::factory()->create();
 
         $this->actingAs($user)
-            ->from(route('account.show'))
-            ->post(route('tours.done', 'welcome'))
-            ->assertRedirect(route('account.show'));
-        $this->actingAs($user)->post(route('tours.done', 'welcome'));
-        $this->actingAs($user)->post(route('tours.done', 'overview'));
+            ->post(route('tours.done'), ['tours' => ['welcome']])
+            ->assertNoContent();
+        $this->actingAs($user)->post(route('tours.done'), ['tours' => ['welcome']]);
+        $this->actingAs($user)->post(route('tours.done'), ['tours' => ['overview']]);
 
         $this->assertSame(['welcome', 'overview'], $user->fresh()->completed_tours);
 
@@ -42,9 +41,21 @@ class ToursTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $this->actingAs($user)->post(route('tours.done', 'nonsense'))->assertNotFound();
+        $this->actingAs($user)
+            ->postJson(route('tours.done'), ['tours' => ['welcome', 'nonsense']])
+            ->assertJsonValidationErrors('tours.1');
 
         $this->assertNull($user->fresh()->completed_tours);
+    }
+
+    /** The welcome folds the project steps in, and both are done together. */
+    public function test_several_tours_can_be_marked_at_once(): void
+    {
+        $user = User::factory()->create();
+
+        $this->actingAs($user)->post(route('tours.done'), ['tours' => ['welcome', 'navigation']]);
+
+        $this->assertSame(['welcome', 'navigation'], $user->fresh()->completed_tours);
     }
 
     public function test_every_tour_can_be_offered_again(): void
@@ -63,7 +74,7 @@ class ToursTest extends TestCase
 
     public function test_guests_cannot_touch_tours(): void
     {
-        $this->post(route('tours.done', 'welcome'))->assertRedirect(route('login'));
+        $this->post(route('tours.done'), ['tours' => ['welcome']])->assertRedirect(route('login'));
         $this->delete(route('tours.reset'))->assertRedirect(route('login'));
     }
 

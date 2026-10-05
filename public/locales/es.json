@@ -988,18 +988,6 @@
                 "title": "Te damos la bienvenida a Padiush",
                 "body": "Un recorrido breve por lo esencial. Puedes saltarlo cuando quieras y volver a verlo con el botón ? de cada página."
             },
-            "switcher": {
-                "title": "Tu proyecto",
-                "body": "Todo lo que ves pertenece al proyecto elegido aquí. Desde este menú cambias de proyecto."
-            },
-            "sections": {
-                "title": "Las secciones del proyecto",
-                "body": "Resumen, formularios, entrevistas, registros de campo, catálogo y datos. Solo ves las que tu rol en el proyecto permite."
-            },
-            "admin": {
-                "title": "Administrar el proyecto",
-                "body": "En Ajustes cambias los datos del proyecto, y en Miembros invitas a tu equipo y decides qué puede hacer cada persona."
-            },
             "start": {
                 "title": "Empieza por un proyecto",
                 "body": "Todo en Padiush parte de un proyecto. Créalo aquí; después podrás diseñar formularios e invitar a tu equipo."
@@ -1011,6 +999,38 @@
             "help": {
                 "title": "Ayuda en cada página",
                 "body": "Este botón explica la página en la que estás. Las novedades de cada versión están al pie de la página."
+            }
+        },
+        "navigation": {
+            "switcher": {
+                "title": "Tu proyecto",
+                "body": "Todo lo que ves pertenece al proyecto elegido aquí. Desde este menú cambias de proyecto."
+            },
+            "sections": {
+                "title": "Las secciones del proyecto",
+                "body": "Resumen, formularios, entrevistas, registros de campo, catálogo y datos. Solo ves las que tu rol en el proyecto permite."
+            },
+            "admin": {
+                "title": "Administrar el proyecto",
+                "body": "En Ajustes cambias los datos del proyecto, y en Miembros invitas a tu equipo y decides qué puede hacer cada persona."
+            }
+        },
+        "projects": {
+            "what": {
+                "title": "Tus proyectos",
+                "body": "Un proyecto es un estudio: sus formularios, entrevistas, registros, catálogo y equipo. Cada uno es independiente: quien colabora en uno no ve los demás."
+            },
+            "invites": {
+                "title": "Te invitaron",
+                "body": "Acepta una invitación para unirte al proyecto de otra persona, con el rol que te asignó."
+            },
+            "list": {
+                "title": "Abre un proyecto",
+                "body": "Entra a un proyecto para trabajar en él. Si lo administras, desde aquí editas sus datos y quién tiene acceso."
+            },
+            "create": {
+                "title": "Crea un proyecto",
+                "body": "Dale un nombre y una descripción. Después podrás diseñar su primer formulario e invitar a tu equipo."
             }
         },
         "overview": {

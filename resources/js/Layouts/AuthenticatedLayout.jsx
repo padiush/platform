@@ -72,11 +72,14 @@ export default function AuthenticatedLayout({
     headTitle = null,
     // The guided tour that explains this page (resources/js/tours).
     tour = null,
+    // False on a page someone came to read, where no tour should start on
+    // its own over what they are reading.
+    autoTours = true,
 }) {
     const { t } = useTranslation();
     const { FlashAlert, flashShown } = useFlashMessage();
     const { release } = usePage().props;
-    const tours = useTours(tour);
+    const tours = useTours(tour, { auto: autoTours });
 
     const wide = useIsWide();
     const [rail, setRail] = useState(initialRail);

@@ -34,7 +34,9 @@ language (`public/locales/whatsnew/`). How a release is cut is in
 - "What's new": a dialog after each release with its notes, a page with every
   release, and this changelog.
 - Guided tours (driver.js): a welcome tour, then one per section on its first
-  visit, leaving out what the user's role does not open. Finished or skipped
+  visit (Proyectos included), leaving out what the user's role does not open.
+  A user who starts with no project is shown the project switcher and sections
+  the first time they have one. Finished or skipped
   tours are remembered per user (`users.completed_tours`). Each page has a ?
   button to replay its tour, and Mi cuenta can offer them all again.
 - A demo image that can be run to try Padiush.

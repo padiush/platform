@@ -988,18 +988,6 @@
                 "title": "Welcome to Padiush",
                 "body": "A short tour of the essentials. Skip it whenever you like, and see it again with the ? button on each page."
             },
-            "switcher": {
-                "title": "Your project",
-                "body": "Everything you see belongs to the project chosen here. Switch projects from this menu."
-            },
-            "sections": {
-                "title": "The project's sections",
-                "body": "Overview, forms, interviews, field records, catalog and data. You only see the ones your role in the project allows."
-            },
-            "admin": {
-                "title": "Running the project",
-                "body": "Settings holds the project's details, and in Members you invite your team and decide what each person can do."
-            },
             "start": {
                 "title": "Start with a project",
                 "body": "Everything in Padiush starts from a project. Create one here; then you can design forms and invite your team."
@@ -1011,6 +999,38 @@
             "help": {
                 "title": "Help on every page",
                 "body": "This button explains the page you are on. What each version brought is at the foot of the page."
+            }
+        },
+        "navigation": {
+            "switcher": {
+                "title": "Your project",
+                "body": "Everything you see belongs to the project chosen here. Switch projects from this menu."
+            },
+            "sections": {
+                "title": "The project's sections",
+                "body": "Overview, forms, interviews, field records, catalog and data. You only see the ones your role in the project allows."
+            },
+            "admin": {
+                "title": "Running the project",
+                "body": "Settings holds the project's details, and in Members you invite your team and decide what each person can do."
+            }
+        },
+        "projects": {
+            "what": {
+                "title": "Your projects",
+                "body": "A project is a study: its forms, interviews, records, catalog and team. Each one stands alone: someone working on one sees nothing of the others."
+            },
+            "invites": {
+                "title": "You have been invited",
+                "body": "Accept an invitation to join someone else's project, with the role they gave you."
+            },
+            "list": {
+                "title": "Open a project",
+                "body": "Go into a project to work on it. If you run it, you can edit its details and who has access from here."
+            },
+            "create": {
+                "title": "Create a project",
+                "body": "Give it a name and a description. Then you can design its first form and invite your team."
             }
         },
         "overview": {

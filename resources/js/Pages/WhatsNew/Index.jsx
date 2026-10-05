@@ -20,7 +20,9 @@ export default function Index() {
         : [];
 
     return (
+        // Someone came here to read the notes; a tour waits for the next page.
         <AuthenticatedLayout
+            autoTours={false}
             title={t('whatsNew.page_title')}
             subtitle={t('whatsNew.page_intro')}
         >

@@ -41,13 +41,16 @@ export default function Index({ projects, invites }) {
     };
 
     return (
-        <AuthenticatedLayout title={t('titles.my_projects')}>
+        <AuthenticatedLayout tour="projects" title={t('titles.my_projects')}>
             <div className="p-4 md:pt-8 lg:pt-12">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
                     {/* Invitaciones pendientes */}
                     {invites.length > 0 && (
                         <div className="grid grid-cols-1 gap-4 pb-4">
-                            <Card title={t('projects.pending_invites')}>
+                            <Card
+                                tour="projects-invites"
+                                title={t('projects.pending_invites')}
+                            >
                                 <p>{t('projects.invited_to')}</p>
                                 <table className="table-compact table w-full">
                                     <thead>
@@ -107,7 +110,10 @@ export default function Index({ projects, invites }) {
 
                     {/* Proyectos disponibles */}
                     {projects.length > 0 ? (
-                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
+                        <div
+                            className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3"
+                            data-tour="projects-list"
+                        >
                             {projects.map((project) => (
                                 <Card key={project.id} title={project.name}>
                                     {project.author && (
@@ -178,6 +184,7 @@ export default function Index({ projects, invites }) {
                         <button
                             type="button"
                             className="btn btn-primary"
+                            data-tour="projects-create"
                             onClick={() => setCreate('1')}
                         >
                             <FontAwesomeIcon icon={faPlus} />

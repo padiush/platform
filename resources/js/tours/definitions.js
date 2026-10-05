@@ -11,8 +11,30 @@
  */
 export const TOURS = {
     welcome: {
+        // The sidebar's project steps (`navigation`) are folded in after the
+        // first step when the user already has a project; see useTours.
         steps: [
             { key: 'intro' },
+            {
+                key: 'start',
+                element: '[data-tour="dashboard-projects"]',
+                requires: true,
+            },
+            {
+                key: 'account',
+                element: '[data-tour="nav-account"]',
+                side: 'right',
+            },
+            { key: 'help', element: '[data-tour="help"]', side: 'bottom' },
+        ],
+    },
+    /**
+     * The project switcher and the sections it opens. Part of the welcome for
+     * a user who has a project; on its own, the first time a user who started
+     * with none has one.
+     */
+    navigation: {
+        steps: [
             {
                 key: 'switcher',
                 element: '[data-tour="project-switcher"]',
@@ -31,17 +53,22 @@ export const TOURS = {
                 requires: true,
                 side: 'right',
             },
+        ],
+    },
+    projects: {
+        steps: [
+            { key: 'what' },
             {
-                key: 'start',
-                element: '[data-tour="dashboard-projects"]',
+                key: 'invites',
+                element: '[data-tour="projects-invites"]',
                 requires: true,
             },
             {
-                key: 'account',
-                element: '[data-tour="nav-account"]',
-                side: 'right',
+                key: 'list',
+                element: '[data-tour="projects-list"]',
+                requires: true,
             },
-            { key: 'help', element: '[data-tour="help"]', side: 'bottom' },
+            { key: 'create', element: '[data-tour="projects-create"]' },
         ],
     },
     overview: {

@@ -42,9 +42,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/whats-new/seen', [WhatsNewController::class, 'seen'])->name('whats-new.seen');
 
     // Guided tours: which ones the user has been through, and starting over.
-    Route::post('/tours/{tour}/done', [TourController::class, 'complete'])
-        ->where('tour', '[a-z_]+')
-        ->name('tours.done');
+    Route::post('/tours/done', [TourController::class, 'complete'])->name('tours.done');
     Route::delete('/tours', [TourController::class, 'reset'])->name('tours.reset');
 
     // Mi cuenta: where the user is signed in, and signing it out.

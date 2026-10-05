@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Validation\Rule;
 
 /**
  * The guided tours: which ones each user has been through. The tours
@@ -14,14 +16,26 @@ use Illuminate\Http\Request;
  */
 class TourController extends Controller
 {
-    /** A tour was finished, or skipped: either way it does not start again. */
-    public function complete(Request $request, string $tour): RedirectResponse
+    /**
+     * Tours finished, or skipped: either way they do not start again. More
+     * than one when a tour folded another in, as the welcome does the
+     * project steps.
+     *
+     * Sent in the background rather than as a page visit, which the next
+     * click would cancel, so there is nothing to redirect to.
+     */
+    public function complete(Request $request): Response
     {
-        abort_unless(in_array($tour, User::TOURS, true), 404);
+        $tours = $request->validate([
+            'tours' => ['required', 'array', 'min:1'],
+            'tours.*' => ['string', Rule::in(User::TOURS)],
+        ])['tours'];
 
-        $request->user()->completeTour($tour);
+        foreach ($tours as $tour) {
+            $request->user()->completeTour($tour);
+        }
 
-        return back();
+        return response()->noContent();
     }
 
     /** Offer every tour again, from Mi cuenta. */
