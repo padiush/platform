@@ -130,7 +130,9 @@ class SystemController extends Controller
                 ->with('message_type', 'error');
         }
 
-        User::whereIn('id', $ids)->delete();
+        // One at a time, through the model: each takes its projects and their
+        // stored files with it.
+        User::whereIn('id', $ids)->get()->each->delete();
 
         return redirect()
             ->route('system.index')

@@ -126,6 +126,14 @@ class FieldRecord extends Model
         return $this->basis_of_record !== self::BASIS_OBSERVATION;
     }
 
+    protected static function booted(): void
+    {
+        // Through the model, so each one's bytes go too (MediaObserver).
+        static::deleting(function (FieldRecord $fieldRecord) {
+            $fieldRecord->media()->get()->each->delete();
+        });
+    }
+
     /**
      * Photographs and audio. For an observation these are the whole of the
      * evidence — there is no pressed material behind them.

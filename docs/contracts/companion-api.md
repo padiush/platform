@@ -319,6 +319,10 @@ POST /api/v1/instances/{instance}/media/complete   // as above
   which starts a new one. A scheduled job (`media:abort-stale-uploads`, daily)
   aborts uploads started more than seven days ago and any that no media row
   names.
+- **Deleting on the web deletes the bytes.** A recording or photograph is
+  removed from storage when its media row goes, whether on its own or with the
+  interview, field record, form, project or account that held it. An upload
+  still open when that happens is left to the daily job above.
 - **Opt-in.** A client that never sends `resumable` gets exactly the response
   above, and a server without this ignores the field and answers with an
   `upload_url` and no `upload`, which a client should treat as a single `PUT`.

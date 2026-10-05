@@ -146,9 +146,7 @@ class FieldRecordMediaController extends Controller
             return $this->notFound($project);
         }
 
-        // The bytes go with the row. Nothing else references them, and leaving
-        // orphaned objects in storage is how a bucket becomes a liability.
-        Storage::disk($medium->storage_disk)->delete($medium->storage_key);
+        // The bytes go with the row (MediaObserver).
         $medium->delete();
 
         return back()

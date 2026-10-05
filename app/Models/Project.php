@@ -45,8 +45,15 @@ class Project extends Model
         // with the project through their foreign keys. A form's questions and
         // the catalog have never had one, so without this a deleted project
         // leaves them behind. Gathered before the cascade takes the sections
-        // that lead to the questions.
+        // that lead to the questions. Its recordings and photographs are
+        // deleted through the model, so their bytes go too (MediaObserver).
         static::deleting(function (Project $project) {
+            $project->media()->get()->each->delete();
+
+            // Memberships cascade on MySQL and MariaDB but not on SQLite, where
+            // the constraint was never rebuilt; removed here, the same everywhere.
+            $project->accesses()->delete();
+
             InterviewItem::whereIn('interview_section_id', InterviewSection::select('interview_sections.id')
                 ->join('interview_forms', 'interview_forms.id', '=', 'interview_sections.interview_form_id')
                 ->where('interview_forms.project_id', $project->id))

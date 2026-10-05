@@ -62,6 +62,10 @@ language (`public/locales/whatsnew/`). How a release is cut is in
 - Deleting a project takes its catalog species, their photos and its forms'
   questions with it. Those tables have no foreign key to cascade from, so they
   were left behind.
+- Deleting a field record, an interview, a form, a project or an account
+  deletes its recordings and photographs from storage, not only their rows.
+  Until now only removing a single photo from a record did, so deleted audio
+  and photographs stayed in the bucket.
 
 ### Upgrading
 

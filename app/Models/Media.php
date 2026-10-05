@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Observers\MediaObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -13,7 +15,12 @@ use Illuminate\Database\Eloquent\Model;
  * the record itself, since no material survives to re-examine
  * (docs/decisions/0010-field-records-and-basis.md). See also
  * docs/contracts/companion-api.md for the device upload path.
+ *
+ * Deleting a row deletes its bytes (MediaObserver). Whatever deletes an owner
+ * deletes its media through the model first, since the foreign keys that
+ * cascade would remove the rows and leave the bytes.
  */
+#[ObservedBy(MediaObserver::class)]
 class Media extends Model
 {
     protected $table = 'media';

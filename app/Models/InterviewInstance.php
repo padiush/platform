@@ -49,4 +49,12 @@ class InterviewInstance extends Model
     {
         return $this->hasMany(Media::class, 'interview_instance_id');
     }
+
+    protected static function booted(): void
+    {
+        // Through the model, so each one's bytes go too (MediaObserver).
+        static::deleting(function (InterviewInstance $instance) {
+            $instance->media()->get()->each->delete();
+        });
+    }
 }
