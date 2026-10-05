@@ -295,6 +295,74 @@
           }
         },
         {
+          "name": "Media intent (resumable)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/instances/{{instance_id}}/media/intent",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "instances",
+                "{{instance_id}}",
+                "media",
+                "intent"
+              ]
+            },
+            "description": "Opt in to a multipart upload (ADR 0012). A file larger than one 8 MiB part gets upload.mode multipart with part_size and part_count instead of an upload_url; a smaller one gets mode single and the usual presigned PUT. Retrying for the same file resumes the same upload.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"client_id\": \"{{$guid}}\",\n  \"kind\": \"audio\",\n  \"content_type\": \"audio/mp4\",\n  \"byte_size\": 20971520,\n  \"resumable\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Media parts",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/instances/{{instance_id}}/media/parts",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "instances",
+                "{{instance_id}}",
+                "media",
+                "parts"
+              ]
+            },
+            "description": "Presigned URLs for the parts of a multipart upload that storage does not hold yet, and only those. PUT each part's bytes to its url, ask again until parts is empty, then call complete. 410 api.media.upload_expired means the upload is gone: call intent again.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"client_id\": \"PASTE_INTENT_CLIENT_ID\",\n  \"storage_key\": \"PASTE_INTENT_STORAGE_KEY\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
           "name": "Media complete",
           "request": {
             "method": "POST",
@@ -354,6 +422,40 @@
             "body": {
               "mode": "raw",
               "raw": "{\n  \"client_id\": \"{{$guid}}\",\n  \"kind\": \"audio\",\n  \"content_type\": \"audio/mp4\",\n  \"byte_size\": 2048000\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Record media parts",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/records/{{record_id}}/media/parts",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "records",
+                "{{record_id}}",
+                "media",
+                "parts"
+              ]
+            },
+            "description": "The same parts step for a field record's multipart upload (send resumable: true on the record's intent).",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"client_id\": \"PASTE_INTENT_CLIENT_ID\",\n  \"storage_key\": \"PASTE_INTENT_STORAGE_KEY\"\n}",
               "options": {
                 "raw": {
                   "language": "json"

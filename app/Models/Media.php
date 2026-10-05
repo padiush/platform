@@ -35,6 +35,8 @@ class Media extends Model
         'storage_key',
         'content_type',
         'byte_size',
+        'upload_id',
+        'upload_part_size',
         'duration_s',
         'status',
         'transcription_status',
@@ -46,6 +48,7 @@ class Media extends Model
         'transcription_text' => 'encrypted',
         'captured_at' => 'datetime',
         'byte_size' => 'integer',
+        'upload_part_size' => 'integer',
         'duration_s' => 'integer',
     ];
 
@@ -66,6 +69,29 @@ class Media extends Model
     public function belongsToFieldRecord(): bool
     {
         return $this->field_record_id !== null;
+    }
+
+    /**
+     * Whether the bytes are arriving as a multipart upload that storage is
+     * still holding open (docs/decisions/0012-resumable-media-upload.md).
+     */
+    public function isMultipart(): bool
+    {
+        return $this->upload_id !== null;
+    }
+
+    /** How many parts the multipart upload is split into. */
+    public function partCount(): int
+    {
+        return (int) ceil($this->byte_size / $this->upload_part_size);
+    }
+
+    /** The size the given part must be: a full part, except the last. */
+    public function expectedPartSize(int $partNumber): int
+    {
+        return $partNumber < $this->partCount()
+            ? $this->upload_part_size
+            : $this->byte_size - $this->upload_part_size * ($this->partCount() - 1);
     }
 
     public function isAudio(): bool

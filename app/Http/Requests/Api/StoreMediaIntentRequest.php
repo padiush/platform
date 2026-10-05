@@ -15,6 +15,9 @@ class StoreMediaIntentRequest extends ApiFormRequest
             'content_type' => ['required', 'string', 'max:255'],
             // Guardrail on absurd sizes; ~500 MB ceiling.
             'byte_size' => ['required', 'integer', 'min:1', 'max:524288000'],
+            // Opt in to a multipart upload for a file larger than one part
+            // (docs/decisions/0012-resumable-media-upload.md).
+            'resumable' => ['sometimes', 'boolean'],
         ];
     }
 }

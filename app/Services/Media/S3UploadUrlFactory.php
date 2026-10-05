@@ -5,8 +5,9 @@ namespace App\Services\Media;
 use Illuminate\Support\Facades\Storage;
 
 /**
- * Presigned uploads backed by the S3 disk. The device PUTs the file
- * directly to the returned URL (resumable/chunked), independent of the JSON sync.
+ * Presigned uploads backed by the S3 disk. The device PUTs the whole file
+ * directly to the returned URL, independent of the JSON sync; a large file
+ * that should resume goes through MultipartUploads instead.
  */
 class S3UploadUrlFactory implements UploadUrlFactory
 {

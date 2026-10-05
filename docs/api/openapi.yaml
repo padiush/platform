@@ -247,12 +247,16 @@ paths:
   /instances/{instance}/media/intent:
     post:
       tags: [Media]
-      summary: Register a media upload and get a presigned URL
+      summary: Register a media upload and get a presigned URL or a multipart plan
       description: >
-        Large files go direct to object storage, not through the app server. The
-        device then PUTs the whole file to `upload_url` in one request, then calls
-        complete. Resuming an interrupted upload is decided in ADR 0012 and not yet
-        built.
+        Large files go direct to object storage, not through the app server. By
+        default the device PUTs the whole file to `upload_url` in one request,
+        then calls complete. With `resumable: true`, a file larger than one part
+        starts a multipart upload instead: the response carries `upload`
+        (mode multipart) and no `upload_url`, the device sends the parts that
+        `media/parts` signs, then calls complete (ADR 0012). Retrying the intent
+        for the same file resumes the same upload; announcing a different file
+        under the same client_id discards it and starts again.
       parameters:
         - $ref: '#/components/parameters/InstanceId'
       requestBody:
@@ -262,7 +266,7 @@ paths:
             schema: { $ref: '#/components/schemas/MediaIntentRequest' }
       responses:
         '200':
-          description: Presigned upload target
+          description: Presigned upload target, or the multipart plan
           content:
             application/json:
               schema: { $ref: '#/components/schemas/MediaIntentResponse' }
@@ -282,10 +286,57 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/Error' }
+  /instances/{instance}/media/parts:
+    post:
+      tags: [Media]
+      summary: List and sign the parts of a multipart upload still to send
+      description: >
+        For a multipart upload started at intent. Lists the parts storage holds
+        and signs a URL for each part that is missing or the wrong size, and
+        only those. The device PUTs each part's bytes (part n is bytes
+        (n-1)*part_size onward, part_size long except the last) and asks again
+        until the list is empty, then calls complete. The URLs expire; the
+        upload does not, so a long upload simply asks again. Empty for a file
+        already stored.
+      parameters:
+        - $ref: '#/components/parameters/InstanceId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/MediaPartsRequest' }
+      responses:
+        '200':
+          description: The parts still to send
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/MediaPartsResponse' }
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '410':
+          description: >
+            `api.media.upload_expired` — storage no longer has the upload (it was
+            abandoned and cleaned up). Call intent again to start a new one.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+        '422':
+          description: Storage key mismatch or validation error
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
   /instances/{instance}/media/complete:
     post:
       tags: [Media]
       summary: Mark an uploaded file stored (and enqueue transcription for audio)
+      description: >
+        For a multipart upload, first checks that every part is in storage at
+        its size (`api.media.upload_incomplete` otherwise) and assembles them.
+        Then, for any upload, inspects the stored object's size and type.
       parameters:
         - $ref: '#/components/parameters/InstanceId'
       requestBody:
@@ -305,8 +356,18 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
+        '410':
+          description: >
+            `api.media.upload_expired` — a multipart upload storage no longer has,
+            and no assembled object. Call intent again to start a new one.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
         '422':
-          description: Storage key mismatch or validation error
+          description: >
+            Storage key mismatch, missing or mismatched upload, a multipart upload
+            with parts still missing (`api.media.upload_incomplete`), or
+            validation error
           content:
             application/json:
               schema: { $ref: '#/components/schemas/Error' }
@@ -328,7 +389,7 @@ paths:
             schema: { $ref: '#/components/schemas/MediaIntentRequest' }
       responses:
         '200':
-          description: Presigned upload target
+          description: Presigned upload target, or the multipart plan
           content:
             application/json:
               schema: { $ref: '#/components/schemas/MediaIntentResponse' }
@@ -345,6 +406,49 @@ paths:
               schema: { $ref: '#/components/schemas/Error' }
         '422':
           description: Validation error (e.g. content_type does not match kind)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+  /records/{record}/media/parts:
+    post:
+      tags: [Media]
+      summary: List and sign the parts of a field record's multipart upload still to send
+      description: >
+        For a multipart upload started at intent. Lists the parts storage holds
+        and signs a URL for each part that is missing or the wrong size, and
+        only those. The device PUTs each part's bytes (part n is bytes
+        (n-1)*part_size onward, part_size long except the last) and asks again
+        until the list is empty, then calls complete. The URLs expire; the
+        upload does not, so a long upload simply asks again. Empty for a file
+        already stored.
+      parameters:
+        - $ref: '#/components/parameters/RecordId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/MediaPartsRequest' }
+      responses:
+        '200':
+          description: The parts still to send
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/MediaPartsResponse' }
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '410':
+          description: >
+            `api.media.upload_expired` — storage no longer has the upload (it was
+            abandoned and cleaned up). Call intent again to start a new one.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+        '422':
+          description: Storage key mismatch or validation error
           content:
             application/json:
               schema: { $ref: '#/components/schemas/Error' }
@@ -375,8 +479,17 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
+        '410':
+          description: >
+            `api.media.upload_expired` — a multipart upload storage no longer has,
+            and no assembled object. Call intent again to start a new one.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
         '422':
-          description: Storage key mismatch, missing upload, or validation error
+          description: >
+            Storage key mismatch, missing upload, a multipart upload with parts
+            still missing (`api.media.upload_incomplete`), or validation error
           content:
             application/json:
               schema: { $ref: '#/components/schemas/Error' }
@@ -789,15 +902,53 @@ components:
         kind: { type: string, enum: [audio, photo] }
         content_type: { type: string, description: Must match the kind (audio/* or image/*). }
         byte_size: { type: integer, minimum: 1, maximum: 524288000 }
+        resumable:
+          type: boolean
+          description: >
+            Ask for a multipart upload when the file is larger than one part
+            (ADR 0012). Leave it out to always get the single PUT.
     MediaIntentResponse:
       type: object
+      required: [storage_key]
       properties:
-        upload_url: { type: string, description: Presigned PUT URL. }
+        upload_url: { type: string, description: Presigned PUT URL. Absent for a multipart upload. }
         headers:
           type: object
           additionalProperties: { type: string }
+          description: Absent for a multipart upload.
         storage_key: { type: string }
-        expires_at: { type: string, format: date-time }
+        expires_at: { type: string, format: date-time, description: Absent for a multipart upload. }
+        upload:
+          type: object
+          description: Present only when the intent asked for `resumable`.
+          required: [mode]
+          properties:
+            mode: { type: string, enum: [single, multipart] }
+            part_size: { type: integer, description: Bytes per part (8 MiB); multipart only. }
+            part_count: { type: integer, description: Multipart only. }
+    MediaPartsRequest:
+      type: object
+      required: [client_id, storage_key]
+      properties:
+        client_id: { type: string, format: uuid }
+        storage_key: { type: string, description: Must equal the key issued at intent. }
+    MediaPartsResponse:
+      type: object
+      required: [parts]
+      properties:
+        parts:
+          type: array
+          description: Only the parts storage does not hold yet. Empty means complete.
+          items:
+            type: object
+            required: [number, url, headers]
+            properties:
+              number: { type: integer, minimum: 1 }
+              url: { type: string, description: Presigned PUT URL for this part. }
+              headers:
+                type: object
+                additionalProperties: { type: string }
+        expires_at: { type: string, format: date-time, nullable: true }
     MediaCompleteRequest:
       type: object
       required: [client_id, storage_key]

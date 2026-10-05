@@ -274,12 +274,54 @@ POST /api/v1/instances/{instance}/media/complete
 - Transcript delivery: the device learns of it on the next pull —
   `GET /api/v1/instances/{instance}` returns
   `{ …, transcription: { status: "queued"|"processing"|"done"|"failed", text? } }`.
-- **The upload is not resumable yet.** A dropped connection restarts the `PUT`
-  from the first byte. [0012](../decisions/0012-resumable-media-upload.md)
-  decides how a large file will resume: an S3 multipart upload the server
-  tracks, a `media/parts` endpoint that signs only the missing parts, and an
-  opt-in `resumable: true` on `intent` that leaves this handshake unchanged for
-  clients that do not send it.
+
+### Resumable upload — large files in parts
+
+A single `PUT` restarts from the first byte when the connection drops. A device
+that sends `resumable: true` on `intent` gets a multipart upload instead for any
+file larger than one part, so a drop costs one part rather than the file
+([0012](../decisions/0012-resumable-media-upload.md)).
+
+```
+POST /api/v1/instances/{instance}/media/intent
+  body: { kind, content_type, byte_size, client_id, resumable: true }
+  → { storage_key, upload: { mode: "multipart", part_size, part_count } }
+  → { upload_url, headers, storage_key, expires_at, upload: { mode: "single" } }   // one part or less
+
+POST /api/v1/instances/{instance}/media/parts
+  body: { client_id, storage_key }
+  → { parts: [ { number, url, headers } ], expires_at }   // only the missing parts
+
+  (device PUTs each part's bytes to its url, then asks for parts again
+   until the list is empty)
+
+POST /api/v1/instances/{instance}/media/complete   // as above
+```
+
+- **Part *n* is bytes `(n-1) × part_size` onward**, `part_size` long except the
+  last. The part size is 8 MiB. The device reads each part from its encrypted
+  store as it sends it, so it never holds the whole file and never writes a
+  plaintext copy.
+- **The server is the record of progress.** `parts` lists what storage holds
+  and signs only what is absent or the wrong size; the device keeps nothing new.
+  The URLs expire after fifteen minutes, and the upload does not: a file sent
+  over hours or days simply asks again. Once the file is stored, `parts` is
+  empty.
+- **A repeated `intent` for the same file resumes the same upload.** One that
+  announces another size or type, or leaves `resumable` out, discards the open
+  upload and starts again.
+- **`complete`** refuses a set with a part still missing or the wrong size
+  (**422** `api.media.upload_incomplete`), then assembles the object and runs
+  the usual size and type checks. Calling it again after a lost answer finds the
+  object assembled and succeeds.
+- **`410 api.media.upload_expired`** from `parts` or `complete` means storage no
+  longer has the upload: it was abandoned and aborted. Call `intent` again,
+  which starts a new one.
+- **Opt-in.** A client that never sends `resumable` gets exactly the response
+  above, and a server without this ignores the field and answers with an
+  `upload_url` and no `upload`, which a client should treat as a single `PUT`.
+- A field record's media resumes the same way, at
+  `records/{record}/media/parts`.
 
 ### A field record's media
 
@@ -290,6 +332,7 @@ something never collected, the photograph is the whole of the evidence
 
 ```
 POST /api/v1/records/{record}/media/intent      // same body and response as above
+POST /api/v1/records/{record}/media/parts       // same, for a multipart upload
 POST /api/v1/records/{record}/media/complete    → { id, status: "stored" }
 ```
 
