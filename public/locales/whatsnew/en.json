@@ -1,0 +1,25 @@
+{
+    "releases": [
+        {
+            "version": "1.1.0",
+            "date": null,
+            "items": [
+                "A sidebar with your projects: pick the project at the top and everything in it is close at hand, on a desktop, a tablet or a phone.",
+                "Each project opens on an overview of where its work stands: interviews, records, species, and what is still waiting to be reviewed.",
+                "Field records have a section of their own, next to collecting permits. Besides collected specimens, you can record what was only observed, and keep its determinations and accession numbers.",
+                "Records, photographs and voice notes taken with the field app reach the web, and each record shows which interview answer it came out of.",
+                "In My account you can see where you are signed in, and sign out of any browser or field device.",
+                "Long recordings sent from the field app no longer start over when the connection drops: they carry on where they left off."
+            ]
+        },
+        {
+            "version": "1.0.0",
+            "date": "2026-08-15",
+            "items": [
+                "Design interview forms and capture interviews on the web or with the field app, even offline.",
+                "Link answers to the project's species catalog.",
+                "Compute the ethnobotanical indices (RFC, UV, CI, ICF and FL) and export the data."
+            ]
+        }
+    ]
+}

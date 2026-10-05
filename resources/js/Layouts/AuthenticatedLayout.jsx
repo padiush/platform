@@ -1,10 +1,11 @@
 import Breadcrumbs from '@/Components/Breadcrumbs';
 import ErrorBoundary from '@/Components/ErrorBoundary';
+import WhatsNewDialog from '@/Components/WhatsNewDialog';
 import { useFlashMessage } from '@/Hooks/useFlashMessage';
 import Sidebar from '@/Layouts/Partials/Sidebar';
 import { faBars } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -71,6 +72,7 @@ export default function AuthenticatedLayout({
 }) {
     const { t } = useTranslation();
     const { FlashAlert, flashShown } = useFlashMessage();
+    const { release } = usePage().props;
 
     const wide = useIsWide();
     const [rail, setRail] = useState(initialRail);
@@ -144,9 +146,27 @@ export default function AuthenticatedLayout({
                 {/*
                     AGPL section 13 requires that people using Padiush over a
                     network can obtain its source. This is that offer, so it sits
-                    on every signed-in page rather than behind a menu.
+                    on every signed-in page rather than behind a menu. Beside
+                    it, the release running and what each release brought.
                 */}
-                <footer className="bg-base-100 border-base-300 text-base-content/60 border-t px-4 py-2 text-center text-xs md:px-8">
+                <footer className="bg-base-100 border-base-300 text-base-content/60 flex flex-wrap items-center justify-center gap-x-2 border-t px-4 py-2 text-center text-xs md:px-8">
+                    {release?.version && (
+                        <>
+                            <span>
+                                {t('whatsNew.footer_version', {
+                                    version: release.version,
+                                })}
+                            </span>
+                            <span aria-hidden="true">·</span>
+                            <Link
+                                href={route('whats-new')}
+                                className="link link-hover"
+                            >
+                                {t('whatsNew.footer_link')}
+                            </Link>
+                            <span aria-hidden="true">·</span>
+                        </>
+                    )}
                     <Link
                         href={route('software.notice')}
                         className="link link-hover"
@@ -154,6 +174,8 @@ export default function AuthenticatedLayout({
                         {t('software.footer_link')}
                     </Link>
                 </footer>
+
+                <WhatsNewDialog />
             </div>
 
             <div className="drawer-side z-40">

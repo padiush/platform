@@ -20,6 +20,7 @@ use App\Http\Controllers\PublicPageController;
 use App\Http\Controllers\SoftwareNoticeController;
 use App\Http\Controllers\SystemController;
 use App\Http\Controllers\WfoController;
+use App\Http\Controllers\WhatsNewController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth'])->group(function () {
@@ -34,6 +35,10 @@ Route::middleware(['auth'])->group(function () {
     // The sidebar's project switcher.
     Route::post('/projects/{project}/activate', [ActiveProjectController::class, 'store'])
         ->name('projects.activate');
+
+    // What's new: the notes of every release, and the one the user has seen.
+    Route::get('/whats-new', [WhatsNewController::class, 'index'])->name('whats-new');
+    Route::post('/whats-new/seen', [WhatsNewController::class, 'seen'])->name('whats-new.seen');
 
     // Mi cuenta: where the user is signed in, and signing it out.
     Route::controller(AccountController::class)

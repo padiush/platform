@@ -48,6 +48,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Application Version
+    |--------------------------------------------------------------------------
+    |
+    | The release this installation runs, read from package.json so that a
+    | release bumps one number. "What's new" shows each user the notes of the
+    | releases since the last one they saw (docs/releasing.md).
+    |
+    */
+
+    'version' => json_decode((string) file_get_contents(base_path('package.json')), true)['version'] ?? '0.0.0',
+
+    /*
+    |--------------------------------------------------------------------------
     | Application Environment
     |--------------------------------------------------------------------------
     |

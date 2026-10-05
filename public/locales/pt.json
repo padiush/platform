@@ -956,5 +956,18 @@
         "design_forms": "Criar formulários",
         "link_species": "Vincular espécies",
         "export": "Exportar dados"
+    },
+    "whatsNew": {
+        "title": "O que há de novo?",
+        "intro": "Isto mudou desde a última vez que você entrou.",
+        "page_title": "Novidades",
+        "page_intro": "O que cada versão do Padiush trouxe.",
+        "version": "Versão {{version}}",
+        "released_on": "Publicada em {{date}}",
+        "got_it": "Entendi",
+        "see_all": "Ver todas as novidades",
+        "footer_link": "Novidades",
+        "footer_version": "Padiush {{version}}",
+        "empty": "Ainda não há notas de versão."
     }
 }
