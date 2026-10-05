@@ -79,8 +79,9 @@ under. Both are in [companion-api.md](contracts/companion-api.md) and
 have their own upload endpoints too, `records/{record}/media/intent` and
 `…/complete` — the same presigned handshake as an interview's media, addressed
 by the server id `records:sync` returns. **The companion now stores, captures
-and sends records**; uploading a record's media from the device is the
-remaining piece.
+and sends records, with their photographs and voice notes**, which go up
+through those endpoints once a record has its server id. Still to come there:
+starting a record from an interview answer, and discarding a draft.
 
 What remains before field deployment for sensitive studies is hardening rather
 than new surface — tracked as: **resumable media upload** (single PUT today, so
