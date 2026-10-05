@@ -19,13 +19,16 @@ export default function Settings({ project }) {
         <AuthenticatedLayout title={t('navigation.settings')}>
             <div className="p-4 md:pt-8 lg:pt-12">
                 <div className="mx-auto flex max-w-3xl flex-col gap-4 sm:px-6 lg:px-8">
-                    <Card title={t('projects.settings.details')}>
+                    <Card
+                        title={t('projects.settings.details')}
+                        className="w-full"
+                    >
                         <ProjectForm project={project} />
                     </Card>
 
                     <Card
                         title={t('projects.settings.delete_title')}
-                        className="border-error/40"
+                        className="border-error/40 w-full"
                     >
                         <p className="text-base-content/70 text-sm">
                             {t('projects.settings.delete_hint')}
