@@ -88,6 +88,26 @@ describe('FieldRecords page', () => {
         expect(screen.queryByText('042')).not.toBeInTheDocument();
     });
 
+    /** The overview links straight to the unidentified ones. */
+    it('opens already narrowed when the link asks for it', () => {
+        window.history.replaceState(null, '', '/records?filter=undetermined');
+
+        renderPage();
+
+        expect(screen.getByText('043')).toBeInTheDocument();
+        expect(screen.queryByText('042')).not.toBeInTheDocument();
+        window.history.replaceState(null, '', '/');
+    });
+
+    it('ignores a filter it does not know', () => {
+        window.history.replaceState(null, '', '/records?filter=everything');
+
+        renderPage();
+
+        expect(screen.getByText('042')).toBeInTheDocument();
+        window.history.replaceState(null, '', '/');
+    });
+
     it('narrows to what is still unvouchered', () => {
         renderPage();
 

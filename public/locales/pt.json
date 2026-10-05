@@ -898,5 +898,29 @@
         "licences_no_notice_body": "Estes pacotes declaram a licença nos seus metadados mas não incluem um ficheiro de aviso. São listados para que a atribuição fique completa.",
         "licences_link": "Licenças das dependências",
         "footer_link": "Software livre · código-fonte"
+    },
+    "overview": {
+        "finished": "Projeto finalizado: pode ser consultado e exportado, mas não recebe novos formulários nem entrevistas.",
+        "interviews": "Entrevistas",
+        "field_records": "Registros de campo",
+        "species": "Espécies no catálogo",
+        "unlinked": "Respostas sem vínculo",
+        "waiting": "Pendente",
+        "nothing_waiting": "Nada pendente por enquanto.",
+        "pending_media_one": "{{count}} arquivo registrado de um celular ainda não chegou",
+        "pending_media_other": "{{count}} arquivos registrados de celulares ainda não chegaram",
+        "undetermined_records_one": "{{count}} registro de campo sem identificação",
+        "undetermined_records_other": "{{count}} registros de campo sem identificação",
+        "unlinked_answers_one": "{{count}} resposta sem vínculo com uma espécie",
+        "unlinked_answers_other": "{{count}} respostas sem vínculo com uma espécie",
+        "recent_interviews": "Entrevistas recentes",
+        "recent_records": "Registros recentes",
+        "no_interviews": "Ainda não há entrevistas.",
+        "no_records": "Ainda não há registros de campo.",
+        "unnamed_record": "Registro sem nome",
+        "new_interview": "Nova entrevista",
+        "design_forms": "Criar formulários",
+        "link_species": "Vincular espécies",
+        "export": "Exportar dados"
     }
 }

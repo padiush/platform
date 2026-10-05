@@ -30,7 +30,7 @@ const SECTIONS = [
         key: 'overview',
         label: 'navigation.overview',
         icon: faGauge,
-        patterns: ['dashboard'],
+        patterns: ['dashboard', 'projects.overview'],
     },
     {
         key: 'forms',
@@ -194,7 +194,10 @@ export default function Sidebar({ rail = false, onToggleRail = null }) {
                         href={route('projects.index')}
                         icon={faFolderOpen}
                         label={t('navigation.projects')}
-                        active={route().current('projects.*')}
+                        active={
+                            route().current('projects.*') &&
+                            !route().current('projects.overview')
+                        }
                         rail={rail}
                     />
                     {auth.user.system_admin && (

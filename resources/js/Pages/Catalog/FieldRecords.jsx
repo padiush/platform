@@ -85,7 +85,12 @@ export default function FieldRecords({
     exemptions = [],
 }) {
     const { t } = useTranslation();
-    const [filter, setFilter] = useState('all');
+    // A link can open the list already filtered: the overview sends
+    // "unidentified" here as the work it is.
+    const [filter, setFilter] = useState(() => {
+        const asked = new URLSearchParams(window.location.search).get('filter');
+        return FILTERS.includes(asked) ? asked : 'all';
+    });
     const [collecting, setCollecting] = useState(false);
     const [editing, setEditing] = useState(null);
     const [determining, setDetermining] = useState(null);

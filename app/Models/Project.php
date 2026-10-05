@@ -70,6 +70,30 @@ class Project extends Model
         return $this->hasMany(FieldRecord::class);
     }
 
+    /** Every interview recorded in this project, across its forms. */
+    public function interviewInstances()
+    {
+        return $this->hasManyThrough(
+            InterviewInstance::class,
+            InterviewForm::class,
+            'project_id',
+            'interview_form_id'
+        );
+    }
+
+    /**
+     * The project's photographs and recordings, an interview's or a field
+     * record's alike.
+     */
+    public function media()
+    {
+        return Media::where(function ($query) {
+            $query
+                ->whereIn('interview_instance_id', $this->interviewInstances()->select('interview_instances.id'))
+                ->orWhereIn('field_record_id', $this->fieldRecords()->select('id'));
+        });
+    }
+
     public function collectingPermits()
     {
         return $this->hasMany(CollectingPermit::class);
