@@ -82,8 +82,9 @@ by the server id `records:sync` returns. **The companion now stores, captures
 and sends records, with their photographs and voice notes**, which go up
 through those endpoints once a record has its server id. A record can also be
 started from an interview answer that names a plant, linked to that answer,
-and a record that was never sent can be discarded. On the web, nothing shows
-the link between a record and its answer yet.
+and a record that was never sent can be discarded. The web shows that link
+from both sides: a record names the interview and question it came out of,
+and an interview lists the records made from each answer.
 
 What remains before field deployment for sensitive studies is hardening rather
 than new surface — tracked as: **resumable media upload** (single PUT today, so
