@@ -1,6 +1,6 @@
 import ApplicationLogo from '@/Components/ApplicationLogo';
+import LanguageMenu from '@/Components/LanguageMenu';
 import ThemeToggle from '@/Components/ThemeToggle';
-import TranslationToggle from '@/Components/TranslationToggle';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Head, Link, usePage } from '@inertiajs/react';
@@ -29,7 +29,7 @@ export default function SoftwareLicences({ licences }) {
                     </Link>
                     <div className="flex items-center gap-1">
                         <ThemeToggle />
-                        <TranslationToggle />
+                        <LanguageMenu />
                     </div>
                 </div>
 

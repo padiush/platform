@@ -1,6 +1,6 @@
 import ApplicationFullLogo from '@/Components/ApplicationFullLogo';
+import LanguageMenu from '@/Components/LanguageMenu';
 import ThemeToggle from '@/Components/ThemeToggle';
-import TranslationToggle from '@/Components/TranslationToggle';
 import { useFlashMessage } from '@/Hooks/useFlashMessage';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -58,7 +58,7 @@ export default function AuthLayout({ children, title, heading, description }) {
             <main className="flex flex-1 flex-col px-6 py-8 lg:px-12 lg:py-16">
                 <div className="flex justify-end gap-1">
                     <ThemeToggle />
-                    <TranslationToggle />
+                    <LanguageMenu />
                 </div>
 
                 <div className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center py-8">

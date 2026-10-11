@@ -1,6 +1,14 @@
 {
     "releases": [
         {
+            "version": "1.2.0",
+            "date": null,
+            "items": [
+                "Elige el idioma de Padiush en un menú, en lugar de recorrer los idiomas uno por uno. Tu elección se guarda en tu cuenta, así que la plataforma y los correos que te enviamos siguen en ese idioma en cualquier navegador o dispositivo.",
+                "El texto de la plataforma se ve con la tipografía de Padiush en cualquier computadora, tableta o teléfono, aunque no la tengas instalada."
+            ]
+        },
+        {
             "version": "1.1.0",
             "date": "2026-10-05",
             "items": [

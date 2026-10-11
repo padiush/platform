@@ -5,11 +5,12 @@ import '@fontsource-variable/montserrat';
 import 'driver.js/dist/driver.css';
 import '../css/app.css';
 import './bootstrap';
-import './i18n.js';
 
-import { createInertiaApp } from '@inertiajs/react';
+import { createInertiaApp, router } from '@inertiajs/react';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createRoot } from 'react-dom/client';
+import i18n from './i18n.js';
+import { syncAccountLanguage } from './lib/accountLanguage';
 
 const appName = import.meta.env.APP_NAME || 'Padiush';
 
@@ -22,6 +23,13 @@ createInertiaApp({
         ),
     setup({ el, App, props }) {
         const root = createRoot(el);
+
+        // A signed-in user's language is an account preference; follow it on
+        // the first page and after every visit.
+        syncAccountLanguage(i18n, props.initialPage.props);
+        router.on('navigate', (event) =>
+            syncAccountLanguage(i18n, event.detail.page.props),
+        );
 
         root.render(<App {...props} />);
     },

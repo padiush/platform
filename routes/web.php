@@ -58,6 +58,7 @@ Route::middleware(['auth'])->group(function () {
         ->name('account.')
         ->group(function () {
             Route::get('/', 'show')->name('show');
+            Route::put('/language', 'updateLanguage')->name('language');
             Route::delete('/sessions', 'destroyOtherSessions')->name('sessions.destroy-others');
             Route::delete('/sessions/{session}', 'destroySession')->name('sessions.destroy');
             Route::delete('/devices/{device}', 'destroyDevice')
