@@ -25,6 +25,9 @@ identifiers:
       The concept DOI, which always resolves to the most recent release.
       Cite this when you mean the software rather than one version of it.
   - type: doi
+    value: 10.5281/zenodo.23305118
+    description: The DOI of version 1.2.0 specifically.
+  - type: doi
     value: 10.5281/zenodo.23175165
     description: The DOI of version 1.1.0 specifically.
   - type: doi
