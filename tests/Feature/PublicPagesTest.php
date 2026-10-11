@@ -81,6 +81,22 @@ class PublicPagesTest extends TestCase
         );
     }
 
+    public function test_pages_share_the_field_apps_store_listings()
+    {
+        config(['padiush.companion_stores' => [
+            'app_store' => 'https://apps.example/1',
+            'play_store' => null,
+            'play_store_coming_soon' => true,
+        ]]);
+
+        $this->get(route('public.contact'))->assertInertia(
+            fn (Assert $page) => $page
+                ->where('companionStores.app_store', 'https://apps.example/1')
+                ->where('companionStores.play_store', null)
+                ->where('companionStores.play_store_coming_soon', true)
+        );
+    }
+
     public function test_pages_offer_no_way_back_to_a_site_that_does_not_exist()
     {
         config(['padiush.public_site_url' => null]);

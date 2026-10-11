@@ -64,6 +64,26 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Field app store listings
+    |--------------------------------------------------------------------------
+    |
+    | A store build of the companion is tied to the instance it was built for,
+    | so only the deployment that publishes one links to it. The public pages'
+    | footer shows a badge for each listing set here, and nothing when neither
+    | is. COMPANION_PLAY_STORE_COMING_SOON announces a Google Play release
+    | that is not public yet, in plain text: Google's badge may only point at
+    | a live listing.
+    |
+    */
+
+    'companion_stores' => [
+        'app_store' => env('COMPANION_APP_STORE_URL') ?: null,
+        'play_store' => env('COMPANION_PLAY_STORE_URL') ?: null,
+        'play_store_coming_soon' => (bool) env('COMPANION_PLAY_STORE_COMING_SOON', false),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Legal documents
     |--------------------------------------------------------------------------
     |

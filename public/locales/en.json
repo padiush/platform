@@ -791,7 +791,11 @@
         "email": "Email address",
         "message": "Message",
         "send": "Send",
-        "contact_success": "Your message has been sent. Thank you for contacting us!"
+        "contact_success": "Your message has been sent. Thank you for contacting us!",
+        "field_app": "Field app",
+        "app_store": "Download on the App Store",
+        "google_play": "Get it on Google Play",
+        "play_soon": "Coming soon to Google Play"
     },
     "auth": {
         "login": "Sign in",

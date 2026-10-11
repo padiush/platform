@@ -1,5 +1,6 @@
 import ApplicationFullLogo from '@/Components/ApplicationFullLogo';
 import LanguageMenu from '@/Components/LanguageMenu';
+import StoreBadges, { hasStoreBadges } from '@/Components/StoreBadges';
 import ThemeToggle from '@/Components/ThemeToggle';
 import { useFlashMessage } from '@/Hooks/useFlashMessage';
 import { faLinkedin } from '@fortawesome/free-brands-svg-icons';
@@ -10,7 +11,7 @@ import { useTranslation } from 'react-i18next';
 
 export default function PublicLayout({ children, title }) {
     const { FlashAlert, flashShown } = useFlashMessage();
-    const { auth, publicSiteUrl } = usePage().props;
+    const { auth, publicSiteUrl, companionStores } = usePage().props;
     const { t } = useTranslation();
 
     // The landing and About pages are a separate site (PUBLIC_SITE_URL), not
@@ -152,6 +153,17 @@ export default function PublicLayout({ children, title }) {
                         {t('software.footer_link')}
                     </Link>
                 </div>
+                {hasStoreBadges(companionStores) && (
+                    <div>
+                        <span className="footer-title">
+                            {t('public.field_app')}
+                        </span>
+                        <StoreBadges
+                            stores={companionStores}
+                            className="flex-col items-start"
+                        />
+                    </div>
+                )}
                 <div>
                     <span className="footer-title">{t('public.social')}</span>
                     <div className="grid grid-flow-col gap-4 text-3xl">

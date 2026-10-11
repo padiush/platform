@@ -11,6 +11,14 @@ language (`public/locales/whatsnew/`). How a release is cut is in
 
 ## [Unreleased]
 
+### Added
+
+- The public pages' footer can list the field app's store listings, as the
+  public site's does: `COMPANION_APP_STORE_URL` and `COMPANION_PLAY_STORE_URL`
+  show Apple's and Google's badges in the reader's language, and
+  `COMPANION_PLAY_STORE_COMING_SOON` announces a Play release in plain text
+  until its listing is public. Unset, the column is left out.
+
 ### Removed
 
 - The landing and about pages, their screenshots and the script that captured
@@ -30,14 +38,17 @@ language (`public/locales/whatsnew/`). How a release is cut is in
 
 ### Changed
 
-- The header of the contact and legal pages matches the public site's: the
-  links, then the theme switch, then a language menu listing the three
-  languages instead of a button that cycles through them.
+- The header and footer of the contact and legal pages match the public
+  site's: the links, then the theme switch, then a language menu listing the
+  three languages instead of a button that cycles through them; and a footer
+  with the same columns.
 
 ### Upgrading
 
 - Set `PUBLIC_SITE_URL` to your site's address if you have one; without it the
-  public and sign-in pages offer no link back. Anything that served `/` or
+  public and sign-in pages offer no link back. If you publish a store build of
+  the companion for your instance, set `COMPANION_APP_STORE_URL` and
+  `COMPANION_PLAY_STORE_URL`. Anything that served `/` or
   `/acerca` from the application has to come from your site now.
 
 ## [1.1.0] — 2026-10-05

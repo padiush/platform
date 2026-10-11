@@ -82,6 +82,8 @@ class HandleInertiaRequests extends Middleware
             // public and sign-in pages link back to it, and hide those links
             // when there is none.
             'publicSiteUrl' => config('padiush.public_site_url'),
+            // The field app's store listings, for the public pages' footer.
+            'companionStores' => config('padiush.companion_stores'),
             // The release running, and for a signed-in user who has not seen
             // its notes yet, the last release they did see — "What's new"
             // shows everything after it (docs/releasing.md). Resolved when

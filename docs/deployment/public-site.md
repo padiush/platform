@@ -31,6 +31,23 @@ That site is its own repository,
 [padiush/website](https://github.com/padiush/website), which documents the
 routing.
 
+## Store listings of the field app
+
+A store build of the companion is made for one instance and talks only to it,
+so only a deployment that publishes its own links to one. If you do, the public
+pages' footer gains a column for it:
+
+```dotenv
+COMPANION_APP_STORE_URL="https://apps.apple.com/app/id…"
+COMPANION_PLAY_STORE_URL="https://play.google.com/store/apps/details?id=…"
+# Before the Play listing is public: announce it in plain text instead.
+COMPANION_PLAY_STORE_COMING_SOON=true
+```
+
+Each listing set shows its store's own badge in the reader's language. Google's
+badge may only point at a live listing, which is why an announced release
+appears as text until `COMPANION_PLAY_STORE_URL` is set.
+
 ## Turning the public pages on
 
 ```dotenv

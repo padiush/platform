@@ -791,7 +791,11 @@
         "email": "Correo electrónico",
         "message": "Mensaje",
         "send": "Enviar",
-        "contact_success": "Tu mensaje ha sido enviado. ¡Gracias por contactarnos!"
+        "contact_success": "Tu mensaje ha sido enviado. ¡Gracias por contactarnos!",
+        "field_app": "Aplicación de campo",
+        "app_store": "Descárgala en el App Store",
+        "google_play": "Disponible en Google Play",
+        "play_soon": "Próximamente en Google Play"
     },
     "auth": {
         "login": "Iniciar sesión",
