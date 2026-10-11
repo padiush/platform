@@ -1,3 +1,7 @@
+// Self-hosted, so no third party sees who opens the application. Imported
+// here rather than from app.css, where Tailwind would inline it and break the
+// relative URLs of its font files.
+import '@fontsource-variable/montserrat';
 import 'driver.js/dist/driver.css';
 import '../css/app.css';
 import './bootstrap';

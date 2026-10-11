@@ -11,7 +11,11 @@ module.exports = {
     theme: {
         extend: {
             fontFamily: {
-                sans: ["Montserrat", ...defaultTheme.fontFamily.sans],
+                sans: [
+                    "Montserrat Variable",
+                    "Montserrat",
+                    ...defaultTheme.fontFamily.sans,
+                ],
             },
         },
     },

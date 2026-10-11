@@ -24,6 +24,9 @@ language (`public/locales/whatsnew/`). How a release is cut is in
   links. They were Inertia links, so with the site served separately they
   opened it in a modal over the page instead of navigating to it.
 - The contact page no longer mentions beta access.
+- The theme names Montserrat, but nothing loaded it, so anyone without it
+  installed saw a system font. It is now bundled with the application
+  (`@fontsource-variable/montserrat`), served from the same origin.
 
 ### Changed
 
