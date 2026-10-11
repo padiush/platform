@@ -11,6 +11,8 @@ language (`public/locales/whatsnew/`). How a release is cut is in
 
 ## [Unreleased]
 
+## [1.2.0] — 2026-10-11
+
 ### Added
 
 - The public pages' footer can list the field app's store listings, as the
@@ -19,12 +21,26 @@ language (`public/locales/whatsnew/`). How a release is cut is in
   `COMPANION_PLAY_STORE_COMING_SOON` announces a Play release in plain text
   until its listing is public. Unset, the column is left out.
 
+
+### Changed
+
+- The interface language is a menu everywhere, listing the three languages,
+  instead of a button that cycled through them. For a signed-in user the
+  choice is saved on the account (`PUT /account/language`) and wins over the
+  browser's cookie, so the application, and its emails, keep the same language
+  on every device. An account that has never chosen adopts the language its
+  owner was reading, once.
+- The header and footer of the contact and legal pages match the public
+  site's, with the same links, controls and columns in the same order.
+
+
 ### Removed
 
 - The landing and about pages, their screenshots and the script that captured
   them. A deployment's own site is now separate from the application: the
   public and sign-in pages link to it at `PUBLIC_SITE_URL`, and `/` sends
   visitors to sign in or to their dashboard. `/acerca` is no longer a route.
+
 
 ### Fixed
 
@@ -36,18 +52,6 @@ language (`public/locales/whatsnew/`). How a release is cut is in
   installed saw a system font. It is now bundled with the application
   (`@fontsource-variable/montserrat`), served from the same origin.
 
-### Changed
-
-- The interface language is a menu everywhere, listing the three languages,
-  instead of a button that cycled through them. For a signed-in user the
-  choice is saved on the account (`PUT /account/language`) and wins over the
-  browser's cookie, so the application, and its emails, keep the same language
-  on every device. An account that has never chosen adopts the language its
-  owner was reading, once.
-- The header and footer of the contact and legal pages match the public
-  site's: the links, then the theme switch, then a language menu listing the
-  three languages instead of a button that cycles through them; and a footer
-  with the same columns.
 
 ### Upgrading
 
@@ -156,6 +160,7 @@ First public release: interview form design, offline capture with the companion
 app, species linking against taxonomic backbones, the five ethnobotanical
 indices, and export.
 
-[Unreleased]: https://github.com/padiush/platform/compare/v1.1.0...HEAD
+[Unreleased]: https://github.com/padiush/platform/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/padiush/platform/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/padiush/platform/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/padiush/platform/releases/tag/v1.0.0

@@ -218,7 +218,8 @@ sidebar.
 
 Cite **[10.5281/zenodo.21943747](https://doi.org/10.5281/zenodo.21943747)** when
 you mean the software; it always resolves to the newest release. Cite the DOI of
-the specific version you ran when reproducibility depends on it — for 1.0.0 that
-is [10.5281/zenodo.21943748](https://doi.org/10.5281/zenodo.21943748).
+the specific version you ran when reproducibility depends on it — for 1.1.0 that
+is [10.5281/zenodo.23175165](https://doi.org/10.5281/zenodo.23175165), and for
+1.0.0 [10.5281/zenodo.21943748](https://doi.org/10.5281/zenodo.21943748).
 
 A methods paper is in preparation and will be linked here once published.
