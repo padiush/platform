@@ -13,7 +13,7 @@ class SetLocaleTest extends TestCase
     public function test_the_interface_language_cookie_sets_the_request_locale()
     {
         $this->withUnencryptedCookie('i18next', 'pt')
-            ->get(route('public.index'))
+            ->get(route('software.notice'))
             ->assertOk();
 
         $this->assertSame('pt', app()->getLocale());
@@ -23,7 +23,7 @@ class SetLocaleTest extends TestCase
     {
         // i18next writes values such as "pt-BR".
         $this->withUnencryptedCookie('i18next', 'pt-BR')
-            ->get(route('public.index'))
+            ->get(route('software.notice'))
             ->assertOk();
 
         $this->assertSame('pt', app()->getLocale());
@@ -32,7 +32,7 @@ class SetLocaleTest extends TestCase
     public function test_an_unsupported_language_leaves_the_default_in_place()
     {
         $this->withUnencryptedCookie('i18next', 'de')
-            ->get(route('public.index'))
+            ->get(route('software.notice'))
             ->assertOk();
 
         $this->assertSame(config('app.locale'), app()->getLocale());
@@ -44,7 +44,7 @@ class SetLocaleTest extends TestCase
 
         $this->actingAs($user)
             ->withUnencryptedCookie('i18next', 'en')
-            ->get(route('public.index'))
+            ->get(route('software.notice'))
             ->assertOk();
 
         // Queued notifications run without a request, so the preference has to
@@ -57,7 +57,7 @@ class SetLocaleTest extends TestCase
         $user = User::factory()->create(['locale' => 'pt']);
 
         $this->actingAs($user)
-            ->get(route('public.index'))
+            ->get(route('software.notice'))
             ->assertOk();
 
         $this->assertSame('pt', app()->getLocale());

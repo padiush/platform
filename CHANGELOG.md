@@ -11,6 +11,46 @@ language (`public/locales/whatsnew/`). How a release is cut is in
 
 ## [Unreleased]
 
+### Added
+
+- The public pages' footer can list the field app's store listings, as the
+  public site's does: `COMPANION_APP_STORE_URL` and `COMPANION_PLAY_STORE_URL`
+  show Apple's and Google's badges in the reader's language, and
+  `COMPANION_PLAY_STORE_COMING_SOON` announces a Play release in plain text
+  until its listing is public. Unset, the column is left out.
+
+### Removed
+
+- The landing and about pages, their screenshots and the script that captured
+  them. A deployment's own site is now separate from the application: the
+  public and sign-in pages link to it at `PUBLIC_SITE_URL`, and `/` sends
+  visitors to sign in or to their dashboard. `/acerca` is no longer a route.
+
+### Fixed
+
+- Links from the contact, legal and sign-in pages back to the site are plain
+  links. They were Inertia links, so with the site served separately they
+  opened it in a modal over the page instead of navigating to it.
+- The contact page no longer mentions beta access.
+- The theme names Montserrat, but nothing loaded it, so anyone without it
+  installed saw a system font. It is now bundled with the application
+  (`@fontsource-variable/montserrat`), served from the same origin.
+
+### Changed
+
+- The header and footer of the contact and legal pages match the public
+  site's: the links, then the theme switch, then a language menu listing the
+  three languages instead of a button that cycles through them; and a footer
+  with the same columns.
+
+### Upgrading
+
+- Set `PUBLIC_SITE_URL` to your site's address if you have one; without it the
+  public and sign-in pages offer no link back. If you publish a store build of
+  the companion for your instance, set `COMPANION_APP_STORE_URL` and
+  `COMPANION_PLAY_STORE_URL`. Anything that served `/` or
+  `/acerca` from the application has to come from your site now.
+
 ## [1.1.0] — 2026-10-05
 
 ### Added

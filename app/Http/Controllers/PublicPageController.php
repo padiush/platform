@@ -4,48 +4,21 @@ namespace App\Http\Controllers;
 
 use App\Notifications\ContactFormNotification;
 use Artesaos\SEOTools\Facades\SEOTools;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Notification;
-use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Spatie\Honeypot\Honeypot;
 
 class PublicPageController extends Controller
 {
-    public function index()
+    /**
+     * The landing and about pages are a separate site, so the root only
+     * sends visitors into the application.
+     */
+    public function root(): RedirectResponse
     {
-        // Reached even when the marketing pages are off, because a bare 404 at
-        // the root of your own instance is a poor welcome. Send people to the
-        // application instead.
-        if (! config('padiush.public_site_enabled')) {
-            return redirect()->route(
-                auth()->check() ? 'dashboard' : 'login'
-            );
-        }
-
-        SEOTools::setTitle('Padiush | Del cuaderno de campo a datos listos para publicar');
-        SEOTools::setDescription('Plataforma de investigación etnobotánica: entrevistas en campo sin señal, reconciliación de nombres locales con taxones aceptados e índices cuantitativos con sus fórmulas citadas.');
-        SEOTools::opengraph()->setUrl(config('app.url'));
-        SEOTools::setCanonical(config('app.url'));
-
-        // The landing page draws its own visuals in markup, so it no longer
-        // pulls a set of presigned image URLs that nothing could cache.
-        return Inertia::render('Public/Index');
-    }
-
-    public function about()
-    {
-        SEOTools::setTitle('Sobre nosotros');
-        SEOTools::setDescription('Por qué construimos Padiush, cómo trabajamos y quiénes lo hacemos.');
-        SEOTools::opengraph()->setUrl(config('app.url').'/acerca');
-        SEOTools::setCanonical(config('app.url').'/acerca');
-
-        return Inertia::render('Public/About', [
-            'images' => [
-                'mercedes' => Storage::disk('s3')->temporaryUrl('Mercedes.webp', now()->addMinutes(10)),
-                'rodrigo' => Storage::disk('s3')->temporaryUrl('Rodrigo.webp', now()->addMinutes(10)),
-            ],
-        ]);
+        return redirect()->route(auth()->check() ? 'dashboard' : 'login');
     }
 
     public function contact(Honeypot $honeypot)

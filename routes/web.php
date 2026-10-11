@@ -347,18 +347,17 @@ Route::get('/software', [SoftwareNoticeController::class, 'show'])->name('softwa
 Route::get('/software/licencias', [SoftwareNoticeController::class, 'licences'])
     ->name('software.licences');
 
-// The root stays ungated so that an installation with no marketing pages still
-// answers something useful there — it sends visitors to the application rather
-// than to a 404.
-Route::get('/', [PublicPageController::class, 'index'])->name('public.index');
+// The application has no landing page of its own: a deployment's site, if it
+// has one, is served separately (PUBLIC_SITE_URL), usually in front of this
+// route. Reaching it sends visitors into the application rather than to a 404.
+Route::get('/', [PublicPageController::class, 'root'])->name('root');
 
-// The rest describe one deployment's operator and make legal claims on their
+// These describe one deployment's operator and make legal claims on their
 // behalf, so they stay registered (route() must resolve for the links that
 // reference them) but answer 404 unless this installation opted in.
 Route::controller(PublicPageController::class)
     ->middleware('public_site')
     ->group(function () {
-        Route::get('/acerca', 'about')->name('public.about');
         Route::get('/contacto', 'contact')->name('public.contact');
         Route::post('/contacto', 'handleContactRequest')
             ->middleware(['honeypot'])
