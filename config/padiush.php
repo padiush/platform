@@ -43,18 +43,24 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Public marketing site
+    | Public pages and the public site
     |--------------------------------------------------------------------------
     |
-    | The landing, about, contact, privacy and terms pages describe a specific
-    | deployment — its operator, its data controller, its contact address. They
-    | are off by default so that a fresh installation serves the application
-    | only, and never someone else's legal claims. Turn this on once you have
-    | written your own; see docs/deployment/public-site.md.
+    | The contact, privacy and terms pages describe a specific deployment — its
+    | operator, its data controller, its contact address. They are off by
+    | default so that a fresh installation serves the application only, and
+    | never someone else's legal claims. Turn them on once you have written
+    | your own; see docs/deployment/public-site.md.
+    |
+    | A landing page and an about page are not part of the application. If the
+    | deployment has a site of its own, PUBLIC_SITE_URL is its address, and the
+    | public and sign-in pages link back to it; left unset, they do not.
     |
     */
 
     'public_site_enabled' => (bool) env('PUBLIC_SITE_ENABLED', false),
+
+    'public_site_url' => rtrim((string) env('PUBLIC_SITE_URL', ''), '/') ?: null,
 
     /*
     |--------------------------------------------------------------------------

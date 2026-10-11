@@ -10,33 +10,9 @@ class PublicPagesTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_landing_page_renders()
-    {
-        $response = $this->get(route('public.index'));
-
-        $response->assertOk();
-        // The landing page draws its own visuals, so it deliberately carries no
-        // image props — and therefore mints no presigned URLs on every visit.
-        $response->assertInertia(
-            fn (Assert $page) => $page->component('Public/Index')->missing('images')
-        );
-    }
-
-    public function test_landing_page_exposes_the_registration_state_for_its_call_to_action()
-    {
-        config(['padiush.registration_enabled' => false]);
-
-        $response = $this->get(route('public.index'));
-
-        $response->assertOk();
-        $response->assertInertia(
-            fn (Assert $page) => $page->where('registrationEnabled', false)
-        );
-    }
-
     public function test_public_pages_emit_link_preview_metadata()
     {
-        $response = $this->get(route('public.index'));
+        $response = $this->get(route('public.contact'));
 
         $response->assertOk();
         // Regression: these controller calls existed but were never rendered,
@@ -49,7 +25,7 @@ class PublicPagesTest extends TestCase
 
     public function test_public_pages_carry_a_link_preview_image()
     {
-        $response = $this->get(route('public.index'));
+        $response = $this->get(route('public.contact'));
 
         $response->assertOk();
         // A crawler fetches this long after reading the page and caches the
@@ -82,19 +58,35 @@ class PublicPagesTest extends TestCase
 
     public function test_pinch_zoom_is_not_blocked()
     {
-        $response = $this->get(route('public.index'));
+        $response = $this->get(route('public.contact'));
 
         $response->assertOk();
         $response->assertDontSee('maximum-scale', false);
     }
 
-    public function test_about_page_renders()
+    public function test_the_landing_and_about_pages_are_not_part_of_the_application()
     {
-        $response = $this->get(route('public.about'));
+        // They are a separate site (PUBLIC_SITE_URL), served in front of the
+        // application; the root only sends visitors in.
+        $this->get('/')->assertRedirect(route('login'));
+        $this->get('/acerca')->assertNotFound();
+    }
 
-        $response->assertOk();
-        $response->assertInertia(
-            fn (Assert $page) => $page->component('Public/About')->has('images')
+    public function test_pages_link_back_to_the_deployments_own_site()
+    {
+        config(['padiush.public_site_url' => 'https://example.org']);
+
+        $this->get(route('public.contact'))->assertInertia(
+            fn (Assert $page) => $page->where('publicSiteUrl', 'https://example.org')
+        );
+    }
+
+    public function test_pages_offer_no_way_back_to_a_site_that_does_not_exist()
+    {
+        config(['padiush.public_site_url' => null]);
+
+        $this->get(route('login'))->assertInertia(
+            fn (Assert $page) => $page->where('publicSiteUrl', null)
         );
     }
 

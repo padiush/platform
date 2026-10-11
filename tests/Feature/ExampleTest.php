@@ -8,14 +8,14 @@ use Tests\TestCase;
 class ExampleTest extends TestCase
 {
     /**
-     * A basic test example.
+     * The application answers: the root leads to sign-in, and sign-in renders.
      *
      * @return void
      */
     public function test_the_application_returns_a_successful_response()
     {
-        $response = $this->get('/');
+        $this->get('/')->assertRedirect(route('login'));
 
-        $response->assertStatus(200);
+        $this->get(route('login'))->assertStatus(200);
     }
 }

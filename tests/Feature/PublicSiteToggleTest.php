@@ -9,7 +9,8 @@ use Tests\TestCase;
 /**
  * The public pages describe one operator and make legal claims on their behalf.
  * A deployment that has not written its own must not serve ours, so the default
- * is off and the routes answer 404 until it opts in.
+ * is off and the routes answer 404 until it opts in. The landing and about
+ * pages are not part of the application at all (see PublicPagesTest).
  */
 class PublicSiteToggleTest extends TestCase
 {
@@ -24,7 +25,7 @@ class PublicSiteToggleTest extends TestCase
     {
         $this->enablePublicSite(false);
 
-        foreach (['/acerca', '/contacto', '/privacidad', '/terminos'] as $path) {
+        foreach (['/contacto', '/privacidad', '/terminos'] as $path) {
             $this->get($path)->assertNotFound();
         }
     }
@@ -45,13 +46,21 @@ class PublicSiteToggleTest extends TestCase
             ->assertRedirect(route('dashboard'));
     }
 
-    public function test_the_marketing_pages_are_served_once_enabled(): void
+    public function test_the_contact_page_is_served_once_enabled(): void
     {
         $this->enablePublicSite(true);
 
-        $this->get('/')->assertOk();
-        $this->get('/acerca')->assertOk();
         $this->get('/contacto')->assertOk();
+    }
+
+    public function test_the_root_sends_visitors_in_whether_or_not_the_pages_are_enabled(): void
+    {
+        $this->enablePublicSite(true);
+
+        $this->get('/')->assertRedirect(route('login'));
+        $this->actingAs(User::factory()->create())
+            ->get('/')
+            ->assertRedirect(route('dashboard'));
     }
 
     public function test_legal_pages_stay_hidden_until_documents_are_published(): void

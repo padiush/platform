@@ -9,8 +9,14 @@ import { useTranslation } from 'react-i18next';
 
 export default function PublicLayout({ children, title }) {
     const { FlashAlert, flashShown } = useFlashMessage();
-    const { auth } = usePage().props;
+    const { auth, publicSiteUrl } = usePage().props;
     const { t } = useTranslation();
+
+    // The landing and About pages are a separate site (PUBLIC_SITE_URL), not
+    // pages of this application. Links to it have to be ordinary anchors: an
+    // Inertia <Link> fetches the target over XHR, and a page that is not an
+    // Inertia response then opens in a modal over this one.
+    const home = publicSiteUrl ? `${publicSiteUrl}/` : null;
 
     return (
         <div className="bg-base-100 text-neutral-content min-h-screen">
@@ -45,18 +51,11 @@ export default function PublicLayout({ children, title }) {
                             tabIndex={0}
                             className="menu menu-compact dropdown-content bg-base-200 text-base-content rounded-box mt-3 w-52 p-2 shadow-sm"
                         >
-                            {!route().current('public.index') && (
+                            {home && (
                                 <li>
-                                    <Link href={route('public.index')}>
-                                        {t('public.home')}
-                                    </Link>
+                                    <a href={home}>{t('public.home')}</a>
                                 </li>
                             )}
-                            <li>
-                                <Link href={route('public.about')}>
-                                    {t('public.about')}
-                                </Link>
-                            </li>
                             <li>
                                 <Link href={route('public.contact')}>
                                     {t('public.contact')}
@@ -77,29 +76,28 @@ export default function PublicLayout({ children, title }) {
                             )}
                         </ul>
                     </div>
-                    <Link
-                        className="btn btn-ghost"
-                        href={route('public.index')}
-                    >
-                        <ApplicationFullLogo className="h-10 w-auto fill-current" />
-                    </Link>
+                    {home ? (
+                        <a className="btn btn-ghost" href={home}>
+                            <ApplicationFullLogo className="h-10 w-auto fill-current" />
+                        </a>
+                    ) : (
+                        <Link
+                            className="btn btn-ghost"
+                            href={route(auth?.user ? 'dashboard' : 'login')}
+                        >
+                            <ApplicationFullLogo className="h-10 w-auto fill-current" />
+                        </Link>
+                    )}
                 </div>
                 <div className="navbar-end hidden lg:flex">
                     <ThemeToggle />
                     <TranslationToggle />
                     <ul className="menu menu-horizontal px-1">
-                        {!route().current('public.index') && (
+                        {home && (
                             <li>
-                                <Link href={route('public.index')}>
-                                    {t('public.home')}
-                                </Link>
+                                <a href={home}>{t('public.home')}</a>
                             </li>
                         )}
-                        <li>
-                            <Link href={route('public.about')}>
-                                {t('public.about')}
-                            </Link>
-                        </li>
                         <li>
                             <Link href={route('public.contact')}>
                                 {t('public.contact')}
@@ -137,13 +135,12 @@ export default function PublicLayout({ children, title }) {
                     </p>
                 </aside>
                 <div>
-                    <span className="footer-title">{t('public.about')}</span>
-                    <Link
-                        className="link link-hover"
-                        href={route('public.about')}
-                    >
-                        {t('public.about')}
-                    </Link>
+                    <span className="footer-title">Padiush</span>
+                    {home && (
+                        <a className="link link-hover" href={home}>
+                            {t('public.home')}
+                        </a>
+                    )}
                     <Link
                         className="link link-hover"
                         href={route('public.contact')}

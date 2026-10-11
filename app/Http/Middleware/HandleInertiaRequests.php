@@ -78,14 +78,10 @@ class HandleInertiaRequests extends Middleware
                 'message_type' => $request->session()->get('message_type'),
             ],
             'environment' => config('app.env'),
-            // The public pages point their call to action at registration when
-            // it is open and at the contact form when it is not, so the button
-            // never promises a sign-up that would just bounce to login.
-            'registrationEnabled' => (bool) config('padiush.registration_enabled'),
-            // The public pages are optional, so anything outside them that
-            // links back to the site — the sign-in screens, chiefly — has to
-            // know whether there is a site to link to.
-            'publicSiteEnabled' => (bool) config('padiush.public_site_enabled'),
+            // The deployment's own site, if it has one (PUBLIC_SITE_URL). The
+            // public and sign-in pages link back to it, and hide those links
+            // when there is none.
+            'publicSiteUrl' => config('padiush.public_site_url'),
             // The release running, and for a signed-in user who has not seen
             // its notes yet, the last release they did see — "What's new"
             // shows everything after it (docs/releasing.md). Resolved when

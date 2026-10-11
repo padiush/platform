@@ -1,8 +1,8 @@
-# The public site and its legal documents
+# Public pages, your site and its legal documents
 
-Padiush ships without a public-facing site. A fresh installation serves the
-application and nothing else: visiting `/` sends you to the sign-in page, and
-`/acerca`, `/contacto`, `/privacidad` and `/terminos` answer 404.
+Padiush is the application only. It has no landing page or about page: a
+fresh installation sends `/` to the sign-in page (or the dashboard, for
+someone signed in), and `/contacto`, `/privacidad` and `/terminos` answer 404.
 
 That is deliberate. Those pages describe **one specific deployment** — who
 operates it, who the data controller is, where to write with a complaint. If
@@ -10,15 +10,36 @@ they shipped in the repository, every installation would republish another
 operator's legal claims as its own, which is a false statement about a service
 that operator does not run.
 
-## Turning the site on
+## Linking to your own site
+
+If your deployment has a website, tell Padiush where it is:
+
+```dotenv
+PUBLIC_SITE_URL="https://example.org"
+```
+
+The public pages and the sign-in screens then link back to it from their logo
+and a "back to the site" link. Without it they offer no such link, and the logo
+leads into the application. These are ordinary links, so the site can be
+anything, on any host.
+
+The site can also share the application's host. The instance at padiushbio.com
+does this: its web server answers the site's own paths (`/`, `/acerca`, `/en`,
+`/pt` and the site's assets) from a static build, and passes everything else to
+Padiush. `/` is then the site's landing page rather than Padiush's redirect.
+That site is its own repository,
+[padiush/website](https://github.com/padiush/website), which documents the
+routing.
+
+## Turning the public pages on
 
 ```dotenv
 PUBLIC_SITE_ENABLED=true
 ```
 
-That alone enables the landing, about and contact pages. The privacy and terms
-routes stay 404 until you publish documents for them, because a legal page that
-renders its chrome around an empty body is worse than an honest 404.
+That alone enables the contact page. The privacy and terms routes stay 404
+until you publish documents for them, because a legal page that renders its
+chrome around an empty body is worse than an honest 404.
 
 ## Publishing your legal documents
 
