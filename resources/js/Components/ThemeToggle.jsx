@@ -18,7 +18,7 @@ function systemTheme() {
  * data-theme on <html>; with no stored choice the OS preference applies (the
  * inline script in app.blade.php replays the stored choice before paint).
  */
-export default function ThemeToggle({ className = '' }) {
+export default function ThemeToggle({ className = '', iconClassName = '' }) {
     const { t } = useTranslation();
 
     const [theme, setTheme] = useState(
@@ -48,7 +48,10 @@ export default function ThemeToggle({ className = '' }) {
                 isDark ? t('theme.switch_to_light') : t('theme.switch_to_dark')
             }
         >
-            <FontAwesomeIcon icon={isDark ? faSun : faMoon} />
+            <FontAwesomeIcon
+                icon={isDark ? faSun : faMoon}
+                className={iconClassName}
+            />
         </button>
     );
 }

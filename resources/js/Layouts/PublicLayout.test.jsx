@@ -28,7 +28,7 @@ vi.mock('@/Components/ThemeToggle', () => ({
     default: () => null,
 }));
 
-vi.mock('@/Components/TranslationToggle', () => ({
+vi.mock('@/Components/LanguageMenu', () => ({
     default: () => null,
 }));
 

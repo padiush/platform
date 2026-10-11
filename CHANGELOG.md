@@ -25,6 +25,12 @@ language (`public/locales/whatsnew/`). How a release is cut is in
   opened it in a modal over the page instead of navigating to it.
 - The contact page no longer mentions beta access.
 
+### Changed
+
+- The header of the contact and legal pages matches the public site's: the
+  links, then the theme switch, then a language menu listing the three
+  languages instead of a button that cycles through them.
+
 ### Upgrading
 
 - Set `PUBLIC_SITE_URL` to your site's address if you have one; without it the

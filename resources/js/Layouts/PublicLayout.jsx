@@ -1,8 +1,9 @@
 import ApplicationFullLogo from '@/Components/ApplicationFullLogo';
+import LanguageMenu from '@/Components/LanguageMenu';
 import ThemeToggle from '@/Components/ThemeToggle';
-import TranslationToggle from '@/Components/TranslationToggle';
 import { useFlashMessage } from '@/Hooks/useFlashMessage';
 import { faLinkedin } from '@fortawesome/free-brands-svg-icons';
+import { faBars } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Head, Link, usePage } from '@inertiajs/react';
 import { useTranslation } from 'react-i18next';
@@ -18,111 +19,91 @@ export default function PublicLayout({ children, title }) {
     // Inertia response then opens in a modal over this one.
     const home = publicSiteUrl ? `${publicSiteUrl}/` : null;
 
+    const links = [
+        home && {
+            key: 'home',
+            href: home,
+            label: t('public.home'),
+            site: true,
+        },
+        {
+            key: 'contact',
+            href: route('public.contact'),
+            label: t('public.contact'),
+        },
+        auth?.user
+            ? {
+                  key: 'account',
+                  href: route('dashboard'),
+                  label: t('public.user_area'),
+              }
+            : { key: 'login', href: route('login'), label: t('public.login') },
+    ].filter(Boolean);
+
     return (
-        <div className="bg-base-100 text-neutral-content min-h-screen">
+        <div className="bg-base-100 text-base-content min-h-screen">
             <Head title={title} />
-            <div className="navbar bg-primary text-primary-content sticky top-0 z-40">
+            <header className="navbar bg-primary text-primary-content sticky top-0 z-40 gap-1">
                 <div className="navbar-start">
-                    <div className="dropdown">
+                    <div className="dropdown lg:hidden">
                         <button
                             type="button"
-                            className="btn btn-ghost lg:hidden"
+                            className="btn btn-ghost btn-square"
                             aria-label={t('navigation.open_menu')}
                             aria-controls="public-mobile-navigation"
                         >
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                className="h-5 w-5"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                                aria-hidden="true"
-                            >
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth="2"
-                                    d="M4 6h16M4 12h8m-8 6h16"
-                                />
-                            </svg>
+                            <FontAwesomeIcon
+                                icon={faBars}
+                                className="text-xl"
+                            />
                         </button>
                         <ul
                             id="public-mobile-navigation"
                             tabIndex={0}
-                            className="menu menu-compact dropdown-content bg-base-200 text-base-content rounded-box mt-3 w-52 p-2 shadow-sm"
+                            className="menu dropdown-content bg-base-200 text-base-content rounded-box z-50 mt-3 w-56 p-2 shadow-sm"
                         >
-                            {home && (
-                                <li>
-                                    <a href={home}>{t('public.home')}</a>
+                            {links.map((link) => (
+                                <li key={link.key}>
+                                    <NavLink link={link} />
                                 </li>
-                            )}
-                            <li>
-                                <Link href={route('public.contact')}>
-                                    {t('public.contact')}
-                                </Link>
-                            </li>
-                            {auth?.user ? (
-                                <li>
-                                    <Link href={route('dashboard')}>
-                                        {t('public.user_area')}
-                                    </Link>
-                                </li>
-                            ) : (
-                                <li>
-                                    <Link href={route('login')}>
-                                        {t('public.login')}
-                                    </Link>
-                                </li>
-                            )}
+                            ))}
                         </ul>
                     </div>
                     {home ? (
-                        <a className="btn btn-ghost" href={home}>
+                        <a
+                            className="btn btn-ghost px-2"
+                            href={home}
+                            aria-label="Padiush"
+                        >
                             <ApplicationFullLogo className="h-10 w-auto fill-current" />
                         </a>
                     ) : (
                         <Link
-                            className="btn btn-ghost"
+                            className="btn btn-ghost px-2"
                             href={route(auth?.user ? 'dashboard' : 'login')}
+                            aria-label="Padiush"
                         >
                             <ApplicationFullLogo className="h-10 w-auto fill-current" />
                         </Link>
                     )}
                 </div>
-                <div className="navbar-end hidden lg:flex">
-                    <ThemeToggle />
-                    <TranslationToggle />
-                    <ul className="menu menu-horizontal px-1">
-                        {home && (
-                            <li>
-                                <a href={home}>{t('public.home')}</a>
+                {/* Same order as the public site's header: the links, then
+                    the theme, then the language. */}
+                <div className="navbar-end gap-1">
+                    <ul className="menu menu-horizontal hidden px-1 lg:flex">
+                        {links.map((link) => (
+                            <li key={link.key}>
+                                <NavLink link={link} />
                             </li>
-                        )}
-                        <li>
-                            <Link href={route('public.contact')}>
-                                {t('public.contact')}
-                            </Link>
-                        </li>
-                        {auth?.user ? (
-                            <li>
-                                <Link href={route('dashboard')}>
-                                    {t('public.user_area')}
-                                </Link>
-                            </li>
-                        ) : (
-                            <li>
-                                <Link href={route('login')}>
-                                    {t('public.login')}
-                                </Link>
-                            </li>
-                        )}
+                        ))}
                     </ul>
+                    <ThemeToggle
+                        className="btn-square"
+                        iconClassName="text-xl"
+                    />
+                    <LanguageMenu />
                 </div>
-                <div className="navbar-end lg:hidden">
-                    <ThemeToggle />
-                    <TranslationToggle />
-                </div>
-            </div>
+            </header>
             <main className="z-0">
                 {flashShown && <FlashAlert />}
                 <div id="content">{children}</div>
@@ -185,5 +166,14 @@ export default function PublicLayout({ children, title }) {
                 </div>
             </footer>
         </div>
+    );
+}
+
+/** A header link: a plain anchor to the site, an Inertia link otherwise. */
+function NavLink({ link }) {
+    return link.site ? (
+        <a href={link.href}>{link.label}</a>
+    ) : (
+        <Link href={link.href}>{link.label}</Link>
     );
 }
