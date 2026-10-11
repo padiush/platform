@@ -10,15 +10,17 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * Aligns the server's locale with the one the visitor is actually reading.
  *
- * The interface is translated client-side by i18next, which persists the
- * chosen language in a cookie. Without this, `app()->getLocale()` stayed on the
- * configured default forever, so validation messages and — more visibly —
- * every notification email came out in Spanish no matter what the recipient
- * had selected.
+ * A signed-in user's language is a preference stored on the account, chosen
+ * from the language menu (`AccountController::updateLanguage`). It wins over
+ * the browser, so the application speaks the same language on every device,
+ * and a queued notification, which runs with no request behind it, is written
+ * in it too. See `User::preferredLocale()`.
  *
- * For signed-in users the choice is also stored on the account, because a
- * queued notification runs with no request and no cookie behind it. See
- * `User::preferredLocale()`.
+ * Guests have only the cookie i18next keeps on the client. An account that
+ * has never chosen adopts that cookie once, so it starts in the language its
+ * owner was already reading; after that only an explicit choice changes it.
+ * The cookie alone must not, because i18next writes it from the browser's own
+ * language as readily as from a choice.
  */
 class SetLocale
 {
@@ -29,37 +31,37 @@ class SetLocale
 
     public function handle(Request $request, Closure $next): Response
     {
-        $locale = $this->resolve($request);
+        $user = $request->user();
+        $stored = $this->supported($user?->locale);
+        $cookie = $this->fromCookie($request);
 
-        if ($locale === null) {
-            return $next($request);
+        if ($user && $stored === null && $cookie !== null) {
+            $user->forceFill(['locale' => $cookie])->saveQuietly();
+            $stored = $cookie;
         }
 
-        App::setLocale($locale);
+        $locale = $stored ?? $cookie;
 
-        $user = $request->user();
-
-        if ($user && $user->locale !== $locale) {
-            $user->forceFill(['locale' => $locale])->saveQuietly();
+        if ($locale !== null) {
+            App::setLocale($locale);
         }
 
         return $next($request);
     }
 
-    private function resolve(Request $request): ?string
+    private function fromCookie(Request $request): ?string
     {
         // i18next writes region-qualified values such as "pt-BR"; only the
         // language part is meaningful here.
         $cookie = $request->cookie(self::COOKIE);
 
-        if (is_string($cookie)) {
-            $language = strtolower(explode('-', $cookie)[0]);
+        return is_string($cookie)
+            ? $this->supported(strtolower(explode('-', $cookie)[0]))
+            : null;
+    }
 
-            if (in_array($language, self::SUPPORTED, true)) {
-                return $language;
-            }
-        }
-
-        return $request->user()?->locale;
+    private function supported(?string $language): ?string
+    {
+        return in_array($language, self::SUPPORTED, true) ? $language : null;
     }
 }

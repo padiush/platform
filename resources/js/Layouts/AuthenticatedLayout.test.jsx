@@ -41,7 +41,7 @@ vi.mock('@/Hooks/useFlashMessage', () => ({
 
 // Chrome that carries its own browser-API dependencies and is not under test.
 vi.mock('@/Components/ThemeToggle', () => ({ default: () => null }));
-vi.mock('@/Components/TranslationToggle', () => ({ default: () => null }));
+vi.mock('@/Components/LanguageMenu', () => ({ default: () => null }));
 
 const herbs = { id: 1, name: 'Hierbas', finished: false };
 const trees = { id: 2, name: 'Árboles', finished: true };

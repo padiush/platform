@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Middleware\SetLocale;
 use App\Models\User;
 use App\Services\BrowserSessions;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response as HttpResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
 use Laravel\Sanctum\PersonalAccessToken;
@@ -48,6 +51,24 @@ class AccountController extends Controller
     }
 
     /** Sign out one other browser. This one signs out from the sidebar. */
+    /**
+     * The language chosen from the language menu, kept on the account so it
+     * follows the user to every device and into their emails.
+     *
+     * Sent in the background, like the tours, so choosing a language never
+     * interrupts what the user was doing; there is nothing to redirect to.
+     */
+    public function updateLanguage(Request $request): HttpResponse
+    {
+        $locale = $request->validate([
+            'locale' => ['required', 'string', Rule::in(SetLocale::SUPPORTED)],
+        ])['locale'];
+
+        $request->user()->forceFill(['locale' => $locale])->save();
+
+        return response()->noContent();
+    }
+
     public function destroySession(Request $request, string $session): RedirectResponse
     {
         $user = $request->user();

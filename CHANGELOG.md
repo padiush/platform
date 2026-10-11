@@ -38,6 +38,12 @@ language (`public/locales/whatsnew/`). How a release is cut is in
 
 ### Changed
 
+- The interface language is a menu everywhere, listing the three languages,
+  instead of a button that cycled through them. For a signed-in user the
+  choice is saved on the account (`PUT /account/language`) and wins over the
+  browser's cookie, so the application, and its emails, keep the same language
+  on every device. An account that has never chosen adopts the language its
+  owner was reading, once.
 - The header and footer of the contact and legal pages match the public
   site's: the links, then the theme switch, then a language menu listing the
   three languages instead of a button that cycles through them; and a footer

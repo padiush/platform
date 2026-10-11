@@ -1,6 +1,6 @@
 import ApplicationLogo from '@/Components/ApplicationLogo';
+import LanguageMenu from '@/Components/LanguageMenu';
 import ThemeToggle from '@/Components/ThemeToggle';
-import TranslationToggle from '@/Components/TranslationToggle';
 import {
     faAnglesLeft,
     faAnglesRight,
@@ -274,7 +274,7 @@ export default function Sidebar({ rail = false, onToggleRail = null }) {
                     className={`flex items-center ${rail ? 'flex-col' : 'flex-wrap'} gap-1`}
                 >
                     <ThemeToggle />
-                    <TranslationToggle compact={rail} />
+                    <LanguageMenu compact={rail} up />
                     <Link
                         className="btn btn-ghost"
                         href="/logout"
