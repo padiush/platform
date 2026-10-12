@@ -11,6 +11,14 @@ language (`public/locales/whatsnew/`). How a release is cut is in
 
 ## [Unreleased]
 
+### Added
+
+- Every project names its branch of ethnobiology in `projects.subfield`. Only
+  ethnobotany exists so far, and existing projects are given it by the
+  migration, so nothing about them changes. Further subfields will choose the
+  taxonomic authorities a catalog is checked against (ADR 0006).
+
+
 ## [1.2.0] — 2026-10-11
 
 ### Added

@@ -9,6 +9,18 @@ class Project extends Model
 {
     use HasFactory;
 
+    /**
+     * The branch of ethnobiology a project belongs to. Each subfield is added
+     * when it is built, not before: its taxonomic authorities, catalog fields,
+     * vocabulary and report defaults come with it.
+     * See docs/decisions/0006-multi-subfield-architecture.md.
+     */
+    public const SUBFIELD_ETHNOBOTANY = 'ethnobotany';
+
+    public const SUBFIELDS = [
+        self::SUBFIELD_ETHNOBOTANY,
+    ];
+
     protected $fillable = [
         'name',
         'author',
@@ -21,14 +33,19 @@ class Project extends Model
         'finished',
         'published',
         'shared',
+        // `subfield` is deliberately NOT fillable: it decides which authority
+        // a catalog's names are checked against, so whatever lets a project
+        // change it has to set it explicitly, after validating it.
     ];
 
     /**
-     * Mirrors the column default, so a project that has not been reloaded from
-     * the database still reports the number it would issue next rather than 0.
+     * Mirror the column defaults, so a project that has not been reloaded from
+     * the database still reports the number it would issue next rather than 0,
+     * and its subfield rather than null.
      */
     protected $attributes = [
         'next_accession_number' => 1,
+        'subfield' => self::SUBFIELD_ETHNOBOTANY,
     ];
 
     protected $casts = [

@@ -94,6 +94,11 @@ rather than the recording
 every large file this way, reading one part at a time from its encrypted
 store, and a scheduled job aborts uploads nobody came back for.
 
+**Generalizing has begun** ([ADR 0006](decisions/0006-multi-subfield-architecture.md)).
+Every project now names its subfield. Ethnobotany is the only one so far, so
+nothing about an existing project changes; the next subfield brings its own
+taxonomic authorities, catalog fields, vocabulary and report defaults with it.
+
 What remains before field deployment for sensitive studies is hardening rather
 than new surface — tracked as: **transcription** (null-bound plumbing until a
 real queue and a self-hosted Whisper are provisioned, per
