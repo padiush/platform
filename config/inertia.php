@@ -18,4 +18,14 @@ return [
         'extensions' => ['js', 'jsx'],
     ],
 
+    /*
+     * The interface renders in the browser only; there is no SSR entry point.
+     * Inertia 3 enables SSR by default and, whenever Vite runs hot, posts every
+     * page to the dev server to render it there, which costs a round trip on
+     * each request, or a timeout where the app cannot reach that address.
+     */
+    'ssr' => [
+        'enabled' => (bool) env('INERTIA_SSR_ENABLED', false),
+    ],
+
 ];
