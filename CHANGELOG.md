@@ -19,6 +19,15 @@ language (`public/locales/whatsnew/`). How a release is cut is in
   taxonomic authorities a catalog is checked against (ADR 0006).
 
 
+### Changed
+
+- Icons come from Font Awesome 7, which redraws some of them and gives each
+  the same width, so the icons of a list line up.
+- An interview's repeated sets show their progress at the right of their
+  header, where it was meant to be; an older stylesheet kept it beside the
+  title.
+
+
 ### Security
 
 - Dependencies are updated past two advisories, neither of which the
