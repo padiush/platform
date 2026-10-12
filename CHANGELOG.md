@@ -19,6 +19,16 @@ language (`public/locales/whatsnew/`). How a release is cut is in
   taxonomic authorities a catalog is checked against (ADR 0006).
 
 
+### Security
+
+- Dependencies are updated past two advisories, neither of which the
+  application was exposed to: `i18next-http-backend` 4.0.2
+  (GHSA-xvq9-wjp8-hwqf, which needs a translation path that starts with the
+  language placeholder; the application's paths start with `/`) and
+  `source-map-js` 1.2.2 (GHSA-68fv-2mgg-jv7q, reached only by the build
+  tooling).
+
+
 ## [1.2.0] — 2026-10-11
 
 ### Added
