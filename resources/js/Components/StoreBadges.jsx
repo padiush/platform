@@ -6,8 +6,8 @@ const LANGUAGES = ['es', 'en', 'pt'];
 export function hasStoreBadges(stores) {
     return Boolean(
         stores?.app_store ||
-            stores?.play_store ||
-            stores?.play_store_coming_soon,
+        stores?.play_store ||
+        stores?.play_store_coming_soon,
     );
 }
 
