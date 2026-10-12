@@ -157,4 +157,29 @@ describe('DeleteUserModal', () => {
             screen.getByRole('button', { name: 'system.deletion.delete' }),
         ).toBeDisabled();
     });
+
+    it('starts over for another account', async () => {
+        const { rerender } = open();
+        await screen.findByText(/Huertos/);
+        fireEvent.change(screen.getByRole('textbox'), {
+            target: { value: 'ana@example.org' },
+        });
+
+        let arrive;
+        mockGet.mockReturnValue(new Promise((resolve) => (arrive = resolve)));
+        rerender(
+            <DeleteUserModal
+                user={marta}
+                people={[ana, marta]}
+                onClose={vi.fn()}
+            />,
+        );
+
+        expect(screen.queryByText(/Huertos/)).not.toBeInTheDocument();
+        expect(screen.getByText('system.deletion.loading')).toBeInTheDocument();
+        expect(mockGet).toHaveBeenLastCalledWith('/system.users.deletion/8');
+
+        await act(async () => arrive({ data: { ...preview, user: marta } }));
+        expect(screen.getByRole('textbox')).toHaveValue('');
+    });
 });

@@ -110,10 +110,17 @@ export default function ItemRender({
     // after a repeatable set is removed, the remaining sets are reindexed and
     // the page reloads, so this component now maps to a different answer.
     // Without this, the field would keep showing its old (stale) value.
-    useEffect(() => {
+    const [syncedTo, setSyncedTo] = useState({
+        persistedValue,
+        repeatableIndex,
+    });
+    if (
+        syncedTo.persistedValue !== persistedValue ||
+        syncedTo.repeatableIndex !== repeatableIndex
+    ) {
+        setSyncedTo({ persistedValue, repeatableIndex });
         setValue(deriveValue());
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [persistedValue, repeatableIndex]);
+    }
 
     useEffect(
         () => () => {

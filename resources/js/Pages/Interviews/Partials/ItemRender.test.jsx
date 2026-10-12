@@ -153,4 +153,31 @@ describe('ItemRender', () => {
             ),
         );
     });
+
+    it('shows the stored answer again when it changes underneath', () => {
+        const { rerender } = render(
+            <ItemRender
+                item={item}
+                projectId={7}
+                instance={instance}
+                repeatableIndex={2}
+                answers={answers([])}
+            />,
+        );
+        const field = screen.getByRole('textbox');
+        expect(field).toHaveValue('Ruda');
+
+        // Another set was removed, so this field now maps to another answer.
+        rerender(
+            <ItemRender
+                item={item}
+                projectId={7}
+                instance={instance}
+                repeatableIndex={2}
+                answers={[{ ...answers([])[0], value: 'Albahaca' }]}
+            />,
+        );
+
+        expect(screen.getByRole('textbox')).toHaveValue('Albahaca');
+    });
 });

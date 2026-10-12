@@ -20,8 +20,19 @@ export default function DeleteUserModal({ user, people, onClose }) {
     const [recipient, setRecipient] = useState('');
     const [busy, setBusy] = useState(false);
 
-    const load = useCallback(() => {
+    // Another account starts from nothing: no preview, no typed address, no
+    // transfer half chosen.
+    const [shownFor, setShownFor] = useState(user);
+    if (shownFor !== user) {
+        setShownFor(user);
+        setPreview(null);
         setFailed(false);
+        setTyped('');
+        setTransferring(false);
+        setRecipient('');
+    }
+
+    const load = useCallback(() => {
         axios
             .get(route('system.users.deletion', user.id))
             .then(({ data }) => setPreview(data))
@@ -29,10 +40,6 @@ export default function DeleteUserModal({ user, people, onClose }) {
     }, [user]);
 
     useEffect(() => {
-        setPreview(null);
-        setTyped('');
-        setTransferring(false);
-        setRecipient('');
         if (user) {
             load();
         }
@@ -51,6 +58,7 @@ export default function DeleteUserModal({ user, people, onClose }) {
                 preserveScroll: true,
                 onSuccess: () => {
                     setTransferring(false);
+                    setFailed(false);
                     load();
                 },
                 onFinish: () => setBusy(false),
