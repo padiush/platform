@@ -97,10 +97,14 @@ These were pencilled-in slots so the model could absorb the roadmap without a
 rewrite. Most have since been built. Each is marked below: ✅ built, 📐 decided
 in an ADR but not yet built, and unmarked for what is still only pencilled in.
 
-- **`Project.subfield`** — a first-class attribute selecting the ethnobiology
-  subfield (ethnobotany, ethnomycology, ethno-ornithology, …). Cheap to add now,
-  expensive to retrofit. Drives which taxonomic authority the catalog validates
-  against and the analysis/vocabulary defaults. See
+- **`Project.subfield`** — ✅ **built.** A first-class attribute naming the
+  project's branch of ethnobiology (`projects.subfield`, a string, default
+  `ethnobotany`). Only ethnobotany exists so far, so every project, including
+  the ones that predate the column, is one; `Project::SUBFIELDS` grows as each
+  subfield is built. It is not mass assignable and no form offers it yet. 📐
+  What it will drive is decided but not built: which taxonomic authorities the
+  catalog checks names against, a few subfield-specific catalog fields, the
+  vocabulary and the report defaults. See
   [decisions/0006-multi-subfield-architecture.md](decisions/0006-multi-subfield-architecture.md).
 - **A use-category role on items** — ✅ **built.** `InterviewItem.is_use_category`
   marks the field whose answer is a use category, mirroring `link_to_species`
