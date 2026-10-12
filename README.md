@@ -106,7 +106,7 @@ The project utilizes the following technologies:
 To set up the project locally, follow these steps:
 
 ### Prerequisites
-- PHP 8.2 or higher
+- PHP 8.3 or higher
 - Node.js and npm
 - Composer
 

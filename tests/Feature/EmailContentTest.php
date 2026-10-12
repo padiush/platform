@@ -8,6 +8,7 @@ use App\Models\ProjectInvite;
 use App\Models\User;
 use App\Notifications\ContactFormNotification;
 use App\Notifications\InviteNotification;
+use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\App;
 use Tests\TestCase;
@@ -115,5 +116,20 @@ class EmailContentTest extends TestCase
         $user = User::factory()->create(['locale' => 'pt']);
 
         $this->assertSame('pt', $user->preferredLocale());
+    }
+
+    public function test_the_password_reset_email_has_a_translated_subject()
+    {
+        $user = User::factory()->create();
+        $subject = fn () => (new ResetPassword('token'))->toMail($user)->subject;
+
+        App::setLocale('es');
+        $this->assertSame('Restablezca su contraseña', $subject());
+
+        App::setLocale('pt');
+        $this->assertSame('Redefina sua senha', $subject());
+
+        App::setLocale('en');
+        $this->assertSame('Reset your password', $subject());
     }
 }
