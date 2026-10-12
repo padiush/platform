@@ -80,4 +80,20 @@ describe('InterviewMedia', () => {
             await screen.findByText('data.media.failed'),
         ).toBeInTheDocument();
     });
+
+    it('never shows another interview’s media while loading', async () => {
+        resolve([{ id: 1, kind: 'photo', url: '/m/1' }]);
+        const { container, rerender } = render(
+            <InterviewMedia project={project} instanceId="abc" />,
+        );
+        await waitFor(() =>
+            expect(container.querySelector('img')).not.toBeNull(),
+        );
+
+        axios.get.mockReturnValue(new Promise(() => {}));
+        rerender(<InterviewMedia project={project} instanceId="def" />);
+
+        expect(container.querySelector('img')).toBeNull();
+        expect(screen.getByText('data.media.loading')).toBeInTheDocument();
+    });
 });

@@ -66,4 +66,30 @@ describe('SectionRender', () => {
         expect(headers[1]).toContain('interviews.field_records_count');
         expect(headers[1]).toContain('"count":1');
     });
+
+    it('follows the number of sets stored when the answers change', () => {
+        const props = { section, instance: { id: 'a9731e28' } };
+        const { rerender } = render(
+            <SectionRender {...props} answers={answers} />,
+        );
+        expect(screen.getAllByRole('group')).toHaveLength(2);
+
+        rerender(
+            <SectionRender
+                {...props}
+                answers={[
+                    ...answers,
+                    {
+                        item_id: 4,
+                        section_id: 2,
+                        repeatable_index: 2,
+                        value: 'Albahaca',
+                        field_records: [],
+                    },
+                ]}
+            />,
+        );
+
+        expect(screen.getAllByRole('group')).toHaveLength(3);
+    });
 });

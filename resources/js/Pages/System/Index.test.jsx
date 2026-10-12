@@ -2,7 +2,6 @@ import { render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('@inertiajs/react', () => ({
-    // eslint-disable-next-line no-unused-vars
     Link: ({ children, href, ...rest }) => (
         <a href={href} {...rest}>
             {children}

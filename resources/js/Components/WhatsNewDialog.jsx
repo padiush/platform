@@ -14,6 +14,15 @@ import { useTranslation } from 'react-i18next';
  *
  * A release that shipped without notes is marked seen without a dialog.
  */
+/** Records that this user has seen the notes of the running release. */
+function recordSeen() {
+    router.post(
+        route('whats-new.seen'),
+        {},
+        { preserveScroll: true, preserveState: true },
+    );
+}
+
 export default function WhatsNewDialog() {
     const { release } = usePage().props;
     const since = release?.unseenSince ?? null;
@@ -34,23 +43,19 @@ export default function WhatsNewDialog() {
 
     const markSeen = () => {
         setDismissed(true);
-        router.post(
-            route('whats-new.seen'),
-            {},
-            { preserveScroll: true, preserveState: true },
-        );
+        recordSeen();
     };
 
     const open = Boolean(since) && !dismissed && unseen.length > 0;
     const nothingToShow =
         Boolean(since) && !dismissed && notes.ready && unseen.length === 0;
 
+    // There is no dialog to dismiss here, so nothing to close: the release is
+    // only recorded as seen.
     useEffect(() => {
         if (nothingToShow) {
-            markSeen();
+            recordSeen();
         }
-        // markSeen only changes what it closes over, never what it does.
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [nothingToShow]);
 
     useEffect(() => {

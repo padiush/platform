@@ -1,4 +1,5 @@
 import { act, render } from '@testing-library/react';
+import { useEffect } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { forgetRecordedTours, useTours } from './useTours';
 
@@ -28,7 +29,10 @@ vi.mock('./runTour', () => ({
 
 let replay = null;
 function Page({ tour, auto = true }) {
-    replay = useTours(tour, { auto }).replay;
+    const tours = useTours(tour, { auto });
+    useEffect(() => {
+        replay = tours.replay;
+    });
     return null;
 }
 

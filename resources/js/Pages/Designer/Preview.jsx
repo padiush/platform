@@ -16,9 +16,10 @@ export default function Preview({ project, form }) {
     const [sectionInstances, setSectionInstances] = useState({});
     const [scrollToId, setScrollToId] = useState(null);
     const instanceRefs = useRef({});
+    const lastInstanceId = useRef(0);
 
     const handleAddInstance = (sectionId) => {
-        const newId = Date.now();
+        const newId = ++lastInstanceId.current;
 
         setSectionInstances((prev) => ({
             ...prev,

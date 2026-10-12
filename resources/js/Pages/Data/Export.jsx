@@ -102,15 +102,24 @@ export default function DataExport({ project, tabs = {}, forms, initial }) {
     };
 
     const selectedKey = [...selected].sort((a, b) => a - b).join(',');
+    const previewable =
+        Boolean(formId) &&
+        (mode === 'custom' ? selected.size > 0 : categoryFieldId !== '');
+
+    // Once the choice no longer describes an export, the last preview and its
+    // error no longer describe anything, so they go at once.
+    const [wasPreviewable, setWasPreviewable] = useState(previewable);
+    if (previewable !== wasPreviewable) {
+        setWasPreviewable(previewable);
+        if (!previewable) {
+            setPreview(null);
+            setMixedError(false);
+        }
+    }
 
     // Live preview of the resulting export (columns, counts, sample rows).
     useEffect(() => {
-        const ready =
-            mode === 'custom' ? selected.size > 0 : categoryFieldId !== '';
-
-        if (!formId || !ready) {
-            setPreview(null);
-            setMixedError(false);
+        if (!previewable) {
             return;
         }
 

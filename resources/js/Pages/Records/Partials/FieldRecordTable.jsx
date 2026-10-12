@@ -124,18 +124,19 @@ export default function FieldRecordTable({
     // An interview links to one of its records by the row's anchor. The table
     // renders after the browser has looked for that anchor, so the browser
     // neither scrolls to it nor marks it; the row is found and marked here.
-    const [arrivedAt, setArrivedAt] = useState(null);
-    useEffect(() => {
+    const [arrivedAt] = useState(() => {
         const match = window.location.hash.match(/^#record-(\d+)$/);
-        if (!match) {
+        return match ? Number(match[1]) : null;
+    });
+    useEffect(() => {
+        if (arrivedAt === null) {
             return;
         }
 
-        setArrivedAt(Number(match[1]));
         document
-            .getElementById(`record-${match[1]}`)
+            .getElementById(`record-${arrivedAt}`)
             ?.scrollIntoView?.({ block: 'center' });
-    }, []);
+    }, [arrivedAt]);
 
     if (fieldRecords.length === 0) {
         return <EmptyState title={emptyTitle} hint={emptyHint} />;

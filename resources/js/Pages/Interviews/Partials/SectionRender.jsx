@@ -2,7 +2,7 @@ import Card from '@/Components/Card';
 import { faPlus, faTrashCan } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { router } from '@inertiajs/react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import ItemRender from './ItemRender';
 
@@ -43,10 +43,11 @@ export default function SectionRender({
         : 1;
 
     const [repeatCount, setRepeatCount] = useState(initialRepeatCount);
-
-    useEffect(() => {
+    const [countedFrom, setCountedFrom] = useState(initialRepeatCount);
+    if (countedFrom !== initialRepeatCount) {
+        setCountedFrom(initialRepeatCount);
         setRepeatCount(initialRepeatCount);
-    }, [initialRepeatCount]);
+    }
 
     // A collapsed set would otherwise give no sign that a plant named in it
     // was recorded; its header says how many field records came out of it.

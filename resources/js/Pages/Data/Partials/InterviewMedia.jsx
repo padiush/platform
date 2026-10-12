@@ -12,13 +12,15 @@ import { useTranslation } from 'react-i18next';
  */
 export default function InterviewMedia({ project, instanceId }) {
     const { t } = useTranslation();
-    const [media, setMedia] = useState(null);
-    const [error, setError] = useState(false);
+    // Kept with the interview it was fetched for, so another interview's
+    // media never shows while this one's is loading.
+    const key = `${project.id}:${instanceId}`;
+    const [fetched, setFetched] = useState({ key: null });
+    const media = fetched.key === key ? (fetched.media ?? null) : null;
+    const error = fetched.key === key && Boolean(fetched.error);
 
     useEffect(() => {
         let active = true;
-        setMedia(null);
-        setError(false);
 
         axios
             .get(
@@ -27,13 +29,16 @@ export default function InterviewMedia({ project, instanceId }) {
                     instance: instanceId,
                 }),
             )
-            .then(({ data }) => active && setMedia(data.media ?? []))
-            .catch(() => active && setError(true));
+            .then(
+                ({ data }) =>
+                    active && setFetched({ key, media: data.media ?? [] }),
+            )
+            .catch(() => active && setFetched({ key, error: true }));
 
         return () => {
             active = false;
         };
-    }, [project.id, instanceId]);
+    }, [key, project.id, instanceId]);
 
     if (error) {
         return <p className="text-error text-sm">{t('data.media.failed')}</p>;

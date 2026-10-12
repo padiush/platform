@@ -28,13 +28,16 @@ export default function SystemUsers({ users, registration_invites }) {
     const [filter, setFilter] = useState('all');
     const [sort, setSort] = useState('storage');
     const [deleting, setDeleting] = useState(null);
+    // Inactivity is measured from when the page was opened, so the list does
+    // not shift while someone is reading it.
+    const [openedAt] = useState(() => Date.now());
 
     const size = (bytes) => formatBytes(bytes, i18n.language);
     const largest = Math.max(0, ...users.map((user) => user.storage));
 
     const shown = useMemo(() => {
         const needle = fold(query.trim());
-        const cutoff = Date.now() - INACTIVE_DAYS * 86_400_000;
+        const cutoff = openedAt - INACTIVE_DAYS * 86_400_000;
 
         return users
             .filter(
@@ -64,7 +67,7 @@ export default function SystemUsers({ users, registration_invites }) {
                 }
                 return b.storage - a.storage;
             });
-    }, [users, query, filter, sort, i18n.language]);
+    }, [users, query, filter, sort, i18n.language, openedAt]);
 
     return (
         <SystemPage tab="users">
