@@ -26,6 +26,10 @@ language (`public/locales/whatsnew/`). How a release is cut is in
 - An interview's repeated sets show their progress at the right of their
   header, where it was meant to be; an older stylesheet kept it beside the
   title.
+- The platform runs on Laravel 13 and Inertia 3. Laravel's request-forgery
+  protection now also checks where a request comes from, and the password
+  reset email's subject is "Reset your password", translated into Spanish and
+  Portuguese.
 
 
 ### Security
@@ -36,6 +40,13 @@ language (`public/locales/whatsnew/`). How a release is cut is in
   language placeholder; the application's paths start with `/`) and
   `source-map-js` 1.2.2 (GHSA-68fv-2mgg-jv7q, reached only by the build
   tooling).
+
+
+### Upgrading
+
+- PHP 8.3 or later is required, up from 8.2.
+- Run `php artisan view:clear` after deploying, since the markup Inertia
+  writes into the page has changed.
 
 
 ## [1.2.0] — 2026-10-11

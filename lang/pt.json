@@ -33,7 +33,7 @@
     "Remember me": "Manter sessão ativa",
     "Resend Verification Email": "Reenviar e-mail de verificação",
     "Reset Password": "Redefinir senha",
-    "Reset Password Notification": "Redefinição de senha",
+    "Reset your password": "Redefina sua senha",
     "results": "resultados",
     "Server Error": "Erro do servidor",
     "Service Unavailable": "Serviço indisponível",
@@ -52,6 +52,7 @@
     "Too Many Requests": "Muitas requisições",
     "Unauthorized": "Não autorizado",
     "Verify Email Address": "Verifique seu endereço de e-mail",
+    "Verify your email address": "Verifique seu endereço de e-mail",
     "Whoops!": "Ops!",
     "Whoops! Something went wrong.": "Ops! Algo deu errado.",
     "You are receiving this email because we received a password reset request for your account.": "Você está recebendo este e-mail porque recebemos um pedido de redefinição de senha para sua conta."
