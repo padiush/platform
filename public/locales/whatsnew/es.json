@@ -1,6 +1,14 @@
 {
     "releases": [
         {
+            "version": "1.3.0",
+            "date": "2026-10-22",
+            "items": [
+                "Quien crea su cuenta desde la página de registro primero confirma su correo con un enlace que le enviamos. Así, una invitación a un proyecto solo puede aceptarla quien recibe correo en esa dirección.",
+                "Los íconos tienen un diseño renovado y quedan alineados en las listas. En una entrevista, el avance de cada grupo repetido aparece a la derecha de su encabezado."
+            ]
+        },
+        {
             "version": "1.2.0",
             "date": "2026-10-11",
             "items": [

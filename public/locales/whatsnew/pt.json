@@ -1,6 +1,14 @@
 {
     "releases": [
         {
+            "version": "1.3.0",
+            "date": "2026-10-22",
+            "items": [
+                "Quem cria uma conta pela página de cadastro primeiro confirma o e-mail com um link que enviamos. Assim, um convite para um projeto só pode ser aceito por quem recebe e-mails nesse endereço.",
+                "Os ícones têm um visual renovado e ficam alinhados nas listas. Em uma entrevista, o progresso de cada grupo repetido aparece à direita do cabeçalho."
+            ]
+        },
+        {
             "version": "1.2.0",
             "date": "2026-10-11",
             "items": [
