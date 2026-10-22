@@ -54,6 +54,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TokenResponse'
+        '403':
+          description: >
+            The account has not confirmed its email address
+            (`api.tokens.email_unverified`). Only given after a correct
+            password.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '422':
           description: Invalid credentials or validation error
           content:
