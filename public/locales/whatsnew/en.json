@@ -1,6 +1,14 @@
 {
     "releases": [
         {
+            "version": "1.3.0",
+            "date": "2026-10-22",
+            "items": [
+                "Anyone who creates an account from the sign-up page first confirms their email with a link we send them. That way, a project invitation can only be accepted by whoever receives mail at that address.",
+                "Icons have a refreshed design and line up in lists. In an interview, the progress of each repeated set appears at the right of its header."
+            ]
+        },
+        {
             "version": "1.2.0",
             "date": "2026-10-11",
             "items": [

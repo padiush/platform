@@ -11,13 +11,14 @@ language (`public/locales/whatsnew/`). How a release is cut is in
 
 ## [Unreleased]
 
+## [1.3.0] — 2026-10-22
+
 ### Added
 
 - Every project names its branch of ethnobiology in `projects.subfield`. Only
   ethnobotany exists so far, and existing projects are given it by the
   migration, so nothing about them changes. Further subfields will choose the
   taxonomic authorities a catalog is checked against (ADR 0006).
-
 
 ### Changed
 
@@ -30,7 +31,6 @@ language (`public/locales/whatsnew/`). How a release is cut is in
   protection now also checks where a request comes from, and the password
   reset email's subject is "Reset your password", translated into Spanish and
   Portuguese.
-
 
 ### Security
 
@@ -50,7 +50,6 @@ language (`public/locales/whatsnew/`). How a release is cut is in
   `source-map-js` 1.2.2 (GHSA-68fv-2mgg-jv7q, reached only by the build
   tooling).
 
-
 ### Upgrading
 
 - PHP 8.3 or later is required, up from 8.2.
@@ -60,7 +59,6 @@ language (`public/locales/whatsnew/`). How a release is cut is in
   already using the platform or the app is asked. Accounts made afterwards
   through open registration are sent a confirmation email, so outgoing mail
   has to work wherever `REGISTRATION_ENABLED` is on.
-
 
 ## [1.2.0] — 2026-10-11
 
@@ -211,7 +209,8 @@ First public release: interview form design, offline capture with the companion
 app, species linking against taxonomic backbones, the five ethnobotanical
 indices, and export.
 
-[Unreleased]: https://github.com/padiush/platform/compare/v1.2.0...HEAD
+[Unreleased]: https://github.com/padiush/platform/compare/v1.3.0...HEAD
+[1.3.0]: https://github.com/padiush/platform/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/padiush/platform/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/padiush/platform/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/padiush/platform/releases/tag/v1.0.0
