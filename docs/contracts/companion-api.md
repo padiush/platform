@@ -48,9 +48,14 @@ POST /api/v1/tokens
   body: { email, password, device_name }
   → 200 { token, user: { id, name, email } }
   → 422 invalid credentials
+  → 403 api.tokens.email_unverified — the account has not confirmed its address
 ```
 
 - `device_name` names the token so a user can revoke a lost device.
+- An account made through open registration has to confirm its email address
+  (the link it is sent) before a device can sign in with it. The 403 is only
+  given after a correct password, so it reveals nothing about which addresses
+  have accounts; the app should ask the user to confirm their address.
 - **Token abilities (accepted 2026-07-12):** issue with a single `capture`
   ability; the per-project gate is still enforced by the policy on every request,
   so the token is user-scoped, not project-scoped. (Per-project token scoping was

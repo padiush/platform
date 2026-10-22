@@ -34,6 +34,15 @@ language (`public/locales/whatsnew/`). How a release is cut is in
 
 ### Security
 
+- Email addresses are confirmed. An account made through open registration
+  starts unconfirmed and is sent a link to confirm its address; until then it
+  is shown only the page that asks for it, and the companion app is not given
+  a token for it (`403 api.tokens.email_unverified`, only after a correct
+  password). Project invitations waiting for an address are now honoured only
+  once it is confirmed: open registration had granted them to whoever
+  registered the address, without checking that it was theirs. An account
+  made from an invitation link counts as confirmed, since the link only
+  reaches that address.
 - Dependencies are updated past two advisories, neither of which the
   application was exposed to: `i18next-http-backend` 4.0.2
   (GHSA-xvq9-wjp8-hwqf, which needs a translation path that starts with the
@@ -47,6 +56,10 @@ language (`public/locales/whatsnew/`). How a release is cut is in
 - PHP 8.3 or later is required, up from 8.2.
 - Run `php artisan view:clear` after deploying, since the markup Inertia
   writes into the page has changed.
+- A migration counts every existing account's address as confirmed, so nobody
+  already using the platform or the app is asked. Accounts made afterwards
+  through open registration are sent a confirmation email, so outgoing mail
+  has to work wherever `REGISTRATION_ENABLED` is on.
 
 
 ## [1.2.0] — 2026-10-11
