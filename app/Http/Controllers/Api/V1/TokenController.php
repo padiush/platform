@@ -27,6 +27,12 @@ class TokenController extends ApiController
             $this->fail('api.tokens.invalid_credentials', 422);
         }
 
+        // Only said to whoever knows the password, so it reveals nothing about
+        // which addresses have accounts.
+        if (! $user->hasVerifiedEmail()) {
+            $this->fail('api.tokens.email_unverified', 403);
+        }
+
         $token = $user->createToken($request->string('device_name'), ['capture']);
 
         return response()->json([

@@ -7,6 +7,7 @@ use App\Models\ProjectInvite;
 use App\Models\RegistrationInvite;
 use App\Models\User;
 use App\Providers\RouteServiceProvider;
+use App\Services\PendingProjectInvites;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -31,6 +32,11 @@ class RegisteredUserController extends Controller
         return $this->renderRegistration($honeypot, route('register'));
     }
 
+    /**
+     * Open registration: the address is only typed, so the account starts
+     * unconfirmed and is sent a link to confirm it. Invitations waiting for
+     * that address are honoured once it is confirmed, not before.
+     */
     public function store(Request $request): RedirectResponse
     {
         if (! config('padiush.registration_enabled')) {
@@ -110,6 +116,11 @@ class RegisteredUserController extends Controller
         ]);
     }
 
+    /**
+     * With `$invitedEmail`, the account is made from an invitation link, which
+     * only reaches whoever reads mail at that address: the address counts as
+     * confirmed and the invitations waiting for it are honoured at once.
+     */
     private function register(
         Request $request,
         ?string $invitedEmail = null,
@@ -124,14 +135,19 @@ class RegisteredUserController extends Controller
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
-        $user = DB::transaction(function () use ($validated, $platformInvite) {
+        $invited = $invitedEmail !== null;
+
+        $user = DB::transaction(function () use ($validated, $platformInvite, $invited) {
             $user = User::create([
                 'name' => $validated['name'],
                 'email' => $validated['email'],
                 'password' => Hash::make($validated['password']),
             ]);
 
-            $this->acceptProjectInvites($user);
+            if ($invited) {
+                $user->markEmailAsVerified();
+                app(PendingProjectInvites::class)->accept($user);
+            }
             $platformInvite?->delete();
 
             return $user;
@@ -141,28 +157,6 @@ class RegisteredUserController extends Controller
         Auth::login($user);
 
         return redirect(RouteServiceProvider::HOME);
-    }
-
-    private function acceptProjectInvites(User $user): void
-    {
-        $invites = ProjectInvite::query()
-            ->where('invited_email', $user->email)
-            ->where('expires_at', '>', now())
-            ->get();
-
-        foreach ($invites as $invite) {
-            $invite->project->accesses()->firstOrCreate(
-                ['user_id' => $user->id],
-                ['project_capability_id' => $invite->project_capability_id]
-            );
-
-            $invite->delete();
-        }
-
-        ProjectInvite::query()
-            ->where('invited_email', $user->email)
-            ->where('expires_at', '<=', now())
-            ->delete();
     }
 
     private function ensureProjectInviteCanRegister(ProjectInvite $invite): void
