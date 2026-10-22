@@ -25,7 +25,15 @@ use App\Http\Controllers\WfoController;
 use App\Http\Controllers\WhatsNewController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware(['auth'])->group(function () {
+// The interface language is saved before the address is confirmed too: the
+// confirmation page has the language menu, and the email follows the choice.
+Route::put('/account/language', [AccountController::class, 'updateLanguage'])
+    ->middleware('auth')
+    ->name('account.language');
+
+// Everything else behind sign-in needs a confirmed address. An unconfirmed
+// account is sent to the page that asks for it (verification.notice).
+Route::middleware(['auth', 'verified'])->group(function () {
     // Signing in lands on the project the user works in; with none yet, on a
     // welcome that points at creating one.
     Route::get('/dashboard', [ProjectOverviewController::class, 'landing'])
@@ -58,7 +66,6 @@ Route::middleware(['auth'])->group(function () {
         ->name('account.')
         ->group(function () {
             Route::get('/', 'show')->name('show');
-            Route::put('/language', 'updateLanguage')->name('language');
             Route::delete('/sessions', 'destroyOtherSessions')->name('sessions.destroy-others');
             Route::delete('/sessions/{session}', 'destroySession')->name('sessions.destroy');
             Route::delete('/devices/{device}', 'destroyDevice')
@@ -338,7 +345,7 @@ Route::middleware(['auth'])->group(function () {
 
 // Session-authenticated: called via axios from the catalog species page.
 Route::post('/api/wfo-query', [WfoController::class, 'query'])
-    ->middleware(['auth', 'throttle:api'])
+    ->middleware(['auth', 'verified', 'throttle:api'])
     ->name('wfo.query');
 
 // AGPL section 13: whoever uses this over a network must be able to obtain its
