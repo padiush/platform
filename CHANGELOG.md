@@ -22,6 +22,10 @@ language (`public/locales/whatsnew/`). How a release is cut is in
 
 - `symfony/mime` is updated to 8.1.10 for CVE-2026-45070, by which a MIME
   parameter name with characters outside a token could inject email headers.
+- `i18next-http-backend` is updated to 4.0.7, which no longer lets a language
+  or namespace value inject query parameters or a protocol-relative URL into
+  the translation request. `undici`, used only by the frontend tests, is
+  updated to 8.12.3.
 
 ## [1.3.1] — 2026-10-30
 
