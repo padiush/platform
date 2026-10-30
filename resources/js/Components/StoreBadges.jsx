@@ -15,7 +15,9 @@ export function hasStoreBadges(stores) {
  * artwork, unaltered and in the reader's language (black on the light theme,
  * white on the dark one, as Apple allows), and Google's once the Play listing
  * is public. Until then a release can only be announced in plain text, since
- * Google's badge may only point at a live listing.
+ * Google's badge may only point at a live listing. Google's artwork has only
+ * its transparent margin trimmed, so both badges share the 40px height Google
+ * asks its own not to fall below. Neither shrinks with a narrow column.
  *
  * Renders nothing for a deployment that publishes no store build.
  *
@@ -42,7 +44,7 @@ export default function StoreBadges({ stores, className = '' }) {
                         alt={t('public.app_store')}
                         width="120"
                         height="40"
-                        className="block h-10 w-auto [[data-theme='padiushdark']_&]:hidden"
+                        className="block h-10 w-auto max-w-none [[data-theme='padiushdark']_&]:hidden"
                     />
                     <img
                         src={`/images/badges/app-store-${language}-white.svg`}
@@ -50,20 +52,18 @@ export default function StoreBadges({ stores, className = '' }) {
                         aria-hidden="true"
                         width="120"
                         height="40"
-                        className="hidden h-10 w-auto [[data-theme='padiushdark']_&]:block"
+                        className="hidden h-10 w-auto max-w-none [[data-theme='padiushdark']_&]:block"
                     />
                 </a>
             )}
             {playStore && (
-                // Google's artwork carries its own clear space, so it is drawn
-                // taller to give the badge itself the App Store's 40px.
                 <a href={playStore} rel="noopener" className="inline-block">
                     <img
                         src={`/images/badges/google-play-${language}.png`}
                         alt={t('public.google_play')}
-                        width="138"
-                        height="53"
-                        className="-my-1.5 block h-[53px] w-auto"
+                        width="135"
+                        height="40"
+                        className="block h-10 w-auto max-w-none"
                     />
                 </a>
             )}

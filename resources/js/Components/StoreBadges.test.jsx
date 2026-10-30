@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react';
+import { readFileSync } from 'node:fs';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import StoreBadges, { hasStoreBadges } from './StoreBadges';
 
@@ -110,4 +111,38 @@ describe('StoreBadges', () => {
             '/images/badges/google-play-en.png',
         );
     });
+
+    it('keeps each badge at its own width in a narrow column', () => {
+        const { container } = render(
+            <StoreBadges
+                stores={{
+                    ...none,
+                    app_store: 'https://apps.example/1',
+                    play_store: 'https://play.example/app',
+                }}
+            />,
+        );
+
+        for (const image of container.querySelectorAll('img')) {
+            expect(image).toHaveClass('h-10', 'w-auto', 'max-w-none');
+        }
+    });
+
+    // The badges share a 40px height, and Google's may be no smaller than
+    // Apple's, so its artwork must be the badge alone, without clear space.
+    it.each(['es', 'en', 'pt'])(
+        "has Google's %s badge shaped for 135×40",
+        (language) => {
+            const data = readFileSync(
+                `public/images/badges/google-play-${language}.png`,
+            );
+            const width = data.readUInt32BE(16);
+            const height = data.readUInt32BE(20);
+
+            expect(Math.round((width / height) * 40)).toBeGreaterThanOrEqual(
+                134,
+            );
+            expect(Math.round((width / height) * 40)).toBeLessThanOrEqual(135);
+        },
+    );
 });
