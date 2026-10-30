@@ -1,11 +1,9 @@
 import { chooseLanguage } from '@/lib/accountLanguage';
+import { LANGUAGES, currentLanguage } from '@/lib/interfaceLanguage';
 import { faLanguage } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { usePage } from '@inertiajs/react';
 import { useTranslation } from 'react-i18next';
-
-/** The interface languages, in the order the public site lists them. */
-const LANGUAGES = ['es', 'en', 'pt'];
 
 /** Each language's name, written in that language. */
 const LANGUAGE_NAMES = {
@@ -13,19 +11,6 @@ const LANGUAGE_NAMES = {
     en: 'English',
     pt: 'Português (Brasil)',
 };
-
-/**
- * The language the interface is in, as one of LANGUAGES. i18next reports what
- * it detected, which can carry a region ("en-US", from the browser); anything
- * it cannot match falls back to Spanish, as the translations do.
- */
-function currentLanguage(i18n) {
-    const language = (i18n.resolvedLanguage ?? i18n.language ?? '')
-        .split('-')[0]
-        .toLowerCase();
-
-    return LANGUAGES.includes(language) ? language : 'es';
-}
 
 /**
  * The language menu: the current language, and the three to choose from. It

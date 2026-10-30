@@ -1,6 +1,5 @@
+import { currentLanguage } from '@/lib/interfaceLanguage';
 import { useTranslation } from 'react-i18next';
-
-const LANGUAGES = ['es', 'en', 'pt'];
 
 /** Whether a deployment has any store listing to show. */
 export function hasStoreBadges(stores) {
@@ -24,7 +23,7 @@ export function hasStoreBadges(stores) {
  */
 export default function StoreBadges({ stores, className = '' }) {
     const { t, i18n } = useTranslation();
-    const language = LANGUAGES.includes(i18n.language) ? i18n.language : 'es';
+    const language = currentLanguage(i18n);
 
     if (!hasStoreBadges(stores)) {
         return null;

@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import StoreBadges, { hasStoreBadges } from './StoreBadges';
 
-const i18n = { language: 'pt' };
+const i18n = { language: 'pt', resolvedLanguage: undefined };
 
 vi.mock('react-i18next', () => ({
     useTranslation: () => ({ t: (key) => key, i18n }),
@@ -17,6 +17,7 @@ const none = {
 describe('StoreBadges', () => {
     beforeEach(() => {
         i18n.language = 'pt';
+        i18n.resolvedLanguage = undefined;
     });
 
     it('renders nothing for a deployment without store listings', () => {
@@ -85,6 +86,28 @@ describe('StoreBadges', () => {
         expect(screen.getByAltText('public.app_store')).toHaveAttribute(
             'src',
             '/images/badges/app-store-es-black.svg',
+        );
+    });
+    it('shows the artwork for the language a browser reports with its region', () => {
+        i18n.language = 'en-US';
+
+        render(
+            <StoreBadges
+                stores={{
+                    ...none,
+                    app_store: 'https://apps.example/1',
+                    play_store: 'https://play.example/app',
+                }}
+            />,
+        );
+
+        expect(screen.getByAltText('public.app_store')).toHaveAttribute(
+            'src',
+            '/images/badges/app-store-en-black.svg',
+        );
+        expect(screen.getByAltText('public.google_play')).toHaveAttribute(
+            'src',
+            '/images/badges/google-play-en.png',
         );
     });
 });
