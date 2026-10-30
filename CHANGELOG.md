@@ -11,6 +11,12 @@ language (`public/locales/whatsnew/`). How a release is cut is in
 
 ## [Unreleased]
 
+### Fixed
+
+- The field app's store badges in the public pages' footer are drawn in the
+  reader's language when the browser reports it with a region, such as
+  `en-US`, instead of falling back to Spanish.
+
 ## [1.3.0] — 2026-10-22
 
 ### Added
