@@ -18,6 +18,11 @@ language (`public/locales/whatsnew/`). How a release is cut is in
   the page's text color, the opposite of the other sections, and the open
   section is now the sidebar's colors reversed.
 
+### Security
+
+- `symfony/mime` is updated to 8.1.10 for CVE-2026-45070, by which a MIME
+  parameter name with characters outside a token could inject email headers.
+
 ## [1.3.1] — 2026-10-30
 
 ### Fixed
