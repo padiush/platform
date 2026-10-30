@@ -16,6 +16,9 @@ language (`public/locales/whatsnew/`). How a release is cut is in
 - The field app's store badges in the public pages' footer are drawn in the
   reader's language when the browser reports it with a region, such as
   `en-US`, instead of falling back to Spanish.
+- The footer no longer squeezes the store badges where its column is narrow,
+  as at tablet width, and Google Play's badge is the same height as the App
+  Store's in every language; the English one was drawn smaller.
 
 ## [1.3.0] — 2026-10-22
 
