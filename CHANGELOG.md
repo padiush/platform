@@ -11,6 +11,13 @@ language (`public/locales/whatsnew/`). How a release is cut is in
 
 ## [Unreleased]
 
+### Fixed
+
+- Everything in the sidebar is drawn in one color in each theme. The logo, the
+  project switcher, the open section and the controls at its foot had taken
+  the page's text color, the opposite of the other sections, and the open
+  section is now the sidebar's colors reversed.
+
 ## [1.3.1] — 2026-10-30
 
 ### Fixed
