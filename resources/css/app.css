@@ -106,6 +106,31 @@
     }
 }
 
+/*
+  The sidebar sits on the primary color, so everything drawn on it takes
+  primary-content: the logo, the project switcher, the sections and the
+  controls at its foot. daisyUI's ghost buttons and menus otherwise draw in
+  the page's base-content, which is light on the dark theme's light green
+  and dark on the light theme's dark green, the opposite of the sections.
+  The active section is the sidebar's colors reversed. The lists that open
+  from it (projects, languages) are page surfaces and keep the page colors.
+*/
+:root {
+    --page-base-content: var(--color-base-content);
+}
+.padiush-sidebar {
+    --color-base-content: var(--color-primary-content);
+}
+.padiush-sidebar .menu {
+    --menu-active-bg: var(--color-primary-content);
+    --menu-active-fg: var(--color-primary);
+}
+.padiush-sidebar .dropdown-content {
+    --color-base-content: var(--page-base-content);
+    --menu-active-bg: var(--color-neutral);
+    --menu-active-fg: var(--color-neutral-content);
+}
+
 td.text-wrap {
     white-space: pre-wrap;
     word-wrap: break-word;

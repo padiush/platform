@@ -136,7 +136,7 @@ export default function Sidebar({ rail = false, onToggleRail = null }) {
 
     return (
         <aside
-            className={`bg-primary text-primary-content flex h-full flex-col gap-3 p-3 transition-[width] duration-200 ${
+            className={`padiush-sidebar bg-primary text-primary-content flex h-full flex-col gap-3 p-3 transition-[width] duration-200 ${
                 rail ? 'w-20' : 'w-72'
             }`}
             aria-label={t('navigation.menu')}
@@ -254,7 +254,7 @@ export default function Sidebar({ rail = false, onToggleRail = null }) {
                     data-tour="nav-account"
                     className={`btn btn-ghost h-auto min-h-9 gap-2 px-2 py-1.5 font-medium ${
                         route().current('account.*')
-                            ? 'bg-primary-content/15'
+                            ? 'bg-primary-content text-primary'
                             : ''
                     } ${rail ? 'justify-center' : 'justify-start'}`}
                     aria-current={
