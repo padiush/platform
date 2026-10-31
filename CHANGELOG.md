@@ -11,6 +11,8 @@ language (`public/locales/whatsnew/`). How a release is cut is in
 
 ## [Unreleased]
 
+## [1.3.2] — 2026-10-31
+
 ### Fixed
 
 - Everything in the sidebar is drawn in one color in each theme. The logo, the
@@ -239,7 +241,8 @@ First public release: interview form design, offline capture with the companion
 app, species linking against taxonomic backbones, the five ethnobotanical
 indices, and export.
 
-[Unreleased]: https://github.com/padiush/platform/compare/v1.3.1...HEAD
+[Unreleased]: https://github.com/padiush/platform/compare/v1.3.2...HEAD
+[1.3.2]: https://github.com/padiush/platform/compare/v1.3.1...v1.3.2
 [1.3.1]: https://github.com/padiush/platform/compare/v1.3.0...v1.3.1
 [1.3.0]: https://github.com/padiush/platform/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/padiush/platform/compare/v1.1.0...v1.2.0
