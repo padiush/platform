@@ -26,6 +26,9 @@ language (`public/locales/whatsnew/`). How a release is cut is in
   or namespace value inject query parameters or a protocol-relative URL into
   the translation request. `undici`, used only by the frontend tests, is
   updated to 8.12.3.
+- `follow-redirects`, which `axios` uses for requests made from Node, is
+  updated to 1.16.2, which no longer forwards custom credentials across
+  redirects.
 
 ## [1.3.1] — 2026-10-30
 
