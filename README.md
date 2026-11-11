@@ -112,7 +112,7 @@ The project utilizes the following technologies:
 To set up the project locally, follow these steps:
 
 ### Prerequisites
-- PHP 8.3 or higher
+- PHP 8.4 or higher
 - Node.js 22.12 or later (or 20.19+) and npm, as Vite 8 requires
 - Composer
 - MariaDB or MySQL
