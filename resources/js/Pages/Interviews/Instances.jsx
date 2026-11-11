@@ -1,6 +1,8 @@
 import Card from '@/Components/Card';
 import DeletionModal from '@/Components/DeletionModal';
+import FormModal from '@/Components/FormModal';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import InterviewMedia from '@/Pages/Data/Partials/InterviewMedia';
 import { formatDateTime } from '@/utils/datetime';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -11,6 +13,7 @@ import { useTranslation } from 'react-i18next';
 export default function InterviewInstances({ project, form, instances }) {
     const { t, i18n } = useTranslation();
     const deletionModalRef = useRef();
+    const [mediaFor, setMediaFor] = useState(null);
     const [deletionModalOptions, setDeletionModalOptions] = useState({
         url: '',
         name: '',
@@ -67,6 +70,18 @@ export default function InterviewInstances({ project, form, instances }) {
                                             {formatDateTime(
                                                 instance.created_at,
                                                 i18n.language,
+                                            )}
+                                            {instance.media_count > 0 && (
+                                                <button
+                                                    type="button"
+                                                    className="link link-primary mt-1 block w-full py-1 text-left text-xs wrap-anywhere"
+                                                    onClick={() =>
+                                                        setMediaFor(instance.id)
+                                                    }
+                                                >
+                                                    {t('data.media.title')} (
+                                                    {instance.media_count})
+                                                </button>
                                             )}
                                         </td>
                                         <td>{instance.id}</td>
@@ -130,6 +145,15 @@ export default function InterviewInstances({ project, form, instances }) {
                 name={deletionModalOptions.name}
                 url={deletionModalOptions.url}
             />
+            {mediaFor && (
+                <FormModal
+                    open
+                    onClose={() => setMediaFor(null)}
+                    title={t('data.media.title')}
+                >
+                    <InterviewMedia project={project} instanceId={mediaFor} />
+                </FormModal>
+            )}
         </AuthenticatedLayout>
     );
 }
