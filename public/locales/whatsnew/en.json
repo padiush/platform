@@ -1,6 +1,15 @@
 {
     "releases": [
         {
+            "version": "1.4.0",
+            "date": "2026-11-11",
+            "items": [
+                "Listen to an interview's recordings on its own page, with the audio above the form and the photos below it, as in the field app. You can also open them from each interview in the list.",
+                "Recordings now play in Safari and on iPhones and iPads, and in any browser you can skip forward or back through them.",
+                "Data now also shows interviews that have photos or audio but no answers, so you can open their files."
+            ]
+        },
+        {
             "version": "1.3.0",
             "date": "2026-10-22",
             "items": [

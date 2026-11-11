@@ -1,6 +1,15 @@
 {
     "releases": [
         {
+            "version": "1.4.0",
+            "date": "2026-11-11",
+            "items": [
+                "Ouça as gravações de uma entrevista na própria página dela, com o áudio acima do formulário e as fotos abaixo, como no aplicativo de campo. Você também pode abri-las em cada entrevista da lista.",
+                "As gravações agora tocam no Safari, no iPhone e no iPad, e em qualquer navegador você pode avançar ou voltar dentro delas.",
+                "Em Dados também aparecem as entrevistas que têm fotos ou áudio, mas nenhuma resposta, para que você possa abrir os arquivos delas."
+            ]
+        },
+        {
             "version": "1.3.0",
             "date": "2026-10-22",
             "items": [
