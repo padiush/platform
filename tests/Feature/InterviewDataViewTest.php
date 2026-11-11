@@ -93,6 +93,52 @@ class InterviewDataViewTest extends TestCase
         ]);
     }
 
+    /** Recording without filling in the form is ordinary fieldwork. */
+    public function test_an_interview_with_audio_and_no_answers_can_still_be_reached()
+    {
+        $audioOnly = InterviewInstance::factory()->create(['interview_form_id' => $this->form->id]);
+        $this->attachMedia($audioOnly);
+
+        $response = $this->actingAs($this->manager())->get(route('data.view', $this->project));
+
+        $response->assertInertia(fn (Assert $page) => $page
+            ->has('rows.data', 0)
+            ->has('unanswered', 1)
+            ->where('unanswered.0.id', $audioOnly->id)
+            ->where('unanswered.0.media_count', 1)
+        );
+    }
+
+    public function test_only_interviews_with_files_and_no_answers_are_listed_apart()
+    {
+        // Has a row of its own in the table.
+        $this->attachMedia($this->recordAnswer('ceiba'));
+        // Nothing to play: its one file never arrived.
+        $this->attachMedia(
+            InterviewInstance::factory()->create(['interview_form_id' => $this->form->id]),
+            Media::STATUS_PENDING
+        );
+        // Started and left empty.
+        InterviewInstance::factory()->create(['interview_form_id' => $this->form->id]);
+
+        $this->actingAs($this->manager())
+            ->get(route('data.view', $this->project))
+            ->assertInertia(fn (Assert $page) => $page->has('unanswered', 0));
+    }
+
+    public function test_the_unanswered_list_follows_the_filters()
+    {
+        $audioOnly = InterviewInstance::factory()->create(['interview_form_id' => $this->form->id]);
+        $this->attachMedia($audioOnly);
+
+        $this->actingAs($this->manager())
+            ->get(route('data.view', [
+                'project' => $this->project,
+                'from' => now()->addDay()->toDateString(),
+            ]))
+            ->assertInertia(fn (Assert $page) => $page->has('unanswered', 0));
+    }
+
     public function test_a_row_counts_only_files_that_have_arrived()
     {
         $instance = $this->recordAnswer('ceiba');

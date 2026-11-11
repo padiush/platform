@@ -143,6 +143,7 @@ class InterviewDataController extends Controller
             'rows' => $section === null
                 ? null
                 : $table->rows($form, $section, $filters, (int) $request->integer('page', 1)),
+            'unanswered' => $table->withoutAnswers($form, $filters),
             'filters' => $filters,
             'interviewers' => $interviewers,
             // Decrypting a whole section to aggregate is only worth it for the

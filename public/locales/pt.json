@@ -761,7 +761,9 @@
             "none": "Esta entrevista não tem fotografias nem áudio.",
             "photo_alt": "Fotografia da entrevista",
             "title": "Evidência",
-            "transcript": "Transcrição"
+            "transcript": "Transcrição",
+            "unanswered_hint": "Estas entrevistas têm fotografias ou áudio, mas ainda não têm respostas, por isso não aparecem na tabela.",
+            "unanswered_title": "Entrevistas sem respostas"
         },
         "no_access": "Você não tem acesso aos dados desse projeto.",
         "no_linkable_title": "Não há respostas para vincular",

@@ -9,6 +9,7 @@ import Select from '@/Components/Select';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import DataTabs from '@/Pages/Data/Partials/DataTabs';
 import InterviewMedia from '@/Pages/Data/Partials/InterviewMedia';
+import UnansweredInterviews from '@/Pages/Data/Partials/UnansweredInterviews';
 import { formatDateTime } from '@/utils/datetime';
 import { faDownload } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -47,6 +48,7 @@ export default function DataView({
     forms,
     structure,
     rows,
+    unanswered = [],
     filters,
     interviewers,
     summary,
@@ -91,7 +93,13 @@ export default function DataView({
         if (next.to) params.to = next.to;
         if (next.tab && next.tab !== 'table') params.tab = next.tab;
 
-        const only = ['rows', 'structure', 'filters', 'interviewers'];
+        const only = [
+            'rows',
+            'unanswered',
+            'structure',
+            'filters',
+            'interviewers',
+        ];
         if (next.tab === 'summary') {
             only.push('summary');
         }
@@ -141,6 +149,12 @@ export default function DataView({
             <div className="p-4 md:pt-8 lg:pt-12">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
                     {dataTabs}
+                    {tab === 'table' && (
+                        <UnansweredInterviews
+                            interviews={unanswered}
+                            onOpen={setMediaFor}
+                        />
+                    )}
                     <Card title={t('data.view.title')}>
                         <div className="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
                             {forms.length > 1 && (

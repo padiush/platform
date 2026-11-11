@@ -761,7 +761,9 @@
             "none": "This interview has no photographs or audio.",
             "photo_alt": "Photograph from the interview",
             "title": "Evidence",
-            "transcript": "Transcript"
+            "transcript": "Transcript",
+            "unanswered_hint": "These interviews have photographs or audio but no answers yet, so they do not appear in the table.",
+            "unanswered_title": "Interviews without answers"
         },
         "no_access": "You don't have access to that project's data.",
         "no_linkable_title": "No answers to link",
