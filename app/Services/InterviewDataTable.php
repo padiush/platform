@@ -9,6 +9,7 @@ use App\Models\InterviewItem;
 use App\Models\InterviewSection;
 use App\Models\Media;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Pagination\LengthAwarePaginator as Paginator;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
@@ -87,24 +88,7 @@ class InterviewDataTable
     ): LengthAwarePaginator {
         $items = $section->items()->orderBy('order')->get();
 
-        // Instances of the form, filtered on structural columns (SQL only).
-        $instances = InterviewInstance::query()
-            ->where('interview_form_id', $form->id)
-            ->with('user')
-            ->when(
-                filled($filters['interviewer'] ?? null),
-                fn ($q) => $q->where('user_id', $filters['interviewer'])
-            )
-            ->when(
-                filled($filters['from'] ?? null),
-                fn ($q) => $q->whereDate('created_at', '>=', $filters['from'])
-            )
-            ->when(
-                filled($filters['to'] ?? null),
-                fn ($q) => $q->whereDate('created_at', '<=', $filters['to'])
-            )
-            ->orderByDesc('created_at')
-            ->get();
+        $instances = $this->filteredInstances($form, $filters)->get();
 
         $records = $this->buildRecords($section, $instances);
 
@@ -121,6 +105,55 @@ class InterviewDataTable
                 'query' => request()->query(),
             ]
         );
+    }
+
+    /**
+     * Interviews carrying photographs or audio and no answers at all. The table
+     * builds its rows from answers, so these have no row to offer their files
+     * from, and recording without filling in the form is ordinary fieldwork.
+     *
+     * @param  array{interviewer?: ?int, from?: ?string, to?: ?string}  $filters
+     * @return array<int, array<string, mixed>>
+     */
+    public function withoutAnswers(InterviewForm $form, array $filters): array
+    {
+        return $this->filteredInstances($form, $filters)
+            ->whereDoesntHave('answers')
+            ->whereHas('media', fn ($q) => $q->stored())
+            ->withCount(['media' => fn ($q) => $q->stored()])
+            ->get()
+            ->map(fn (InterviewInstance $instance) => [
+                'id' => $instance->id,
+                'recorded_at' => $instance->created_at?->toIso8601String(),
+                'recorder' => $instance->user?->name,
+                'media_count' => $instance->media_count,
+            ])
+            ->all();
+    }
+
+    /**
+     * Instances of the form, filtered on structural columns (SQL only).
+     *
+     * @param  array{interviewer?: ?int, from?: ?string, to?: ?string}  $filters
+     */
+    private function filteredInstances(InterviewForm $form, array $filters): Builder
+    {
+        return InterviewInstance::query()
+            ->where('interview_form_id', $form->id)
+            ->with('user')
+            ->when(
+                filled($filters['interviewer'] ?? null),
+                fn ($q) => $q->where('user_id', $filters['interviewer'])
+            )
+            ->when(
+                filled($filters['from'] ?? null),
+                fn ($q) => $q->whereDate('created_at', '>=', $filters['from'])
+            )
+            ->when(
+                filled($filters['to'] ?? null),
+                fn ($q) => $q->whereDate('created_at', '<=', $filters['to'])
+            )
+            ->orderByDesc('created_at');
     }
 
     /**
