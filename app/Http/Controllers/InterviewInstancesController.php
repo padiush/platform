@@ -7,6 +7,7 @@ use App\Models\InterviewForm;
 use App\Models\InterviewInstance;
 use App\Models\InterviewItem;
 use App\Models\InterviewSection;
+use App\Models\Media;
 use App\Models\Project;
 use App\Models\User;
 use App\Services\ActiveProject;
@@ -64,6 +65,16 @@ class InterviewInstancesController extends Controller
         );
     }
 
+    /**
+     * Whether the user may see an interview's photographs and audio: the gate
+     * on the data itself, which recording interviews does not imply.
+     */
+    private static function canSeeMedia(Project $project): bool
+    {
+        return Auth::user()->can('manageData', $project)
+            || Auth::user()->can('generateReports', $project);
+    }
+
     /** A finished project takes no new interviews and no new answers. */
     private static function denyIfFinished(Project $project): void
     {
@@ -115,7 +126,10 @@ class InterviewInstancesController extends Controller
     {
         self::verifyAccess($project, $form);
 
+        $canSeeMedia = self::canSeeMedia($project);
+
         $instances = InterviewInstance::with('user')
+            ->withCount(['media' => fn ($q) => $q->stored()])
             ->where('interview_form_id', $form->id)
             ->orderByDesc('created_at')
             ->paginate(20)
@@ -124,6 +138,7 @@ class InterviewInstancesController extends Controller
                     'id' => $instance->id,
                     // Sent as ISO; the page formats it in the user's language.
                     'created_at' => $instance->created_at->toIso8601String(),
+                    'media_count' => $canSeeMedia ? $instance->media_count : 0,
                     'user' => [
                         'id' => $instance->user->id,
                         'name' => $instance->user->name,
@@ -187,6 +202,13 @@ class InterviewInstancesController extends Controller
         // instead of the raw instance id.
         $instance->load('user');
 
+        $mediaCounts = self::canSeeMedia($project)
+            ? $instance->media()->stored()->toBase()
+                ->selectRaw('kind, count(*) as total')
+                ->groupBy('kind')
+                ->pluck('total', 'kind')
+            : collect();
+
         return Inertia::render('Interviews/Instance', [
             'project' => $project,
             'form' => $form,
@@ -195,6 +217,8 @@ class InterviewInstancesController extends Controller
             // The records are listed either way; they link to the catalog
             // only for someone who can read it.
             'canViewCatalog' => (bool) Auth::user()->can('viewCatalog', $project),
+            'audioCount' => (int) ($mediaCounts[Media::KIND_AUDIO] ?? 0),
+            'photoCount' => (int) ($mediaCounts[Media::KIND_PHOTO] ?? 0),
         ]);
     }
 

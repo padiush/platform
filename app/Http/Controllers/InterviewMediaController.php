@@ -46,7 +46,10 @@ class InterviewMediaController extends Controller
         abort_unless($this->belongsToProject($instance, $project), 404);
 
         return response()->json([
-            'media' => $instance->media()->stored()->orderBy('captured_at')->get()->map(fn (Media $medium) => [
+            // By id as well: recordings are numbered in this order, and the
+            // device uploads them oldest first without saying when they were
+            // captured, so that number has to stay the same between visits.
+            'media' => $instance->media()->stored()->orderBy('captured_at')->orderBy('id')->get()->map(fn (Media $medium) => [
                 'id' => $medium->id,
                 'kind' => $medium->kind,
                 'content_type' => $medium->content_type,

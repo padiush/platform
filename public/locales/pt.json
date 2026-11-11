@@ -756,10 +756,13 @@
             "permit_states": "{{under}} com permissão · {{exempt}} isentos · {{unrecorded}} por registar"
         },
         "media": {
+            "audio_title": "Áudio",
             "failed": "Não foi possível carregar a evidência.",
             "loading": "A carregar…",
             "none": "Esta entrevista não tem fotografias nem áudio.",
             "photo_alt": "Fotografia da entrevista",
+            "photos_title": "Fotos",
+            "recording_label": "Gravação {{number}}",
             "title": "Evidência",
             "transcript": "Transcrição",
             "unanswered_hint": "Estas entrevistas têm fotografias ou áudio, mas ainda não têm respostas, por isso não aparecem na tabela.",

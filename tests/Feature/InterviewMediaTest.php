@@ -12,6 +12,7 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Inertia\Testing\AssertableInertia as Assert;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Concerns\InteractsWithProjects;
 use Tests\TestCase;
@@ -250,5 +251,100 @@ class InterviewMediaTest extends TestCase
             ->assertOk()
             ->assertJsonCount(1, 'media')
             ->assertJsonPath('media.0.id', $stored->id);
+    }
+
+    private function recorderWithoutDataAccess(): User
+    {
+        $user = User::factory()->create();
+        ProjectAccess::factory()->create([
+            'user_id' => $user->id,
+            'project_id' => $this->project->id,
+            'project_capability_id' => ProjectCapability::factory()->create([
+                'record_data' => true,
+                'manage_data' => false,
+                'generate_reports' => false,
+            ])->id,
+        ]);
+
+        return $user;
+    }
+
+    private function interviewPage(): string
+    {
+        return route('interviews.show', [
+            'project' => $this->project->id,
+            'instance' => $this->instance->id,
+        ]);
+    }
+
+    private function interviewList(): string
+    {
+        return route('interviews.instances', [
+            'project' => $this->project->id,
+            'form' => $this->instance->interview_form_id,
+        ]);
+    }
+
+    public function test_the_interview_page_counts_what_has_arrived()
+    {
+        $this->medium();
+        $this->audio();
+        $this->audio();
+        $this->medium(['status' => Media::STATUS_PENDING]);
+
+        $this->actingAs($this->userWithCapability($this->project, 'manage_data'))
+            ->get($this->interviewPage())
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->component('Interviews/Instance')
+                ->where('audioCount', 2)
+                ->where('photoCount', 1)
+            );
+    }
+
+    /** Recordings are numbered in this order, and carry no capture time. */
+    public function test_recordings_keep_their_order_between_visits()
+    {
+        $first = $this->audio();
+        $second = $this->audio();
+
+        $this->actingAs($this->userWithCapability($this->project, 'manage_data'))
+            ->getJson($this->url('data.media.index'))
+            ->assertOk()
+            ->assertJsonPath('media.0.id', $first->id)
+            ->assertJsonPath('media.1.id', $second->id);
+    }
+
+    public function test_the_interview_list_says_which_have_files()
+    {
+        $this->medium();
+        $this->medium(['status' => Media::STATUS_PENDING]);
+
+        $this->actingAs($this->userWithCapability($this->project, 'manage_data'))
+            ->get($this->interviewList())
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->component('Interviews/Instances')
+                ->where('instances.data.0.media_count', 1)
+            );
+    }
+
+    public function test_recording_interviews_does_not_reveal_their_files()
+    {
+        $this->medium();
+        $user = $this->recorderWithoutDataAccess();
+
+        $this->actingAs($user)
+            ->get($this->interviewPage())
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->where('audioCount', 0)
+                ->where('photoCount', 0)
+            );
+
+        $this->actingAs($user)
+            ->get($this->interviewList())
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page->where('instances.data.0.media_count', 0));
     }
 }

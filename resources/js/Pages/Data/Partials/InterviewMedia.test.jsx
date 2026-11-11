@@ -44,6 +44,44 @@ describe('InterviewMedia', () => {
         expect(container.querySelector('audio')).toHaveAttribute('src', '/m/2');
     });
 
+    it('numbers the recordings and shows their length, as the app does', async () => {
+        resolve([
+            { id: 2, kind: 'audio', url: '/m/2', duration_s: 485 },
+            { id: 3, kind: 'audio', url: '/m/3', duration_s: null },
+        ]);
+        render(<InterviewMedia project={project} instanceId="abc" />);
+
+        expect(
+            await screen.findByText(
+                'data.media.recording_label {"number":1} · 8:05',
+            ),
+        ).toBeInTheDocument();
+        expect(
+            screen.getByText('data.media.recording_label {"number":2}'),
+        ).toBeInTheDocument();
+    });
+
+    it('shows only the kind asked for, numbered among its own', async () => {
+        resolve([
+            { id: 1, kind: 'photo', url: '/m/1' },
+            { id: 2, kind: 'audio', url: '/m/2' },
+        ]);
+        const { container } = render(
+            <InterviewMedia project={project} instanceId="abc" kind="audio" />,
+        );
+
+        await waitFor(() =>
+            expect(container.querySelector('audio')).not.toBeNull(),
+        );
+        expect(container.querySelector('img')).toBeNull();
+        expect(
+            screen.getByText('data.media.recording_label {"number":1}'),
+        ).toBeInTheDocument();
+        expect(
+            screen.queryByText('data.media.audio_title'),
+        ).not.toBeInTheDocument();
+    });
+
     it('shows a transcript when there is one', async () => {
         resolve([
             {

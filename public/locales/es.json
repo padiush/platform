@@ -756,10 +756,13 @@
             "permit_states": "{{under}} con permiso · {{exempt}} exentos · {{unrecorded}} sin registrar"
         },
         "media": {
+            "audio_title": "Audio",
             "failed": "No se pudo cargar la evidencia.",
             "loading": "Cargando…",
             "none": "Esta entrevista no tiene fotos ni audio.",
             "photo_alt": "Fotografía de la entrevista",
+            "photos_title": "Fotos",
+            "recording_label": "Grabación {{number}}",
             "title": "Evidencia",
             "transcript": "Transcripción",
             "unanswered_hint": "Estas entrevistas tienen fotos o audio, pero todavía no tienen respuestas, por eso no aparecen en la tabla.",

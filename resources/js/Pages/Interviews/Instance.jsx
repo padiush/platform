@@ -1,4 +1,6 @@
+import Card from '@/Components/Card';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import InterviewMedia from '@/Pages/Data/Partials/InterviewMedia';
 import { formatDateTime } from '@/utils/datetime';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -20,6 +22,8 @@ export default function Instance({
     instance,
     answers,
     canViewCatalog = false,
+    audioCount = 0,
+    photoCount = 0,
 }) {
     const { t, i18n } = useTranslation();
 
@@ -101,6 +105,17 @@ export default function Instance({
             <div className="p-4 md:pt-8 lg:pt-12">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
                     <div className="grid grid-cols-1 gap-4">
+                        {/* Where the field app has them: audio above the
+                            form, photographs below it. */}
+                        {audioCount > 0 && (
+                            <Card title={t('data.media.audio_title')}>
+                                <InterviewMedia
+                                    project={project}
+                                    instanceId={instance.id}
+                                    kind="audio"
+                                />
+                            </Card>
+                        )}
                         {form.sections.map((section, index) => (
                             <SectionRender
                                 key={index}
@@ -115,6 +130,15 @@ export default function Instance({
                                 onAnswered={handleAnswered}
                             />
                         ))}
+                        {photoCount > 0 && (
+                            <Card title={t('data.media.photos_title')}>
+                                <InterviewMedia
+                                    project={project}
+                                    instanceId={instance.id}
+                                    kind="photo"
+                                />
+                            </Card>
+                        )}
                     </div>
                 </div>
             </div>
