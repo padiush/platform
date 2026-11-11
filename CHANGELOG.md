@@ -11,6 +11,21 @@ language (`public/locales/whatsnew/`). How a release is cut is in
 
 ## [Unreleased]
 
+### Changed
+
+- PHP 8.4 is the minimum. The framework's Symfony components already required
+  it, so 8.3 could no longer install the locked dependencies.
+- Spreadsheets are written with Laravel Excel 4 and PhpSpreadsheet 5, the
+  sitemap is generated with `laravel-sitemap` 8 and Guzzle 8, and translations
+  load through i18next 27. Exported files are unchanged.
+
+### Security
+
+- The Symfony components are updated to 8.1.11 for CVE-2026-118514,
+  CVE-2026-118516, CVE-2026-123339 and CVE-2026-123792, and for advisories on
+  path handling, generated URLs and the `private_ranges` trusted proxies
+  shortcut.
+
 ## [1.3.2] — 2026-10-31
 
 ### Fixed
