@@ -12,6 +12,7 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Concerns\InteractsWithProjects;
 use Tests\TestCase;
 
@@ -170,5 +171,72 @@ class InterviewMediaTest extends TestCase
         $this->medium();
 
         $this->assertSame(2, $this->instance->media()->count());
+    }
+
+    private function audio(): Media
+    {
+        $medium = $this->medium(['kind' => Media::KIND_AUDIO, 'content_type' => 'audio/mp4']);
+        Storage::disk('s3')->put($medium->storage_key, 'abcdefghij');
+
+        return $medium;
+    }
+
+    private function fetch(Media $medium, ?string $range = null)
+    {
+        return $this->actingAs($this->userWithCapability($this->project, 'manage_data'))
+            ->withHeaders($range === null ? [] : ['Range' => $range])
+            ->get($this->url('data.media.show', ['medium' => $medium->id]));
+    }
+
+    public function test_the_whole_file_says_it_can_be_read_in_ranges()
+    {
+        $response = $this->fetch($this->audio());
+
+        $response->assertOk()
+            ->assertHeader('accept-ranges', 'bytes')
+            ->assertHeader('content-length', '10')
+            ->assertHeader('content-type', 'audio/mp4');
+
+        $this->assertSame('abcdefghij', $response->streamedContent());
+    }
+
+    /** @return array<string, array{0: string, 1: string, 2: string}> */
+    public static function ranges(): array
+    {
+        return [
+            'the probe Safari sends first' => ['bytes=0-1', 'bytes 0-1/10', 'ab'],
+            'the middle' => ['bytes=2-5', 'bytes 2-5/10', 'cdef'],
+            'from a point to the end' => ['bytes=7-', 'bytes 7-9/10', 'hij'],
+            'the last few bytes' => ['bytes=-3', 'bytes 7-9/10', 'hij'],
+            'an end past the file' => ['bytes=8-99', 'bytes 8-9/10', 'ij'],
+        ];
+    }
+
+    #[DataProvider('ranges')]
+    public function test_a_range_gets_exactly_those_bytes(string $range, string $contentRange, string $body)
+    {
+        $response = $this->fetch($this->audio(), $range);
+
+        $response->assertStatus(206)
+            ->assertHeader('content-range', $contentRange)
+            ->assertHeader('content-length', (string) strlen($body))
+            ->assertHeader('accept-ranges', 'bytes');
+
+        $this->assertSame($body, $response->streamedContent());
+    }
+
+    public function test_a_range_outside_the_file_is_refused()
+    {
+        $this->fetch($this->audio(), 'bytes=10-20')
+            ->assertStatus(416)
+            ->assertHeader('content-range', 'bytes */10');
+    }
+
+    public function test_several_ranges_at_once_get_the_whole_file()
+    {
+        $response = $this->fetch($this->audio(), 'bytes=0-1,4-5');
+
+        $response->assertOk();
+        $this->assertSame('abcdefghij', $response->streamedContent());
     }
 }
