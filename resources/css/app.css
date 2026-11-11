@@ -1,11 +1,11 @@
 @import 'tailwindcss';
-@plugin "daisyui" {
+@plugin 'daisyui' {
     themes:
         padiushlight --default,
         padiushdark;
 }
 
-@plugin "daisyui/theme" {
+@plugin 'daisyui/theme' {
     name: 'padiushlight';
     default: true;
     prefersdark: false;
@@ -51,7 +51,7 @@
   media block would override an explicit light choice for OS-dark
   users because daisyUI emits it after [data-theme=padiushlight].
 */
-@plugin "daisyui/theme" {
+@plugin 'daisyui/theme' {
     name: 'padiushdark';
     default: false;
     prefersdark: false;
