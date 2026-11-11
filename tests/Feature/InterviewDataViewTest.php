@@ -7,11 +7,13 @@ use App\Models\InterviewForm;
 use App\Models\InterviewInstance;
 use App\Models\InterviewItem;
 use App\Models\InterviewSection;
+use App\Models\Media;
 use App\Models\Project;
 use App\Models\ProjectAccess;
 use App\Models\ProjectCapability;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Str;
 use Inertia\Testing\AssertableInertia as Assert;
 use Tests\Concerns\InteractsWithProjects;
 use Tests\TestCase;
@@ -76,6 +78,30 @@ class InterviewDataViewTest extends TestCase
             ->where('structure', null)
             ->has('tabs')
         );
+    }
+
+    private function attachMedia(InterviewInstance $instance, string $status = Media::STATUS_STORED): void
+    {
+        Media::create([
+            'interview_instance_id' => $instance->id,
+            'client_id' => (string) Str::uuid(),
+            'kind' => Media::KIND_AUDIO,
+            'storage_disk' => 's3',
+            'storage_key' => 'projects/1/'.Str::uuid().'.m4a',
+            'content_type' => 'audio/mp4',
+            'status' => $status,
+        ]);
+    }
+
+    public function test_a_row_counts_only_files_that_have_arrived()
+    {
+        $instance = $this->recordAnswer('ceiba');
+        $this->attachMedia($instance);
+        $this->attachMedia($instance, Media::STATUS_PENDING);
+
+        $this->actingAs($this->manager())
+            ->get(route('data.view', $this->project))
+            ->assertInertia(fn (Assert $page) => $page->where('rows.data.0.media_count', 1));
     }
 
     public function test_manager_sees_the_data_table()

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Observers\MediaObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -76,6 +77,15 @@ class Media extends Model
     public function belongsToFieldRecord(): bool
     {
         return $this->field_record_id !== null;
+    }
+
+    /**
+     * Files whose bytes have arrived. A device registers a file before sending
+     * it, and one interrupted in between leaves a row with nothing behind it.
+     */
+    public function scopeStored(Builder $query): Builder
+    {
+        return $query->where('status', self::STATUS_STORED);
     }
 
     /**
