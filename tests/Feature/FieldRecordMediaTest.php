@@ -124,6 +124,24 @@ class FieldRecordMediaTest extends TestCase
             ->assertRedirect(route('dashboard'));
     }
 
+    public function test_its_audio_can_be_read_in_ranges()
+    {
+        $this->attach(UploadedFile::fake()->create('nota.mp3', 64, 'audio/mpeg'))
+            ->assertRedirect();
+        $media = Media::sole();
+        Storage::disk('local')->put($media->storage_key, 'abcdefghij');
+
+        $response = $this->actingAs($this->viewer())
+            ->withHeaders(['Range' => 'bytes=2-5'])
+            ->get($this->url('catalogs.fieldRecords.media.show', ['medium' => $media->id]));
+
+        $response->assertStatus(206)
+            ->assertHeader('content-range', 'bytes 2-5/10')
+            ->assertHeader('accept-ranges', 'bytes');
+
+        $this->assertSame('cdef', $response->streamedContent());
+    }
+
     public function test_a_viewer_cannot_attach_or_remove()
     {
         $this->attach()->assertRedirect();

@@ -6,6 +6,7 @@ use App\Models\FieldRecord;
 use App\Models\Media;
 use App\Models\Project;
 use App\Services\ActiveProject;
+use App\Services\Media\MediaStream;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -108,9 +109,11 @@ class FieldRecordMediaController extends Controller
      * project revokes access to its photographs at the same moment.
      */
     public function show(
+        Request $request,
         Project $project,
         FieldRecord $fieldRecord,
-        Media $medium
+        Media $medium,
+        MediaStream $stream
     ): StreamedResponse|RedirectResponse {
         if (! Auth::user()->can('viewCatalog', $project)) {
             return $this->noAccess();
@@ -125,11 +128,7 @@ class FieldRecordMediaController extends Controller
 
         abort_unless($disk->exists($medium->storage_key), 404);
 
-        return $disk->response(
-            $medium->storage_key,
-            null,
-            ['Content-Type' => $medium->content_type]
-        );
+        return $stream->respond($request, $medium);
     }
 
     public function destroy(

@@ -6,6 +6,7 @@ use App\Http\Controllers\Concerns\ChecksProjectDataAccess;
 use App\Models\InterviewInstance;
 use App\Models\Media;
 use App\Models\Project;
+use App\Services\Media\MediaStream;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -73,9 +74,11 @@ class InterviewMediaController extends Controller
      * recordings at that moment.
      */
     public function show(
+        Request $request,
         Project $project,
         InterviewInstance $instance,
-        Media $medium
+        Media $medium,
+        MediaStream $stream
     ): StreamedResponse|RedirectResponse {
         $this->checkPermission($project);
 
@@ -92,11 +95,7 @@ class InterviewMediaController extends Controller
             404
         );
 
-        return $disk->response(
-            $medium->storage_key,
-            null,
-            ['Content-Type' => $medium->content_type]
-        );
+        return $stream->respond($request, $medium);
     }
 
     private function belongsToProject(InterviewInstance $instance, Project $project): bool
