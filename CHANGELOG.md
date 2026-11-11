@@ -19,6 +19,19 @@ language (`public/locales/whatsnew/`). How a release is cut is in
   sitemap is generated with `laravel-sitemap` 8 and Guzzle 8, and translations
   load through i18next 27. Exported files are unchanged.
 
+### Fixed
+
+- Recordings play in Safari and on iPhones and iPads, and can be skipped
+  through in every browser. Stored files are now served in byte ranges, without
+  which Apple's media engine refuses them.
+- An interview's audio and photographs appear on its own page, placed as in
+  the field app, with each recording numbered and its length shown. They can
+  also be opened from each interview in the list.
+- Interviews with photographs or audio but no answers are listed in Datos.
+  The table builds its rows from answers, so their files could not be reached.
+- A file a device registered but never finished sending no longer appears as a
+  player that does not work.
+
 ### Security
 
 - The Symfony components are updated to 8.1.11 for CVE-2026-118514,
