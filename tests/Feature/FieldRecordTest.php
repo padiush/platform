@@ -10,6 +10,7 @@ use App\Models\Project;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Inertia\Testing\AssertableInertia as Assert;
+use Maatwebsite\Excel\Concerns\ToArray;
 use Maatwebsite\Excel\Excel;
 use Tests\Concerns\InteractsWithProjects;
 use Tests\TestCase;
@@ -545,7 +546,11 @@ class FieldRecordTest extends TestCase
         );
 
         // Round-trip it: a download that opens is the claim being made.
-        $sheet = \Maatwebsite\Excel\Facades\Excel::toArray(new \stdClass, $path, null, Excel::XLSX)[0];
+        $import = new class implements ToArray
+        {
+            public function array(array $array): void {}
+        };
+        $sheet = \Maatwebsite\Excel\Facades\Excel::toArray($import, $path, null, Excel::XLSX)[0];
         unlink($path);
 
         $this->assertSame('catalogNumber', $sheet[0][0]);

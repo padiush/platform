@@ -2,6 +2,7 @@
 
 namespace App\Exports;
 
+use Maatwebsite\Excel\Concerns\Export;
 use Maatwebsite\Excel\Concerns\WithMultipleSheets;
 
 /**
@@ -9,7 +10,7 @@ use Maatwebsite\Excel\Concerns\WithMultipleSheets;
  * sheet. Used for xlsx only — CSV is a single flat table and downloads just the
  * indices sheet.
  */
-class IndicesReportExport implements WithMultipleSheets
+class IndicesReportExport implements Export, WithMultipleSheets
 {
     public function __construct(
         private IndicesExport $indices,
