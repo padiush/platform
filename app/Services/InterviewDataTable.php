@@ -179,6 +179,7 @@ class InterviewDataTable
 
         // One grouped count for the page rather than a query per row.
         $mediaCounts = Media::query()
+            ->stored()
             ->whereIn('interview_instance_id', $instanceIds)
             ->selectRaw('interview_instance_id, count(*) as aggregate')
             ->groupBy('interview_instance_id')

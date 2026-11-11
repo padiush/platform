@@ -46,7 +46,7 @@ class InterviewMediaController extends Controller
         abort_unless($this->belongsToProject($instance, $project), 404);
 
         return response()->json([
-            'media' => $instance->media()->orderBy('captured_at')->get()->map(fn (Media $medium) => [
+            'media' => $instance->media()->stored()->orderBy('captured_at')->get()->map(fn (Media $medium) => [
                 'id' => $medium->id,
                 'kind' => $medium->kind,
                 'content_type' => $medium->content_type,

@@ -239,4 +239,16 @@ class InterviewMediaTest extends TestCase
         $response->assertOk();
         $this->assertSame('abcdefghij', $response->streamedContent());
     }
+
+    public function test_a_file_still_being_sent_is_not_listed()
+    {
+        $this->medium(['status' => Media::STATUS_PENDING]);
+        $stored = $this->medium();
+
+        $this->actingAs($this->userWithCapability($this->project, 'manage_data'))
+            ->getJson($this->url('data.media.index'))
+            ->assertOk()
+            ->assertJsonCount(1, 'media')
+            ->assertJsonPath('media.0.id', $stored->id);
+    }
 }
