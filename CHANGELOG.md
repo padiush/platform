@@ -11,6 +11,14 @@ language (`public/locales/whatsnew/`). How a release is cut is in
 
 ## [Unreleased]
 
+## [1.4.0] — 2026-11-11
+
+### Added
+
+- An interview's audio and photographs appear on its own page, placed as in
+  the field app, with each recording numbered and its length shown. They can
+  also be opened from each interview in the list.
+
 ### Changed
 
 - PHP 8.4 is the minimum. The framework's Symfony components already required
@@ -24,9 +32,6 @@ language (`public/locales/whatsnew/`). How a release is cut is in
 - Recordings play in Safari and on iPhones and iPads, and can be skipped
   through in every browser. Stored files are now served in byte ranges, without
   which Apple's media engine refuses them.
-- An interview's audio and photographs appear on its own page, placed as in
-  the field app, with each recording numbered and its length shown. They can
-  also be opened from each interview in the list.
 - Interviews with photographs or audio but no answers are listed in Datos.
   The table builds its rows from answers, so their files could not be reached.
 - A file a device registered but never finished sending no longer appears as a
@@ -269,7 +274,8 @@ First public release: interview form design, offline capture with the companion
 app, species linking against taxonomic backbones, the five ethnobotanical
 indices, and export.
 
-[Unreleased]: https://github.com/padiush/platform/compare/v1.3.2...HEAD
+[Unreleased]: https://github.com/padiush/platform/compare/v1.4.0...HEAD
+[1.4.0]: https://github.com/padiush/platform/compare/v1.3.2...v1.4.0
 [1.3.2]: https://github.com/padiush/platform/compare/v1.3.1...v1.3.2
 [1.3.1]: https://github.com/padiush/platform/compare/v1.3.0...v1.3.1
 [1.3.0]: https://github.com/padiush/platform/compare/v1.2.0...v1.3.0
