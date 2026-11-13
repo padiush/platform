@@ -601,9 +601,22 @@ export default function SpeciesShow({
                     setWfo(response.data);
                 }
             } catch (err) {
-                console.error('Error fetching WFO data:', err);
+                // A 502 carrying this code means WFO itself did not answer.
+                // Worth saying plainly, so nobody reads it as a problem with
+                // the record they are looking at, or keeps retrying.
+                const unreachable =
+                    err.response?.data?.error === 'wfo_unreachable';
+
+                if (!unreachable) {
+                    console.error('Error fetching WFO data:', err);
+                }
+
                 if (active) {
-                    setError(t('catalogs.fetch_error'));
+                    setError(
+                        unreachable
+                            ? t('catalogs.wfo.unavailable')
+                            : t('catalogs.fetch_error'),
+                    );
                 }
             } finally {
                 if (active) {

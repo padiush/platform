@@ -426,7 +426,8 @@
             "spelling_variant": "possible spelling variant",
             "is_accepted": "Is an accepted name",
             "accepted_as": "Accepted as",
-            "no_accepted": "WFO lists no accepted name for this record."
+            "no_accepted": "WFO lists no accepted name for this record.",
+            "unavailable": "WFO is not responding right now. The taxonomic information will reappear once the service is back."
         },
         "accept": {
             "use_this": "Use this name",
@@ -460,6 +461,7 @@
             "searching": "Searching…",
             "no_results": "No matches in WFO.",
             "error": "Could not search WFO.",
+            "unavailable": "WFO is not responding right now. You can register the species by hand and link it to WFO later.",
             "resolve_error": "Could not load the name.",
             "accepted": "Accepted name",
             "synonym": "Synonym"

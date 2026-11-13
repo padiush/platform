@@ -87,6 +87,40 @@ describe('SpeciesShow', () => {
         ).toBeInTheDocument();
     });
 
+    it('says WFO is unavailable when the lookup reports it unreachable', async () => {
+        // What the breaker returns once WFO is known to be down.
+        axios.post.mockRejectedValue({
+            response: { status: 502, data: { error: 'wfo_unreachable' } },
+        });
+
+        render(<SpeciesShow species={species} project={project} />);
+
+        expect(
+            await screen.findByText('catalogs.wfo.unavailable'),
+        ).toBeInTheDocument();
+        // The generic message would read as a fault in the record itself.
+        expect(
+            screen.queryByText('catalogs.fetch_error'),
+        ).not.toBeInTheDocument();
+    });
+
+    it('keeps the generic message for a failure that is not WFO being down', async () => {
+        const logged = vi.spyOn(console, 'error').mockImplementation(() => {});
+        axios.post.mockRejectedValue(new Error('Network Error'));
+
+        render(<SpeciesShow species={species} project={project} />);
+
+        expect(
+            await screen.findByText('catalogs.fetch_error'),
+        ).toBeInTheDocument();
+        expect(
+            screen.queryByText('catalogs.wfo.unavailable'),
+        ).not.toBeInTheDocument();
+        // An unexpected failure is still worth a console entry.
+        expect(logged).toHaveBeenCalled();
+        logged.mockRestore();
+    });
+
     it('shows linked records to a data-capable viewer', async () => {
         axios.post.mockResolvedValue({ data: spellingVariantResult });
 

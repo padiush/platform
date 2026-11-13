@@ -89,6 +89,47 @@ describe('SpeciesForm', () => {
         );
     });
 
+    it('says WFO is unavailable, and that the species can still be registered by hand', async () => {
+        axios.get.mockRejectedValue({
+            response: { status: 502, data: { error: 'wfo_unreachable' } },
+        });
+
+        const { container } = render(
+            <SpeciesForm project={project} onClose={() => {}} />,
+        );
+
+        fireEvent.change(
+            container.querySelector('input[name="source-search"]'),
+            { target: { value: 'Cecropia' } },
+        );
+
+        expect(
+            await screen.findByText('catalogs.source.unavailable'),
+        ).toBeInTheDocument();
+        expect(
+            screen.queryByText('catalogs.source.error'),
+        ).not.toBeInTheDocument();
+        // The form itself stays usable, which is what the message promises.
+        expect(container.querySelector('input[name="genus"]')).toBeEnabled();
+    });
+
+    it('keeps the generic search message for any other failure', async () => {
+        axios.get.mockRejectedValue(new Error('Network Error'));
+
+        const { container } = render(
+            <SpeciesForm project={project} onClose={() => {}} />,
+        );
+
+        fireEvent.change(
+            container.querySelector('input[name="source-search"]'),
+            { target: { value: 'Cecropia' } },
+        );
+
+        expect(
+            await screen.findByText('catalogs.source.error'),
+        ).toBeInTheDocument();
+    });
+
     it('keeps manual entry working without a source lookup', async () => {
         axios.get.mockResolvedValue({ data: { found: false } });
 

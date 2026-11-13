@@ -426,7 +426,8 @@
             "spelling_variant": "possível variante ortográfica",
             "is_accepted": "É um nome aceito",
             "accepted_as": "Aceito como",
-            "no_accepted": "O WFO não indica um nome aceito para este registro."
+            "no_accepted": "O WFO não indica um nome aceito para este registro.",
+            "unavailable": "O WFO não está respondendo neste momento. As informações taxonómicas voltarão a aparecer quando o serviço for restabelecido."
         },
         "accept": {
             "use_this": "Usar este nome",
@@ -460,6 +461,7 @@
             "searching": "Buscando…",
             "no_results": "Sem correspondências no WFO.",
             "error": "Não foi possível consultar o WFO.",
+            "unavailable": "O WFO não está respondendo neste momento. Você pode registrar a espécie manualmente e vinculá-la ao WFO mais tarde.",
             "resolve_error": "Não foi possível obter o nome.",
             "accepted": "Nome aceito",
             "synonym": "Sinônimo"
