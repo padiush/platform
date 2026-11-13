@@ -98,6 +98,38 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | World Flora Online
+    |--------------------------------------------------------------------------
+    |
+    | The taxonomic authority the species catalog reconciles recorded names
+    | against. It is somebody else's service, and the catalog is unusable while
+    | it is unreachable, so the lookups are cached and guarded by a breaker.
+    |
+    | A result is served without asking WFO again for `cache_ttl`, and kept for
+    | `cache_retain` so that a name resolved once still resolves while WFO is
+    | down. Taxonomy moves with WFO's periodic releases, not by the hour, which
+    | is what makes a week of staleness a fair price for a catalog that keeps
+    | working. Lower both to see WFO's corrections sooner.
+    |
+    | The breaker opens after `breaker_threshold` failures within
+    | `breaker_cooldown` seconds, and then fails straight away for the rest of
+    | that window instead of waiting out `timeout` on every request. That wait
+    | is the real cost of an outage: each one holds a PHP-FPM worker, and there
+    | are few of them.
+    |
+    */
+
+    'wfo' => [
+        'endpoint' => env('WFO_ENDPOINT', 'https://list.worldfloraonline.org/gql.php'),
+        'timeout' => (int) env('WFO_TIMEOUT', 15),
+        'cache_ttl' => (int) env('WFO_CACHE_TTL', 7 * 24 * 60 * 60),
+        'cache_retain' => (int) env('WFO_CACHE_RETAIN', 30 * 24 * 60 * 60),
+        'breaker_threshold' => (int) env('WFO_BREAKER_THRESHOLD', 2),
+        'breaker_cooldown' => (int) env('WFO_BREAKER_COOLDOWN', 60),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Source code location
     |--------------------------------------------------------------------------
     |

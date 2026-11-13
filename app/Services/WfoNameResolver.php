@@ -2,10 +2,14 @@
 
 namespace App\Services;
 
+use App\Exceptions\WfoUnavailableException;
+use App\Support\CircuitBreaker;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use RuntimeException;
+use Throwable;
 
 /**
  * Resolves a catalog species (genus, specific epithet, authority) against the
@@ -26,13 +30,13 @@ use RuntimeException;
  * candidate names sharing the genus and an epithet prefix, ranked by similarity
  * to the full recorded name — so a spelling variant surfaces as the closest
  * match instead of silently disappearing among unrelated homonyms.
+ *
+ * Every lookup goes through one cached, breaker-guarded request, so WFO being
+ * unreachable degrades the catalog instead of emptying it: see `query()` and
+ * the `padiush.wfo` configuration.
  */
 class WfoNameResolver
 {
-    private const ENDPOINT = 'https://list.worldfloraonline.org/gql.php';
-
-    private const TIMEOUT = 15;
-
     /** How many candidate names to surface after ranking. */
     private const MAX_CANDIDATES = 6;
 
@@ -382,16 +386,76 @@ class WfoNameResolver
     }
 
     /**
+     * The single place every WFO lookup goes through, and therefore the single
+     * place that decides what happens when WFO does not answer.
+     *
+     * A fresh cached result is returned without asking. Otherwise, if the
+     * breaker is open, a kept result is returned however old it is — stale
+     * taxonomy beats none — and only a name nobody has looked up before fails.
+     * A request that does reach WFO and fails falls back the same way, so the
+     * first researcher to hit an outage is no worse off than the rest.
+     *
      * @param  array<string, string>  $variables
      * @return array<string, mixed>
+     *
+     * @throws WfoUnavailableException WFO is down and nothing cached can answer.
      */
     private function query(array $variables, string $query): array
     {
-        $response = Http::timeout(self::TIMEOUT)
+        $key = $this->cacheKey($query, $variables);
+        $kept = Cache::get($key);
+        $kept = is_array($kept) && array_key_exists('data', $kept) ? $kept : null;
+
+        $age = now()->getTimestamp() - (int) ($kept['at'] ?? 0);
+
+        if ($kept !== null && $age < $this->config('cache_ttl')) {
+            return $kept['data'];
+        }
+
+        $breaker = $this->breaker();
+
+        if ($breaker->isOpen()) {
+            if ($kept !== null) {
+                return $kept['data'];
+            }
+
+            throw new WfoUnavailableException('WFO is unreachable; the circuit breaker is open.');
+        }
+
+        try {
+            $data = $this->fetch($variables, $query);
+        } catch (Throwable $e) {
+            $breaker->recordFailure();
+
+            if ($kept !== null) {
+                return $kept['data'];
+            }
+
+            throw $e;
+        }
+
+        $breaker->recordSuccess();
+
+        Cache::put(
+            $key,
+            ['data' => $data, 'at' => now()->getTimestamp()],
+            $this->config('cache_retain'),
+        );
+
+        return $data;
+    }
+
+    /**
+     * @param  array<string, string>  $variables
+     * @return array<string, mixed>
+     */
+    private function fetch(array $variables, string $query): array
+    {
+        $response = Http::timeout($this->config('timeout'))
             // WFO's server omits its intermediate certificate; see the bundle's header.
             ->withOptions(['verify' => base_path('resources/certs/wfo-ca-chain.pem')])
             ->acceptJson()
-            ->post(self::ENDPOINT, [
+            ->post((string) config('padiush.wfo.endpoint'), [
                 'query' => $query,
                 'variables' => $variables,
             ]);
@@ -401,5 +465,36 @@ class WfoNameResolver
         }
 
         return $response->json('data') ?? [];
+    }
+
+    private function breaker(): CircuitBreaker
+    {
+        return new CircuitBreaker(
+            Cache::store(),
+            'wfo',
+            $this->config('breaker_threshold'),
+            $this->config('breaker_cooldown'),
+        );
+    }
+
+    /**
+     * Keyed by the query document as well as its variables, so changing what
+     * the resolver asks for retires the entries written by the old shape
+     * instead of serving results that are missing its new fields.
+     *
+     * @param  array<string, string>  $variables
+     */
+    private function cacheKey(string $query, array $variables): string
+    {
+        return 'wfo:'.hash('xxh128', implode('|', [
+            (string) config('padiush.wfo.endpoint'),
+            $query,
+            json_encode($variables),
+        ]));
+    }
+
+    private function config(string $key): int
+    {
+        return (int) config("padiush.wfo.{$key}");
     }
 }
