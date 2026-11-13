@@ -2,9 +2,12 @@
 
 namespace Tests\Unit\Services;
 
+use App\Exceptions\WfoUnavailableException;
 use App\Services\WfoNameResolver;
 use Illuminate\Support\Facades\Http;
+use RuntimeException;
 use Tests\TestCase;
+use Throwable;
 
 class WfoNameResolverTest extends TestCase
 {
@@ -261,5 +264,222 @@ class WfoNameResolverTest extends TestCase
         $this->fakeNameById(null);
 
         $this->assertNull((new WfoNameResolver)->fetchName('wfo-does-not-exist'));
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Surviving a WFO outage
+    |--------------------------------------------------------------------------
+    |
+    | WFO is somebody else's service and the catalog is built on it, so these
+    | cover what happens when it stops answering: results are reused, a known
+    | outage is not waited out again, and a name resolved before still resolves.
+    |
+    */
+
+    /**
+     * Whether the stub registered by `fakeSwitchableWfo()` is currently
+     * refusing to answer.
+     */
+    private bool $wfoDown = false;
+
+    /**
+     * Registers one stub whose behaviour follows `$this->wfoDown`, so a test
+     * can take WFO down partway through.
+     *
+     * A second `Http::fake()` call would not do: stubs are merged and matched
+     * in registration order, so the first one keeps answering, and faking
+     * again clears the record of what has been sent.
+     */
+    private function fakeSwitchableWfo(): void
+    {
+        $suggestions = $this->justiciaSuggestions();
+
+        Http::fake([
+            'list.worldfloraonline.org/*' => function () use ($suggestions) {
+                if ($this->wfoDown) {
+                    return Http::response('', 500);
+                }
+
+                return Http::response([
+                    'data' => [
+                        'taxonNameMatch' => ['match' => null, 'error' => false],
+                        'taxonNameSuggestion' => $suggestions,
+                    ],
+                ]);
+            },
+        ]);
+    }
+
+    /** WFO answering with a 500 — the cheap stand-in for "not answering". */
+    private function wfoFails(): void
+    {
+        $this->wfoDown = true;
+        $this->fakeSwitchableWfo();
+    }
+
+    public function test_an_identical_lookup_is_served_from_cache_without_asking_wfo_again()
+    {
+        $this->fakeWfo(null, $this->justiciaSuggestions());
+
+        $first = (new WfoNameResolver)->resolve('Justicia', 'carthagenensis', 'Jacq.');
+        $second = (new WfoNameResolver)->resolve('Justicia', 'carthagenensis', 'Jacq.');
+
+        $this->assertSame($first, $second);
+        Http::assertSentCount(1);
+    }
+
+    public function test_a_different_name_is_not_served_from_another_names_cache()
+    {
+        $this->fakeWfo(null, $this->justiciaSuggestions());
+        $resolver = new WfoNameResolver;
+
+        $resolver->resolve('Justicia', 'carthagenensis', 'Jacq.');
+        $resolver->resolve('Quercus', 'robur', 'L.');
+
+        Http::assertSentCount(2);
+    }
+
+    public function test_a_free_text_search_is_cached_separately_from_a_resolve()
+    {
+        $this->fakeWfo(null, $this->justiciaSuggestions());
+        $resolver = new WfoNameResolver;
+
+        $resolver->resolve('Justicia', 'carthagenensis', 'Jacq.');
+        $resolver->search('Justicia carth');
+
+        // Different query documents, so one must not answer for the other.
+        Http::assertSentCount(2);
+    }
+
+    public function test_a_name_resolved_before_still_resolves_while_wfo_is_down()
+    {
+        config(['padiush.wfo.cache_ttl' => 60, 'padiush.wfo.cache_retain' => 3600]);
+        $this->fakeSwitchableWfo();
+        $fresh = (new WfoNameResolver)->resolve('Justicia', 'carthagenensis', 'Jacq.');
+
+        // Past the point where the result is served without asking, but still
+        // kept — exactly the window an outage has to survive.
+        $this->travel(120)->seconds();
+        $this->wfoDown = true;
+
+        $stale = (new WfoNameResolver)->resolve('Justicia', 'carthagenensis', 'Jacq.');
+
+        $this->assertSame($fresh, $stale);
+        // WFO was asked, since the entry was no longer fresh, and the kept
+        // result answered once the attempt failed.
+        Http::assertSentCount(2);
+    }
+
+    public function test_a_name_never_looked_up_before_fails_while_wfo_is_down()
+    {
+        $this->wfoFails();
+
+        $error = $this->thrownBy(
+            fn () => (new WfoNameResolver)->resolve('Quercus', 'robur', 'L.')
+        );
+
+        $this->assertInstanceOf(RuntimeException::class, $error);
+    }
+
+    public function test_repeated_failures_open_the_breaker_and_stop_calling_wfo()
+    {
+        config(['padiush.wfo.breaker_threshold' => 2, 'padiush.wfo.breaker_cooldown' => 60]);
+        $this->wfoFails();
+        $resolver = new WfoNameResolver;
+
+        // Two distinct names, so neither is answered from the other's cache.
+        $this->thrownBy(fn () => $resolver->resolve('Quercus', 'robur', 'L.'));
+        $this->thrownBy(fn () => $resolver->resolve('Pinus', 'sylvestris', 'L.'));
+
+        Http::assertSentCount(2);
+
+        // The third caller must not wait out a timeout to learn what the first
+        // two already established.
+        $error = $this->thrownBy(fn () => $resolver->resolve('Fagus', 'sylvatica', 'L.'));
+
+        $this->assertInstanceOf(WfoUnavailableException::class, $error);
+        Http::assertSentCount(2);
+    }
+
+    public function test_the_breaker_still_serves_a_kept_result_once_open()
+    {
+        config([
+            'padiush.wfo.cache_ttl' => 60,
+            'padiush.wfo.cache_retain' => 3600,
+            'padiush.wfo.breaker_threshold' => 1,
+            'padiush.wfo.breaker_cooldown' => 600,
+        ]);
+        $this->fakeSwitchableWfo();
+        $resolver = new WfoNameResolver;
+        $fresh = $resolver->resolve('Justicia', 'carthagenensis', 'Jacq.');
+
+        $this->travel(120)->seconds();
+        $this->wfoDown = true;
+
+        // Trips the breaker on a name nothing has cached.
+        $this->thrownBy(fn () => $resolver->resolve('Quercus', 'robur', 'L.'));
+
+        // An open breaker must not take the rest of the catalog down with it.
+        $this->assertSame($fresh, $resolver->resolve('Justicia', 'carthagenensis', 'Jacq.'));
+        // The first success and the one that tripped the breaker, and nothing
+        // since: the reply above never left the cache.
+        Http::assertSentCount(2);
+    }
+
+    public function test_wfo_is_asked_again_once_the_cooldown_passes()
+    {
+        config(['padiush.wfo.breaker_threshold' => 1, 'padiush.wfo.breaker_cooldown' => 60]);
+        $this->wfoFails();
+        $resolver = new WfoNameResolver;
+        $this->thrownBy(fn () => $resolver->resolve('Quercus', 'robur', 'L.'));
+
+        $this->travel(61)->seconds();
+        $this->wfoDown = false;
+
+        // Recovered, and the breaker has to let the catalog notice.
+        $result = $resolver->resolve('Justicia', 'carthagenensis', 'Jacq.');
+
+        $this->assertNotEmpty($result['candidates']);
+    }
+
+    public function test_a_successful_answer_closes_the_breaker()
+    {
+        config(['padiush.wfo.breaker_threshold' => 2, 'padiush.wfo.breaker_cooldown' => 600]);
+        $this->wfoFails();
+        $resolver = new WfoNameResolver;
+
+        $this->thrownBy(fn () => $resolver->resolve('Quercus', 'robur', 'L.'));
+
+        $this->wfoDown = false;
+        $resolver->resolve('Justicia', 'carthagenensis', 'Jacq.');
+
+        $this->wfoDown = true;
+        $error = $this->thrownBy(fn () => $resolver->resolve('Pinus', 'sylvestris', 'L.'));
+
+        // The run of failures was broken, so this one starts a new count
+        // rather than completing the old one: the request is really made, and
+        // it is the upstream failure that surfaces, not an open breaker.
+        $this->assertInstanceOf(RuntimeException::class, $error);
+        $this->assertNotInstanceOf(WfoUnavailableException::class, $error);
+        Http::assertSentCount(3);
+    }
+
+    /**
+     * Returns whatever $call threw, or null.
+     *
+     * Asserting on the result afterwards, rather than calling `fail()` inside
+     * a catch block, keeps PHPUnit's own failure from being swallowed: its
+     * AssertionFailedError is itself a RuntimeException.
+     */
+    private function thrownBy(callable $call): ?Throwable
+    {
+        try {
+            $call();
+        } catch (Throwable $e) {
+            return $e;
+        }
+
+        return null;
     }
 }

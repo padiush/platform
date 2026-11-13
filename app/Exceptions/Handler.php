@@ -26,7 +26,11 @@ class Handler extends ExceptionHandler
      * @var array<int, class-string<Throwable>>
      */
     protected $dontReport = [
-        //
+        // The breaker refusing to call World Flora Online is not a new fault.
+        // The request that actually failed was reported when it failed; every
+        // request arriving during the cooldown would otherwise log the same
+        // outage again, burying the one entry that says when it started.
+        WfoUnavailableException::class,
     ];
 
     /**
