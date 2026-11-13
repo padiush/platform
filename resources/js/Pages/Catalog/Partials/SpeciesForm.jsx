@@ -60,7 +60,13 @@ export default function SpeciesForm({ project, onClose }) {
                         active && setResults(response.data.results ?? []),
                 )
                 .catch(
-                    () => active && setSearchError(t('catalogs.source.error')),
+                    (err) =>
+                        active &&
+                        setSearchError(
+                            err.response?.data?.error === 'wfo_unreachable'
+                                ? t('catalogs.source.unavailable')
+                                : t('catalogs.source.error'),
+                        ),
                 )
                 .finally(() => active && setSearching(false));
         }, 350);
