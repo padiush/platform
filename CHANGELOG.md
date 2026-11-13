@@ -11,6 +11,20 @@ language (`public/locales/whatsnew/`). How a release is cut is in
 
 ## [Unreleased]
 
+### Changed
+
+- The species catalog survives World Flora Online being unreachable. A name
+  looked up before still resolves, because results are served without asking
+  again for a week and kept for a month. Once WFO is known to be down, lookups
+  fail at once instead of waiting out the timeout — which is what held a
+  PHP-FPM worker for fifteen seconds a time and, with few workers, slowed the
+  rest of the site. The windows, the timeout and the breaker are configurable;
+  see the `wfo` block in `config/padiush.php`.
+- A species page and the catalog's registration search say that WFO is not
+  responding, rather than a generic error that reads as a fault in the record
+  being viewed. The registration search adds that the species can still be
+  entered by hand, since only the lookup is unavailable.
+
 ## [1.4.0] — 2026-11-11
 
 ### Added
